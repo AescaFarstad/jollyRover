@@ -15,7 +15,7 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(NetworkPacket* pack
 	ReadOnlySerializationStream rstream(packet->payload, packet->payloadSize);
 	std::unique_ptr<NetworkMessage> p = pointerByType(type);
 	p->deserialize(rstream);
-	return std::move(p);
+	return p;
 }
 
 

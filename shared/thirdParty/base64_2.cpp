@@ -31,7 +31,6 @@
 
 //The code is modified.
 
-#pragma warning (disable : 4267)
 
 #include <base64_2.h>
 #include <iostream>

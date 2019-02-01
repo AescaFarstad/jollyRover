@@ -1,12 +1,19 @@
 
-#include <SDL.h>
 #include <Game.h>
 #include <SystemInfo.h>
 
+//#define WINDOWS 1
+#define LINUX 1
+
 #ifdef __EMSCRIPTEN__
-#include <emscripten.h>
+	#include <emscripten.h>
+	#include <SDL.h>
+#elif LINUX
+	#include <pty.h>
+	#include <SDL2/SDL.h>
 #else
-#include <windows.h>
+	#include <windows.h>
+	#include <SDL2/SDL.h>
 #endif
 
 
@@ -56,10 +63,17 @@ void mainLoop(void* arg)
 int main(int argc, char* args[])
 {
 #ifndef __EMSCRIPTEN__
-	AllocConsole();
-	freopen("CONIN$", "r", stdin);
-	freopen("CONOUT$", "w", stdout);
-	freopen("CONOUT$", "w", stderr);
+	#ifdef WINDOWS
+		AllocConsole();
+		freopen("CONIN$", "r", stdin);
+		freopen("CONOUT$", "w", stdout);
+		freopen("CONOUT$", "w", stderr);
+	#elif LINUX
+		int amaster;
+		int slave;
+		termios params;
+		openpty(&amaster, &slave, NULL, &params, NULL);
+	#endif
 #endif
 	printf("Start\n");
 	printf("endiness: %s\n", (SystemInfo::instance->isBigEndian ? "big" : "little"));

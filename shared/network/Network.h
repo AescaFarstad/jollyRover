@@ -2,7 +2,6 @@
 #include <NetworkPacket.h>
 #include <TimeSync.h>
 #include <NetworkMessageFactory.h>
-#include <SDL_net.h>
 #include <PacketReader.h>
 #include <memory>
 #include <string>
@@ -12,7 +11,10 @@
 #include <AnonymousBinding.h>
 
 #ifdef __EMSCRIPTEN__
-#include <SimplePacket.h>
+	#include <SimplePacket.h>
+	#include <SDL_net.h>
+#else
+	#include <SDL2/SDL_net.h>
 #endif
 
 using MessageHandler = std::function<void(std::unique_ptr<NetworkMessage>)>;

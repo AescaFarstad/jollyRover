@@ -68,7 +68,7 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 		}
 
 		auto finishedCars = std::remove_if(player.activeCars.begin(), player.activeCars.end(), [](CarRide &ride) {
-			bool isf = ride.isFinished || ride.car.health <= 0;
+			//bool isf = ride.isFinished || ride.car.health <= 0;
 			//printf("has finish %d, %d\n", isf, ride.ui);
 			return ride.isFinished || ride.car.health <= 0; 
 		});
@@ -95,13 +95,13 @@ bool GameLogic::testRouteIsValid(std::vector<Point> &route)
 
 	for (size_t i = 1; i < route.size(); i++)
 	{
-		if (std::fabsf(route[i - 1].distanceTo(route[i]) - prototypes->variables.routeStepSize) > FMath::EPSILON)
+		if (fabsf(route[i - 1].distanceTo(route[i]) - prototypes->variables.routeStepSize) > FMath::EPSILON)
 		{
 			if (i != route.size() - 1 || route[i - 1].distanceTo(route[i]) > prototypes->variables.routeStepSize + FMath::EPSILON)
 			{
-				float ds = route[i - 1].distanceTo(route[i]);
-				float max = prototypes->variables.routeStepSize + FMath::EPSILON;
-				float abs = std::fabsf(route[i - 1].distanceTo(route[i]) - prototypes->variables.routeStepSize);
+				//float ds = route[i - 1].distanceTo(route[i]);
+				//float max = prototypes->variables.routeStepSize + FMath::EPSILON;
+				//float abs = std::fabsf(route[i - 1].distanceTo(route[i]) - prototypes->variables.routeStepSize);
 				return false;
 			}
 		}

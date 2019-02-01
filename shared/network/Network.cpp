@@ -143,7 +143,7 @@ std::unique_ptr<NetworkMessage> Network::poll()
 	int32_t ticks = SDL_GetTicks();
 	if (resultMessage->inResponseTo > 0 &&
 		requestTimeByInitiatorId[resultMessage->inResponseTo] &&
-		resultMessage->stamp != -1)
+		resultMessage->stamp != -1) //resultMessage->stamp is unsigned! 0_o
 	{
 		int32_t uncertaintyBefore = timeSync.getUncertainty();
 		timeSync.addMeasurement(requestTimeByInitiatorId[resultMessage->inResponseTo], resultMessage->stamp, ticks);

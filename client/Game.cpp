@@ -170,9 +170,12 @@ void Game::handleEvent(SDL_Event* event)
 			break;
 	}
 }
+
+
+
 void Game::loadPrototypes()
 {
-	std::ifstream file("prototypes.json");
+	std::ifstream file("./out/prototypes.json");	
 	json j = json::parse(file);
 	file.close();
 	prototypes.load(j);

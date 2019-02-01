@@ -20,7 +20,7 @@ class SerializationStream
 public:
 	SerializationStream(StreamGrower* grower);
 	SerializationStream();
-	~SerializationStream();
+	virtual ~SerializationStream();
 
 	const char* read(size_t length);
 	char* readAll();
@@ -69,7 +69,7 @@ class StreamGrower
 {
 public:
 	StreamGrower();
-	~StreamGrower();
+	virtual ~StreamGrower();
 
 	virtual void grow(SerializationStream* stream, size_t minimum);
 	size_t getBlockCount(SerializationStream* stream);

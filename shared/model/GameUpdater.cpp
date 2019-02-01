@@ -21,10 +21,6 @@ void GameUpdater::update(uint32_t time)
 	while (state->timeStamp < time - GAME_CONFIG::logicStepSize)
 	{
 		std::vector<InputMessage*>* inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + GAME_CONFIG::logicStepSize);
-		if (inputs->size())
-		{
-			int a = 5;
-		}
 		logic.update(state.get(), GAME_CONFIG::logicStepSize, *inputs, prototypes);
 		lastValidTimeStamp = state->timeStamp;
 		if (state->stepsPerformed % GAME_CONFIG::saveStateInterval == 0)
@@ -63,7 +59,7 @@ std::unique_ptr<GameState> GameUpdater::getNewStateByStamp(uint32_t stamp)
 		delete inputs;
 	}
 
-	return std::move(result);
+	return result;
 }
 
 uint32_t GameUpdater::getExecutionStamp(InputMessage* input)

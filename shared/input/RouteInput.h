@@ -1,5 +1,4 @@
 #pragma once
-#include <SDL.h>
 #include <GameState.h>
 #include <InputMessage.h>
 #include <Point.h>
@@ -9,6 +8,12 @@
 #include <Prototypes.h>
 #include <vector>
 #include <functional>
+
+#ifdef __EMSCRIPTEN__
+	#include <SDL.h>
+#else 
+	#include <SDL2/SDL.h>
+#endif
 
 class RoutePoint;
 class RouteInput

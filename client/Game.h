@@ -1,12 +1,9 @@
 #pragma once
 
-//#define WINDOWS 1
-#define LINUX 1
-
 #ifdef __EMSCRIPTEN__
-#include <SDL.h>
+	#include <SDL.h>
 #else 
-#include <SDL2/SDL.h>
+	#include <SDL2/SDL.h>
 #endif
 
 #include <Network.h>

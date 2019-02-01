@@ -28,13 +28,46 @@
             }
         },
         {
-            "label": "emsc",
+            "label": "emsc clean",
             "type": "shell",
-            "command": "make",
+            "command": "make clean",
             "args": [],
             "problemMatcher": [],
             "presentation": {
-                "reveal": "always"
+                "reveal": "never"
+            }
+        },
+        {
+            "label": "em wc",
+            "type": "shell",
+            "command": "make web",
+            "args": [],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+				"panel": "new"
+            }
+        },
+        {
+            "label": "em lc",
+            "type": "shell",
+            "command": "make local",
+            "args": [],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+				"panel": "new"
+            }
+        },
+        {
+            "label": "em s",
+            "type": "shell",
+            "command": "make server",
+            "args": [],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+				"panel": "new"
             }
         }
     ]

@@ -29,7 +29,8 @@ bool Obstacle::isInside(Point &p)
 	bool oddNodes = false;
 	for (Edge &edge : edges)
 	{
-		if ((edge.p1->y < p.y && edge.p2->y >= p.y || edge.p2->y < p.y && edge.p1->y >= p.y) &&
+		if (
+			((edge.p1->y < p.y && edge.p2->y >= p.y) || (edge.p2->y < p.y && edge.p1->y >= p.y)) &&
 			(edge.p1->x <= p.x || edge.p2->x <= p.x))
 		{
 			if (edge.p1->x + (p.y - edge.p1->y) / (edge.p2->y - edge.p1->y) * (edge.p2->x - edge.p1->x) < p.x)

@@ -134,7 +134,7 @@ bool RouteInput::isAnglePositive(Point &target)
 	Point finishingVector = (target).subtract(*iter);
 
 	float angleDelta = FMath::angleDelta(ongoingVector.asAngle(), finishingVector.asAngle());
-	return std::fabsf(angleDelta) < prototypes->variables.stepAngleWindow / 2;
+	return fabsf(angleDelta) < prototypes->variables.stepAngleWindow / 2;
 }
 
 

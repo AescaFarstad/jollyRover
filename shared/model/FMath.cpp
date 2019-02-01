@@ -79,7 +79,7 @@ float FMath::angleDelta(float from, float to)
 
 float FMath::normalizeAngle(float angle)
 {
-	angle = std::fmodf(angle, (float)M_PI * 2);
+	angle = fmodf(angle, (float)M_PI * 2);
 	angle = angle < 0 ? (float)M_PI * 2 + angle : angle;
 	return angle;
 }

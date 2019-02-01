@@ -1,8 +1,15 @@
 #pragma once
 #include <memory>
-#include <SDL_net.h>
+
 #include <functional>
 #include <NetworkPacket.h>
+
+
+#ifdef __EMSCRIPTEN__
+	#include <SDL_net.h>
+#else
+	#include <SDL2/SDL_net.h>
+#endif
 
 class PacketReader
 {

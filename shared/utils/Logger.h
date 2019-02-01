@@ -2,10 +2,15 @@
 #include <vector>
 #include <cstdarg>
 #include <algorithm>
-#include <SDL.h>
 #include <iostream>
 #include <string>
 #include <iomanip>
+
+#ifdef __EMSCRIPTEN__
+	#include <SDL.h>
+#else 
+	#include <SDL2/SDL.h>
+#endif
 
 enum LOG_TAGS : int
 {

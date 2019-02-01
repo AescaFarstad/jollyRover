@@ -9,20 +9,24 @@
       "name": "Hello world",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/debugBuild",
+      "program": "${workspaceFolder}/out/local",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
-      "preLaunchTask": "build through make",
+      "preLaunchTask": "em lc",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb and add better child debugging",
           "text": "-enable-pretty-printing -gdb-set detach-on-fork off",
           "ignoreFailures": true
-        }
+        },
+		{
+			"description": "Skip /build/glibc-bfm8X4/glibc-2.23/ files",
+			"text": "-interpreter-exec console \"skip -gfi /build/glibc-OTsEL5/glibc-2.27/**/*\""
+		}
       ]
     }
   ]

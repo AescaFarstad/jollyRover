@@ -2,6 +2,7 @@
 
 Callback::Callback()
 {
+	pendingCallback = nullptr;
 	isValid = false;
 }
 
@@ -9,6 +10,7 @@ Callback::Callback(std::function<void()> function)
 {
 	this->function = function;
 	isValid = true;
+	pendingCallback = nullptr;
 }
 
 Callback::~Callback()

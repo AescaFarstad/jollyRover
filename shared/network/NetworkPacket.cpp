@@ -39,12 +39,12 @@ void NetworkPacket::loadFromRawData(const char* rawData, int bytesAvailable)
 	{
 		int16_t sugar;
 		Serializer::read(sugar, tempBuffer);
-		if (sugar != SUGAR)
+		if (sugar != 1934)
 		{
 			std::string errorMessage = "Sugar mismatch. expected ";
-			errorMessage += std::to_string((int)(SUGAR & 0xff));
+			errorMessage += std::to_string((int)(1934 & 0xff));
 			errorMessage += " ";
-			errorMessage += std::to_string((int)((SUGAR >> 8) & 0xff));
+			errorMessage += std::to_string((int)((1934 >> 8) & 0xff));
 
 			errorMessage += " received ";
 
@@ -95,7 +95,7 @@ void NetworkPacket::setPayloadFromRawData(const char* newRawData, size_t size)
 	payload = rawData + sizeof(uint16_t) * 2;
 	memcpy(payload, newRawData, size);
 
-	Serializer::write(SUGAR, rawData);
+	Serializer::write(1934, rawData);
 	Serializer::write((uint16_t)size, rawData + 2);
 
 	bytesLoaded = rawSize;
