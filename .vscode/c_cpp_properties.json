@@ -1,0 +1,50 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/",
+                "/usr/include/SDL2/",
+                "${workspaceFolder}/client/",
+                "${workspaceFolder}/client/view/",
+                "${workspaceFolder}/shared/",
+                "${workspaceFolder}/shared/input/",
+                "${workspaceFolder}/shared/model/",
+                "${workspaceFolder}/shared/model/entity/",
+                "${workspaceFolder}/shared/model/prototypes/",
+                "${workspaceFolder}/shared/network/",
+                "${workspaceFolder}/shared/network/bindings/",
+                "${workspaceFolder}/shared/network/messages/",
+                "${workspaceFolder}/shared/thirdParty/",
+                "${workspaceFolder}/shared/utils/"
+            ],
+			"browse": {
+				"path": [
+                "${workspaceFolder}/",
+                "/usr/include/SDL2/",
+                "${workspaceFolder}/client/",
+                "${workspaceFolder}/client/view/",
+                "${workspaceFolder}/shared/",
+                "${workspaceFolder}/shared/input/",
+                "${workspaceFolder}/shared/model/",
+                "${workspaceFolder}/shared/model/entity/",
+                "${workspaceFolder}/shared/model/prototypes/",
+                "${workspaceFolder}/shared/network/",
+                "${workspaceFolder}/shared/network/bindings/",
+                "${workspaceFolder}/shared/network/messages/",
+                "${workspaceFolder}/shared/thirdParty/",
+                "${workspaceFolder}/shared/utils/"
+				]
+				
+			},
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "intelliSenseMode": "clang-x64",
+            "configurationProvider": "vector-of-bool.cmake-tools"
+        }
+    ],
+    "version": 4
+}
