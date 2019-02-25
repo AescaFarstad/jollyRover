@@ -2,7 +2,7 @@
 #include <memory>
 #include <vector>
 #include <functional>
-#include <SDL_net.h>
+#include <SDL2/SDL_net.h>
 #include <Global.h>
 #include <ServerConstants.h>
 #include <NetworkMessage.h>

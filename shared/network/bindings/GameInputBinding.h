@@ -7,7 +7,7 @@ class GameInputBinding :
 	public ResponseBinding
 {
 public:
-	GameInputBinding(GameUpdater* gameUpdater);
+	GameInputBinding(GameUpdater* gameUpdater, std::string name);
 	~GameInputBinding();
 
 	void handle(std::unique_ptr<NetworkMessage> message) override;

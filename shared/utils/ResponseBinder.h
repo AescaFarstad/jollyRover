@@ -13,7 +13,8 @@ struct BindingStruct
 	BindingStruct(BindingStruct&& that) = default;
 	BindingStruct& operator=(BindingStruct&& that) = default;
 	
-	ResponseBinding* binding;
+	int32_t id;
+	std::unique_ptr<ResponseBinding> binding;
 	std::unique_ptr<PendingCallback> pendingCallback;
 };
 
@@ -23,13 +24,14 @@ public:
 	ResponseBinder();
 	~ResponseBinder();
 
-	void bind(ResponseBinding* binding);
-	void unbind(ResponseBinding* binding);
+	int32_t bind(std::unique_ptr<ResponseBinding> binding);
+	void unbind(int32_t bindingId);
 
 	bool process(std::unique_ptr<NetworkMessage> msg);
 private:
 	std::vector<BindingStruct> bindings;
 	virtual bool match(ResponseBinding* binding, NetworkMessage* msg);
+	void traceBindings(std::string reason="noreason");
 };
 
 class GenericRequestBinder : public ResponseBinder

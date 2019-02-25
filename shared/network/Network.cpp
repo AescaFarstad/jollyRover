@@ -16,21 +16,20 @@ Network::Network()
 
 	//----------------------------------
 
-	handleGenericRequest = [this](std::unique_ptr<NetworkMessage> message) {
+	auto handleGenericRequest = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message) {
 		if (!genericRequestBinder.process(std::move(message)))
 		{
 			GenericRequestMessage* t = dynamic_cast<GenericRequestMessage*>(message.get());
 			S::log.add("GenericRequestMessage is not handled: " + t->getName() + " " + std::to_string(t->request), { LOG_TAGS::NET });
 		}
-	};
-
-	binder.bind(
-		genericRequestBinding.
-
-		bindByType(MessageTypes::TYPE_REQUEST_MSG)->
-		setCallOnce(false)->
-		setHandler(&handleGenericRequest)
-	);
+	});
+	
+	std::unique_ptr<AnonymousBinding> binding = std::make_unique<AnonymousBinding>("Network generic binding");
+	binding->
+	bindByType(MessageTypes::TYPE_REQUEST_MSG)->
+	setCallOnce(false)->
+	setHandler(std::move(handleGenericRequest));
+	binder.bind(std::move(binding));
 
 	//----------------------------------
 }

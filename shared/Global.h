@@ -16,7 +16,7 @@ namespace GAME_CONFIG
 	const bool IS_WEB = false;
 #endif
 
-	const char host[13] = "192.168.1.44";
+	const char host[13] = "192.168.1.52";
 	const int maxMessageSize = 30000;
 	const int32_t simpleClientCode = 0xfcaceb;
 	const int32_t logicStepSize = 10;

@@ -96,7 +96,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 	}
 }
 
-
+#include <DEBUG.h>
 void loadPrototypes()
 {
 	//system("dir /b > test.txt");
@@ -119,7 +119,6 @@ void loadPrototypes()
 	file.read(buffer, length);       // read the whole file into the buffer
 	file.close();
 	printf("file:\n%s", buffer);*/
-
 	std::ifstream file("prototypes.json");
 	json j = json::parse(file);
 	file.close();
@@ -175,8 +174,8 @@ void initLog()
 	});
 
 	S::log.enableTags({
-		//LOG_TAGS::UNIQUE,
-		//LOG_TAGS::NET,
+		LOG_TAGS::UNIQUE,
+		LOG_TAGS::NET,
 		//LOG_TAGS::GAME,
 		LOG_TAGS::ERROR_,
 

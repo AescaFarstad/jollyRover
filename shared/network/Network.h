@@ -30,8 +30,7 @@ public:
 	TimeSync timeSync;
 	ResponseBinder binder;
 	GenericRequestBinder genericRequestBinder;
-	AnonymousBinding genericRequestBinding;
-
+	
 	virtual void connect();
 	virtual void update();
 	virtual void send(NetworkPacket* packet);
@@ -53,7 +52,6 @@ private:
 	std::unordered_map<int16_t, GenericRequestHandler> interceptorsGeneric_once;
 	virtual std::unique_ptr<NetworkMessage> poll();
 
-	std::function<void(std::unique_ptr<NetworkMessage>)> handleGenericRequest;
 
 
 };

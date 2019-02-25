@@ -2,13 +2,24 @@
 
 
 
-AnonymousBinding::AnonymousBinding()
+AnonymousBinding::AnonymousBinding(std::string name) : ResponseBinding(name)
 {
+	moved="not moved";
 }
 
 
 AnonymousBinding::~AnonymousBinding()
 {
+	std::cout << "destroy AnonymousBinding " + name << "\n";
+}
+
+
+AnonymousBinding::AnonymousBinding(AnonymousBinding&& that) : ResponseBinding::ResponseBinding(std::move(that))
+{
+	handler = std::move(that.handler);
+	moved = "moved";
+	that.moved = "moved from";
+	std::cout << "move AnonymousBinding " << "\n";
 }
 
 
@@ -39,13 +50,13 @@ AnonymousBinding* AnonymousBinding::setCallOnce(bool callOnce)
 	return this;
 }
 
-AnonymousBinding* AnonymousBinding::setHandler(std::function<void(std::unique_ptr<NetworkMessage>)>* handler)
+AnonymousBinding* AnonymousBinding::setHandler(std::unique_ptr<std::function<void(std::unique_ptr<NetworkMessage>)>> handler)
 {
-	this->handler = handler;
+	this->handler = std::move(handler);
 	return this;
 }
 
 void AnonymousBinding::handle(std::unique_ptr<NetworkMessage> message)
 {
-	(*handler)(std::move(message));
+	handler->operator()(std::move(message));
 }

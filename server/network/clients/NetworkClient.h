@@ -1,6 +1,6 @@
 #pragma once
 #include <memory>
-#include <SDL_net.h>
+#include <SDL2/SDL_net.h>
 #include <NetworkPacket.h>
 #include <NetworkMessage.h>
 #include <PacketReader.h>
@@ -17,7 +17,7 @@ class NetworkClient
 {
 public:
 	NetworkClient(std::function< int() > globalSocketNudgeFunction);
-	~NetworkClient();
+	virtual ~NetworkClient();
 
 	TCPsocket socket;
 	bool wasConnected;

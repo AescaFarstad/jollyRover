@@ -9,10 +9,12 @@
 class ResponseBinding
 {
 public:
-	ResponseBinding();
+	ResponseBinding(std::string name);
 	~ResponseBinding();
 	ResponseBinding(const ResponseBinding& that) = delete;
 	ResponseBinding(ResponseBinding&& that) = default;
+	
+	std::string name;
 
 	int16_t typeId;
 	bool bindsType;
@@ -26,7 +28,11 @@ public:
 	bool callOnce;
 
 	DeathNotice deathNotice;
+	
+	std::string moved;
 
-	virtual void handle(std::unique_ptr<NetworkMessage> message) = 0;
+	virtual void handle(std::unique_ptr<NetworkMessage> message) = 0;	
+	
+	std::string toString();
 };
 

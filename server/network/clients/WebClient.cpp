@@ -76,8 +76,8 @@ std::unique_ptr<NetworkPacket> WebClient::poll()
 
 			//printf(response.c_str());
 			//printf("\n");
-			char* unconst = const_cast<char*>(response.c_str());
-			unsigned char* tt = reinterpret_cast<unsigned char*>(unconst);
+			//char* unconst = const_cast<char*>(response.c_str());
+			//unsigned char* tt = reinterpret_cast<unsigned char*>(unconst);
 			//printf(base64_encode(tt, response.size()).c_str());
 			//printf("\n");
 

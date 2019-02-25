@@ -27,6 +27,7 @@
 #include <AnonymousBinding.h>
 #include <json.hpp>
 #include <fstream>
+#include <memory>
 
 class Game
 {
@@ -54,11 +55,8 @@ private:
 	void handleKeyUp(KEYBOARD_ACTIONS code);
 	void handleGenericRequest(GenericRequestMessage* request);
 	void addNetworkBindings();
-	std::vector<AnonymousBinding> bindings;
+	void handleGameInput(std::unique_ptr<NetworkMessage>);
 
 
-
-	std::function<void(std::unique_ptr<NetworkMessage>)> handleGameInput;
-	std::function<void(std::unique_ptr<NetworkMessage>)> handleGameState;
 
 };

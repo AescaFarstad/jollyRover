@@ -6,17 +6,37 @@
   "configurations": [
 
     {
-      "name": "Hello world",
+      "name": "Client",
       "type": "cppdbg",
       "request": "launch",
       "program": "${workspaceFolder}/out/local",
       "args": [],
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/out",
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
       "preLaunchTask": "em lc",
+      "setupCommands": [
+        
+		{
+			"description": "Skip /build/glibc-bfm8X4/glibc-2.23/ files",
+			"text": "-interpreter-exec console \"skip -gfi /build/glibc-OTsEL5/glibc-2.27/**/*\""
+		}
+      ]
+    },
+	{
+      "name": "Server",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/out/server",
+      "args": [],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/out",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "preLaunchTask": "em s",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb and add better child debugging",

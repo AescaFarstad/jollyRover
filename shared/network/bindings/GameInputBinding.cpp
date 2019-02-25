@@ -1,9 +1,9 @@
 #include <GameInputBinding.h>
 
 
-GameInputBinding::GameInputBinding(GameUpdater* gameUpdater)
+GameInputBinding::GameInputBinding(GameUpdater* gameUpdater, std::string name) : ResponseBinding(name)
 {
-	this->gameUpdater = gameUpdater;
+	this->gameUpdater = gameUpdater;	
 }
 
 

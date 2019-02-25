@@ -118,7 +118,7 @@ void RouteInput::buildPath(Point &target)
 		newPoint.y = last.y + step.y;
 
 		newPoint.isValid = GameLogic::testEdgeIsValid(last, newPoint, prototypes->obstacles);
-
+		std::cout << "+point:" + newPoint.toString() + " " + (newPoint.isValid ? "true" : "false") << "\n";
 		//S::log.add("+point:" + newPoint.toString() + " " + (newPoint.isValid ? "true" : "false"), { LOG_TAGS::INPUT_ });
 
 		last = newPoint;
@@ -150,7 +150,7 @@ RoutePoint::RoutePoint()
 {
 }
 
-RoutePoint::RoutePoint(float x, float y) : Point(x, y){}
+RoutePoint::RoutePoint(float x, float y) : Point(x, y) { isValid = true; }
 
 RoutePoint::~RoutePoint()
 {

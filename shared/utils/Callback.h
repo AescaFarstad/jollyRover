@@ -16,6 +16,7 @@ public:
 
 	void execute();
 	std::unique_ptr<PendingCallback> createPendingCallback();
+	int32_t id;
 
 protected:
 	PendingCallback* pendingCallback;
@@ -29,6 +30,7 @@ class PendingCallback
 public:
 	PendingCallback();
 	~PendingCallback();
+	PendingCallback(PendingCallback&& that);
 	void disconnect();
 	void cancel();
 
@@ -43,7 +45,7 @@ public:
 	DeathNotice();
 	~DeathNotice();
 	DeathNotice(const DeathNotice& that) = delete;
-	DeathNotice(DeathNotice&& that) = default;
+	DeathNotice(DeathNotice&& that);
 	std::unique_ptr<PendingCallback> subscribe(std::function<void()> function);
 
 private:

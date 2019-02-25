@@ -10,7 +10,6 @@
 
 namespace Serializer {
 
-
 	void write(const int32_t& value, std::ostream& stream);
 	void write(const uint32_t& value, std::ostream& stream);
 	void write(const int16_t& value, std::ostream& stream);

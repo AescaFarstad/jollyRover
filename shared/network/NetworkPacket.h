@@ -33,7 +33,7 @@ public:
 
 
 private:
-	//static const int16_t SUGAR = 1934;
+	static const int16_t SUGAR = 1934;
 	static const int16_t bufferSize = sizeof(uint16_t) * 2;
 	char tempBuffer[bufferSize];
 

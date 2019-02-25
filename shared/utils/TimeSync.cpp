@@ -6,7 +6,7 @@ TimeSync::TimeSync()
 {
 	measurementCount = 0;
 	minDelta = INT32_MAX;
-	maxDelta = -INT32_MIN;
+	maxDelta = INT32_MIN;
 }
 
 

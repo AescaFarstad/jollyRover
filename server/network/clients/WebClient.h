@@ -2,7 +2,7 @@
 #include <NetworkClient.h>
 #include <WebNetworkPacket.h>
 #include <Global.h>
-#include <SDL_net.h>
+#include <SDL2/SDL_net.h>
 #include <Serializer.h>
 #include <functional>
 #include <libwshandshake.hpp>
@@ -19,7 +19,7 @@ public:
 	WebClient(
 		std::function<void(NetworkClient* client)> onHttpHandshakeDone,
 		std::function< int() > globalSocketNudgeFunction);
-	~WebClient();
+	virtual ~WebClient();
 
 	bool isHandshakeDone;
 

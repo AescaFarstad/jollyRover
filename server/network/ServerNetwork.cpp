@@ -48,7 +48,7 @@ void ServerNetwork::init()
 	SDLNet_ResolveHost(&ip, NULL, GAME_CONFIG::port);
 	serverSocketRaw = SDLNet_TCP_Open(&ip);
 
-	SDLNet_ResolveHost(&ip, NULL, 80);
+	SDLNet_ResolveHost(&ip, NULL, 12880);
 	serverSocketWeb = SDLNet_TCP_Open(&ip);
 
 	std::vector<TCPsocket> clients;
@@ -223,7 +223,6 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 		}
 		case MessageTypes::TYPE_GREETING_MSG:
 		{
-			auto msg2 = msg.get();
 			GreetingMessage* gMsg = dynamic_cast<GreetingMessage*>(msg.get());
 			//TODO check login, password
 			generateNewLogin(gMsg->login);

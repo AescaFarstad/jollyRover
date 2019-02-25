@@ -1,3 +1,2 @@
-virtual destructors
 logging via macros
 refactor network into server-like clients

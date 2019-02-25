@@ -1,7 +1,7 @@
 #pragma once
 #include <NetworkClient.h>
 #include <Global.h>
-#include <SDL_net.h>
+#include <SDL2/SDL_net.h>
 #include <Serializer.h>
 #include <functional>
 
@@ -12,7 +12,7 @@ public:
 	UndeterminedClient(
 		std::function<void(UndeterminedClient* client)> onClientDetermined,
 		std::function< int() > globalSocketNudgeFunction);
-	~UndeterminedClient();
+	virtual ~UndeterminedClient();
 
 	bool isSimpleClient;
 

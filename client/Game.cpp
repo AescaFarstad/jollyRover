@@ -19,23 +19,24 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 	std::unique_ptr<ConsequtiveTask> loadGameTask = std::make_unique<ConsequtiveTask>();
 
 	loadGameTask->pushAsync([this](std::unique_ptr<Callback> callback) {
-		AnonymousBinding* binding = new AnonymousBinding();
+		std::unique_ptr<AnonymousBinding> binding = std::make_unique<AnonymousBinding>("wait for greetings prompt from the server and send it");
 
-		std::function<void(std::unique_ptr<NetworkMessage>)> handleRequest = [this, cb = callback.release()](std::unique_ptr<NetworkMessage> message) {
+		auto handleRequest = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this, cb = callback.release()](std::unique_ptr<NetworkMessage> message) {
 
 			GreetingMessage gMsg;
 			network->send(&gMsg);
 
 			cb->execute();
 			delete cb;
-		};
+		});
 		
-		network->genericRequestBinder.bind(
-			binding->
-			bindByType(RequestTypes::REQUEST_GREETING)->
-			setCallOnce(true)->
-			setHandler(&handleRequest)
-		);
+		binding->
+		bindByType(RequestTypes::REQUEST_GREETING)->
+		setCallOnce(true)->
+		setHandler(std::move(handleRequest));
+		
+		network->genericRequestBinder.bind(std::move(binding));
+		//binding->handle(std::make_unique<NetworkMessage>());
 	}, "wait for greetings prompt from the server and send it");
 
 	loadGameTask->pushAsync([this](std::unique_ptr<Callback> callback) {
@@ -175,7 +176,7 @@ void Game::handleEvent(SDL_Event* event)
 
 void Game::loadPrototypes()
 {
-	std::ifstream file("./out/prototypes.json");	
+	std::ifstream file("prototypes.json");	
 	json j = json::parse(file);
 	file.close();
 	prototypes.load(j);
@@ -199,50 +200,44 @@ void Game::handleKeyUp(KEYBOARD_ACTIONS code)
 	network->send(&im);
 }
 
+void Game::handleGameInput(std::unique_ptr<NetworkMessage> message)
+{
+	InputMessage* t = dynamic_cast<InputMessage*>(message.release());
+	gameUpdater.addNewInput(std::unique_ptr<InputMessage>(t));
+}
 
 void Game::addNetworkBindings()
 {
 	//-------------------------------------------------------------------------------
-	handleGameInput = [this](std::unique_ptr<NetworkMessage> message) {
-		InputMessage* t = dynamic_cast<InputMessage*>(message.release());
-		gameUpdater.addNewInput(std::unique_ptr<InputMessage>(t));
-	};
+	std::unique_ptr<AnonymousBinding> binding;
+	
+	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_ACTION_MSG");
+	binding->
+	bindByType(MessageTypes::TYPE_INPUT_ACTION_MSG)->
+	setCallOnce(false)->
+	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
+	network->binder.bind(std::move(binding));
+	
+	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_JOINED_MSG");
+	binding->
+	bindByType(MessageTypes::TYPE_INPUT_JOINED_MSG)->
+	setCallOnce(false)->
+	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
+	network->binder.bind(std::move(binding));
 
-	bindings.emplace_back();
-	network->binder.bind(
-		bindings.back().
+	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_ROUTE_MSG");
+	binding->
+	bindByType(MessageTypes::TYPE_INPUT_ROUTE_MSG)->
+	setCallOnce(false)->
+	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
+	network->binder.bind(std::move(binding));
 
-		bindByType(MessageTypes::TYPE_INPUT_ACTION_MSG)->
-		setCallOnce(false)->
-		setHandler(&handleGameInput)
-	);
-
-	bindings.emplace_back();
-	network->binder.bind(
-		bindings.back().
-
-		bindByType(MessageTypes::TYPE_INPUT_JOINED_MSG)->
-		setCallOnce(false)->
-		setHandler(&handleGameInput)
-	);
-
-	bindings.emplace_back();
-	network->binder.bind(
-		bindings.back().
-
-		bindByType(MessageTypes::TYPE_INPUT_ROUTE_MSG)->
-		setCallOnce(false)->
-		setHandler(&handleGameInput)
-	);
-
-	bindings.emplace_back();
-	network->binder.bind(
-		bindings.back().
-		
-		bindByType(MessageTypes::TYPE_INPUT_LEFT_MSG)->
-		setCallOnce(false)->
-		setHandler(&handleGameInput)
-	);
+	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_LEFT_MSG");
+	binding->
+	bindByType(MessageTypes::TYPE_INPUT_LEFT_MSG)->
+	setCallOnce(false)->
+	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
+	network->binder.bind(std::move(binding));
 
 	//-------------------------------------------------------------------------------
 
@@ -251,7 +246,7 @@ void Game::addNetworkBindings()
 	//-------------------------------------------------------------------------------
 
 
-	handleGameState = [this](std::unique_ptr<NetworkMessage> message) {
+	auto handleGameState = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message) {
 
 		GameStateMessage* gameStateMsg = dynamic_cast<GameStateMessage*>(message.get());
 
@@ -285,16 +280,14 @@ void Game::addNetworkBindings()
 			logStr += "] ";
 		}
 		S::log.add(logStr + "\n\n", { LOG_TAGS::UNIQUE });
-	};
+	});
 
-	bindings.emplace_back();
-	network->binder.bind(
-		bindings.back().
-
-		bindByType(MessageTypes::TYPE_GAME_STATE_MSG)->
-		setCallOnce(false)->
-		setHandler(&handleGameState)
-	);
+	binding = std::make_unique<AnonymousBinding>("TYPE_GAME_STATE_MSG");
+	binding->
+	bindByType(MessageTypes::TYPE_GAME_STATE_MSG)->
+	setCallOnce(false)->
+	setHandler(std::move(handleGameState));
+	network->binder.bind(std::move(binding));
 
 	//-------------------------------------------------------------------------------
 
