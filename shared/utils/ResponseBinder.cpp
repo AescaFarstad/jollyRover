@@ -22,7 +22,7 @@ int32_t ResponseBinder::bind(std::unique_ptr<ResponseBinding> binding)
 			std::move(pendingCallback)
 		}
 	);
-	traceBindings();
+	//traceBindings();
 	return id;
 }
 
@@ -31,7 +31,7 @@ void ResponseBinder::unbind(int32_t id)
 	for (auto i = bindings.begin(); i != bindings.end(); i++) {
 		if (i->id == id)
 		{
-			std::cout<< "unbind " + i->binding->name + "\n";
+			//std::cout<< "unbind " + i->binding->name + "\n";
 			auto p = i->pendingCallback.get();
 			if (p)
 				p->disconnect();
@@ -47,13 +47,13 @@ bool ResponseBinder::process(std::unique_ptr<NetworkMessage> msg)
 	for (auto i = bindings.begin(); i != bindings.end(); i++) {
 		if (match(i->binding.get(), p_msg))
 		{
-			std::cout << "apply binding " << i->binding->name << " " <<i->binding->callOnce << "\n";
+			//std::cout << "apply binding " << i->binding->name << " " <<i->binding->callOnce << "\n";
 			i->binding->handle(std::move(msg));
 
 			if (i->binding->callOnce)
 			{
 				//traceBindings("remove " + i->binding->name + " because callOnce");
-				std::cout<< "unbind because call once " + i->binding->name + "\n";
+				//std::cout<< "unbind because call once " + i->binding->name + "\n";
 				i->pendingCallback->disconnect();
 				bindings.erase(i);
 			}

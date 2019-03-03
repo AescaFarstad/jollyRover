@@ -19,7 +19,9 @@ void SimpleClient::sendMessage(NetworkMessage* msg)
 
 	logSend(msg->getName(), packet);
 
-	SDLNet_TCP_Send(socket, packet.rawData, packet.rawSize);
+	auto sentSize = SDLNet_TCP_Send(socket, packet.rawData, packet.rawSize);
+	if (packet.rawSize != sentSize)
+		wasDisconnected = true;
 }
 
 void SimpleClient::sendMessage(const char* payload, size_t size)
@@ -29,7 +31,9 @@ void SimpleClient::sendMessage(const char* payload, size_t size)
 
 	logSend("______", packet);
 
-	SDLNet_TCP_Send(socket, packet.rawData, packet.rawSize);
+	auto sentSize = SDLNet_TCP_Send(socket, packet.rawData, packet.rawSize);
+	if (packet.rawSize != sentSize)
+		wasDisconnected = true;
 }
 
 

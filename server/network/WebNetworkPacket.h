@@ -1,5 +1,6 @@
 #pragma once
 #include "NetworkPacket.h"
+#include "SystemInfo.h"
 
 class WebNetworkPacket :
 	public NetworkPacket
@@ -16,7 +17,7 @@ public:
 private:
 
 	static const int16_t SUGAR = 1934;
-	static const int16_t bufferSize1 = sizeof(uint16_t) * 2;
+	static const int16_t bufferSize1 = sizeof(uint8_t) * 2;
 	char tempBuffer1[bufferSize1];
 	int16_t bufferSize2;
 	char* tempBuffer2;

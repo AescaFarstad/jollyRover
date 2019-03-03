@@ -38,7 +38,7 @@ void ConsequtiveTask::update()
 		)
 	{
 		if (currentSubTask == 0)
-			S::log.add(getName() + "-> starting: " + subTasks[currentSubTask].name, { LOG_TAGS::TASK, LOG_TAGS::SUBTASK });
+			S::log.add(getName() + "-> starting #" + std::to_string(currentSubTask) + ": " + subTasks[currentSubTask].name, { LOG_TAGS::TASK, LOG_TAGS::SUBTASK });
 		tryToAdvance();
 	}
 	isWaitingForRepeatedFunction = false;
@@ -97,7 +97,7 @@ void ConsequtiveTask::onTaskComplete()
 	isWaitingForCallback = false;
 	currentSubTask++;
 	if (subTasks.size() > currentSubTask)
-		S::log.add(getName() + "-> starting: " + subTasks[currentSubTask].name, { LOG_TAGS::TASK, LOG_TAGS::SUBTASK });
+		S::log.add(getName() + "-> starting #" + std::to_string(currentSubTask) + ": " + subTasks[currentSubTask].name, { LOG_TAGS::TASK, LOG_TAGS::SUBTASK });
 }
 std::string ConsequtiveTask::getName()
 {

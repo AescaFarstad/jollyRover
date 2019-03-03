@@ -9,7 +9,7 @@ namespace GAME_CONFIG
 {
 
 #ifdef __EMSCRIPTEN__
-	const int port = 80;
+	const int port = 12880;
 	const bool IS_WEB = true;
 #else
 	const int port = 12745;

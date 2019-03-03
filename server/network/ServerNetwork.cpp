@@ -175,7 +175,7 @@ void ServerNetwork::handleData(std::unique_ptr<NetworkMessage> externalBuffer[])
 			std::unique_ptr<NetworkPacket> packet = clients[i]->poll();
 			if (packet)
 			{
-				S::log.add("> incoming:\n\t" + Serializer::toHex(packet->payload, packet->payloadSize), { LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
+				S::log.add("> incoming " + std::to_string(packet->payloadSize) + ":\n\t" + Serializer::toHex(packet->payload, packet->payloadSize), { LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
 				handlePacket(std::move(packet), clients[i], externalBuffer);
 			}
 			else

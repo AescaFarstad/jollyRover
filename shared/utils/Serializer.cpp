@@ -409,3 +409,11 @@ void Serializer::read(float& out, const char* value)
 	outFloat[2] = value[2];
 	outFloat[3] = value[3];
 }
+
+void Serializer::swapBytes(char* target, size_t size)
+{
+	unsigned char* tmp = new unsigned char[size];
+	for(size_t i = 0; i < size; i++)
+		tmp[i] = target[size - i - 1];
+	memcpy(target, tmp, size);
+}

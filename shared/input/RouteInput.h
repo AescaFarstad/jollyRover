@@ -58,11 +58,11 @@ public:
 
 
 /*
- down-> route goes to bottom in a straight line, input mode activated
+ down-> route goes to the bottom in a straight line, input mode activated
 
  wrong terrain - highlight in red
 
- move - depending on the angle - advance or retract
+ move - depends on the angle - advance or retract
 
  up-> if valid - send to server
 

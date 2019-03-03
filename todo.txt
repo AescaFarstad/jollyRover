@@ -12,3 +12,5 @@
 
 Рутинг портов https://serverfault.com/questions/112795/how-to-run-a-server-on-port-80-as-a-normal-user-on-linux
 sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
+
+# iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 12880

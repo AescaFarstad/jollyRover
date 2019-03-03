@@ -3,12 +3,15 @@
 Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 {
 	loadPrototypes();
+	printf("loadPrototypes\n");
 
 	gameView = new GameView(window, renderer, &prototypes);
+	printf("GameView\n");
 
 	taskManager = new TaskManager();
 	network = new Network();
 	network->connect();
+	printf("network->connect()\n");
 
 
 	routeInput = new RouteInput();
@@ -65,8 +68,8 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 	};
 
 	loadGameTask->pushAsync(ping, "ping1");
-	//loadGameTask->pushAsync(ping, "ping2");
-	//loadGameTask->pushAsync(ping, "ping3");
+	loadGameTask->pushAsync(ping, "ping2");
+	loadGameTask->pushAsync(ping, "ping3");
 
 	loadGameTask->pushSync([this]() {
 		GenericRequestMessage grMsg;
@@ -91,10 +94,13 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 		});
 	}, "wait for game state from the server and load the game");
 
+	printf("loadGameTask\n");
 	loadGameTask->exec();
+	printf("loadGameTask exec\n");
 
 
 	taskManager->push(std::move(loadGameTask));
+	printf("taskManager->push\n");
 }
 
 Game::~Game()
@@ -176,10 +182,21 @@ void Game::handleEvent(SDL_Event* event)
 
 void Game::loadPrototypes()
 {
-	std::ifstream file("prototypes.json");	
+	std::ifstream file("out/prototypes.json");
+	/*	
+	printf("ifstream\n");
+	if (file.is_open())
+        std::cout << file.rdbuf() << "/n";
+	else 
+		printf("failed to open file\n");
+		*/
+	printf("file loaded\n");
 	json j = json::parse(file);
+	printf("parse\n");
 	file.close();
+	printf("close\n");
 	prototypes.load(j);
+	printf("load\n");
 }
 int16_t idCounter = 0;
 void Game::handleKeyDown(KEYBOARD_ACTIONS code)

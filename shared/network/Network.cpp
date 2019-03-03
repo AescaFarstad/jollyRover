@@ -104,7 +104,7 @@ void Network::send(NetworkMessage* msg)
 	std::unique_ptr<NetworkPacket> packet = getNewPacket();
 	packet->setPayloadFromSerializable(msg);
 
-	S::log.add("SEND " + msg->getName() + ":\n\t" +
+	S::log.add("SEND " + msg->getName() + " " + std::to_string(packet->payloadSize) + ":\n\t" +
 		Serializer::toHex(packet->payload, packet->payloadSize),
 		{ LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
 
@@ -208,8 +208,10 @@ void Network::interceptGenericRequestOnce(int16_t requestType, GenericRequestHan
 std::unique_ptr<NetworkPacket> Network::getNewPacket()
 {
 #ifdef __EMSCRIPTEN__
+	printf("use SimplePacket\n");
 	return std::make_unique<SimplePacket>();
 #else	
+	printf("use NetworkPacket\n");
 	return std::make_unique<NetworkPacket>();
 #endif
 }

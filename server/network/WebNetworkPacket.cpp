@@ -18,16 +18,20 @@ WebNetworkPacket::~WebNetworkPacket()
 }
 
 
-void WebNetworkPacket::loadFromRawData(const char* rawData, int bytesAvailable)
+void WebNetworkPacket::loadFromRawData(const char* incomingData, int bytesAvailable)
 {
+	std::cout << "trace of raw incoming web packet(" + std::to_string(bytesAvailable) + ")\n";
+	std::cout << Serializer::toHex(incomingData, bytesAvailable);
+	std::cout << "\n";
+	
 	//Load size of packet size
 	if (bytesLoaded < bufferSize1)
 	{
 		auto newBytes = std::min(bytesAvailable, bufferSize1 - bytesLoaded);
-		memcpy(tempBuffer1 + bytesLoaded, rawData, newBytes);
+		memcpy(tempBuffer1 + bytesLoaded, incomingData, newBytes);
 		bytesLoaded += newBytes;
 
-		rawData += newBytes;
+		incomingData += newBytes;
 		bytesAvailable -= newBytes;
 	}
 
@@ -72,30 +76,48 @@ void WebNetworkPacket::loadFromRawData(const char* rawData, int bytesAvailable)
 	if (bytesLoaded < bufferSize1 + bufferSize2)
 	{
 		auto newBytes = std::min(bytesAvailable, bufferSize1 + bufferSize2 - bytesLoaded);
-		memcpy(tempBuffer2 + bytesLoaded - bufferSize1, rawData, newBytes);
+		memcpy(tempBuffer2 + bytesLoaded - bufferSize1, incomingData, newBytes);
 		bytesLoaded += newBytes;
 
-		rawData += newBytes;
+		incomingData += newBytes;
 		bytesAvailable -= newBytes;
 	}
 
-	//Final Packet size has just been received
+	//Final Packet size (+keys) has just been received
 	if (bytesLoaded == bufferSize1 + bufferSize2 && rawSize == 0)
 	{
 		int rawPayloadLength = 0;
 		if (bufferSize2 == 4)
 		{
 			int8_t tmp;
-			char* readable = const_cast<char*>(tempBuffer1) + 1;
+			char* readable = static_cast<char*>(tempBuffer1) + 1;
+			std::cout << "\ntrace of packet 1 size\n";
+			std::cout << Serializer::toHex(readable, sizeof(int8_t));
+			std::cout << Serializer::toDec(readable, sizeof(int8_t));
+			std::cout << "\n\n";
+			
 			Serializer::read(tmp, readable);
 			tmp -= 128;
 			rawPayloadLength = tmp;
 		}
 		else
 		{
-			int16_t tmp;
-			char* readable = const_cast<char*>(tempBuffer2);
+			uint16_t tmp;
+			char* readable = static_cast<char*>(tempBuffer2);
+			std::cout << "\ntrace of packet d size\n";
+			std::cout << Serializer::toHex(readable, sizeof(uint16_t));
+			std::cout << Serializer::toDec(readable, sizeof(uint16_t));
+			std::cout << "\n\n";
+			
 			Serializer::read(tmp, readable);
+			if (!SystemInfo::instance->isBigEndian)
+				Serializer::swapBytes(&tmp);
+				
+			std::cout << "\ntrace of packet d size\n";
+			std::cout << Serializer::toHex((char*)&tmp, sizeof(uint16_t));
+			std::cout << Serializer::toDec((char*)&tmp, sizeof(uint16_t));
+			std::cout << "\n\n";
+			
 			rawPayloadLength = tmp;
 		}
 		this->payload = new char[rawPayloadLength];
@@ -107,7 +129,7 @@ void WebNetworkPacket::loadFromRawData(const char* rawData, int bytesAvailable)
 	if (bytesLoaded >= bufferSize1 + bufferSize2)
 	{
 		uint16_t bytesToRead = std::min(bytesAvailable, rawSize - bytesLoaded);
-		memcpy(this->payload, rawData, bytesToRead);
+		memcpy(this->payload + bytesLoaded - bufferSize1 - bufferSize2, incomingData, bytesToRead);
 		bytesLoaded += bytesToRead;
 	}
 
@@ -130,13 +152,14 @@ void WebNetworkPacket::setPayloadFromRawData(const char * newRawData, size_t siz
 	if (rawSize > 0)
 		delete[] rawData;	
 
-	payloadSize = (int16_t)size;
+	payloadSize = (uint16_t)size;
 	rawSize = payloadSize + (payloadSize > 125 ? 4 : 2);
 	rawData = new char[rawSize];
+	
 	payload = rawData + rawSize - payloadSize;
 
 	memcpy(payload, newRawData, size);
-
+	
 	int cursor = 0;
 	rawData[cursor] = (unsigned char)130;
 	cursor++;
@@ -148,8 +171,34 @@ void WebNetworkPacket::setPayloadFromRawData(const char * newRawData, size_t siz
 	}
 	else
 	{
-		Serializer::write(payloadSize, rawData + cursor + 1);
-		cursor += 3;
+		rawData[cursor] = (unsigned char)126;
+		cursor++;
+		
+		uint16_t tmp = payloadSize;
+		
+		std::cout << "\ntrace of packet d size\n";
+		std::cout << Serializer::toHex((char*)&tmp, sizeof(uint16_t));
+		std::cout << Serializer::toDec((char*)&tmp, sizeof(uint16_t));
+		std::cout << "\n\n";
+			
+		if (!SystemInfo::instance->isBigEndian)
+			Serializer::swapBytes(&tmp);
+		/*
+		std::cout << "\ntrace of packet d size\n";
+		std::cout << Serializer::toHex((char*)&tmp, sizeof(uint16_t));
+		std::cout << Serializer::toDec((char*)&tmp, sizeof(uint16_t));
+		std::cout << "\n\n";*/
+			
+		Serializer::write(tmp, rawData + cursor);
+		cursor += 2;
 	}
+	std::cout << "\nbefore serialization result:\n";
+	std::cout << Serializer::toHex(rawData, 20);
+	std::cout << "\n\n";/*
+	for (int i = 0; i < 4; i++)
+		rawData[cursor++] = 0;
+	std::cout << "\nafter serialization result:\n";
+	std::cout << Serializer::toHex(rawData, 10);
+	std::cout << "\n\n";*/
 }
 

@@ -108,8 +108,21 @@ namespace Serializer {
 			read(out[i], stream);
 		}
 	}
-
+	
+	//Debug Utils
 	std::string toHex(const char* source, size_t size);
 	std::string toDec(const char* source, size_t size);
 	void fromHex(std::string source, std::stringstream& stream);
+	template <typename T>
+	void swapBytes(T* target)
+	{
+		T tmp = *target;
+		unsigned char* ptmp = (unsigned char*)&tmp;
+		unsigned char* ttmp = (unsigned char*)target;
+		for(size_t i = 0; i < sizeof(T); i++)
+			ttmp[i] = ptmp[sizeof(T) - 1 - i];
+	}
+	
+	void swapBytes(char* target, size_t size);
+	
 }

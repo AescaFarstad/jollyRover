@@ -16,7 +16,6 @@ Callback::Callback(std::function<void()> function)
 
 Callback::~Callback()
 {
-	std::cout << "~Callback" + std::to_string(id) + "\n";
 	if (pendingCallback != nullptr)
 		pendingCallback->disconnect();
 }
@@ -61,7 +60,6 @@ PendingCallback::PendingCallback()
 
 PendingCallback::~PendingCallback()
 {
-	std::cout << "~PendingCallback\n";
 	cancel();
 }
 
@@ -75,7 +73,6 @@ PendingCallback::PendingCallback(PendingCallback&& that)
 
 void PendingCallback::disconnect()
 {
-	std::cout << "PendingCallback::disconnect\n";
 	if (callback != nullptr)
 	{
 		callback->pendingCallback = nullptr;
@@ -85,7 +82,6 @@ void PendingCallback::disconnect()
 
 void PendingCallback::cancel()
 {
-	std::cout << "PendingCallback::cancel\n";
 	if (callback != nullptr)
 	{
 		callback->isValid = false;
@@ -100,9 +96,6 @@ DeathNotice::DeathNotice()
 
 DeathNotice::~DeathNotice()
 {
-	std::cout << "~DeathNotice" + std::to_string(id) + "\n";
-	//printf("DeathNotice destructor");
-	//std::cout<<"\nDeathNotice destructor\n";
 	execute();
 }
 

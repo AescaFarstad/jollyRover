@@ -1,4 +1,4 @@
-WEB_COMPILER =../emsdk/emscripten/1.38.24/em++
+WEB_COMPILER =../../emsdk/emscripten/1.38.24/em++
 LOCAL_COMPILER = g++
 OUT=out
 WEB_TARGET=$(OUT)/web
@@ -51,8 +51,8 @@ local: $(SUBOBJ_LOCAL)
 	spd-say 'i' --volume -92
 	
 web: $(SUBOBJ_WEB)
-	$(WEB_COMPILER) -s USE_SDL=2 -s USE_SDL_NET=2 -o $(WEB_TARGET).html $(SUBOBJ_WEB)
 	cp shared/prototypes.json out/prototypes.json
+	$(WEB_COMPILER) -s USE_SDL=2 -s USE_SDL_NET=2 -s WASM=0 -g3 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -v -s ASSERTIONS=1 -s SAFE_HEAP=1 -o $(WEB_TARGET).html $(SUBOBJ_WEB) --embed-file out/prototypes.json
 	spd-say 'i' --volume -92
 	
 server: $(SUBOBJ_SERVER)

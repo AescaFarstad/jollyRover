@@ -14,22 +14,7 @@ ResponseBinding::ResponseBinding(std::string name)
 
 ResponseBinding::~ResponseBinding()
 {	
-	std::cout << "~ResponseBinding\n";
 }
-/*
-ResponseBinding::ResponseBinding(ResponseBinding&& that)
-{
-	this->name = std::move(that.name);
-	this->typeId = that.typeId;
-	this->bindsType = that.bindsType;
-	this->login = that.login;
-	this->bindsLogin = that.bindsLogin;
-	this->inResponseTo = that.inResponseTo;
-	this->bindsResponseTo = that.bindsResponseTo;
-	this->callOnce = that.callOnce;
-	this->deathNotice = std::move(that.deathNotice);
-}
-*/
 
 std::string  ResponseBinding::toString()
 {

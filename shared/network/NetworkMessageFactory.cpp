@@ -36,6 +36,6 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::pointerByType(int16_t typ
 	else if (type == MessageTypes::TYPE_INPUT_ROUTE_MSG)
 		return std::make_unique<InputRouteMessage>();
 	else
-		THROW_FATAL_ERROR("Unknow Network Message");
+		THROW_FATAL_ERROR("Unknow Network Message " + std::to_string(type));
 	return nullptr;
 }

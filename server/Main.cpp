@@ -169,7 +169,7 @@ void initLog()
 		//LOG_TAGS::NET,
 		//LOG_TAGS::GAME,
 
-		LOG_TAGS::NET_MESSAGE,
+		//LOG_TAGS::NET_MESSAGE,
 		Z
 	});
 
