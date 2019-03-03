@@ -74,13 +74,6 @@ std::unique_ptr<NetworkPacket> WebClient::poll()
 			response += "Sec-WebSocket-Protocol: binary\r\n";
 			response += "Sec-WebSocket-Accept: " + responseHashStr + "\r\n\r\n";
 
-			//printf(response.c_str());
-			//printf("\n");
-			//char* unconst = const_cast<char*>(response.c_str());
-			//unsigned char* tt = reinterpret_cast<unsigned char*>(unconst);
-			//printf(base64_encode(tt, response.size()).c_str());
-			//printf("\n");
-
 			SDLNet_TCP_Send(socket, response.c_str(), response.size());
 
 			isHandshakeDone = true;
@@ -98,18 +91,8 @@ void WebClient::sendMessage(NetworkMessage* msg)
 {
 	NetworkPacket packet;
 	packet.setPayloadFromSerializable(msg);
-	/*
-	std::cout << "\ntrace of packet d size\n";
-		std::cout << Serializer::toHex((char*)&tmp, sizeof(uint16_t));
-		std::cout << Serializer::toDec((char*)&tmp, sizeof(uint16_t));
-		std::cout << "\n\n";*/
 
-	logSend(msg->getName(), packet);
-	
-	
-	std::cout << "\nraw data before web\n";
-		std::cout << Serializer::toHex(packet.rawData, 8);
-		std::cout << "\n\n";/**/
+	logSend(msg->getName(), packet);	
 
 	WebNetworkPacket wpacket;
 	wpacket.setPayloadFromRawData(packet.rawData, packet.rawSize);

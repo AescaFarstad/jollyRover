@@ -75,7 +75,6 @@ int main(int argc, char* args[])
 		openpty(&amaster, &slave, NULL, &params, NULL);
 	#endif
 #endif
-	printf("Start\n");
 	printf("endiness: %s\n", (SystemInfo::instance->isBigEndian ? "big" : "little"));
 
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
@@ -83,7 +82,7 @@ int main(int argc, char* args[])
 		printf("Failed to initialize SDL %s\n", SDL_GetError());
 		return 0;
 	}
-	printf("SDL_INIT_VIDEO\n");
+	
 	window = SDL_CreateWindow("smth", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	SDL_SetWindowPosition(window, 50, 50);
 	if (window == NULL)
@@ -91,14 +90,13 @@ int main(int argc, char* args[])
 		printf("Failed to create window %s\n", SDL_GetError());
 		return 0;
 	}
-	printf("SDL_CreateWindow\n");
+	
 	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
 	if (renderer == NULL)
 	{
 		printf("Failed to create renderer %s\n", SDL_GetError());
 		return 0;
 	}
-	printf("SDL_CreateRenderer\n");
 
 	S::log.disableTags({
 		//LOG_TAGS::UNIQUE,
@@ -111,16 +109,16 @@ int main(int argc, char* args[])
 
 	S::log.enableTags({
 		//LOG_TAGS::UNIQUE,
-		LOG_TAGS::NET,
+		//LOG_TAGS::NET,
 		//LOG_TAGS::GAME,
 		LOG_TAGS::ERROR_,
 
-		LOG_TAGS::NET_MESSAGE,
+		//LOG_TAGS::NET_MESSAGE,
 		Z
 	});
-	printf("creating game...\n");
+	
 	game = new Game(window, renderer);
-	printf("Game crated\n");
+	
 #ifdef __EMSCRIPTEN__
 	printf("EMSCRIPTEN mode\n");
 	emscripten_set_main_loop_arg(mainLoop, NULL, -1, true);

@@ -27,6 +27,5 @@ std::string  ResponseBinding::toString()
 		result += "responseTo:" + std::to_string(inResponseTo) + " ";
 	if (callOnce)
 		result += "callOnce ";
-	result += moved;
 	return result;
 }

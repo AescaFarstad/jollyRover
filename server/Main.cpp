@@ -99,27 +99,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 #include <DEBUG.h>
 void loadPrototypes()
 {
-	//system("dir /b > test.txt");
-	/*
-	std::ifstream f("test.txt");
-	f.seekg(0, std::ios::end);    // go to the end
-	int length = f.tellg();           // report location (this is the length)
-	f.seekg(0, std::ios::beg);    // go back to the beginning
-	char* buffer = new char[length];    // allocate memory for a buffer of appropriate dimension
-	f.read(buffer, length);       // read the whole file into the buffer
-	f.close();
-	printf("f:\n%s", buffer);
-
-	std::ifstream file("prototypes.json");
-
-	file.seekg(0, std::ios::end);    // go to the end
-	length = file.tellg();           // report location (this is the length)
-	file.seekg(0, std::ios::beg);    // go back to the beginning
-	buffer = new char[length];    // allocate memory for a buffer of appropriate dimension
-	file.read(buffer, length);       // read the whole file into the buffer
-	file.close();
-	printf("file:\n%s", buffer);*/
-	std::ifstream file("prototypes.json");
+	std::ifstream file("out/prototypes.json");
 	json j = json::parse(file);
 	file.close();
 	prototypes.load(j);
@@ -169,13 +149,13 @@ void initLog()
 		//LOG_TAGS::NET,
 		//LOG_TAGS::GAME,
 
-		//LOG_TAGS::NET_MESSAGE,
+		LOG_TAGS::NET_MESSAGE,
 		Z
 	});
 
 	S::log.enableTags({
 		LOG_TAGS::UNIQUE,
-		LOG_TAGS::NET,
+		//LOG_TAGS::NET,
 		//LOG_TAGS::GAME,
 		LOG_TAGS::ERROR_,
 

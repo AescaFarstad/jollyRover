@@ -53,7 +53,6 @@ bool PacketReader::tryToRead()
 		int16_t bytesBefore = currentPacket->bytesLoaded;
 		currentPacket->loadFromRawData(buffer + bufferCursor, bytesInBuffer - bufferCursor);
 		bufferCursor += currentPacket->bytesLoaded - bytesBefore;
-		printf("something in buffer\n");
 	}
 
 	if (currentPacket->isFullyLoaded())

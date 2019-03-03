@@ -25,10 +25,6 @@ void NetworkPacket::setPayloadFromString(std::string str)
 
 void NetworkPacket::loadFromRawData(const char* rawData, int bytesAvailable)
 {
-	std::cout << "\nraw incoming:\n";
-	std::cout << Serializer::toHex(rawData, bytesAvailable);
-	std::cout << "\n\n";
-	
 	if (bytesLoaded < bufferSize)
 	{
 		auto newBytes = std::min(bytesAvailable, bufferSize - bytesLoaded);

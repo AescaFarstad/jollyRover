@@ -29,7 +29,6 @@ public:
 
 	DeathNotice deathNotice;
 	
-	std::string moved;
 
 	virtual void handle(std::unique_ptr<NetworkMessage> message) = 0;	
 	

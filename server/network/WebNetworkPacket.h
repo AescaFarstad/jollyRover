@@ -16,7 +16,7 @@ public:
 
 private:
 
-	static const int16_t SUGAR = 1934;
+	static const int16_t CYPHER_KEY_SIZE = 4;
 	static const int16_t bufferSize1 = sizeof(uint8_t) * 2;
 	char tempBuffer1[bufferSize1];
 	int16_t bufferSize2;

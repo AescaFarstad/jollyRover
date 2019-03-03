@@ -4,22 +4,17 @@
 
 AnonymousBinding::AnonymousBinding(std::string name) : ResponseBinding(name)
 {
-	moved="not moved";
 }
 
 
 AnonymousBinding::~AnonymousBinding()
 {
-	std::cout << "destroy AnonymousBinding " + name << "\n";
 }
 
 
 AnonymousBinding::AnonymousBinding(AnonymousBinding&& that) : ResponseBinding::ResponseBinding(std::move(that))
 {
 	handler = std::move(that.handler);
-	moved = "moved";
-	that.moved = "moved from";
-	std::cout << "move AnonymousBinding " << "\n";
 }
 
 

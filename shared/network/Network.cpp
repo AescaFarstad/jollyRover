@@ -208,10 +208,8 @@ void Network::interceptGenericRequestOnce(int16_t requestType, GenericRequestHan
 std::unique_ptr<NetworkPacket> Network::getNewPacket()
 {
 #ifdef __EMSCRIPTEN__
-	printf("use SimplePacket\n");
 	return std::make_unique<SimplePacket>();
 #else	
-	printf("use NetworkPacket\n");
 	return std::make_unique<NetworkPacket>();
 #endif
 }
