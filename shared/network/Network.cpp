@@ -76,10 +76,10 @@ void Network::update()
 	std::unique_ptr<NetworkMessage> message = poll();
 	while (message != nullptr)
 	{
-		NetworkMessage* msgP = message.get();
+		std::string name = message->getName();
 		if (!binder.process(std::move(message)))
 		{
-			S::log.add("NetworkMessage is not handled: " + msgP->getName(), { LOG_TAGS::NET });
+			S::log.add("NetworkMessage is not handled: " + name, { LOG_TAGS::NET });
 		}
 		message = poll();
 	}
@@ -118,25 +118,28 @@ std::unique_ptr<NetworkMessage> Network::poll()
 		return nullptr;
 
 	packetReader->setDataAvailable(SDLNet_SocketReady(socket));
-	std::unique_ptr<NetworkPacket> temp = packetReader->poll();
-	if (!temp)
+	std::unique_ptr<NetworkPacket> packet = packetReader->poll();
+	if (!packet)
 	{
 		return nullptr;
 	}
-	else if (temp->isDisconnectNotice)
+	else if (packet->isDisconnectNotice)
 	{
 		isConnected = false;
 		S::log.add("disconnected",	{ LOG_TAGS::NET });
 		//TODO initiate reconnect
 		return nullptr;
 	}
+	return processIncomingPacket(std::move(packet));
+}
 
-
-	S::log.add("incoming (" + std::to_string(temp->payloadSize) + "):\n\t" +
-		Serializer::toHex(temp->payload, temp->payloadSize),
+std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<NetworkPacket> packet)
+{
+	S::log.add("incoming (" + std::to_string(packet->payloadSize) + "):\n\t" +
+		Serializer::toHex(packet->payload, packet->payloadSize),
 		{ LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
 
-	std::unique_ptr<NetworkMessage> resultMessage = factory.parse(temp.get());
+	std::unique_ptr<NetworkMessage> resultMessage = factory.parse(packet.get());
 
 	//auto t = requestTimeByInitiatorId[resultMessage->inResponseTo];
 	int32_t ticks = SDL_GetTicks();

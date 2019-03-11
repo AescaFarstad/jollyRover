@@ -2,12 +2,23 @@
 #include <GameState.h>
 #include <Prototypes.h>
 #include <RouteInput.h>
+#include <ViewController.h>
+#include <CreepView.h>
 #include <memory>
 #ifdef __EMSCRIPTEN__
 	#include <SDL.h>
 #else 
 	#include <SDL2/SDL.h>
 #endif
+
+
+#ifdef __EMSCRIPTEN__
+	#include <SDL_image.h>
+#else 
+	#include <SDL2/SDL_image.h>
+#endif
+
+
 
 class GameView
 {
@@ -24,6 +35,8 @@ private:
 	bool isInitialized;
 	GameState* state;
 	RouteInput* routeInput;
+	
+	ViewController<Creep, CreepView> creepViews; 
 
 	void init();
 	void setColor(uint32_t color);
@@ -31,5 +44,11 @@ private:
 	void drawObstacles();
 	void drawInput();
 	void drawCars();
+	void drawCreeps();
+	void drawProjectiles();
+	
+ SDL_Surface* loadedSurface;
+ SDL_Texture* ltexture;
+	
 };
 

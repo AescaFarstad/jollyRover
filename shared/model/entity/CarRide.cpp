@@ -31,7 +31,7 @@ void CarRide::deserialize(SerializationStream &stream)
 	Serializer::readVector(route, stream);
 }
 
-void CarRide::serialize(SerializationStream &stream)
+void CarRide::serialize(SerializationStream &stream) const
 {
 	Serializer::write(car, stream);
 	Serializer::write(routeIndex, stream);

@@ -7,7 +7,7 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 	gameView = new GameView(window, renderer, &prototypes);
 
 	taskManager = new TaskManager();
-	network = new Network();
+	network = new LoopBackNetwork(&gameUpdater);
 	network->connect();
 
 
@@ -50,6 +50,7 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 			cb->execute();
 			delete cb;
 		});
+		//network->binder.traceBindings("added #2");
 	}, "wait for greetings response from the server");
 
 	auto ping = [this](std::unique_ptr<Callback> callback) {
@@ -173,6 +174,12 @@ void Game::handleEvent(SDL_Event* event)
 }
 
 
+#ifdef __EMSCRIPTEN__
+	#include <SDL_image.h>
+#else 
+	#include <SDL2/SDL_image.h>
+#endif
+
 
 void Game::loadPrototypes()
 {
@@ -180,6 +187,8 @@ void Game::loadPrototypes()
 	json j = json::parse(file);
 	file.close();
 	prototypes.load(j);
+	
+	//std::ifstream file2("out/assets/sheet_tanks.png");
 }
 int16_t idCounter = 0;
 void Game::handleKeyDown(KEYBOARD_ACTIONS code)

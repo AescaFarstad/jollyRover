@@ -1,15 +1,15 @@
 #include <ISerializable.h>
 
 
-
+ISerializable::~ISerializable()
+{
+}
+/*
 ISerializable::ISerializable()
 {
 }
 
 
-ISerializable::~ISerializable()
-{
-}
 
 void ISerializable::deserialize(SerializationStream & stream)
 {
@@ -17,7 +17,7 @@ void ISerializable::deserialize(SerializationStream & stream)
 
 void ISerializable::serialize(SerializationStream & stream)
 {
-}
+}*/
 
 
 void Serializer::write(ISerializable &value, SerializationStream &stream)

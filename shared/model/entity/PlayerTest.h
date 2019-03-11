@@ -1,8 +1,7 @@
 #pragma once
 #include <ISerializable.h>
 #include <CarRide.h>
-class PlayerTest :
-	public ISerializable
+class PlayerTest
 {
 public:
 	PlayerTest();
@@ -21,7 +20,7 @@ public:
 
 	std::vector<CarRide> activeCars;
 
-	virtual void deserialize(SerializationStream& stream);
-	virtual void serialize(SerializationStream& stream);
+	void deserialize(SerializationStream& stream);
+	void serialize(SerializationStream& stream) const;
 };
 

@@ -27,7 +27,7 @@ void RouteInput::onMouseDown(SDL_MouseButtonEvent* event)
 		event->y < prototypes->variables.fieldHeight && event->y > 0)
 	{
 		Point touch(event->x, event->y);
-
+		S::log.add(touch.toString());
 		route.push_back(RoutePoint(event->x, prototypes->variables.fieldHeight));
 
 		buildPath(touch);

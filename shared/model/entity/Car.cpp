@@ -20,7 +20,7 @@ void Car::deserialize(SerializationStream &stream)
 	Serializer::read(health, stream);
 }
 
-void Car::serialize(SerializationStream &stream)
+void Car::serialize(SerializationStream &stream) const
 {
 	Serializer::write(prototypeId, stream);
 	Serializer::write(health, stream);

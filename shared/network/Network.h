@@ -35,9 +35,13 @@ public:
 	virtual void update();
 	virtual void send(NetworkPacket* packet);
 	virtual void send(NetworkMessage* msg);
+	
 	void interceptOnce(int16_t messageType, MessageHandler handler);
 	void interceptGenericRequestOnce(int16_t requestType, GenericRequestHandler handler);
 
+protected:
+
+	std::unique_ptr<NetworkMessage> processIncomingPacket(std::unique_ptr<NetworkPacket> packet);
 
 private:
 
@@ -47,9 +51,11 @@ private:
 	int activeSockets = 0;
 	bool isConnected = false;
 	std::unordered_map<int32_t, uint32_t> requestTimeByInitiatorId;
-	static std::unique_ptr<NetworkPacket> getNewPacket();
 	std::unordered_map<int16_t, MessageHandler> interceptors_once;
 	std::unordered_map<int16_t, GenericRequestHandler> interceptorsGeneric_once;
+	
+	static std::unique_ptr<NetworkPacket> getNewPacket();
+	
 	virtual std::unique_ptr<NetworkMessage> poll();
 
 

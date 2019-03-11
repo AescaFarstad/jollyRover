@@ -8,35 +8,30 @@ Prototypes::~Prototypes()
 {
 }
 
-const CarProto* Prototypes::getCar(int16_t id)
-{
-	return nullptr;
-}
-
-const LootProto* Prototypes::getLoot(int16_t id)
-{
-	return nullptr;
-}
 
 void Prototypes::load(json &source)
 {
 	variables.load(source.at("variables"));
 	obstacles = source.at("obstacles").get<std::vector<Obstacle>>();
 	cars = source.at("cars").get<std::vector<CarProto>>();
-	/*
-	for (auto &ob : obstacles)
+	
+	creeps = source.at("creeps").get<std::vector<CreepProto>>();
+	weapons = source.at("weapons").get<std::vector<WeaponProto>>();
+	forces = source.at("forces").get<std::vector<ForceProto>>();
+	
+	formations = source.at("formations").get<std::vector<FormationProto>>();
+	auto allObjectives = source.at("objectives").get<std::vector<ObjectiveProto>>();
+	
+	for(auto& force : forces)
+		objectives.emplace_back();
+	
+	for(auto& o : allObjectives)
 	{
-		for (auto &ver : ob.vertices)
+		for(auto& force : o.forces)
 		{
-			S::log.add("post vert " + ver.toString());
-			S::log.add("adr: " + std::to_string((uint32_t)&ver));
+			objectives[force].push_back(o);
 		}
-		for (auto &edg : ob.edges)
-		{
-			S::log.add("post edge " + edg.p1->toString() + edg.p2->toString());
-			S::log.add("adr: " + std::to_string((uint32_t)edg.p1));
-		}
-	}*/
+	}
 
 	//cars = source.at("loot").get<std::vector<LootProto>>();
 	//loot = source.at("cars").get<std::vector<CarProto>>();

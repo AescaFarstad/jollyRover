@@ -49,7 +49,7 @@ void SeededRandom::deserialize(SerializationStream & stream)
 	Serializer::read(seed, stream);
 }
 
-void SeededRandom::serialize(SerializationStream & stream)
+void SeededRandom::serialize(SerializationStream & stream) const
 {
 	Serializer::write(seed, stream);
 }

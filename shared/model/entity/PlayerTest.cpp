@@ -37,7 +37,7 @@ void PlayerTest::deserialize(SerializationStream & stream)
 	Serializer::readVector(activeCars, stream);
 }
 
-void PlayerTest::serialize(SerializationStream & stream)
+void PlayerTest::serialize(SerializationStream & stream) const
 {
 	Serializer::write(x, stream);
 	Serializer::write(y, stream);

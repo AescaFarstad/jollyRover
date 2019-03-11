@@ -1,13 +1,6 @@
 #include <GameLogic.h>
 #include <Keyboard.h>
-
-GameLogic::GameLogic()
-{
-}
-
-GameLogic::~GameLogic()
-{
-}
+#include <Creeps.h>
 
 
 void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessage*> &inputs, Prototypes* prototypes)
@@ -78,6 +71,11 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 		}
 
 	}
+	
+	Creeps::processCreeps(state, prototypes, timePassed);
+	Creeps::processProjectiles(state, prototypes, timePassed);
+	Creeps::removeDeadProjectiles(state);
+	Creeps::removeDeadCreeps(state);
 }
 
 bool GameLogic::testRouteIsValid(std::vector<Point> &route)
@@ -197,7 +195,7 @@ void GameLogic::handlePlayerJoinedInput(InputPlayerJoinedMessage* input)
 
 void GameLogic::handlePlayerLeftInput(InputPlayerLeftMessage* input)
 {
-	for (std::vector<PlayerTest>::iterator it = state->players.begin(); it != state->players.end(); it++) {
+	for (auto it = state->players.begin(); it != state->players.end(); it++) {
 		if (it->login == input->login)
 		{
 			state->players.erase(it);

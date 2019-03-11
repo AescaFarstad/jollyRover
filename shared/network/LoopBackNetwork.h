@@ -1,7 +1,8 @@
 #pragma once
 #include <Network.h>
 #include <GameUpdater.h>
-#include <list>
+#include <MessageTypes.h>
+#include <vector>
 
 class LoopBackNetwork : public Network
 {
@@ -11,15 +12,18 @@ public:
 
 
 
-	void connect();
-	void update();
-	virtual void send(NetworkPacket* packet);
-	virtual void send(NetworkMessage* msg);
-	virtual std::unique_ptr<NetworkMessage> poll();
-
+	virtual void connect() override;
+	virtual void update() override;
+	virtual void send(NetworkPacket* packet) override;
+	virtual void send(NetworkMessage* msg) override;
+	
 
 private:
-	std::list<std::unique_ptr<NetworkPacket>> buffer;
+	std::vector<NetworkPacket*> buffer;
 	GameUpdater* gameUpdater;
 	int16_t idCounter;
+	
+	void addToIncoming(NetworkMessage* msg);
+	
+	const int16_t LOGIN = 102;
 };

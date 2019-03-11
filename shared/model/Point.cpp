@@ -98,7 +98,7 @@ void Point::deserialize(SerializationStream &stream)
 	Serializer::read(y, stream);
 }
 
-void Point::serialize(SerializationStream &stream)
+void Point::serialize(SerializationStream &stream) const
 {
 	Serializer::write(x, stream);
 	Serializer::write(y, stream);

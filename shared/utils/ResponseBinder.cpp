@@ -47,7 +47,7 @@ bool ResponseBinder::process(std::unique_ptr<NetworkMessage> msg)
 	for (auto i = bindings.begin(); i != bindings.end(); i++) {
 		if (match(i->binding.get(), p_msg))
 		{
-			//std::cout << "apply binding " << i->binding->name << " " <<i->binding->callOnce << "\n";
+			std::cout << "apply binding " << i->binding->name << " " <<i->binding->callOnce << "\n";
 			i->binding->handle(std::move(msg));
 
 			if (i->binding->callOnce)
@@ -60,6 +60,7 @@ bool ResponseBinder::process(std::unique_ptr<NetworkMessage> msg)
 			return true;
 		}
 	}
+	traceBindings("Failed to process NetworkMessage");
 	return false;
 }
 

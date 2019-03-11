@@ -5,11 +5,31 @@
 		"routeStepSize": 20,
 		"minRouteSteps": 5,
 		"maxRouteSteps": 4400,
-		"stepAngleWindow": 3.14
+		"stepAngleWindow": 3.14,
+		"war":{
+			"intensity": 5000
+		}
 	},
-	"cars":[
+	"forces":[
+		{
+			"id": 0,
+			"spawn": { "x1":1000, "y1":100, "x2":1000, "y2":620  },
+			"freq":[20, 100]
+		},
 		{
 			"id": 1,
+			"spawn": { "x1":100, "y1":100, "x2":100, "y2":620  },
+			"freq":[10, 200]
+		},
+		{
+			"id": 2,
+			"spawn": { "x1":-100, "y1":100, "x2":1380, "y2":100  },
+			"freq":[250, 1800]
+		}
+	],
+	"cars":[
+		{
+			"id": 0,
 			"name": "Mustang",
 			"speed": 0.0003,
 			"fuelPerMeter": 2,
@@ -18,7 +38,7 @@
 			"refuelTime": 50
 		},
 		{
-			"id": 2,
+			"id": 1,
 			"name": "Coyote",
 			"speed": 0.0005,
 			"fuelPerMeter": 3,
@@ -29,13 +49,13 @@
 	],
 	"loot":[
 		{
-			"id": 1,
+			"id": 0,
 			"name": "gold",
 			"spawnRate": 0.01,
 			"lifeSpan": 40
 		},
 		{
-			"id": 2,
+			"id": 1,
 			"name": "health",
 			"spawnRate": 0.02,
 			"lifeSpan": 20
@@ -45,16 +65,455 @@
 		{
 			"vertices":[
 				{ "x":100, "y":100 },
-				{ "x":200, "y":100 },
-				{ "x":200, "y":300 },
-				{ "x":100, "y":300 }
+				{ "x":150, "y":100 },
+				{ "x":150, "y":150 },
+				{ "x":100, "y":150 }
 			]
 		},
 		{
 			"vertices":[
-				{ "x":400, "y":150 },
-				{ "x":800, "y":700 },
-				{ "x":350, "y":550 }
+				{ "x":304, "y":271 },
+				{ "x":282, "y":314 },
+				{ "x":331, "y":348 },
+				{ "x":394, "y":322 },
+				{ "x":370, "y":272 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":133, "y":539 },
+				{ "x":192, "y":614 },
+				{ "x":267, "y":608 },
+				{ "x":227, "y":547 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":947, "y":88 },
+				{ "x":925, "y":186 },
+				{ "x":1027, "y":157 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":816, "y":513 },
+				{ "x":818, "y":561 },
+				{ "x":879, "y":557 },
+				{ "x":925, "y":512 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":773, "y":161 },
+				{ "x":775, "y":222 },
+				{ "x":820, "y":243 },
+				{ "x":851, "y":188 },
+				{ "x":815, "y":138 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":643, "y":19 },
+				{ "x":603, "y":60 },
+				{ "x":643, "y":99 },
+				{ "x":708, "y":66 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":457, "y":399 },
+				{ "x":456, "y":474 },
+				{ "x":481, "y":469 },
+				{ "x":488, "y":374 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":658, "y":611 },
+				{ "x":684, "y":659 },
+				{ "x":706, "y":610 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":930, "y":234 },
+				{ "x":928, "y":270 },
+				{ "x":961, "y":267 },
+				{ "x":962, "y":232 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":844, "y":285 },
+				{ "x":843, "y":315 },
+				{ "x":875, "y":317 },
+				{ "x":873, "y":281 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":946, "y":341 },
+				{ "x":945, "y":378 },
+				{ "x":984, "y":380 },
+				{ "x":984, "y":347 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":779, "y":299 },
+				{ "x":782, "y":335 },
+				{ "x":811, "y":334 },
+				{ "x":805, "y":301 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":749, "y":359 },
+				{ "x":752, "y":387 },
+				{ "x":788, "y":382 },
+				{ "x":782, "y":361 }
+			]
+		},
+		{
+			"vertices":[
+				{ "x":656, "y":291 },
+				{ "x":656, "y":317 },
+				{ "x":685, "y":316 },
+				{ "x":684, "y":290 }
+			]
+		}
+		
+	],
+	"creeps":[
+		{
+			"id": 0,
+			"name":"tank",
+			"maxHealth":200,
+			"speed": 50,
+			"cost":1000,
+			"loot": 100,
+			"weapon": 0
+		},
+		{
+			"id": 1,
+			"name":"soldier",
+			"maxHealth":40,
+			"speed": 15,
+			"cost":10,
+			"loot": 0,		
+			"weapon": 1
+		},
+		{
+			"id": 2,
+			"name":"katzuka",
+			"maxHealth":10,
+			"speed": 70,
+			"cost":100,
+			"loot": 0,		
+			"weapon": 3
+		},
+		{
+			"id": 3,
+			"name":"hotzwiner",
+			"maxHealth":50,
+			"speed": 12,
+			"cost":2000,
+			"loot": 0,		
+			"weapon": 2
+		}
+	],
+	"weapons":[
+			{
+				"id": 0,
+				"damage": 150,
+				"attackSpeed": 1000,
+				"splash": 12,			
+				"ranged":true,
+				"range": 120,
+				"bulletSpeed": 180				
+			},
+			{
+				"id": 1,
+				"damage": 12,
+				"attackSpeed": 2500,
+				"splash": 1,	
+				"ranged":true,
+				"range": 20,
+				"bulletSpeed": 120
+			},
+			{
+				"id": 2,
+				"damage": 20,
+				"attackSpeed": 500,
+				"splash": 25,	
+				"ranged":true,
+				"range": 320,
+				"bulletSpeed": 80
+			},
+			{
+				"id": 3,
+				"damage": 25,
+				"attackSpeed": 8000,
+				"splash": 2,	
+				"ranged":true,
+				"range": 8,
+				"bulletSpeed": 160
+			},
+			{
+				"id": 4,
+				"damage": 12,
+				"attackSpeed": 8000,
+				"splash": 125,	
+				"ranged":true,
+				"range": 8,
+				"bulletSpeed": 1600
+			}
+	],
+	"objectives":[
+		{
+			"id":0,
+			"forces":[0, 1],
+			"location":{ "x":580, "y":153 },
+			"type":"point",
+			"weight":100
+		},
+		{
+			"id":1,
+			"forces":[0, 1],
+			"location":{ "x":569, "y":537 },
+			"type":"point",
+			"weight":100
+		},
+		{
+			"id":2,
+			"forces":[0],
+			"location":{ "x":254, "y":131 },
+			"type":"point",
+			"weight":100
+		},
+		{
+			"id":3,
+			"forces":[0],
+			"location":{ "x":260, "y":488 },
+			"type":"point",
+			"weight":100
+		},
+		{
+			"id":4,
+			"forces":[1],
+			"location":{ "x":889, "y":202 },
+			"type":"point",
+			"weight":100
+		},
+		{
+			"id":5,
+			"forces":[1],
+			"location":{ "x":939, "y":569 },
+			"type":"point",
+			"weight":100
+		}
+	],
+	"formations":[
+		{
+			"id":0,
+			"type":"assault",
+			"slots":[
+				{
+					"offset":{ "x":25, "y":10 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-25, "y":10 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":75, "y":10 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-75, "y":10 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":15, "y":40 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-15, "y":40 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":45, "y":40 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-45, "y":40 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":75, "y":40 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-75, "y":40 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":15, "y":70 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-15, "y":70 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":45, "y":70 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-45, "y":70 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":75, "y":70 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-75, "y":70 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":15, "y":100 },
+					"creepType":2,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-15, "y":100 },
+					"creepType":2,
+					"optional":true
+				},
+				{
+					"offset":{ "x":45, "y":100 },
+					"creepType":2,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-45, "y":100 },
+					"creepType":2,
+					"optional":true
+				},
+				{
+					"offset":{ "x":75, "y":100 },
+					"creepType":2,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-75, "y":100 },
+					"creepType":2,
+					"optional":true
+				},
+				{
+					"offset":{ "x":120, "y":50 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-120, "y":50 },
+					"creepType":1,
+					"optional":true
+				}				
+			]
+		},
+		{
+			"id":1,
+			"type":"assault",
+			"slots":[
+				{
+					"offset":{ "x":0, "y":10 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":25, "y":30 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-25, "y":30 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":55, "y":35 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-55, "y":35 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":25, "y":60 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-25, "y":60 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":55, "y":65 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-55, "y":65 },
+					"creepType":2,
+					"optional":false
+				},
+				{
+					"offset":{ "x":0, "y":65 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":15, "y":110 },
+					"creepType":2,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-15, "y":110 },
+					"creepType":2,
+					"optional":true
+				},
+				{
+					"offset":{ "x":45, "y":110 },
+					"creepType":2,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-45, "y":110 },
+					"creepType":2,
+					"optional":true
+				}
 			]
 		}
 	]

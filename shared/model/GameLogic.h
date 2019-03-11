@@ -11,8 +11,8 @@
 class GameLogic
 {
 public:
-	GameLogic();
-	~GameLogic();
+	GameLogic() = default;
+	~GameLogic() = default;
 
 	CarLogic carLogic;
 

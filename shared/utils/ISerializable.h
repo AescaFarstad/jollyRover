@@ -4,11 +4,10 @@
 class ISerializable
 {
 public:
-	ISerializable();
 	virtual ~ISerializable();
 
-	virtual void deserialize(SerializationStream& stream);
-	virtual void serialize(SerializationStream& stream);
+	virtual void deserialize(SerializationStream& stream) = 0;
+	virtual void serialize(SerializationStream& stream) = 0;
 };
 
 namespace Serializer {
@@ -17,9 +16,32 @@ namespace Serializer {
 	void read(ISerializable& value, SerializationStream& stream);
 	void write(ISerializable* value, SerializationStream& stream);
 	void read(ISerializable* value, SerializationStream& stream);
+	
+	
+	template <typename T>
+	void write(const T& value, SerializationStream& stream)
+	{
+		value.serialize(stream);
+	}
+	
+	template <typename T>
+	void read(T& value, SerializationStream& stream)
+	{
+		value.deserialize(stream);
+	}
+	template <typename T>
+	void write(const T* value, SerializationStream& stream)
+	{
+		value->serialize(stream);
+	}
+	template <typename T>
+	void read(T* value, SerializationStream& stream)
+	{
+		value->deserialize(stream);
+	}
 
 	template <typename T>
-	void writeVector(std::vector<T> &value, SerializationStream& stream)
+	void writeVector(const std::vector<T> &value, SerializationStream& stream)
 	{
 		int16_t size = (int16_t)value.size();
 		write(size, stream);

@@ -8,13 +8,49 @@ GameView::GameView(SDL_Window* window, SDL_Renderer* renderer, Prototypes* proto
 	this->prototypes = prototypes;
 
 	isInitialized = false;
+	
 }
 
 
 GameView::~GameView()
 {
 }
-
+/*
+void rendery(SDL_Renderer *renderer, SDL_Surface *surf, SDL_Texture *texture)
+	{
+		SDL_Rect srcR;
+		srcR.x = 573;
+		srcR.y = 275;
+		srcR.w = 83;
+		srcR.h = 78;
+		
+		SDL_Rect srcR2;
+		srcR2.x = 0;
+		srcR2.y = 384;
+		srcR2.w = 100;
+		srcR2.h = 97;
+			//x="573" y="275" width="83" height="78" x="0" y="384" width="100" height="97"
+		
+		SDL_Rect dst;
+		SDL_Rect dst2;
+		for(size_t i = 0; i < 15000; i++)
+		{
+			dst.x = i % 1280;
+			dst.y = i / 1280;
+			dst.w = 20;
+			dst.h = 20;
+			SDL_RenderCopyEx(renderer, texture, &srcR, &dst, 0, NULL, SDL_FLIP_NONE);
+			
+			int h = i + 100000;
+			
+			dst2.x = h % 1280;
+			dst2.y = h / 1280;
+			dst2.w = 40;
+			dst2.h = 40;
+			SDL_RenderCopyEx(renderer, texture, &srcR2, &dst2, 0, NULL, SDL_FLIP_NONE);
+		}
+		
+	}*/
 void GameView::render(GameState* state, RouteInput* routeInput)
 {
 	if (!isInitialized)
@@ -27,12 +63,20 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawObstacles();
 	drawInput();
 	drawCars();
+	//drawCreeps();
+	//drawProjectiles();
+	//rendery(renderer, loadedSurface, ltexture);
 }
+
 
 void GameView::init()
 {
 	SDL_SetWindowSize(window, prototypes->variables.fieldWidth, prototypes->variables.fieldHeight);
 	isInitialized = true;
+	loadedSurface = IMG_Load("out/assets/sheet_tanks.png");
+	if(!loadedSurface) {
+    	printf("IMG_Load: %s\n", IMG_GetError());}
+	ltexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
 }
 
 void GameView::setColor(uint32_t color)
@@ -169,6 +213,87 @@ void GameView::drawCars()
 			carRect.w = carSize;
 			carRect.h = carSize;
 			SDL_RenderFillRect(renderer, &carRect);
+		}
+	}
+}
+
+
+void GameView::drawCreeps()
+{	
+	creepViews.render(renderer, state->creeps, state, prototypes);
+	return;
+	uint32_t color = 0xff0000;
+	int rectSize1 = 10;
+	int rectSize2 = 6;
+	setColor(color);
+	
+	for (Creep &creep : state->creeps)
+	{
+		int rectSize = creep.weapon.prototypeId == 1 ? rectSize1 : rectSize2;
+		SDL_Rect rect;
+		rect.x = creep.unit.location.x - rectSize/2;
+		rect.y = creep.unit.location.y - rectSize/2;
+		rect.w = rectSize;
+		rect.h = rectSize;
+		SDL_RenderDrawRect(renderer, &rect);
+		
+		if (creep.unit.force == 1)
+		{
+			rectSize -= 2;		
+			
+			rect.x = creep.unit.location.x - rectSize/2;
+			rect.y = creep.unit.location.y - rectSize/2;
+			rect.w = rectSize;
+			rect.h = rectSize;
+			SDL_RenderDrawRect(renderer, &rect);
+			
+			rectSize -= 2;		
+			
+			rect.x = creep.unit.location.x - rectSize/2;
+			rect.y = creep.unit.location.y - rectSize/2;
+			rect.w = rectSize;
+			rect.h = rectSize;
+			SDL_RenderDrawRect(renderer, &rect);
+			
+		}
+	}
+}
+
+
+void GameView::drawProjectiles()
+{
+	
+	uint32_t color = 0xff00ff;
+	int rectSize = 2;
+	setColor(color);
+	
+	for (Projectile &projectile : state->projectiles)
+	{
+		if (projectile.object.prototypeId != 3)
+		{
+			SDL_Rect rect;
+			rect.x = projectile.location.x - rectSize/2;
+			rect.y = projectile.location.y - rectSize/2;
+			rect.w = rectSize;
+			rect.h = rectSize;
+			SDL_RenderDrawRect(renderer, &rect);			
+		}
+	}
+	
+	color = 0x0;
+	rectSize = 3;
+	setColor(color);
+	
+	for (Projectile &projectile : state->projectiles)
+	{
+		if (projectile.object.prototypeId == 3)
+		{
+			SDL_Rect rect;
+			rect.x = projectile.location.x - rectSize/2;
+			rect.y = projectile.location.y - rectSize/2;
+			rect.w = rectSize;
+			rect.h = rectSize;
+			SDL_RenderDrawRect(renderer, &rect);			
 		}
 	}
 }

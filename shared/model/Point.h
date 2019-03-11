@@ -9,11 +9,11 @@
 
 using json = nlohmann::json;
 
-class Point : public ISerializable
+class Point
 {
 public:
 	Point(float x = 0, float y = 0);
-	virtual ~Point();
+	~Point();
 
 	float x;
 	float y;
@@ -32,8 +32,8 @@ public:
 	void add(const Point &anotherPoint, Point &out);
 
 
-	void deserialize(SerializationStream& stream) override;
-	void serialize(SerializationStream& stream) override;
+	void deserialize(SerializationStream& stream);
+	void serialize(SerializationStream& stream) const;
 
 private:
 

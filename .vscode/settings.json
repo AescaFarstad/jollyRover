@@ -47,7 +47,8 @@
 		"utility": "cpp",
 		"valarray": "cpp",
 		"algorithm": "cpp",
-		"list": "cpp"
+		"list": "cpp",
+		"string": "cpp"
 	},
 	"window.title": "CLIENT"
 }

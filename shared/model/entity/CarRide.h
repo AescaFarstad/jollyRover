@@ -5,7 +5,7 @@
 #include <Car.h>
 #include <CarProto.h>
 
-class CarRide : public ISerializable
+class CarRide
 {
 public:
 	CarRide();
@@ -20,8 +20,8 @@ public:
 
 	int ui;
 
-	void deserialize(SerializationStream& stream) override;
-	void serialize(SerializationStream& stream) override;
+	void deserialize(SerializationStream& stream);
+	void serialize(SerializationStream& stream) const;
 
 private:
 

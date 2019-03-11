@@ -28,10 +28,10 @@ public:
 	void unbind(int32_t bindingId);
 
 	bool process(std::unique_ptr<NetworkMessage> msg);
+	void traceBindings(std::string reason="noreason");
 private:
 	std::vector<BindingStruct> bindings;
 	virtual bool match(ResponseBinding* binding, NetworkMessage* msg);
-	void traceBindings(std::string reason="noreason");
 };
 
 class GenericRequestBinder : public ResponseBinder

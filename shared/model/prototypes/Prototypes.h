@@ -6,6 +6,9 @@
 #include <Obstacle.h>
 #include <CarProto.h>
 #include <LootProto.h>
+#include <CreepProto.h>
+#include <FormationProto.h>
+#include <ObjectiveProto.h>
 
 using json = nlohmann::json;
 
@@ -19,9 +22,12 @@ public:
 	std::vector<Obstacle> obstacles;
 	std::vector<CarProto> cars;
 	std::vector<LootProto> loot;
+	std::vector<CreepProto> creeps;
+	std::vector<WeaponProto> weapons;
+	std::vector<ForceProto> forces;
+	std::vector<FormationProto> formations;
+	std::vector<std::vector<ObjectiveProto>> objectives;
 
-	const CarProto* getCar(int16_t id);
-	const LootProto* getLoot(int16_t id);
 
 	void load(json &source);
 };

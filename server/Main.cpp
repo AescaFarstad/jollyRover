@@ -55,7 +55,6 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					network.addPlayer(genericRequestMsg->login);
 
 					GameStateMessage gsMsg;
-					SerializationStream stream(new StreamGrowerExp(256, 2));
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
 					gsMsg.state = gameUpdater.state.get();
 					network.send(&gsMsg, genericRequestMsg->login);
@@ -72,7 +71,6 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 				case RequestTypes::REQUEST_GAME_STATE:
 				{
 					GameStateMessage gsMsg;
-					SerializationStream stream(new StreamGrowerExp(256, 2));
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
 					gsMsg.state = gameUpdater.state.get(); 
 					network.send(&gsMsg, genericRequestMsg->login);

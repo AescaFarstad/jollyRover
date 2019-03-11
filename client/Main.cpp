@@ -1,6 +1,7 @@
 
 #include <Game.h>
 #include <SystemInfo.h>
+#include <FPSMeter.h>
 
 //#define WINDOWS 1
 #define LINUX 1
@@ -28,6 +29,7 @@ Game* game;
 
 bool isFinished = false;
 int lastTicks = 0;
+FPSMeter fpsMeter;
 
 void mainLoop(void* arg)
 {
@@ -54,7 +56,10 @@ void mainLoop(void* arg)
 		SDL_RenderClear(renderer);
 
 		lastTicks = ticks;
-		game->update();
+		game->update();/*
+		fpsMeter.registerFrame(ticks);
+		if (fpsMeter.getMeasurementDuration() > 5000)
+			printf(fpsMeter.report().c_str());*/
 
 		SDL_RenderPresent(renderer);
 	}
@@ -84,7 +89,7 @@ int main(int argc, char* args[])
 	}
 	
 	window = SDL_CreateWindow("smth", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	SDL_SetWindowPosition(window, 50, 50);
+	SDL_SetWindowPosition(window, 0, 50);
 	if (window == NULL)
 	{
 		printf("Failed to create window %s\n", SDL_GetError());
