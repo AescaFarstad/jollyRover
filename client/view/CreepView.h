@@ -14,7 +14,7 @@ public:
 	
 	int16_t id;
 	
-	void render(SDL_Renderer* renderer, Creep& creep, GameState* state, Prototypes* prototypes);
+	void render(SDL_Renderer* renderer, CreepState& creep, GameState* state, Prototypes* prototypes);
 	
 	
 private:

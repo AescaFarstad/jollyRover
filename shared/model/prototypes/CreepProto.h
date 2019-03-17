@@ -30,7 +30,7 @@ public:
 	int32_t maxHealth;
 	float speed;
 	int32_t loot;
-	int32_t cost;
+	int32_t strength;
 	int16_t weapon;
 
 private:

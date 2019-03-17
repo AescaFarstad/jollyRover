@@ -71,11 +71,14 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 		}
 
 	}
-	
+	Creeps::handleCreeps(state, prototypes, timePassed);
+	/*
+	Creeps::spawnCreeps(state, prototypes, timePassed);
+	Creeps::processFormations(state, prototypes, timePassed);
 	Creeps::processCreeps(state, prototypes, timePassed);
 	Creeps::processProjectiles(state, prototypes, timePassed);
 	Creeps::removeDeadProjectiles(state);
-	Creeps::removeDeadCreeps(state);
+	Creeps::removeDeadCreeps(state);*/
 }
 
 bool GameLogic::testRouteIsValid(std::vector<Point> &route)

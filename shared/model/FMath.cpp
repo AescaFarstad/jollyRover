@@ -1,5 +1,13 @@
 #include "FMath.h"
 
+
+float lerp(float x1, float y1, float x2, float y2, float argument)
+{
+	if (x1 == x2)
+		return y1 == y2 ? y1 : std::numeric_limits<float>::quiet_NaN();
+	return (argument  - x1) * (y1 - y2) / (x1 - x2) + y1;
+}
+	
 Point FMath::getEdgeIntersection(Edge &e1, Edge &e2)
 {
 	Point nullResult;
@@ -82,4 +90,57 @@ float FMath::normalizeAngle(float angle)
 	angle = fmodf(angle, (float)M_PI * 2);
 	angle = angle < 0 ? (float)M_PI * 2 + angle : angle;
 	return angle;
+}
+
+const int SIN_VALUES_LENGTH = 21;
+const float SIN_VALUES[SIN_VALUES_LENGTH] = {
+			0,
+			0.0784590957,
+			0.1564344650,
+			0.2334453638,
+			0.3090169943,
+			0.3826834323,
+			0.4539904997,
+			0.5224985647,
+			0.5877852522,
+			0.6494480483,
+			0.7071067811,
+			0.7604059656,
+			0.8090169943,
+			0.8526401643,
+			0.8910065241,
+			0.9238795325,
+			0.9510565162,
+			0.9723699203,
+			0.9876883405,
+			0.9969173337,
+			1
+		};
+
+
+float firstQuarterSin(float angle)
+{
+	float index = angle / (float)M_PI * 2 * (SIN_VALUES_LENGTH - 1);
+				
+	return lerp(std::floor(index), SIN_VALUES[(int)(std::floor(index))], std::ceil(index), SIN_VALUES[(int)(std::ceil(index))], index);
+		
+}
+
+float FMath::sin(float angle)
+{
+	angle = normalizeAngle(angle);
+			
+	if (angle <= (float)M_PI / 2)
+		return firstQuarterSin(angle);
+	else if (angle <= (float)M_PI)
+		return firstQuarterSin((float)M_PI - angle);
+	else if (angle <= (float)M_PI * 3 / 2)
+		return -firstQuarterSin(angle - (float)M_PI);
+	else
+		return -firstQuarterSin((float)M_PI * 2 - angle);
+}
+
+float FMath::cos(float angle)
+{
+	return sin((float)M_PI / 2 - angle);
 }

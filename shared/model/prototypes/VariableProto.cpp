@@ -8,18 +8,6 @@ VariableProto::~VariableProto()
 {
 }
 
-void from_json(const json &j, ForceProto &force)
-{
-	auto spawn = j.at("spawn");
-	force.id = j.at("id");
-	force.spawnAA.x = spawn.at("x1");
-	force.spawnAA.y = spawn.at("y1");
-	force.spawnBB.x = spawn.at("x2");
-	force.spawnBB.y = spawn.at("y2");
-	force.freq[0] = j.at("freq")[0];
-	force.freq[1] = j.at("freq")[1];
-}
-
 void VariableProto::load(json &source)
 {
 	fieldWidth = source.at("fieldWidth");
@@ -32,6 +20,9 @@ void VariableProto::load(json &source)
 	stepAngleWindow = source.at("stepAngleWindow");
 	
 	intensity = source.at("war").at("intensity");
+	
+	fieldCenter.x = fieldWidth/2;
+	fieldCenter.y = fieldWidth/2;
 	/*
 	json forceArray = source.at("war").at("forces");
 	

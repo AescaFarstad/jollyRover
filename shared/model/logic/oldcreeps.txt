@@ -12,7 +12,7 @@ namespace Creeps
 			int32_t strength = 0;
 			for(Creep& creep : state->creeps)
 			{
-				strength += prototypes->getCreep(creep.object.prototypeId)->cost;
+				strength += prototypes->getCreep(creep.object.prototypeId)->strength;
 			}
 			
 			if (state->random.get() > 0.9)

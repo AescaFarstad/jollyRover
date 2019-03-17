@@ -36,7 +36,7 @@ private:
 	GameState* state;
 	RouteInput* routeInput;
 	
-	ViewController<Creep, CreepView> creepViews; 
+	ViewController<CreepState, CreepView> creepViews; 
 
 	void init();
 	void setColor(uint32_t color);

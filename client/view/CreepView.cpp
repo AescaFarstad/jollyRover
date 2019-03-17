@@ -1,7 +1,7 @@
 #include <CreepView.h>
 
 
-void CreepView::render(SDL_Renderer* renderer, Creep& creep, GameState* state, Prototypes* prototypes)
+void CreepView::render(SDL_Renderer* renderer, CreepState& creep, GameState* state, Prototypes* prototypes)
 {
 	uint32_t color = 0xff0000;
 	int rectSize1 = 10;

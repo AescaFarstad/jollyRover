@@ -7,24 +7,27 @@
 		"maxRouteSteps": 4400,
 		"stepAngleWindow": 3.14,
 		"war":{
-			"intensity": 5000
+			"intensity": 1000
 		}
 	},
 	"forces":[
 		{
 			"id": 0,
 			"spawn": { "x1":1000, "y1":100, "x2":1000, "y2":620  },
-			"freq":[20, 100]
+			"freq":[20, 100],
+			"alwaysOn":true
 		},
 		{
 			"id": 1,
 			"spawn": { "x1":100, "y1":100, "x2":100, "y2":620  },
-			"freq":[10, 200]
+			"freq":[10, 200],
+			"alwaysOn":true
 		},
 		{
 			"id": 2,
 			"spawn": { "x1":-100, "y1":100, "x2":1380, "y2":100  },
-			"freq":[250, 1800]
+			"freq":[250, 1800],
+			"alwaysOn":false
 		}
 	],
 	"cars":[
@@ -190,7 +193,7 @@
 			"name":"tank",
 			"maxHealth":200,
 			"speed": 50,
-			"cost":1000,
+			"strength":1000,
 			"loot": 100,
 			"weapon": 0
 		},
@@ -199,7 +202,7 @@
 			"name":"soldier",
 			"maxHealth":40,
 			"speed": 15,
-			"cost":10,
+			"strength":10,
 			"loot": 0,		
 			"weapon": 1
 		},
@@ -208,7 +211,7 @@
 			"name":"katzuka",
 			"maxHealth":10,
 			"speed": 70,
-			"cost":100,
+			"strength":100,
 			"loot": 0,		
 			"weapon": 3
 		},
@@ -217,7 +220,7 @@
 			"name":"hotzwiner",
 			"maxHealth":50,
 			"speed": 12,
-			"cost":2000,
+			"strength":2000,
 			"loot": 0,		
 			"weapon": 2
 		}

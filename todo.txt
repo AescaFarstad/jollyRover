@@ -12,6 +12,13 @@ stepanglewindow - window??
 !пофиксить второй пендинг у колбека
 !вернуть шугар 1934
 
+game.cpp routeInput.load?????
+why routeinput is in shared??
+delete creep.cpp
+byte
+vector<T> vs T in serializer
+overwatch create objects during frame, GDC (sync)
+
 
 Рутинг портов https://serverfault.com/questions/112795/how-to-run-a-server-on-port-80-as-a-normal-user-on-linux
 sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT

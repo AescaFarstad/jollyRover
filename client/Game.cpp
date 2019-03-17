@@ -16,24 +16,24 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 	//addNetworkBindings();
 
 
-	std::unique_ptr<ConsequtiveTask> loadGameTask = std::make_unique<ConsequtiveTask>();
+	auto loadGameTask = std::make_unique<ConsequtiveTask>();
+	//std::unique_ptr<ConsequtiveTask> loadGameTask(new ConsequtiveTask);
 
 	loadGameTask->pushAsync([this](std::unique_ptr<Callback> callback) {
 		std::unique_ptr<AnonymousBinding> binding = std::make_unique<AnonymousBinding>("wait for greetings prompt from the server and send it");
 
-		auto handleRequest = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this, cb = callback.release()](std::unique_ptr<NetworkMessage> message) {
+		auto handleRequest = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this, cb = std::move(callback)](std::unique_ptr<NetworkMessage> message) {
 
 			GreetingMessage gMsg;
 			network->send(&gMsg);
 
 			cb->execute();
-			delete cb;
 		});
 		
 		binding->
-		bindByType(RequestTypes::REQUEST_GREETING)->
-		setCallOnce(true)->
-		setHandler(std::move(handleRequest));
+			bindByType(RequestTypes::REQUEST_GREETING)->
+			setCallOnce(true)->
+			setHandler(std::move(handleRequest));
 		
 		network->genericRequestBinder.bind(std::move(binding));
 		//binding->handle(std::make_unique<NetworkMessage>());

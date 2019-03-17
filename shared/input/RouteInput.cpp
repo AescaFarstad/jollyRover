@@ -106,7 +106,7 @@ void RouteInput::onMouseMove(SDL_MouseMotionEvent* event)
 void RouteInput::buildPath(Point &target)
 {
 	RoutePoint last = route.back();
-	Point step = target.subtract(last);
+	Point step = target - last;
 	step.scaleTo(prototypes->variables.routeStepSize);
 
 	while (last.distanceTo(target) > prototypes->variables.routeStepSize)
@@ -130,8 +130,8 @@ bool RouteInput::isAnglePositive(Point &target)
 {
 	auto iter = --route.end();
 
-	Point ongoingVector = (*iter).subtract(*(iter - 1));
-	Point finishingVector = (target).subtract(*iter);
+	Point ongoingVector = *iter - *(iter - 1);
+	Point finishingVector = target - *iter;
 
 	float angleDelta = FMath::angleDelta(ongoingVector.asAngle(), finishingVector.asAngle());
 	return fabsf(angleDelta) < prototypes->variables.stepAngleWindow / 2;

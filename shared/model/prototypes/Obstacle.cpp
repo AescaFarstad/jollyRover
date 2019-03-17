@@ -14,6 +14,7 @@ Obstacle::Obstacle(Obstacle const &other)
 	edges = other.edges;
 	AA = other.AA;
 	BB = other.BB;
+	centroid = other.centroid;
 
 	for (size_t i = 1; i < vertices.size(); i++)
 	{
@@ -46,11 +47,18 @@ bool Obstacle::isInside(Point &p)
 void from_json(const json &j, Obstacle &obstacle)
 {
 	obstacle.vertices = j.at("vertices").get<std::vector<Point>>();
+	
 
 	obstacle.AA.x = std::numeric_limits<float>::max();
 	obstacle.AA.y = std::numeric_limits<float>::max();
 	obstacle.BB.x = std::numeric_limits<float>::min();
 	obstacle.BB.y = std::numeric_limits<float>::min();
+	
+	
+	float area = 0;
+	float tmp;
+	obstacle.centroid.x = 0;
+	obstacle.centroid.y = 0;
 
 	for (size_t i = 0; i < obstacle.vertices.size(); i++)
 	{
@@ -65,6 +73,17 @@ void from_json(const json &j, Obstacle &obstacle)
 		{
 			obstacle.edges.emplace_back(&obstacle.vertices[i - 1], &v);
 		}
+		Point &vNext = obstacle.vertices[(i + 1) % obstacle.vertices.size()];
+		
+		//https://en.wikipedia.org/wiki/Centroid#Of_a_polygon
+		tmp = v.x * vNext.y - vNext.x * v.y;
+		area += tmp;
+		obstacle.centroid.x += (v.x + vNext.x) * tmp;
+		obstacle.centroid.y += (v.y + vNext.y) * tmp;
 	}
+	area /= 2;
+	obstacle.centroid.x /= 6 * area;
+	obstacle.centroid.y /= 6 * area;
+	
 	obstacle.edges.emplace_back(&obstacle.vertices.back(), &obstacle.vertices[0]);
 }

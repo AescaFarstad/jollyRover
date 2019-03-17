@@ -3,7 +3,7 @@
 GameState::GameState()
 {
 	timeStamp = 0;
-	idCounter = 0;
+	idCounter = 1;
 	stepsPerformed = 0;
 }
 
@@ -16,6 +16,7 @@ void GameState::deserialize(SerializationStream & stream)
 	Serializer::readVector(players, stream);
 	Serializer::readVector(creeps, stream);
 	Serializer::readVector(projectiles, stream);
+	Serializer::readVector(formations, stream);
 }
 
 void GameState::serialize(SerializationStream & stream) const 
@@ -27,4 +28,5 @@ void GameState::serialize(SerializationStream & stream) const
 	Serializer::writeVector(players, stream);
 	Serializer::writeVector(creeps, stream);
 	Serializer::writeVector(projectiles, stream);
+	Serializer::writeVector(formations, stream);
 }

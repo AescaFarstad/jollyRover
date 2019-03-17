@@ -25,11 +25,17 @@ public:
 	float asAngle();
 	std::string toString();
 
-	float distanceTo(const Point &anotherPoint);
-	Point subtract(const Point &anotherPoint);
-	void subtract(const Point &anotherPoint, Point &out);
-	Point add(const Point &anotherPoint);
-	void add(const Point &anotherPoint, Point &out);
+	float distanceTo(const Point& anotherPoint);
+	Point subtract(const Point& anotherPoint);
+	void subtract(const Point& anotherPoint, Point &out);
+	Point add(const Point& anotherPoint);
+	void add(const Point& anotherPoint, Point &out);
+	Point rotate(float angle);
+	void rotate(float angle, Point &out);
+	float crossProduct(Point &anotherPoint);
+	
+	void operator+=(const Point& p);
+	void operator-=(const Point& p);
 
 
 	void deserialize(SerializationStream& stream);
@@ -40,3 +46,5 @@ private:
 };
 
 void from_json(const json& j, Point& point);
+Point operator+(const Point& x, const Point& y);
+Point operator-(const Point& x, const Point& y);

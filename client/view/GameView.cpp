@@ -203,9 +203,9 @@ void GameView::drawCars()
 				SDL_RenderDrawRect(renderer, &rect);
 			}
 
-			Point carLocation = ride.route[ride.routeIndex + 1].subtract(ride.route[ride.routeIndex]);
+			Point carLocation = ride.route[ride.routeIndex + 1] - ride.route[ride.routeIndex];
 			carLocation.scaleTo(ride.progress * carLocation.getLength());
-			carLocation.add(ride.route[ride.routeIndex]);
+			carLocation += ride.route[ride.routeIndex];
 
 			SDL_Rect carRect;
 			carRect.x = carLocation.x - carSize / 2;
@@ -227,7 +227,7 @@ void GameView::drawCreeps()
 	int rectSize2 = 6;
 	setColor(color);
 	
-	for (Creep &creep : state->creeps)
+	for (CreepState &creep : state->creeps)
 	{
 		int rectSize = creep.weapon.prototypeId == 1 ? rectSize1 : rectSize2;
 		SDL_Rect rect;

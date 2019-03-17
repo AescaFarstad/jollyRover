@@ -92,6 +92,37 @@ void Point::add(const Point & anotherPoint, Point & out)
 	out.y = y + anotherPoint.y;
 }
 
+Point Point::rotate(float angle)
+{
+	return Point(x * FMath::cos(angle) - y * FMath::sin(angle),  x * FMath::sin(angle) + y * FMath::cos(angle));
+}
+
+void Point::rotate(float angle, Point &out)
+{
+	//&out can be the point itself -> don't mutate it until both x and y are final
+	float nx = x * FMath::cos(angle) - y * FMath::sin(angle);
+	float ny = x * FMath::sin(angle) + y * FMath::cos(angle);
+	out.x = nx;
+	out.y = ny;
+}
+
+float crossProduct(Point &anotherPoint)
+{
+	
+}
+	
+void Point::operator+=(const Point& p)
+{
+	x += p.x;
+	y += p.y;
+}
+
+void Point::operator-=(const Point& p)
+{
+	x -= p.x;
+	y -= p.y;
+}
+
 void Point::deserialize(SerializationStream &stream)
 {
 	Serializer::read(x, stream);
@@ -108,4 +139,13 @@ void from_json(const json &j, Point &point)
 {
 	point.x = j.at("x");
 	point.y = j.at("y");
+}
+
+Point operator+(const Point& x, const Point& y)
+{
+	return Point(x.x + y.x, x.y + y.y);
+}
+Point operator-(const Point& x, const Point& y)
+{
+	return Point(x.x - y.x, x.y - y.y);
 }

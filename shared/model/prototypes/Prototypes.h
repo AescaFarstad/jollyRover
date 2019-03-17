@@ -9,6 +9,7 @@
 #include <CreepProto.h>
 #include <FormationProto.h>
 #include <ObjectiveProto.h>
+#include <ForceProto.h>
 
 using json = nlohmann::json;
 
@@ -27,7 +28,8 @@ public:
 	std::vector<ForceProto> forces;
 	std::vector<FormationProto> formations;
 	std::vector<std::vector<ObjectiveProto>> objectives;
-
+	
+	void postProcess();
 
 	void load(json &source);
 };

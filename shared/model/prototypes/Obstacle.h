@@ -17,6 +17,7 @@ public:
 	std::vector<Edge> edges;
 	Point AA;
 	Point BB;
+	Point centroid;
 
 	bool isInside(Point &p);
 

@@ -32,7 +32,21 @@ void Prototypes::load(json &source)
 			objectives[force].push_back(o);
 		}
 	}
+	
+	postProcess();
 
 	//cars = source.at("loot").get<std::vector<LootProto>>();
 	//loot = source.at("cars").get<std::vector<CarProto>>();
+}
+
+void Prototypes::postProcess()
+{
+	for(auto& formation : formations)
+	{
+		formation.strength = 0;
+		for(auto& slot : formation.slots)
+		{
+			formation.strength += creeps[slot.creepType].strength;
+		}
+	}
 }
