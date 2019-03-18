@@ -28,6 +28,19 @@ Callback::Callback(Callback&& that)
 	isValid = that.isValid;
 	that.isValid = false;
 }
+
+Callback& Callback::operator=(Callback&& that)
+{
+	if (this != &that)
+	{
+		pendingCallback = that.pendingCallback;
+		if (pendingCallback)
+			pendingCallback->callback = this;
+		isValid = that.isValid;
+		that.isValid = false;		
+	}
+	return *this;
+}
  
 void Callback::execute()
 {

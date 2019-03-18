@@ -12,7 +12,9 @@ public:
 	Callback(std::function<void()> function);
 	~Callback();
 	Callback(const Callback& that) = delete;
+	Callback& operator=(const Callback& that) = delete;
 	Callback(Callback&& that);
+	Callback& operator=(Callback&& that);
 
 	void execute();
 	std::unique_ptr<PendingCallback> createPendingCallback();
