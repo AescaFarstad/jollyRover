@@ -96,7 +96,7 @@ namespace Creeps
 			creep.object.id = state->idCounter++;
 			
 			creep.unit.health = creep._creepProto->maxHealth;
-			creep.unit.location.setTo(location);
+			creep.unit.location = location;
 			
 			creep.weapon.prototypeId = creep._creepProto->weapon;
 			creep.weapon.attackCooldown = 0;
@@ -184,30 +184,36 @@ namespace Creeps
 		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed)
 		{
 			Point step = target - creep.unit.location;
-			step.scaleTo(creep._creepProto->speed * timePassed);
+			float stepSize = creep._creepProto->speed * timePassed;
+			step.scaleTo(stepSize);
 			
 			Point nextLoc = creep.unit.location + step;
 			Obstacle* obstacle = Field::findObstacle(nextLoc, prototypes);
 			if (obstacle)
 			{
-				direction = -FieldMath.crossProduct(_unit, target, obstacle.polygon.center);
-			
-				var bestPoint:Dot;
-				var bestDistance:Number = Number.POSITIVE_INFINITY;
-				for (var j:int = 0; j < obstacle.polygon.vertices.length; j++)
+				Point creepToTarget = creep.unit.location - target;
+				float direction = -creepToTarget.crossProduct(obstacle->centroid);
+				
+				Point* bestPoint = nullptr;
+				float bestDistance = std::numeric_limits<float>::max();
+				for(auto& vert : obstacle->vertices)
 				{
-					var dir:Number = FieldMath.crossProduct(_unit, target, obstacle.polygon.vertices[j]);
-					if (dir > 0 != direction > 0)
-						continue;
-					var distance:Number = obstacle.polygon.vertices[j].distanceTo(_unit);
-					if (distance < bestDistance)
+					float vertDir = creepToTarget.crossProduct(vert);
+					if (vertDir > 0 == direction > 0)
 					{
-						bestPoint = obstacle.polygon.vertices[j];
-						bestDistance = distance;
+						float distance = vert.distanceTo(creep.unit.location);
+						if (distance < bestDistance)
+						{
+							bestDistance = distance;
+							bestPoint = &vert;
+						}
 					}
 				}
+				step = *bestPoint - creep.unit.location;
+				step.scaleTo(stepSize);	
+				nextLoc = creep.unit.location + step;
 			}
-			creep.unit.location.setTo(nextLoc);
+			creep.unit.location = nextLoc;
 		}
 		
 		CreepState* creepByid(int32_t id, std::vector<CreepState>& creeps)

@@ -7,10 +7,6 @@ Point::Point(float x, float y)
 	this->y = y;
 }
 
-Point::~Point()
-{
-}
-
 void Point::scaleTo(float length)
 {
 	if (length == 0)
@@ -30,12 +26,6 @@ void Point::scaleTo(float length)
 	{
 		THROW_FATAL_ERROR("Can't scale (0;0) point");
 	}
-}
-
-void Point::setTo(const Point &anotherPoint)
-{
-	x = anotherPoint.x;
-	y = anotherPoint.y;
 }
 
 void Point::setToNaN()
@@ -106,9 +96,9 @@ void Point::rotate(float angle, Point &out)
 	out.y = ny;
 }
 
-float crossProduct(Point &anotherPoint)
+float Point::crossProduct(Point &anotherPoint)
 {
-	
+	return x*anotherPoint.y - anotherPoint.x * y;
 }
 	
 void Point::operator+=(const Point& p)

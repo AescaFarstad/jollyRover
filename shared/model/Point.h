@@ -13,13 +13,15 @@ class Point
 {
 public:
 	Point(float x = 0, float y = 0);
-	~Point();
+	/*
+	~Point() = default;
+	Point(const Point&) = default;
+	Point& operator=(const Point&) = default;*/
 
 	float x;
 	float y;
 
 	void scaleTo(float length);
-	void setTo(const Point &anotherPoint);
 	void setToNaN();
 	float getLength();
 	float asAngle();

@@ -84,6 +84,19 @@ PendingCallback::PendingCallback(PendingCallback&& that)
 	that.callback = nullptr;
 }
 
+
+PendingCallback& PendingCallback::operator=(PendingCallback&& that)
+{
+	if (this != &that)
+	{
+		callback = that.callback;
+		if (callback)
+			callback->pendingCallback = this;
+		that.callback = nullptr;		
+	}
+	return *this
+}
+
 void PendingCallback::disconnect()
 {
 	if (callback != nullptr)

@@ -33,6 +33,7 @@ public:
 	PendingCallback();
 	~PendingCallback();
 	PendingCallback(PendingCallback&& that);
+	PendingCallback& operator=(PendingCallback&& that);
 	void disconnect();
 	void cancel();
 
