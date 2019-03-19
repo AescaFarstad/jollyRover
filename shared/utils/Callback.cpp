@@ -94,7 +94,7 @@ PendingCallback& PendingCallback::operator=(PendingCallback&& that)
 			callback->pendingCallback = this;
 		that.callback = nullptr;		
 	}
-	return *this
+	return *this;
 }
 
 void PendingCallback::disconnect()

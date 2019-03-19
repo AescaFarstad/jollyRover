@@ -32,9 +32,9 @@ public:
 	void subtract(const Point& anotherPoint, Point &out);
 	Point add(const Point& anotherPoint);
 	void add(const Point& anotherPoint, Point &out);
-	Point rotate(float angle);
-	void rotate(float angle, Point &out);
-	float crossProduct(Point &anotherPoint);
+	Point rotate(const float angle);
+	void rotate(const float angle, Point &out);
+	float crossProduct(const Point &anotherPoint);
 	
 	void operator+=(const Point& p);
 	void operator-=(const Point& p);

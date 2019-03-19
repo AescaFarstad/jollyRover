@@ -67,7 +67,7 @@ void LoopBackNetwork::send(NetworkMessage* message)
 				case RequestTypes::REQUEST_JOIN_GAME:
 				{
 					GameStateMessage gsMsg;
-					GameState tempState;
+					GameState tempState(1934);
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
 					gsMsg.state = &tempState;
 					addToIncoming(&gsMsg);

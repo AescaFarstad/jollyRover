@@ -15,11 +15,11 @@ void from_json(const json &j, FormationProto &formation)
 	
 	std::string strType = j.at("type");	
 	if (strType == "assault")
-		formation.type = ASSAULT;
+		formation.type = FORMATION_TYPE::ASSAULT;
 	else if (strType == "hold")
-		formation.type = HOLD;
+		formation.type = FORMATION_TYPE::HOLD;
 	else if (strType == "transport")
-		formation.type = TRANSPORT;
+		formation.type = FORMATION_TYPE::TRANSPORT;
 	else
 		THROW_FATAL_ERROR("josn parse error");
 		

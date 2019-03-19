@@ -5,7 +5,9 @@ void from_json(const json &j, CreepProto &creep)
 	creep.id = j.at("id");
 	creep.name = j.at("name");
 	creep.maxHealth = j.at("maxHealth");
-	creep.speed = j.at("speed") / 1000;
+	creep.speed = j.at("speed");
+	creep.speed /= 1000;
+	
 	creep.loot = j.at("loot");
 	creep.strength = j.at("strength");
 	creep.weapon = j.at("weapon");

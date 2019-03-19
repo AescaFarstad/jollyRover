@@ -82,12 +82,12 @@ void Point::add(const Point & anotherPoint, Point & out)
 	out.y = y + anotherPoint.y;
 }
 
-Point Point::rotate(float angle)
+Point Point::rotate(const float angle)
 {
 	return Point(x * FMath::cos(angle) - y * FMath::sin(angle),  x * FMath::sin(angle) + y * FMath::cos(angle));
 }
 
-void Point::rotate(float angle, Point &out)
+void Point::rotate(const float angle, Point &out)
 {
 	//&out can be the point itself -> don't mutate it until both x and y are final
 	float nx = x * FMath::cos(angle) - y * FMath::sin(angle);
@@ -96,7 +96,7 @@ void Point::rotate(float angle, Point &out)
 	out.y = ny;
 }
 
-float Point::crossProduct(Point &anotherPoint)
+float Point::crossProduct(const Point &anotherPoint)
 {
 	return x*anotherPoint.y - anotherPoint.x * y;
 }

@@ -7,6 +7,11 @@ GameState::GameState()
 	stepsPerformed = 0;
 }
 
+GameState::GameState(uint32_t randomSeed) : GameState()
+{
+	random.initFromSeed(randomSeed);
+}
+
 void GameState::deserialize(SerializationStream & stream)
 {
 	Serializer::read(timeStamp, stream);

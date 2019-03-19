@@ -63,8 +63,8 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawObstacles();
 	drawInput();
 	drawCars();
-	//drawCreeps();
-	//drawProjectiles();
+	drawCreeps();
+	drawProjectiles();
 	//rendery(renderer, loadedSurface, ltexture);
 }
 

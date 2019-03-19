@@ -79,6 +79,7 @@ namespace Creeps
 					
 					CreepState& creep = spawnCreep(slot.creepType, formationCenter + slot.offset.rotate(angle), state, prototypes);
 					creep.mode = CREEP_MODE::FORMATION;
+					creep.unit.force = forceProto.id;
 					formation.slots.push_back(creep.object.id);
 				}
 			}
@@ -198,8 +199,8 @@ namespace Creeps
 				float bestDistance = std::numeric_limits<float>::max();
 				for(auto& vert : obstacle->vertices)
 				{
-					float vertDir = creepToTarget.crossProduct(vert);
-					if (vertDir > 0 == direction > 0)
+					float vertDir = creepToTarget.crossProduct(vert - creep.unit.location);
+					if (vertDir * direction > 0)
 					{
 						float distance = vert.distanceTo(creep.unit.location);
 						if (distance < bestDistance)

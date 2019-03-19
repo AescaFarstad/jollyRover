@@ -20,6 +20,7 @@ class GameState
 {
 public:
 	GameState();
+	GameState(uint32_t randomSeed);
 	~GameState() = default;
 	
 	std::vector<CreepState> creeps;
