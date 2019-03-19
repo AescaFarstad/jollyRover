@@ -11,7 +11,7 @@
                 "reveal": "never"
             }
         },
-		{
+        {
             "label": "clean lc",
             "type": "shell",
             "command": "make cleanlc",
@@ -29,7 +29,7 @@
             "problemMatcher": [],
             "presentation": {
                 "reveal": "always",
-				"panel": "new"
+                "panel": "new"
             }
         },
         {
@@ -40,7 +40,7 @@
             "problemMatcher": [],
             "presentation": {
                 "reveal": "always",
-				"panel": "new"
+                "panel": "new"
             }
         },
         {
@@ -51,7 +51,7 @@
             "problemMatcher": [],
             "presentation": {
                 "reveal": "always",
-				"panel": "new"
+                "panel": "new"
             }
         }
     ]
