@@ -22,12 +22,13 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 	loadGameTask->pushAsync([this](std::unique_ptr<Callback> callback) {
 		auto binding = std::make_unique<AnonymousBinding>("wait for greetings prompt from the server and send it");
 
-		auto handleRequest = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this, cb = std::move(callback)](std::unique_ptr<NetworkMessage> message) {
+		auto handleRequest = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this, cb = callback.release()](std::unique_ptr<NetworkMessage> message) {
 
 			GreetingMessage gMsg;
 			network->send(&gMsg);
 
 			cb->execute();
+			delete cb;
 		});
 		
 		binding->
@@ -40,7 +41,7 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 	}, "wait for greetings prompt from the server and send it");
 
 	loadGameTask->pushAsync([this](std::unique_ptr<Callback> callback) {
-		network->interceptOnce(MessageTypes::TYPE_GREETING_MSG, [this, cb = std::move(callback)](std::unique_ptr<NetworkMessage> message) {
+		network->interceptOnce(MessageTypes::TYPE_GREETING_MSG, [this, cb = callback.release()](std::unique_ptr<NetworkMessage> message) {
 
 			GreetingMessage* gMsg = dynamic_cast<GreetingMessage*>(message.release());
 			login = gMsg->login;
@@ -48,14 +49,16 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 			delete gMsg;
 
 			cb->execute();
+			delete cb;
 		});
 		//network->binder.traceBindings("added #2");
 	}, "wait for greetings response from the server");
 
 	auto ping = [this](std::unique_ptr<Callback> callback) {
-		network->interceptGenericRequestOnce(RequestTypes::REQUEST_PONG, [cb = std::move(callback)](std::unique_ptr<GenericRequestMessage> message) {
+		network->interceptGenericRequestOnce(RequestTypes::REQUEST_PONG, [cb = callback.release()](std::unique_ptr<GenericRequestMessage> message) {
 			
 			cb->execute();
+			delete cb;
 		});
 
 		GenericRequestMessage grMsg;
