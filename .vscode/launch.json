@@ -18,7 +18,11 @@
       "MIMode": "gdb",
       "preLaunchTask": "em lc",
       "setupCommands": [
-        
+        {
+          "description": "Enable pretty-printing for gdb and add better child debugging",
+          "text": "-enable-pretty-printing -gdb-set detach-on-fork off",
+          "ignoreFailures": true
+        },
 		{
 			"description": "Skip /build/glibc-bfm8X4/glibc-2.23/ files",
 			"text": "-interpreter-exec console \"skip -gfi /build/glibc-OTsEL5/glibc-2.27/**/*\""
@@ -46,6 +50,11 @@
 		{
 			"description": "Skip /build/glibc-bfm8X4/glibc-2.23/ files",
 			"text": "-interpreter-exec console \"skip -gfi /build/glibc-OTsEL5/glibc-2.27/**/*\""
+		},
+		{ 
+			"text": "handle SIGPIPE nostop pass", 
+			"description": "ignore SIGPIPE", 
+			"ignoreFailures": true 
 		}
       ]
     }
