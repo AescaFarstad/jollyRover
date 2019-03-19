@@ -24,11 +24,10 @@ Network::Network()
 		}
 	});
 	
-	std::unique_ptr<AnonymousBinding> binding = std::make_unique<AnonymousBinding>("Network generic binding");
+	auto binding = makeAnonymousBinding("Network generic binding", std::move(handleGenericRequest));
 	binding->
-	bindByType(MessageTypes::TYPE_REQUEST_MSG)->
-	setCallOnce(false)->
-	setHandler(std::move(handleGenericRequest));
+		bindByType(MessageTypes::TYPE_REQUEST_MSG)->
+		setCallOnce(false);
 	binder.bind(std::move(binding));
 
 	//----------------------------------

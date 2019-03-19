@@ -1,25 +1,60 @@
 #pragma once
 #include <ResponseBinding.h>
 
+template <typename T>
 class AnonymousBinding :
 	public ResponseBinding
 {
+	using PNetworkMessage = std::unique_ptr<NetworkMessage>;
+
 public:
-	AnonymousBinding(std::string name);
-	virtual ~AnonymousBinding();
 	AnonymousBinding(const AnonymousBinding& that) = delete;
-	AnonymousBinding(AnonymousBinding&& that);
+	AnonymousBinding(AnonymousBinding&& that) = default;
 
-	AnonymousBinding* bindByType(int16_t typeId);
-	AnonymousBinding* bindByLogin(int32_t login);
-	AnonymousBinding* bindByResponseTo(int32_t inResponseTo);
-	AnonymousBinding* setCallOnce(bool callOnce);
-	AnonymousBinding* setHandler(std::unique_ptr<std::function<void(std::unique_ptr<NetworkMessage>)>> handler);
+	AnonymousBinding(std::string name, T handler)
+		: ResponseBinding(std::move(name))
+		, m_handler(std::move(handler))
+	{
+	}
 
+	AnonymousBinding* bindByType(int16_t typeId)
+	{
+		bindsType = true;
+		this->typeId = typeId;
+		return this;
+	}
 
-	void handle(std::unique_ptr<NetworkMessage> message) override;
+	AnonymousBinding* bindByLogin(int32_t login)
+	{
+		bindsLogin = true;
+		this->login = login;
+		return this;
+	}
+
+	AnonymousBinding* bindByResponseTo(int32_t inResponseTo)
+	{
+		bindsResponseTo = true;
+		this->inResponseTo = inResponseTo;
+		return this;
+	}
+
+	AnonymousBinding* setCallOnce(bool callOnce)
+	{
+		this->callOnce = callOnce;
+		return this;
+	}
+
+	void handle(PNetworkMessage message) override
+	{
+		m_handler(std::move(message));
+	}
 
 private:
-	std::unique_ptr<std::function<void(std::unique_ptr<NetworkMessage>)>> handler;
+	T m_handler;
 };
 
+template <typename T>
+std::unique_ptr<AnonymousBinding<T>> makeAnonymousBinding(std::string name, T&& handler)
+{
+	return std::make_unique<AnonymousBinding<T>>(std::move(name), std::forward<T>(handler));
+}
