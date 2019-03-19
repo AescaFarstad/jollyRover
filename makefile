@@ -1,5 +1,5 @@
 WEB_COMPILER =../../emsdk/emscripten/1.38.24/em++
-LOCAL_COMPILER = g++
+LOCAL_COMPILER = $(CXX)
 OUT=out
 WEB_TARGET=$(OUT)/web
 LOCAL_TARGET=$(OUT)/local
