@@ -27,6 +27,7 @@ public:
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
+	void propagatePrototypes(std::vector<CreepProto>& creepProtos, std::vector<WeaponProto>& weaponProtos);
 
 private:
 

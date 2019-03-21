@@ -25,6 +25,13 @@ void CreepState::serialize(SerializationStream &stream) const
 	Serializer::write(mode, stream);
 }
 
+void CreepState::propagatePrototypes(std::vector<CreepProto>& creepProtos, std::vector<WeaponProto>& weaponProtos)
+{
+	_creepProto = &(creepProtos[object.prototypeId]);
+	_weaponProto = &(weaponProtos[_creepProto->weapon]);
+	
+}
+
 
 void Serializer::write(const CREEP_MODE& value, SerializationStream& stream)
 {

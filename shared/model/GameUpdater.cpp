@@ -34,6 +34,7 @@ void GameUpdater::load(std::unique_ptr<GameState> state, Prototypes* prototypes)
 	this->state = std::move(state);
 	lastValidTimeStamp = this->state->timeStamp;
 	saveState(this->state.get());
+	this->state->propagatePrototypes(prototypes);
 
 	this->prototypes = prototypes;
 
@@ -48,9 +49,10 @@ void GameUpdater::addNewInput(std::unique_ptr<InputMessage> input)
 
 std::unique_ptr<GameState> GameUpdater::getNewStateByStamp(uint32_t stamp)
 {
-	std::unique_ptr<GameState> result = std::make_unique<GameState>();
+	auto result = std::make_unique<GameState>();
 	SerializationStream* s = states.lower_bound(stamp)->second.get();
 	result->deserialize(*s);
+	result->propagatePrototypes(prototypes);
 
 	while (result->timeStamp < stamp - GAME_CONFIG::logicStepSize)
 	{
@@ -86,6 +88,7 @@ void GameUpdater::rewindToPrecedingState(uint32_t stamp)
 {
 	SerializationStream* s = states.lower_bound(stamp)->second.get();
 	state->deserialize(*s);
+	state->propagatePrototypes(prototypes);
 	s->seekAbsolute(0);
 }
 

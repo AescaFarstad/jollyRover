@@ -5,6 +5,7 @@
 #include <CreepState.h>
 #include <Projectile.h>
 #include <FormationState.h>
+#include <Prototypes.h>
 #include <vector>
 /*
 class ForceState
@@ -38,6 +39,7 @@ public:
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
+	void propagatePrototypes(Prototypes* prototypes);
 
 private:
 

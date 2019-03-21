@@ -24,6 +24,14 @@ void GameState::deserialize(SerializationStream& stream)
 	Serializer::readVector(formations, stream);
 }
 
+void GameState::propagatePrototypes(Prototypes* prototypes)
+{
+	for(auto& creep : creeps)
+	{
+		creep.propagatePrototypes(prototypes->creeps, prototypes->weapons);
+	}
+}
+
 void GameState::serialize(SerializationStream& stream) const 
 {
 	Serializer::write(timeStamp, stream);

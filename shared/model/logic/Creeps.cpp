@@ -46,8 +46,7 @@ namespace Creeps
 			{
 				if (creep._creepProto == nullptr)
 				{
-					creep._creepProto = &(prototypes->creeps[creep.object.prototypeId]);
-					creep._weaponProto = &(prototypes->weapons[creep._creepProto->weapon]);
+					THROW_FATAL_ERROR("Prototypes are not resolved");
 				}
 				state->_forceStrength[creep.unit.force] += creep._creepProto->strength;
 			}
