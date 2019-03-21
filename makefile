@@ -1,4 +1,5 @@
-WEB_COMPILER =../../emsdk/emscripten/1.38.24/em++
+EMSCRIPTEN ?= ../../emsdk/emscripten/1.38.24
+WEB_COMPILER := $(EMSCRIPTEN)/em++
 LOCAL_COMPILER = $(CXX)
 OUT=out
 WEB_TARGET=$(OUT)/web
