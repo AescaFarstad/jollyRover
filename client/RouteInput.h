@@ -1,13 +1,8 @@
 #pragma once
 #include <GameState.h>
-#include <InputMessage.h>
 #include <Point.h>
-#include <Edge.h>
-#include <FMath.h>
-#include <GameLogic.h>
 #include <Prototypes.h>
 #include <vector>
-#include <functional>
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL.h>
@@ -19,12 +14,15 @@ class RouteInput
 {
 public:
 	RouteInput();
-	~RouteInput();
+	~RouteInput() = default;
 
 	std::vector<RoutePoint> route;
 	bool isInputActive;
+	bool isLoaded;
+	bool isCompletelyValid;
 
-	void load(GameState* state, Prototypes* prototypes, std::function<void(std::unique_ptr<InputMessage>)> sendInputFunc);
+	void load(GameState* state, Prototypes* prototypes);
+	std::vector<Point> claimRoute();
 
 	void onMouseDown(SDL_MouseButtonEvent* event);
 	void onMouseUp(SDL_MouseButtonEvent* event);
@@ -32,10 +30,8 @@ public:
 
 private:
 
-	bool isLoaded;
 	GameState* state;
 	Prototypes* prototypes;
-	std::function<void(std::unique_ptr<InputMessage>)> sendInputFunc;
 	
 	void reset();
 

@@ -1,4 +1,7 @@
 #include <RouteInput.h>
+#include <GameLogic.h>
+#include <FMath.h>
+#include <Edge.h>
 
 
 RouteInput::RouteInput()
@@ -7,17 +10,24 @@ RouteInput::RouteInput()
 	isLoaded = false;
 }
 
-RouteInput::~RouteInput()
-{
-}
-
-void RouteInput::load(GameState* state, Prototypes* prototypes, std::function<void(std::unique_ptr<InputMessage>)> sendInputFunc)
+void RouteInput::load(GameState* state, Prototypes* prototypes)
 {
 	this->state = state;
 	this->prototypes = prototypes;
-	this->sendInputFunc = sendInputFunc;
 	isLoaded = true;
 }
+
+std::vector<Point> RouteInput::claimRoute()
+{
+	std::vector<Point> routeAsPoints;
+	for (RoutePoint& rp : route)
+	{
+		routeAsPoints.push_back(rp.location);
+	}
+	reset();
+	return routeAsPoints;
+}
+
 
 void RouteInput::onMouseDown(SDL_MouseButtonEvent* event)
 {
@@ -58,7 +68,7 @@ void RouteInput::onMouseUp(SDL_MouseButtonEvent* event)
 	GameLogic::buildRouteToTarget(finish.location, route, prototypes);
 	route.push_back(finish);
 
-	bool isCompletelyValid = true;
+	isCompletelyValid = true;
 
 	for (RoutePoint& p : route)
 	{
@@ -71,16 +81,8 @@ void RouteInput::onMouseUp(SDL_MouseButtonEvent* event)
 
 	if (isCompletelyValid)
 	{
-		std::vector<Point> routeAsPoints;
-		for (RoutePoint& rp : route)
-		{
-			routeAsPoints.push_back(rp.location);
-		}
-		sendInputFunc(std::make_unique<InputRouteMessage>(routeAsPoints));
 		S::log.add("Route input is valid!", { LOG_TAGS::INPUT_ });
 	}
-	reset();
-
 }
 
 void RouteInput::onMouseMove(SDL_MouseMotionEvent* event)
@@ -108,4 +110,5 @@ void RouteInput::reset()
 {
 	route.clear();
 	isInputActive = false;
+	isCompletelyValid = false;
 }

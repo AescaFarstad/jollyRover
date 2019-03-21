@@ -111,9 +111,16 @@ void Game::update()
 	if (gameUpdater.isLoaded)
 	{
 		gameUpdater.update(SDL_GetTicks() + clientToServerDelta);
-		routeInput->load(gameUpdater.state.get(), &prototypes, [this](std::unique_ptr<InputMessage> msg) {
-			network->send(msg.get());
-		});
+		if (!routeInput->isLoaded)
+		{	
+			routeInput->load(gameUpdater.state.get(), &prototypes);
+		}
+		if (routeInput->isCompletelyValid)
+		{
+			auto route = routeInput->claimRoute();
+			InputRouteMessage nim(route);
+			network->send(&nim);
+		}
 		gameView->render(gameUpdater.state.get(), routeInput);
 	}
 }
