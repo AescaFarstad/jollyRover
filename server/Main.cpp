@@ -15,16 +15,20 @@
 #include <Prototypes.h>
 #undef main
 
-const int MIN_TIME_PER_FRAME = 10;
+namespace MainInternal 
+{
+	const int MIN_TIME_PER_FRAME = 10;
 
-bool isFinished = false;
-int lastTicks = 0;
-ServerNetwork network;
-std::unique_ptr<NetworkMessage>* messageBuffer;
-GameUpdater gameUpdater;
-int32_t inputIdCounter = 0;
-Prototypes prototypes;
+	bool isFinished = false;
+	int lastTicks = 0;
+	ServerNetwork network;
+	std::unique_ptr<NetworkMessage>* messageBuffer;
+	GameUpdater gameUpdater;
+	int32_t inputIdCounter = 0;
+	Prototypes prototypes;
+}
 
+using namespace MainInternal;
 
 void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 {
@@ -148,7 +152,7 @@ void initLog()
 		//LOG_TAGS::GAME,
 
 		LOG_TAGS::NET_MESSAGE,
-		Z
+		LOG_TAGS::Z
 	});
 
 	S::log.enableTags({
@@ -158,7 +162,7 @@ void initLog()
 		LOG_TAGS::ERROR_,
 
 		//LOG_TAGS::NET_MESSAGE,
-		Z
+		LOG_TAGS::Z
 	});
 }
 

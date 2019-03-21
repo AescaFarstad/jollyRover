@@ -7,7 +7,7 @@
 		"maxRouteSteps": 4400,
 		"stepAngleWindow": 3.14,
 		"war":{
-			"intensity": 1000
+			"intensity": 1
 		}
 	},
 	"forces":[
@@ -316,206 +316,15 @@
 			"weight":100
 		}
 	],
-	"formations":[
-		{
-			"id":0,
-			"type":"assault",
-			"slots":[
-				{
-					"offset":{ "x":25, "y":10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-25, "y":10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":75, "y":10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-75, "y":10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":15, "y":40 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-15, "y":40 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":45, "y":40 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-45, "y":40 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":75, "y":40 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-75, "y":40 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":15, "y":70 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-15, "y":70 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":45, "y":70 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-45, "y":70 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":75, "y":70 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-75, "y":70 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":15, "y":100 },
-					"creepType":2,
-					"optional":true
-				},
-				{
-					"offset":{ "x":-15, "y":100 },
-					"creepType":2,
-					"optional":true
-				},
-				{
-					"offset":{ "x":45, "y":100 },
-					"creepType":2,
-					"optional":true
-				},
-				{
-					"offset":{ "x":-45, "y":100 },
-					"creepType":2,
-					"optional":true
-				},
-				{
-					"offset":{ "x":75, "y":100 },
-					"creepType":2,
-					"optional":true
-				},
-				{
-					"offset":{ "x":-75, "y":100 },
-					"creepType":2,
-					"optional":true
-				},
-				{
-					"offset":{ "x":120, "y":50 },
-					"creepType":1,
-					"optional":true
-				},
-				{
-					"offset":{ "x":-120, "y":50 },
-					"creepType":1,
-					"optional":true
-				}				
-			]
-		},
+	"formations":[		
 		{
 			"id":1,
 			"type":"assault",
 			"slots":[
 				{
 					"offset":{ "x":0, "y":10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":25, "y":30 },
 					"creepType":2,
 					"optional":false
-				},
-				{
-					"offset":{ "x":-25, "y":30 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":55, "y":35 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-55, "y":35 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":25, "y":60 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-25, "y":60 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":55, "y":65 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-55, "y":65 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "x":0, "y":65 },
-					"creepType":1,
-					"optional":true
-				},
-				{
-					"offset":{ "x":15, "y":110 },
-					"creepType":2,
-					"optional":true
-				},
-				{
-					"offset":{ "x":-15, "y":110 },
-					"creepType":2,
-					"optional":true
-				},
-				{
-					"offset":{ "x":45, "y":110 },
-					"creepType":2,
-					"optional":true
-				},
-				{
-					"offset":{ "x":-45, "y":110 },
-					"creepType":2,
-					"optional":true
 				}
 			]
 		}

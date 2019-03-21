@@ -81,16 +81,20 @@ $(OBJDIR_CLIENT_SERVER)/%.bc : %.cpp
 -include $(SUBOBJ_WEB:.bc=.d)
 -include $(SUBOBJ_SERVER:.bc=.d)
 	
-clean: cleanlc
-	rm -rf $(OBJDIR_CLIENT_WEB)/
+clean: cleanlc cleanServer cleanWeb
+	
+cleanlc:
+	rm -rf $(OBJDIR_CLIENT_LOCAL)/
+	rm -f $(LOCAL_TARGET)	
+
+cleanServer:
 	rm -rf $(OBJDIR_CLIENT_SERVER)/
 	rm -f $(SERVER_TARGET)
+	
+cleanWeb:
+	rm -rf $(OBJDIR_CLIENT_WEB)/
 	rm -f $(WEB_TARGET).html
 	rm -f $(WEB_TARGET).html.map
 	rm -f $(WEB_TARGET).js
 	rm -f $(WEB_TARGET).wasm
-	
-cleanlc:
-	rm -rf $(OBJDIR_CLIENT_LOCAL)/
-	rm -f $(LOCAL_TARGET)
 	

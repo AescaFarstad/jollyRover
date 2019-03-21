@@ -17,6 +17,8 @@
 	#include <SDL2/SDL.h>
 #endif
 
+namespace MainInternal
+{
 
 const int SCREEN_WIDTH = 640;
 const int SCREEN_HEIGHT = 480;
@@ -30,6 +32,8 @@ Game* game;
 bool isFinished = false;
 int lastTicks = 0;
 FPSMeter fpsMeter;
+}
+using namespace MainInternal;
 
 void mainLoop(void* arg)
 {
@@ -109,7 +113,7 @@ int main(int argc, char* args[])
 		//LOG_TAGS::GAME,
 
 		LOG_TAGS::NET_MESSAGE,
-		Z
+		LOG_TAGS::Z
 	});
 
 	S::log.enableTags({
@@ -119,7 +123,7 @@ int main(int argc, char* args[])
 		LOG_TAGS::ERROR_,
 
 		//LOG_TAGS::NET_MESSAGE,
-		Z
+		LOG_TAGS::Z
 	});
 	
 	game = new Game(window, renderer);

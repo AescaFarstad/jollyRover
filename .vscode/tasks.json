@@ -22,6 +22,26 @@
             }
         },
         {
+            "label": "clean s",
+            "type": "shell",
+            "command": "make cleanServer",
+            "args": [],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "never"
+            }
+        },
+        {
+            "label": "clean wc",
+            "type": "shell",
+            "command": "make cleanWeb",
+            "args": [],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "never"
+            }
+        },
+        {
             "label": "em wc",
             "type": "shell",
             "command": "make web",

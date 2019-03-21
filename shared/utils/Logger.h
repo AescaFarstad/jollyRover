@@ -12,7 +12,7 @@
 	#include <SDL2/SDL.h>
 #endif
 
-enum LOG_TAGS : int
+enum class LOG_TAGS : int
 {
 	UNIQUE,
 	ERROR_,
