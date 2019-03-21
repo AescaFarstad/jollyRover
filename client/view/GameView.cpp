@@ -143,7 +143,7 @@ void GameView::drawInput()
 
 	for (size_t i = 1; i < routeInput->route.size(); i++)
 	{
-		bool isValidEdge = routeInput->route[i].isValid;
+		bool isValidEdge = routeInput->route[i].isValid_;
 		uint32_t newColor = isValidEdge ? validColor : invalidColor;
 		if (lastColor != newColor)
 		{
@@ -151,15 +151,15 @@ void GameView::drawInput()
 			lastColor = newColor;
 		}
 		SDL_RenderDrawLine(renderer,
-			(int)routeInput->route[i - 1].x,
-			(int)routeInput->route[i - 1].y,
-			(int)routeInput->route[i].x,
-			(int)routeInput->route[i].y
+			(int)routeInput->route[i - 1].location.x,
+			(int)routeInput->route[i - 1].location.y,
+			(int)routeInput->route[i].location.x,
+			(int)routeInput->route[i].location.y
 		);
 
 		//S::log.add(std::to_string(i) + " draw " + routeInput->route[i - 1].toString() + " -> " + routeInput->route[i].toString());
 
-		newColor = routeInput->route[i].isValid ? validColor : invalidColor;
+		newColor = routeInput->route[i].isValid_ ? validColor : invalidColor;
 		if (lastColor != newColor)
 		{
 			setColor(newColor);
@@ -167,8 +167,8 @@ void GameView::drawInput()
 		}
 
 		SDL_Rect rect;
-		rect.x = routeInput->route[i].x - rectSize / 2;
-		rect.y = routeInput->route[i].y - rectSize / 2;
+		rect.x = routeInput->route[i].location.x - rectSize / 2;
+		rect.y = routeInput->route[i].location.y - rectSize / 2;
 		rect.w = rectSize;
 		rect.h = rectSize;
 		SDL_RenderDrawRect(renderer, &rect);

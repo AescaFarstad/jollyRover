@@ -42,3 +42,13 @@ public:
 private:
 
 };
+
+class RoutePoint
+{
+public:
+	Point location;
+	bool isValid_;
+	
+	void deserialize(SerializationStream& stream);
+	void serialize(SerializationStream& stream) const;
+};

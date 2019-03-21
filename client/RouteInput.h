@@ -15,7 +15,6 @@
 	#include <SDL2/SDL.h>
 #endif
 
-class RoutePoint;
 class RouteInput
 {
 public:
@@ -37,22 +36,9 @@ private:
 	GameState* state;
 	Prototypes* prototypes;
 	std::function<void(std::unique_ptr<InputMessage>)> sendInputFunc;
-
-	void buildPath(Point &target);
-	bool isAnglePositive(Point &target);
-	bool testIsValid(Point &from, Point &to);
+	
 	void reset();
 
-};
-
-class RoutePoint : public Point
-{
-public:
-	RoutePoint();
-	RoutePoint(float x, float y);
-	~RoutePoint();
-
-	bool isValid;
 };
 
 

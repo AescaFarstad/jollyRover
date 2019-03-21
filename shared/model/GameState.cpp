@@ -12,7 +12,7 @@ GameState::GameState(uint32_t randomSeed) : GameState()
 	random.initFromSeed(randomSeed);
 }
 
-void GameState::deserialize(SerializationStream & stream)
+void GameState::deserialize(SerializationStream& stream)
 {
 	Serializer::read(timeStamp, stream);
 	Serializer::read(random, stream);
@@ -24,7 +24,7 @@ void GameState::deserialize(SerializationStream & stream)
 	Serializer::readVector(formations, stream);
 }
 
-void GameState::serialize(SerializationStream & stream) const 
+void GameState::serialize(SerializationStream& stream) const 
 {
 	Serializer::write(timeStamp, stream);
 	Serializer::write(random, stream);
@@ -34,4 +34,14 @@ void GameState::serialize(SerializationStream & stream) const
 	Serializer::writeVector(creeps, stream);
 	Serializer::writeVector(projectiles, stream);
 	Serializer::writeVector(formations, stream);
+}
+
+void RoutePoint::deserialize(SerializationStream& stream)
+{
+	Serializer::read(location, stream);
+}
+
+void RoutePoint::serialize(SerializationStream& stream) const 
+{
+	Serializer::write(location, stream);
 }

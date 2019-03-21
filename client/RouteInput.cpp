@@ -27,10 +27,10 @@ void RouteInput::onMouseDown(SDL_MouseButtonEvent* event)
 		event->y < prototypes->variables.fieldHeight && event->y > 0)
 	{
 		Point touch(event->x, event->y);
-		S::log.add(touch.toString());
-		route.push_back(RoutePoint(event->x, prototypes->variables.fieldHeight));
-
-		buildPath(touch);
+		//S::log.add(touch.toString());
+		route.push_back(RoutePoint{Point(event->x, prototypes->variables.fieldHeight), true});
+		GameLogic::buildRouteToTarget(touch, route, prototypes);
+		//GameLogic::isRouteAnglePositive(route, touch, prototypes);
 
 		isInputActive = true;
 	}
@@ -48,21 +48,21 @@ void RouteInput::onMouseUp(SDL_MouseButtonEvent* event)
 		return;
 	}
 
-	RoutePoint finish(event->x, prototypes->variables.fieldHeight);
-	if (!isAnglePositive(finish))
+	RoutePoint finish{Point(event->x, prototypes->variables.fieldHeight), true}; //Assumed no obstacles next to the field edge
+	if (!GameLogic::isRouteAnglePositive(route, finish.location, prototypes))
 	{
 		reset();
 		return;
 	}
 
-	buildPath(finish);
+	GameLogic::buildRouteToTarget(finish.location, route, prototypes);
 	route.push_back(finish);
 
 	bool isCompletelyValid = true;
 
-	for (RoutePoint &p : route)
+	for (RoutePoint& p : route)
 	{
-		if (!p.isValid)
+		if (!p.isValid_)
 		{
 			isCompletelyValid = false;
 			break;
@@ -72,9 +72,9 @@ void RouteInput::onMouseUp(SDL_MouseButtonEvent* event)
 	if (isCompletelyValid)
 	{
 		std::vector<Point> routeAsPoints;
-		for (RoutePoint &rp : route)
+		for (RoutePoint& rp : route)
 		{
-			routeAsPoints.emplace_back(rp.x, rp.y);
+			routeAsPoints.push_back(rp.location);
 		}
 		sendInputFunc(std::make_unique<InputRouteMessage>(routeAsPoints));
 		S::log.add("Route input is valid!", { LOG_TAGS::INPUT_ });
@@ -93,65 +93,19 @@ void RouteInput::onMouseMove(SDL_MouseMotionEvent* event)
 	{
 		Point touch(event->x, event->y);
 
-		while (route.size() > 1 && !isAnglePositive(touch))
+		while (route.size() > 1 && !GameLogic::isRouteAnglePositive(route, touch, prototypes))
 		{
 			//S::log.add("-point:" + route.back().toString(), { LOG_TAGS::INPUT_ });
 			route.pop_back();
 		}
 
-		buildPath(touch);
+		GameLogic::buildRouteToTarget(touch, route, prototypes);
 	}
 }
-
-void RouteInput::buildPath(Point &target)
-{
-	RoutePoint last = route.back();
-	Point step = target - last;
-	step.scaleTo(prototypes->variables.routeStepSize);
-
-	while (last.distanceTo(target) > prototypes->variables.routeStepSize)
-	{
-		route.emplace_back();
-		RoutePoint &newPoint = route.back();
-
-		newPoint.x = last.x + step.x;
-		newPoint.y = last.y + step.y;
-
-		newPoint.isValid = GameLogic::testEdgeIsValid(last, newPoint, prototypes->obstacles);
-		//std::cout << "+point:" + newPoint.toString() + " " + (newPoint.isValid ? "true" : "false") << "\n";
-		//S::log.add("+point:" + newPoint.toString() + " " + (newPoint.isValid ? "true" : "false"), { LOG_TAGS::INPUT_ });
-
-		last = newPoint;
-	}
-}
-
-
-bool RouteInput::isAnglePositive(Point &target)
-{
-	auto iter = --route.end();
-
-	Point ongoingVector = *iter - *(iter - 1);
-	Point finishingVector = target - *iter;
-
-	float angleDelta = FMath::angleDelta(ongoingVector.asAngle(), finishingVector.asAngle());
-	return fabsf(angleDelta) < prototypes->variables.stepAngleWindow / 2;
-}
-
 
 
 void RouteInput::reset()
 {
 	route.clear();
 	isInputActive = false;
-}
-
-
-RoutePoint::RoutePoint()
-{
-}
-
-RoutePoint::RoutePoint(float x, float y) : Point(x, y) { isValid = true; }
-
-RoutePoint::~RoutePoint()
-{
 }

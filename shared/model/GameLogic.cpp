@@ -81,7 +81,7 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 	Creeps::removeDeadCreeps(state);*/
 }
 
-bool GameLogic::testRouteIsValid(std::vector<Point> &route)
+bool GameLogic::testRouteIsValid(std::vector<Point>& route)
 {
 	if (route.size() < (size_t)prototypes->variables.minRouteSteps || 
 		route.size() > (size_t)prototypes->variables.maxRouteSteps)
@@ -113,13 +113,13 @@ bool GameLogic::testRouteIsValid(std::vector<Point> &route)
 	return true;
 }
 
-bool GameLogic::testEdgeIsValid(Point &from, Point &to, std::vector<Obstacle> &obstacles)
+bool GameLogic::testEdgeIsValid(Point& from, Point& to, std::vector<Obstacle>& obstacles)
 {
 	Edge testEdge(&from, &to);
 	Point AA(std::min(from.x, to.x), std::min(from.y, to.y));
 	Point BB(std::max(from.x, to.x), std::max(from.y, to.y));
 
-	for (Obstacle &obstacle : obstacles)
+	for (Obstacle& obstacle : obstacles)
 	{
 		if (obstacle.AA.x <= BB.x && obstacle.AA.y <= BB.y && obstacle.BB.x >= AA.x && obstacle.BB.y >= AA.y)
 		{
@@ -147,6 +147,46 @@ bool GameLogic::testEdgeIsValid(Point &from, Point &to, std::vector<Obstacle> &o
 		}
 	}
 	return true;
+}
+
+bool GameLogic::buildRouteToTarget(Point& target, std::vector<RoutePoint>& route, Prototypes* prototypes)
+{
+	int stepsLeft = route.back().location.distanceTo(target) / prototypes->variables.routeStepSize;
+	int y = route.size();
+	route.resize(route.size() + stepsLeft);	
+	
+	auto iter = route.end() - stepsLeft;
+	Point& last_ref = (route.end() - stepsLeft - 1)->location;
+	Point* last_p = &last_ref;
+	
+	Point step = target - last_ref;
+	step.scaleTo(prototypes->variables.routeStepSize);		
+
+	while (stepsLeft--)
+	{
+		Point& newPoint = iter->location;
+
+		newPoint.x = last_p->x + step.x;
+		newPoint.y = last_p->y + step.y;
+
+		iter->isValid_ = GameLogic::testEdgeIsValid(*last_p, newPoint, prototypes->obstacles);
+		//std::cout << "+point:" + newPoint.toString() + " " + (newPoint.isValid ? "true" : "false") << "\n";
+		//S::log.add("+point:" + newPoint.toString() + " " + (iter->isValid_ ? "true" : "false"), { LOG_TAGS::INPUT_ });
+
+		last_p = &newPoint;
+		iter++;
+	}
+}
+
+bool GameLogic::isRouteAnglePositive(std::vector<RoutePoint>& route, Point& target, Prototypes* prototypes)
+{
+	auto iter = --route.end();
+
+	Point ongoingVector = iter->location - (iter - 1)->location;
+	Point finishingVector = target - iter->location;
+
+	float angleDelta = FMath::angleDelta(ongoingVector.asAngle(), finishingVector.asAngle());
+	return fabsf(angleDelta) < prototypes->variables.stepAngleWindow / 2;
 }
 
 void GameLogic::handleActionInput(InputActionMessage* input)
