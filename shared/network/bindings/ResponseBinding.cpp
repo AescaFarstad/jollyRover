@@ -6,7 +6,8 @@ ResponseBinding::ResponseBinding(std::string name)
 {
 	bindsLogin = false;
 	bindsResponseTo = false;
-	bindsType = false;
+	bindsMsgType = false;
+	bindsGenericType = false;
 	callOnce = true;
 	this->name = name;
 }
@@ -19,8 +20,10 @@ ResponseBinding::~ResponseBinding()
 std::string  ResponseBinding::toString()
 {
 	std::string result = name + " ";
-	if (bindsType)
-		result += "t:" + std::to_string(typeId) + " ";
+	if (bindsMsgType)
+		result += "t:" + std::to_string((int16_t)msgTypeId) + " ";
+	if (bindsGenericType)
+		result += "t:" + std::to_string((int16_t)genericTypeId) + " ";
 	if (bindsLogin)
 		result += "login:" + std::to_string(login) + " ";
 	if (bindsResponseTo)

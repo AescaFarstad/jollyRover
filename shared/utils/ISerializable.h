@@ -1,5 +1,6 @@
 #pragma once
 #include <Serializer.h>
+#include <MessageTypes.h>
 
 class ISerializable
 {
@@ -16,6 +17,11 @@ namespace Serializer {
 	void read(ISerializable& value, SerializationStream& stream);
 	void write(ISerializable* value, SerializationStream& stream);
 	void read(ISerializable* value, SerializationStream& stream);
+	
+	void write(MessageTypes& value, SerializationStream& stream);
+	void read(MessageTypes& value, SerializationStream& stream);
+	void write(RequestTypes& value, SerializationStream& stream);
+	void read(RequestTypes& value, SerializationStream& stream);
 	
 	
 	template <typename T>

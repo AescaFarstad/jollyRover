@@ -13,13 +13,13 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(NetworkPacket* pack
 	int16_t type;
 	Serializer::read(type, packet->payload);
 	ReadOnlySerializationStream rstream(packet->payload, packet->payloadSize);
-	std::unique_ptr<NetworkMessage> p = pointerByType(type);
+	std::unique_ptr<NetworkMessage> p = pointerByType((MessageTypes)type);
 	p->deserialize(rstream);
 	return p;
 }
 
 
-std::unique_ptr<NetworkMessage> NetworkMessageFactory::pointerByType(int16_t type)
+std::unique_ptr<NetworkMessage> NetworkMessageFactory::pointerByType(MessageTypes type)
 {
 	if (type == MessageTypes::TYPE_INPUT_ACTION_MSG)
 		return std::make_unique<InputActionMessage>();

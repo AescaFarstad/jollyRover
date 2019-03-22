@@ -47,7 +47,7 @@ bool ResponseBinder::process(std::unique_ptr<NetworkMessage> msg)
 	for (auto i = bindings.begin(); i != bindings.end(); i++) {
 		if (match(i->binding.get(), p_msg))
 		{
-			std::cout << "apply binding " << i->binding->name << " " <<i->binding->callOnce << "\n";
+			S::log.add("apply binding " + i->binding->name + " " + std::to_string(i->binding->callOnce), {LOG_TAGS::NET});
 			i->binding->handle(std::move(msg));
 
 			if (i->binding->callOnce)
@@ -66,7 +66,7 @@ bool ResponseBinder::process(std::unique_ptr<NetworkMessage> msg)
 
 bool ResponseBinder::match(ResponseBinding* binding, NetworkMessage* msg)
 {
-	return (!binding->bindsType || binding->typeId == msg->typeId) &&
+	return (!binding->bindsMsgType || binding->msgTypeId == msg->typeId) &&
 			(!binding->bindsLogin || binding->login == msg->login) &&
 			(!binding->bindsResponseTo || binding->inResponseTo == msg->inResponseTo);
 }
@@ -91,5 +91,5 @@ GenericRequestBinder::~GenericRequestBinder()
 bool GenericRequestBinder::match(ResponseBinding* binding, NetworkMessage* msg)
 {
 	GenericRequestMessage* grm = static_cast<GenericRequestMessage*>(msg);
-	return binding->typeId == grm->request;
+	return binding->genericTypeId == grm->request;
 }

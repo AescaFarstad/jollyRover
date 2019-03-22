@@ -32,7 +32,7 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 		});
 		
 		binding->
-			bindByType(RequestTypes::REQUEST_GREETING)->
+			bindByGenericType(RequestTypes::REQUEST_GREETING)->
 			setCallOnce(true)->
 			setHandler(std::move(handleRequest));
 		
@@ -230,28 +230,28 @@ void Game::addNetworkBindings()
 	
 	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_ACTION_MSG");
 	binding->
-	bindByType(MessageTypes::TYPE_INPUT_ACTION_MSG)->
+	bindByMsgType(MessageTypes::TYPE_INPUT_ACTION_MSG)->
 	setCallOnce(false)->
 	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
 	network->binder.bind(std::move(binding));
 	
 	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_JOINED_MSG");
 	binding->
-	bindByType(MessageTypes::TYPE_INPUT_JOINED_MSG)->
+	bindByMsgType(MessageTypes::TYPE_INPUT_JOINED_MSG)->
 	setCallOnce(false)->
 	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
 	network->binder.bind(std::move(binding));
 
 	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_ROUTE_MSG");
 	binding->
-	bindByType(MessageTypes::TYPE_INPUT_ROUTE_MSG)->
+	bindByMsgType(MessageTypes::TYPE_INPUT_ROUTE_MSG)->
 	setCallOnce(false)->
 	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
 	network->binder.bind(std::move(binding));
 
 	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_LEFT_MSG");
 	binding->
-	bindByType(MessageTypes::TYPE_INPUT_LEFT_MSG)->
+	bindByMsgType(MessageTypes::TYPE_INPUT_LEFT_MSG)->
 	setCallOnce(false)->
 	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
 	network->binder.bind(std::move(binding));
@@ -301,7 +301,7 @@ void Game::addNetworkBindings()
 
 	binding = std::make_unique<AnonymousBinding>("TYPE_GAME_STATE_MSG");
 	binding->
-	bindByType(MessageTypes::TYPE_GAME_STATE_MSG)->
+	bindByMsgType(MessageTypes::TYPE_GAME_STATE_MSG)->
 	setCallOnce(false)->
 	setHandler(std::move(handleGameState));
 	network->binder.bind(std::move(binding));

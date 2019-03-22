@@ -20,13 +20,13 @@ Network::Network()
 		if (!genericRequestBinder.process(std::move(message)))
 		{
 			GenericRequestMessage* t = dynamic_cast<GenericRequestMessage*>(message.get());
-			S::log.add("GenericRequestMessage is not handled: " + t->getName() + " " + std::to_string(t->request), { LOG_TAGS::NET });
+			S::log.add("GenericRequestMessage is not handled: " + t->getName() + " " + std::to_string((int16_t)t->request), { LOG_TAGS::NET });
 		}
 	});
 	
 	std::unique_ptr<AnonymousBinding> binding = std::make_unique<AnonymousBinding>("Network generic binding");
 	binding->
-	bindByType(MessageTypes::TYPE_REQUEST_MSG)->
+	bindByMsgType(MessageTypes::TYPE_REQUEST_MSG)->
 	setCallOnce(false)->
 	setHandler(std::move(handleGenericRequest));
 	binder.bind(std::move(binding));
@@ -145,7 +145,7 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 	int32_t ticks = SDL_GetTicks();
 	if (resultMessage->inResponseTo > 0 &&
 		requestTimeByInitiatorId[resultMessage->inResponseTo] &&
-		resultMessage->stamp != -1) //resultMessage->stamp is unsigned! 0_o
+		resultMessage->stamp != 0)
 	{
 		int32_t uncertaintyBefore = timeSync.getUncertainty();
 		timeSync.addMeasurement(requestTimeByInitiatorId[resultMessage->inResponseTo], resultMessage->stamp, ticks);
@@ -192,7 +192,7 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 	return nullptr;	
 }
 
-void Network::interceptOnce(int16_t messageType, MessageHandler handler)
+void Network::interceptOnce(MessageTypes messageType, MessageHandler handler)
 {
 	if (interceptors_once.count(messageType) > 0)
 		THROW_FATAL_ERROR("message type already intercepted");
@@ -201,7 +201,7 @@ void Network::interceptOnce(int16_t messageType, MessageHandler handler)
 	interceptors_once[messageType] = handler;
 }
 
-void Network::interceptGenericRequestOnce(int16_t requestType, GenericRequestHandler handler)
+void Network::interceptGenericRequestOnce(RequestTypes requestType, GenericRequestHandler handler)
 {
 	if (interceptorsGeneric_once.count(requestType) > 0)
 		THROW_FATAL_ERROR("request type already intercepted");

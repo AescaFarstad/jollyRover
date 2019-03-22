@@ -21,11 +21,11 @@ public:
 
 	std::unique_ptr<NetworkMessage> parse(NetworkPacket* packet);
 
-	std::unique_ptr<NetworkMessage> pointerByType(int16_t type);
+	std::unique_ptr<NetworkMessage> pointerByType(MessageTypes type);
 	
 
 	template <typename T, typename A>
-	T pointerByType2(int16_t type, A &source)
+	T pointerByType2(MessageTypes type, A &source)
 	{
 		if (type == MessageTypes::TYPE_INPUT_ACTION_MSG)
 			return std::make_unique<InputActionMessage>(source);

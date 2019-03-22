@@ -7,8 +7,8 @@ class InputMessage :
 	public NetworkMessage
 {
 public:
-	InputMessage();
-	~InputMessage();
+	InputMessage() = default;
+	~InputMessage() = default;
 	int32_t serverStamp;
 	int16_t localId;
 	int16_t serverId;

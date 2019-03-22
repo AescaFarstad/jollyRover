@@ -152,7 +152,6 @@ bool GameLogic::testEdgeIsValid(Point& from, Point& to, std::vector<Obstacle>& o
 bool GameLogic::buildRouteToTarget(Point& target, std::vector<RoutePoint>& route, Prototypes* prototypes)
 {
 	int stepsLeft = route.back().location.distanceTo(target) / prototypes->variables.routeStepSize;
-	int y = route.size();
 	route.resize(route.size() + stepsLeft);	
 	
 	auto iter = route.end() - stepsLeft;
