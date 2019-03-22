@@ -218,11 +218,7 @@ void Game::handleKeyDown(KEYBOARD_ACTIONS code)
 		case KEYBOARD_ACTIONS::TIME_STEP1 :
 		{
 			InputTimeMessage timeMsg;
-			if (gameUpdater.state->time.allowedSteps > 0)
-				timeMsg.allowSteps = gameUpdater.state->time.allowedSteps;
-			else
-				timeMsg.allowSteps = gameUpdater.state->time.performedSteps;
-			timeMsg.allowSteps += 1;	
+			timeMsg.allowSteps = 1;	
 			timeMsg.modifyAllowSteps = true;
 			network->send(&timeMsg);
 			break;
@@ -230,11 +226,7 @@ void Game::handleKeyDown(KEYBOARD_ACTIONS code)
 		case KEYBOARD_ACTIONS::TIME_STEP5 :
 		{
 			InputTimeMessage timeMsg;
-			if (gameUpdater.state->time.allowedSteps > 0)
-				timeMsg.allowSteps = gameUpdater.state->time.allowedSteps;
-			else
-				timeMsg.allowSteps = gameUpdater.state->time.performedSteps;
-			timeMsg.allowSteps += 5;	
+			timeMsg.allowSteps = 5;	
 			timeMsg.modifyAllowSteps = true;
 			network->send(&timeMsg);
 			break;
@@ -242,11 +234,7 @@ void Game::handleKeyDown(KEYBOARD_ACTIONS code)
 		case KEYBOARD_ACTIONS::TIME_STEP25 :
 		{
 			InputTimeMessage timeMsg;
-			if (gameUpdater.state->time.allowedSteps > 0)
-				timeMsg.allowSteps = gameUpdater.state->time.allowedSteps;
-			else
-				timeMsg.allowSteps = gameUpdater.state->time.performedSteps;
-			timeMsg.allowSteps += 25;	
+			timeMsg.allowSteps = 25;	
 			timeMsg.modifyAllowSteps = true;
 			network->send(&timeMsg);
 			break;
@@ -307,6 +295,14 @@ void Game::handleKeyDown(KEYBOARD_ACTIONS code)
 			network->send(&timeMsg);
 			break;
 		};
+		case KEYBOARD_ACTIONS::TIME_TOGGLE_PAUSE :
+		{
+			InputTimeMessage timeMsg;
+			timeMsg.allowSteps = gameUpdater.state->time.allowedSteps > 0 ? -1 : 0;
+			timeMsg.modifyAllowSteps = true;
+			network->send(&timeMsg);
+			break;
+		};
 		case KEYBOARD_ACTIONS::RIGHT :
 		case KEYBOARD_ACTIONS::LEFT :
 		case KEYBOARD_ACTIONS::FORWARD :
@@ -354,6 +350,7 @@ void Game::handleKeyUp(KEYBOARD_ACTIONS code)
 		case KEYBOARD_ACTIONS::TIME_STEP1 :
 		case KEYBOARD_ACTIONS::TIME_STEP5 :
 		case KEYBOARD_ACTIONS::TIME_STEP25 :
+		case KEYBOARD_ACTIONS::TIME_TOGGLE_PAUSE :
 		break;
 		
 		case KEYBOARD_ACTIONS::RIGHT :

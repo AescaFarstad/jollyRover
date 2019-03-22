@@ -282,7 +282,18 @@ void GameLogic::handleTimeInput(InputTimeMessage* input, Prototypes* prototypes)
 	TimeState& time = state->time;
 	if (input->modifyAllowSteps)
 	{
-		time.allowedSteps = input->allowSteps;
+		if (input->allowSteps < 0)
+		{
+			time.allowedSteps = -1;
+		}
+		else if (time.allowedSteps > 0)
+		{
+			time.allowedSteps += input->allowSteps;
+		}
+		else
+		{
+			time.allowedSteps = time.performedSteps + input->allowSteps;
+		}
 		S::log.add("allows steps: " + std::to_string(time.performedSteps) + " / " + std::to_string(time.allowedSteps), {LOG_TAGS::INPUT_});
 	}
 	if (input->modifyForcedTimeScale)

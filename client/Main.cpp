@@ -110,6 +110,7 @@ int main(int argc, char* args[])
 	S::log.disableTags({
 		//LOG_TAGS::UNIQUE,
 		LOG_TAGS::NET,
+		LOG_TAGS::INPUT_,
 		//LOG_TAGS::GAME,
 
 		LOG_TAGS::NET_MESSAGE,

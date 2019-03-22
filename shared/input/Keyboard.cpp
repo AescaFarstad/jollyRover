@@ -33,6 +33,7 @@ Keyboard::Keyboard()
 	actionByButton[SDL_SCANCODE_KP_7] = KEYBOARD_ACTIONS::TIME_SCALE3;
 	
 	actionByButton[SDL_SCANCODE_KP_0] = KEYBOARD_ACTIONS::TIME_TOGGLE_PAUSE;
+	actionByButton[SDL_SCANCODE_SPACE] = KEYBOARD_ACTIONS::TIME_TOGGLE_PAUSE;
 	
 	for(uint16_t i = 0; i < 128; i++)
 		buttonByAction[(int)actionByButton[i]] = i;
