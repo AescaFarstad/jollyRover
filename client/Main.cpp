@@ -93,7 +93,7 @@ int main(int argc, char* args[])
 	}
 	
 	window = SDL_CreateWindow("smth", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	SDL_SetWindowPosition(window, 0, 50);
+	SDL_SetWindowPosition(window, 640, 50);
 	if (window == NULL)
 	{
 		printf("Failed to create window %s\n", SDL_GetError());
@@ -109,7 +109,7 @@ int main(int argc, char* args[])
 
 	S::log.disableTags({
 		//LOG_TAGS::UNIQUE,
-		//LOG_TAGS::NET,
+		LOG_TAGS::NET,
 		//LOG_TAGS::GAME,
 
 		LOG_TAGS::NET_MESSAGE,

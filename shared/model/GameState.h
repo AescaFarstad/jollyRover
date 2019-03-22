@@ -1,5 +1,6 @@
 #pragma once
 #include <PlayerTest.h>
+#include <TimeState.h>
 #include <SeededRandom.h>
 #include <ISerializable.h>
 #include <CreepState.h>
@@ -31,8 +32,8 @@ public:
 	std::vector<PlayerTest> players;
 	std::vector<FormationState> formations;
 	SeededRandom random;
+	TimeState time;
 	uint32_t timeStamp;
-	int16_t stepsPerformed;
 	uint32_t idCounter;
 	
 	std::vector<int> _forceStrength;

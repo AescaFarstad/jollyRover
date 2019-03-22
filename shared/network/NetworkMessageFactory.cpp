@@ -35,6 +35,8 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::pointerByType(MessageType
 		return std::make_unique<GameStateMessage>();
 	else if (type == MessageTypes::TYPE_INPUT_ROUTE_MSG)
 		return std::make_unique<InputRouteMessage>();
+	else if (type == MessageTypes::TYPE_INPUT_TIME_MSG)
+		return std::make_unique<InputTimeMessage>();
 	else
 		THROW_FATAL_ERROR("Unknow Network Message " + std::to_string(type));
 	return nullptr;

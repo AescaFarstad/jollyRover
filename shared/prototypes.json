@@ -201,7 +201,7 @@
 			"id": 1,
 			"name":"soldier",
 			"maxHealth":40,
-			"speed": 15,
+			"speed": 5,
 			"strength":10,
 			"loot": 0,		
 			"weapon": 1

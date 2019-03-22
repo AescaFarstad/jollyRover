@@ -7,14 +7,25 @@ enum class KEYBOARD_ACTIONS : int8_t {
 	LEFT,
 	RIGHT,
 	FORWARD,
-	BACKWARD
+	BACKWARD,
+	TIME_STEP1,
+	TIME_STEP5,
+	TIME_STEP25,
+	TIME_SCALE_T_03,
+	TIME_SCALE_T_1,
+	TIME_SCALE_T_3,
+	TIME_SCALE03,
+	TIME_SCALE1,
+	TIME_SCALE3,
+	TIME_TOGGLE_PAUSE
 };
 
 class Keyboard
 {
 public:
 	Keyboard();
-	~Keyboard();
+	~Keyboard() = default;
 	bool isDown[128];
 	KEYBOARD_ACTIONS actionByButton[128];
+	uint16_t buttonByAction[128];
 };

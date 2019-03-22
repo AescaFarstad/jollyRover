@@ -23,7 +23,7 @@ void GameUpdater::update(uint32_t time)
 		std::vector<InputMessage*>* inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + GAME_CONFIG::logicStepSize);
 		logic.update(state.get(), GAME_CONFIG::logicStepSize, *inputs, prototypes);
 		lastValidTimeStamp = state->timeStamp;
-		if (state->stepsPerformed % GAME_CONFIG::saveStateInterval == 0)
+		if (state->time.performedSteps % GAME_CONFIG::saveStateInterval == 0)
 			saveState(state.get());
 		delete inputs;
 	}

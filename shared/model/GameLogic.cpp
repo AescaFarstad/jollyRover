@@ -1,16 +1,15 @@
 #include <GameLogic.h>
 #include <Keyboard.h>
 #include <Creeps.h>
+#include <InputTimeMessage.h>
 
 
 void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessage*> &inputs, Prototypes* prototypes)
 {
 	this->state = state;
-	this->timePassed = timePassed;
-	this->prototypes = prototypes;
 
 	state->timeStamp += timePassed;
-
+	
 	for (size_t i = 0; i < inputs.size(); i++)
 	{
 		if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_ACTION_MSG)
@@ -20,9 +19,29 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 		else if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_LEFT_MSG)
 			handlePlayerLeftInput(static_cast<InputPlayerLeftMessage*>(inputs[i]));
 		else if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_ROUTE_MSG)
-			handleRouteInput(static_cast<InputRouteMessage*>(inputs[i]));
+			handleRouteInput(static_cast<InputRouteMessage*>(inputs[i]), prototypes);
+		else if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_TIME_MSG)
+			handleTimeInput(static_cast<InputTimeMessage*>(inputs[i]), prototypes);
 		//S::log.add(std::to_string(prototypes->variables.fieldWidth), { LOG_TAGS::UNIQUE });
 	}
+	
+	TimeState& time = state->time;
+	float timeScale = time.forcedTimeScale > 0 ? time.forcedTimeScale : time.timeScale;
+	int32_t ingameTimePassed = timePassed * timeScale;
+	bool isPaused = (time.allowedSteps >= 0 && time.allowedSteps <= time.performedSteps) && time.forcedTimeScale <= 0;
+	
+	if (isPaused)
+	{
+		return;
+	}
+	else
+	{
+		if (time.forcedTimeScale > 0 && time.allowedSteps >= 0)
+			time.allowedSteps++;
+		state->time.performedSteps++;
+	}
+		
+	state->time.time += ingameTimePassed;
 
 	for (size_t i = 0; i < state->players.size(); i++)
 	{
@@ -57,7 +76,7 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 
 		for (CarRide &ride : player.activeCars)
 		{
-			carLogic.update(ride, player, state, prototypes, timePassed);
+			carLogic.update(ride, player, state, prototypes, ingameTimePassed);
 		}
 
 		auto finishedCars = std::remove_if(player.activeCars.begin(), player.activeCars.end(), [](CarRide &ride) {
@@ -71,7 +90,7 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 		}
 
 	}
-	Creeps::handleCreeps(state, prototypes, timePassed);
+	Creeps::handleCreeps(state, prototypes, ingameTimePassed);
 	/*
 	Creeps::spawnCreeps(state, prototypes, timePassed);
 	Creeps::processFormations(state, prototypes, timePassed);
@@ -81,7 +100,7 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 	Creeps::removeDeadCreeps(state);*/
 }
 
-bool GameLogic::testRouteIsValid(std::vector<Point>& route)
+bool GameLogic::testRouteIsValid(std::vector<Point>& route, Prototypes* prototypes)
 {
 	if (route.size() < (size_t)prototypes->variables.minRouteSteps || 
 		route.size() > (size_t)prototypes->variables.maxRouteSteps)
@@ -246,15 +265,35 @@ void GameLogic::handlePlayerLeftInput(InputPlayerLeftMessage* input)
 	}
 }
 
-void GameLogic::handleRouteInput(InputRouteMessage* input)
+void GameLogic::handleRouteInput(InputRouteMessage* input, Prototypes* prototypes)
 {
-	if (testRouteIsValid(input->route))
+	if (testRouteIsValid(input->route, prototypes))
 	{
 		playerByLogin(input->login)->activeCars.emplace_back(input->route, prototypes->cars[0]);
 	}
 	else
 	{
 		S::log.add("Route not valid", { LOG_TAGS::GAME });
+	}
+}
+
+void GameLogic::handleTimeInput(InputTimeMessage* input, Prototypes* prototypes)
+{
+	TimeState& time = state->time;
+	if (input->modifyAllowSteps)
+	{
+		time.allowedSteps = input->allowSteps;
+		S::log.add("allows steps: " + std::to_string(time.performedSteps) + " / " + std::to_string(time.allowedSteps), {LOG_TAGS::INPUT_});
+	}
+	if (input->modifyForcedTimeScale)
+	{
+		time.forcedTimeScale = input->forcedTimeScale;
+		S::log.add("tmp time scale: " + std::to_string(time.forcedTimeScale), {LOG_TAGS::INPUT_});
+	}
+	if (input->modifyTimeScale)
+	{
+		time.timeScale = input->timeScale;
+		S::log.add("time scale: " + std::to_string(time.timeScale), {LOG_TAGS::INPUT_});
 	}
 }
 

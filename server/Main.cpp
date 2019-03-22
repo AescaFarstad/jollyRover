@@ -38,6 +38,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 		case MessageTypes::TYPE_INPUT_LEFT_MSG:
 		case MessageTypes::TYPE_INPUT_ROUTE_MSG:
 		case MessageTypes::TYPE_INPUT_JOINED_MSG:
+		case MessageTypes::TYPE_INPUT_TIME_MSG:
 		{
 			InputMessage* t = dynamic_cast<InputMessage*>(message.release());
 			//std::unique_ptr<InputMessage> iMsg = network.factory.pointerByType2<std::unique_ptr<NetworkMessage>>(message->typeId, *t);

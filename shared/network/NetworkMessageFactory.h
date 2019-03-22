@@ -7,6 +7,7 @@
 #include <GreetingMessage.h>
 #include <GenericRequestMessage.h>
 #include <InputRouteMessage.h>
+#include <InputTimeMessage.h>
 #include <InputActionMessage.h>
 #include <InputPlayerJoinedMessage.h>
 #include <InputPlayerLeftMessage.h>
@@ -39,6 +40,8 @@ public:
 			return std::make_unique<GreetingMessage>(source);
 		else if (type == MessageTypes::TYPE_GAME_STATE_MSG)
 			return std::make_unique<GameStateMessage>(source);
+		else if (type == MessageTypes::TYPE_INPUT_TIME_MSG)
+			return std::make_unique<InputTimeMessage>(source);
 		return nullptr;
 	}
 

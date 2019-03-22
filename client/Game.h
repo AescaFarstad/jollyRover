@@ -8,26 +8,11 @@
 
 #include <Network.h>
 #include <GameUpdater.h>
-#include <GameState.h>
 #include <GameView.h>
 #include <Keyboard.h>
-#include <LoopBackNetwork.h>
-#include <NetworkMessageFactory.h>
-#include <SerializationStream.h>
-#include <GreetingMessage.h>
-#include <GenericRequestMessage.h>
 #include <TaskManager.h>
-#include <ConsequtiveTask.h>
-#include <string>
-#include <istream>
-#include <sstream>
 #include <Prototypes.h>
 #include <RouteInput.h>
-#include <GameInputBinding.h>
-#include <AnonymousBinding.h>
-#include <json.hpp>
-#include <fstream>
-#include <memory>
 
 class Game
 {

@@ -9,7 +9,8 @@ enum class MessageTypes : int16_t
 	TYPE_INPUT_JOINED_MSG = 4,
 	TYPE_INPUT_LEFT_MSG = 5,
 	TYPE_GAME_STATE_MSG = 6,
-	TYPE_INPUT_ROUTE_MSG = 7
+	TYPE_INPUT_ROUTE_MSG = 7,
+	TYPE_INPUT_TIME_MSG = 8
 };
 
 enum class RequestTypes : int16_t

@@ -51,6 +51,7 @@ void LoopBackNetwork::send(NetworkMessage* message)
 		case MessageTypes::TYPE_INPUT_JOINED_MSG:
 		case MessageTypes::TYPE_INPUT_LEFT_MSG:
 		case MessageTypes::TYPE_INPUT_ROUTE_MSG:
+		case MessageTypes::TYPE_INPUT_TIME_MSG:
 		{
 			InputMessage* iMsg = dynamic_cast<InputMessage*>(message);
 			iMsg->serverStamp = gameUpdater->state->timeStamp;
@@ -96,7 +97,10 @@ void LoopBackNetwork::send(NetworkMessage* message)
 					break;
 				}
 				default:
+				{
+					S::log.add("Request type not handled: " + std::to_string((int)genericRequestMsg->request), {LOG_TAGS::ERROR_});
 					break;
+				}
 			}
 			break;
 		}
@@ -108,7 +112,10 @@ void LoopBackNetwork::send(NetworkMessage* message)
 			break;
 		}
 		default:
+		{
+			S::log.add("Message type not handled: " + std::to_string((int)message->typeId), {LOG_TAGS::ERROR_});
 			break;
+		}
 	}
 }
 

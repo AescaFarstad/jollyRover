@@ -44,7 +44,7 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "intelliSenseMode": "gcc-x64",
+            "intelliSenseMode": "clang-x64",
             "configurationProvider": "vector-of-bool.cmake-tools"
         }
     ],
