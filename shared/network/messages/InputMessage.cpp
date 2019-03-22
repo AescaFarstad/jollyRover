@@ -1,18 +1,6 @@
 #include <InputMessage.h>
 
 
-
-InputMessage::InputMessage()
-{
-	typeId = -1;
-}
-
-
-InputMessage::~InputMessage()
-{
-}
-
-
 void InputMessage::deserialize(SerializationStream& stream)
 {
 	NetworkMessage::deserialize(stream);

@@ -7,8 +7,8 @@ int32_t NetworkMessage::idCounter = 1;
 NetworkMessage::NetworkMessage()
 {
 	initiator_id = -1;
-	typeId = -1;
-	stamp = -1;
+	typeId = MessageTypes::TYPE_UNINITIALIZED;
+	stamp = 0;
 	inResponseTo = -1;
 }
 

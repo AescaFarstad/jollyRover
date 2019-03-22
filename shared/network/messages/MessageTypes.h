@@ -1,21 +1,22 @@
 #pragma once
 #include <cstdint>
-namespace MessageTypes
+enum class MessageTypes : int16_t
 {
-	const int16_t TYPE_REQUEST_MSG = 1;
-	const int16_t TYPE_GREETING_MSG = 2;
-	const int16_t TYPE_INPUT_ACTION_MSG = 3;
-	const int16_t TYPE_INPUT_JOINED_MSG = 4;
-	const int16_t TYPE_INPUT_LEFT_MSG = 5;
-	const int16_t TYPE_GAME_STATE_MSG = 6;
-	const int16_t TYPE_INPUT_ROUTE_MSG = 7;
-}
+	TYPE_UNINITIALIZED = -1,
+	TYPE_REQUEST_MSG = 1,
+	TYPE_GREETING_MSG = 2,
+	TYPE_INPUT_ACTION_MSG = 3,
+	TYPE_INPUT_JOINED_MSG = 4,
+	TYPE_INPUT_LEFT_MSG = 5,
+	TYPE_GAME_STATE_MSG = 6,
+	TYPE_INPUT_ROUTE_MSG = 7
+};
 
-namespace RequestTypes
+enum class RequestTypes : int16_t
 {
-	const int16_t REQUEST_GREETING = 1;
-	const int16_t REQUEST_JOIN_GAME = 2;
-	const int16_t REQUEST_GAME_STATE = 3;
-	const int16_t REQUEST_PING = 4;
-	const int16_t REQUEST_PONG = 5;
-}
+	REQUEST_GREETING = 1,
+	REQUEST_JOIN_GAME = 2,
+	REQUEST_GAME_STATE = 3,
+	REQUEST_PING = 4,
+	REQUEST_PONG = 5
+};

@@ -8,7 +8,7 @@ public:
 	GenericRequestMessage();
 	~GenericRequestMessage();
 
-	int16_t request;
+	RequestTypes request;
 
 	virtual void deserialize(SerializationStream& stream);
 	virtual void serialize(SerializationStream& stream);

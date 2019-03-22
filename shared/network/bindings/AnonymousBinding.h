@@ -10,7 +10,8 @@ public:
 	AnonymousBinding(const AnonymousBinding& that) = delete;
 	AnonymousBinding(AnonymousBinding&& that);
 
-	AnonymousBinding* bindByType(int16_t typeId);
+	AnonymousBinding* bindByMsgType(MessageTypes typeId);
+	AnonymousBinding* bindByGenericType(RequestTypes typeId);
 	AnonymousBinding* bindByLogin(int32_t login);
 	AnonymousBinding* bindByResponseTo(int32_t inResponseTo);
 	AnonymousBinding* setCallOnce(bool callOnce);

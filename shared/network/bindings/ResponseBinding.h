@@ -16,8 +16,11 @@ public:
 	
 	std::string name;
 
-	int16_t typeId;
-	bool bindsType;
+	MessageTypes msgTypeId;
+	bool bindsMsgType;
+	
+	RequestTypes genericTypeId;
+	bool bindsGenericType;
 
 	int32_t login;
 	bool bindsLogin;

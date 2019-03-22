@@ -238,7 +238,7 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 		}
 		default:
 		{	
-			S::log.add("Message type not handled: " + std::to_string(msg->typeId), { LOG_TAGS::ERROR_ });
+			S::log.add("Message type not handled: " + std::to_string((int16_t)msg->typeId), { LOG_TAGS::ERROR_ });
 			break;
 		}
 	}
