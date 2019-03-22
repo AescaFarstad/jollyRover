@@ -323,7 +323,7 @@ void GameLogic::handleGameLoad(LoadGameMessage* input, Prototypes* prototypes)
 	state->timeStamp = stamp;
 	if (time.allowedSteps > 0)
 		state->time.allowedSteps = time.allowedSteps - time.performedSteps + state->time.performedSteps;
-		
+	state->time.forcedTimeScale = time.forcedTimeScale;	
 	//TODO keep existing players in game
 }
 
