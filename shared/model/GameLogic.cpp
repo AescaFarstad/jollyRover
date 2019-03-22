@@ -22,6 +22,8 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 			handleRouteInput(static_cast<InputRouteMessage*>(inputs[i]), prototypes);
 		else if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_TIME_MSG)
 			handleTimeInput(static_cast<InputTimeMessage*>(inputs[i]), prototypes);
+		else if (inputs[i]->typeId == MessageTypes::TYPE_LOAD_GAME_MSG)
+			handleGameLoad(static_cast<LoadGameMessage*>(inputs[i]), prototypes);
 		//S::log.add(std::to_string(prototypes->variables.fieldWidth), { LOG_TAGS::UNIQUE });
 	}
 	
@@ -306,6 +308,23 @@ void GameLogic::handleTimeInput(InputTimeMessage* input, Prototypes* prototypes)
 		time.timeScale = input->timeScale;
 		S::log.add("time scale: " + std::to_string(time.timeScale), {LOG_TAGS::INPUT_});
 	}
+}
+
+void GameLogic::handleGameLoad(LoadGameMessage* input, Prototypes* prototypes)
+{
+	auto stream = SerializationStream::createExp();
+	auto stamp = state->timeStamp;
+	TimeState time = state->time;
+	stream->write(input->state, input->stateLength); 
+	stream->seekAbsolute(0);
+	state->deserialize(*stream);
+	state->propagatePrototypes(prototypes);
+	
+	state->timeStamp = stamp;
+	if (time.allowedSteps > 0)
+		state->time.allowedSteps = time.allowedSteps - time.performedSteps + state->time.performedSteps;
+		
+	//TODO keep existing players in game
 }
 
 PlayerTest* GameLogic::playerByLogin(int32_t login)

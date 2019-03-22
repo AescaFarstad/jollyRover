@@ -16,30 +16,7 @@ void GameUpdater::update(uint32_t time)
 		rewindToPrecedingState(lastValidTimeStamp);
 
 	while (state->timeStamp < time - GAME_CONFIG::logicStepSize)
-	{
-		if (loadGameMsg)
-		{
-			int32_t execTime = (int32_t)getExecutionStamp(loadGameMsg.get());
-			if (loadGameMsg->serverStamp <= execTime && loadGameMsg->serverStamp + GAME_CONFIG::logicStepSize > execTime)
-			{
-				auto stream = SerializationStream::createExp();
-				auto stamp = state->timeStamp;
-				TimeState time = state->time;
-				stream->write(loadGameMsg->state, loadGameMsg->stateLength); 
-				stream->seekAbsolute(0);
-				state->deserialize(*stream);
-				state->propagatePrototypes(prototypes);
-				loadGameMsg = nullptr;
-				state->timeStamp = stamp;
-				state->time.timeScale = time.timeScale;
-				if (time.allowedSteps > 0)
-					state->time.allowedSteps = time.allowedSteps - time.performedSteps + state->time.performedSteps;
-				
-				
-				//TODO resolve players joining and quiting
-			}			
-		}
-		
+	{		
 		std::vector<InputMessage*>* inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + GAME_CONFIG::logicStepSize);
 		logic.update(state.get(), GAME_CONFIG::logicStepSize, *inputs, prototypes);
 		lastValidTimeStamp = state->timeStamp;
@@ -64,11 +41,7 @@ void GameUpdater::load(std::unique_ptr<GameState> state, Prototypes* prototypes)
 void GameUpdater::addNewInput(std::unique_ptr<InputMessage> input)
 {
 	lastValidTimeStamp = std::min(lastValidTimeStamp, getExecutionStamp(input.get()));
-	
-	if (input->typeId != MessageTypes::TYPE_LOAD_GAME_MSG)
-		inputs.push_back(std::move(input));
-	else
-		loadGameMsg = std::unique_ptr<LoadGameMessage>(dynamic_cast<LoadGameMessage*>(input.release()));
+	inputs.push_back(std::move(input));
 }
 
 std::unique_ptr<GameState> GameUpdater::getNewStateByStamp(uint32_t stamp)

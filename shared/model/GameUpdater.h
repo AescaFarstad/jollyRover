@@ -28,7 +28,6 @@ public:
 
 private:
 	std::vector<std::unique_ptr<InputMessage>> inputs;
-	std::unique_ptr<LoadGameMessage> loadGameMsg;
 	uint32_t lastValidTimeStamp;
 	uint32_t getExecutionStamp(InputMessage* input);
 	std::vector<InputMessage*>* getThisFrameInputs(uint32_t fromInclusive, uint32_t toExclusive);

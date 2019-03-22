@@ -111,7 +111,7 @@ int main(int argc, char* args[])
 		//LOG_TAGS::UNIQUE,
 		LOG_TAGS::NET,
 		LOG_TAGS::INPUT_,
-		//LOG_TAGS::GAME,
+		LOG_TAGS::GAME,
 
 		LOG_TAGS::NET_MESSAGE,
 		LOG_TAGS::Z

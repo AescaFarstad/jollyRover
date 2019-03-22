@@ -7,6 +7,7 @@
 #include <InputPlayerLeftMessage.h>
 #include <InputRouteMessage.h>
 #include <InputTimeMessage.h>
+#include <LoadGameMessage.h>
 #include <CarLogic.h>
 
 class GameLogic
@@ -33,6 +34,7 @@ private:
 	void handlePlayerLeftInput(InputPlayerLeftMessage* input);
 	void handleRouteInput(InputRouteMessage* input, Prototypes* prototypes);
 	void handleTimeInput(InputTimeMessage* input, Prototypes* prototypes);
+	void handleGameLoad(LoadGameMessage* input, Prototypes* prototypes);
 
 	PlayerTest* playerByLogin(int32_t login);
 };
