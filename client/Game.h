@@ -36,8 +36,6 @@ public:
 	void loadPrototypes();
 
 private:
-	void handleKeyDown(KEYBOARD_ACTIONS code);
-	void handleKeyUp(KEYBOARD_ACTIONS code);
 	void handleGenericRequest(GenericRequestMessage* request);
 	void addNetworkBindings();
 	void handleGameInput(std::unique_ptr<NetworkMessage>);

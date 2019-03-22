@@ -217,6 +217,7 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 		case MessageTypes::TYPE_INPUT_JOINED_MSG:
 		case MessageTypes::TYPE_INPUT_ROUTE_MSG:
 		case MessageTypes::TYPE_INPUT_TIME_MSG:
+		case MessageTypes::TYPE_LOAD_GAME_MSG:
 		case MessageTypes::TYPE_REQUEST_MSG:
 		{
 			addMessageToBuffer(std::move(msg), externalBuffer);

@@ -11,6 +11,7 @@
 #include <InputActionMessage.h>
 #include <InputPlayerJoinedMessage.h>
 #include <InputPlayerLeftMessage.h>
+#include <LoadGameMessage.h>
 #include <ReadOnlySerializationStream.h>
 #include <GameStateMessage.h>
 
@@ -42,6 +43,8 @@ public:
 			return std::make_unique<GameStateMessage>(source);
 		else if (type == MessageTypes::TYPE_INPUT_TIME_MSG)
 			return std::make_unique<InputTimeMessage>(source);
+		else if (type == MessageTypes::TYPE_LOAD_GAME_MSG)
+			return std::make_unique<LoadGameMessage>(source);
 		return nullptr;
 	}
 

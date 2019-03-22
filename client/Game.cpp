@@ -15,6 +15,7 @@
 #include <fstream>
 #include <memory>
 #include <GameState.h>
+#include <KeyboardInput.h>
 
 Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 {
@@ -174,7 +175,7 @@ void Game::handleEvent(SDL_Event* event)
 			{
 				//printf("Key press detected\n");
 				keyboard.isDown[event->key.keysym.scancode] = true;
-				handleKeyDown(keyboard.actionByButton[event->key.keysym.scancode]);
+				KeyboardInput::handleKeyDown(keyboard.actionByButton[event->key.keysym.scancode], keyboard, *network, gameUpdater);
 			}
 			break;
 
@@ -183,7 +184,7 @@ void Game::handleEvent(SDL_Event* event)
 			{
 				//printf("Key release detected\n");
 				keyboard.isDown[event->key.keysym.scancode] = false;
-				handleKeyUp(keyboard.actionByButton[event->key.keysym.scancode]);
+				KeyboardInput::handleKeyUp(keyboard.actionByButton[event->key.keysym.scancode], keyboard, *network, gameUpdater);
 			}
 			break;
 
@@ -210,169 +211,8 @@ void Game::loadPrototypes()
 	
 	//std::ifstream file2("out/assets/sheet_tanks.png");
 }
-int16_t idCounter = 0;
-void Game::handleKeyDown(KEYBOARD_ACTIONS code)
-{
-	switch (code)
-	{
-		case KEYBOARD_ACTIONS::TIME_STEP1 :
-		{
-			InputTimeMessage timeMsg;
-			timeMsg.allowSteps = 1;	
-			timeMsg.modifyAllowSteps = true;
-			network->send(&timeMsg);
-			break;
-		};
-		case KEYBOARD_ACTIONS::TIME_STEP5 :
-		{
-			InputTimeMessage timeMsg;
-			timeMsg.allowSteps = 5;	
-			timeMsg.modifyAllowSteps = true;
-			network->send(&timeMsg);
-			break;
-		};
-		case KEYBOARD_ACTIONS::TIME_STEP25 :
-		{
-			InputTimeMessage timeMsg;
-			timeMsg.allowSteps = 25;	
-			timeMsg.modifyAllowSteps = true;
-			network->send(&timeMsg);
-			break;
-		};
-		
-		case KEYBOARD_ACTIONS::TIME_SCALE_T_03 :
-		{
-			InputTimeMessage timeMsg;
-			timeMsg.forcedTimeScale = 0.3;
-			timeMsg.modifyForcedTimeScale = true;
-			network->send(&timeMsg);
-			break;
-		};
-		case KEYBOARD_ACTIONS::TIME_SCALE_T_1 :
-		{
-			InputTimeMessage timeMsg;
-			timeMsg.forcedTimeScale = 1;
-			timeMsg.modifyForcedTimeScale = true;
-			network->send(&timeMsg);
-			break;
-		};
-		case KEYBOARD_ACTIONS::TIME_SCALE_T_3 :
-		{
-			InputTimeMessage timeMsg;
-			timeMsg.forcedTimeScale = 3;
-			timeMsg.modifyForcedTimeScale = true;
-			network->send(&timeMsg);
-			break;
-		};
-		
-		case KEYBOARD_ACTIONS::TIME_SCALE03 :
-		{
-			InputTimeMessage timeMsg;
-			timeMsg.timeScale = 0.3;
-			timeMsg.modifyTimeScale = true;
-			timeMsg.allowSteps = -1;
-			timeMsg.modifyAllowSteps = true;
-			network->send(&timeMsg);
-			break;
-		};
-		case KEYBOARD_ACTIONS::TIME_SCALE1 :
-		{
-			InputTimeMessage timeMsg;
-			timeMsg.timeScale = 1;
-			timeMsg.modifyTimeScale = true;
-			timeMsg.allowSteps = -1;
-			timeMsg.modifyAllowSteps = true;
-			network->send(&timeMsg);
-			break;
-		};
-		case KEYBOARD_ACTIONS::TIME_SCALE3 :
-		{
-			InputTimeMessage timeMsg;
-			timeMsg.timeScale = 3;
-			timeMsg.modifyTimeScale = true;
-			timeMsg.allowSteps = -1;
-			timeMsg.modifyAllowSteps = true;
-			network->send(&timeMsg);
-			break;
-		};
-		case KEYBOARD_ACTIONS::TIME_TOGGLE_PAUSE :
-		{
-			InputTimeMessage timeMsg;
-			timeMsg.allowSteps = gameUpdater.state->time.allowedSteps > 0 ? -1 : 0;
-			timeMsg.modifyAllowSteps = true;
-			network->send(&timeMsg);
-			break;
-		};
-		case KEYBOARD_ACTIONS::RIGHT :
-		case KEYBOARD_ACTIONS::LEFT :
-		case KEYBOARD_ACTIONS::FORWARD :
-		case KEYBOARD_ACTIONS::BACKWARD :
-		{
-			InputActionMessage im;
 
-			im.downedButtons.push_back((int8_t)code);
-			im.localId = idCounter++;
-			network->send(&im);
-			break;
-		}
-		default:
-		{
-			S::log.add("action not handled: " + std::to_string((int)code), {LOG_TAGS::ERROR_});
-			break;
-		}	
-	}
-}
 
-void Game::handleKeyUp(KEYBOARD_ACTIONS code)
-{
-	switch (code)
-	{		
-		case KEYBOARD_ACTIONS::TIME_SCALE_T_03 :
-		case KEYBOARD_ACTIONS::TIME_SCALE_T_1 :
-		case KEYBOARD_ACTIONS::TIME_SCALE_T_3 :
-		{
-			if (!keyboard.isDown[keyboard.buttonByAction[(int)KEYBOARD_ACTIONS::TIME_SCALE_T_03]] &&
-				!keyboard.isDown[keyboard.buttonByAction[(int)KEYBOARD_ACTIONS::TIME_SCALE_T_1]] &&
-				!keyboard.isDown[keyboard.buttonByAction[(int)KEYBOARD_ACTIONS::TIME_SCALE_T_3]]
-			)
-			{
-			InputTimeMessage timeMsg;
-			timeMsg.forcedTimeScale = -1;
-			timeMsg.modifyForcedTimeScale = true;
-			network->send(&timeMsg);
-			}
-			break;
-			
-		};
-		case KEYBOARD_ACTIONS::TIME_SCALE03 :
-		case KEYBOARD_ACTIONS::TIME_SCALE1 :
-		case KEYBOARD_ACTIONS::TIME_SCALE3 :
-		case KEYBOARD_ACTIONS::TIME_STEP1 :
-		case KEYBOARD_ACTIONS::TIME_STEP5 :
-		case KEYBOARD_ACTIONS::TIME_STEP25 :
-		case KEYBOARD_ACTIONS::TIME_TOGGLE_PAUSE :
-		break;
-		
-		case KEYBOARD_ACTIONS::RIGHT :
-		case KEYBOARD_ACTIONS::LEFT :
-		case KEYBOARD_ACTIONS::FORWARD :
-		case KEYBOARD_ACTIONS::BACKWARD :
-		{
-			InputActionMessage im;
-
-			im.uppedButtons.push_back((int8_t)code);
-			im.localId = idCounter++;
-			network->send(&im);
-			break;
-		}
-		default:
-		{
-			S::log.add("action not handled: " + std::to_string((int)code), {LOG_TAGS::ERROR_});
-			break;
-		}		
-		
-	}
-}
 
 void Game::handleGameInput(std::unique_ptr<NetworkMessage> message)
 {
@@ -416,6 +256,13 @@ void Game::addNetworkBindings()
 	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_TIME_MSG");
 	binding->
 	bindByMsgType(MessageTypes::TYPE_INPUT_TIME_MSG)->
+	setCallOnce(false)->
+	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
+	network->binder.bind(std::move(binding));
+
+	binding = std::make_unique<AnonymousBinding>("TYPE_LOAD_GAME_MSG");
+	binding->
+	bindByMsgType(MessageTypes::TYPE_LOAD_GAME_MSG)->
 	setCallOnce(false)->
 	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
 	network->binder.bind(std::move(binding));
