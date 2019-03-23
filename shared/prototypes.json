@@ -7,7 +7,7 @@
 		"maxRouteSteps": 4400,
 		"stepAngleWindow": 3.14,
 		"war":{
-			"intensity": 1
+			"intensity": 5000
 		}
 	},
 	"forces":[
@@ -201,7 +201,7 @@
 			"id": 1,
 			"name":"soldier",
 			"maxHealth":40,
-			"speed": 5,
+			"speed": 25,
 			"strength":10,
 			"loot": 0,		
 			"weapon": 1
@@ -232,7 +232,7 @@
 				"attackSpeed": 1000,
 				"splash": 12,			
 				"ranged":true,
-				"range": 120,
+				"range": 160,
 				"bulletSpeed": 180				
 			},
 			{
@@ -241,7 +241,7 @@
 				"attackSpeed": 2500,
 				"splash": 1,	
 				"ranged":true,
-				"range": 20,
+				"range": 30,
 				"bulletSpeed": 120
 			},
 			{
@@ -316,15 +316,206 @@
 			"weight":100
 		}
 	],
-	"formations":[		
+	"formations":[
+		{
+			"id":0,
+			"type":"assault",
+			"slots":[
+				{
+					"offset":{ "x":25, "y":10 },
+					"creepType":0,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-25, "y":10 },
+					"creepType":0,
+					"optional":false
+				},
+				{
+					"offset":{ "x":75, "y":10 },
+					"creepType":0,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-75, "y":10 },
+					"creepType":0,
+					"optional":false
+				},
+				{
+					"offset":{ "x":15, "y":40 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-15, "y":40 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":45, "y":40 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-45, "y":40 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":75, "y":40 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-75, "y":40 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":15, "y":70 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-15, "y":70 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":45, "y":70 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-45, "y":70 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":75, "y":70 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-75, "y":70 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":15, "y":100 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-15, "y":100 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":45, "y":100 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-45, "y":100 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":75, "y":100 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-75, "y":100 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":120, "y":50 },
+					"creepType":0,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-120, "y":50 },
+					"creepType":0,
+					"optional":true
+				}				
+			]
+		},
 		{
 			"id":1,
 			"type":"assault",
 			"slots":[
 				{
 					"offset":{ "x":0, "y":10 },
-					"creepType":2,
+					"creepType":0,
 					"optional":false
+				},
+				{
+					"offset":{ "x":25, "y":30 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-25, "y":30 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":55, "y":35 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-55, "y":35 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":25, "y":60 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-25, "y":60 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":55, "y":65 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-55, "y":65 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":0, "y":65 },
+					"creepType":0,
+					"optional":true
+				},
+				{
+					"offset":{ "x":15, "y":110 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-15, "y":110 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":45, "y":110 },
+					"creepType":1,
+					"optional":true
+				},
+				{
+					"offset":{ "x":-45, "y":110 },
+					"creepType":1,
+					"optional":true
 				}
 			]
 		}

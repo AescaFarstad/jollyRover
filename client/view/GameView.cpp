@@ -115,6 +115,7 @@ void GameView::drawPlayers()
 void GameView::drawObstacles()
 {
 	uint32_t obstacleColor = 0x004477;
+	int centroidSize = 4;
 
 	setColor(obstacleColor);
 
@@ -131,6 +132,13 @@ void GameView::drawObstacles()
 		points[count - 1].y = obstacle.vertices[0].y;
 		SDL_RenderDrawLines(renderer, points, count);
 		delete[] points;
+		
+		SDL_Rect rect;
+		rect.x = obstacle.centroid.x - centroidSize/2;
+		rect.y = obstacle.centroid.y - centroidSize/2;
+		rect.w = centroidSize;
+		rect.h = centroidSize;
+		SDL_RenderDrawRect(renderer, &rect);
 	}
 }
 

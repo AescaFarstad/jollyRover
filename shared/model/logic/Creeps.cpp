@@ -23,6 +23,7 @@ namespace Creeps
 		
 		processFormations(state, prototypes, timePassed);
 		processCreeps(state, prototypes, timePassed);
+		processProjectiles(state, prototypes, timePassed);
 		
 		
 		
@@ -191,15 +192,15 @@ namespace Creeps
 			Obstacle* obstacle = Field::findObstacle(nextLoc, prototypes);
 			if (obstacle)
 			{
-				Point creepToTarget = creep.unit.location - target;
-				float direction = -creepToTarget.crossProduct(obstacle->centroid);
+				Point creepToTarget = target - creep.unit.location;
+				float direction = creepToTarget.crossProduct(obstacle->centroid - creep.unit.location);
 				
 				Point* bestPoint = nullptr;
 				float bestDistance = std::numeric_limits<float>::max();
 				for(auto& vert : obstacle->vertices)
 				{
 					float vertDir = creepToTarget.crossProduct(vert - creep.unit.location);
-					if (vertDir * direction > 0)
+					if (vertDir * direction < 0)
 					{
 						float distance = vert.distanceTo(creep.unit.location);
 						if (distance < bestDistance)
@@ -265,7 +266,28 @@ namespace Creeps
 		
 		void processProjectiles(GameState* state, Prototypes* prototypes, int timePassed)
 		{
-			
+			for(auto& proj : state->projectiles)
+			{
+				auto direction = proj.location - proj.target;
+				float step = timePassed * proj.speed / 1000.0;
+				
+				if (direction.getLength() > step)
+				{
+					direction.scaleTo(-step);
+					proj.location += direction;
+				}
+				else
+				{
+					for(CreepState& creep : state->creeps)
+					{
+						if (creep.unit.location.distanceTo(proj.target) < proj.splash)
+						{
+							creep.unit.health -= proj.damage;
+						}
+					}
+					proj.damage = -1;
+				}			
+			}
 		}
 		
 		void removeDeadProjectiles(GameState* state)
