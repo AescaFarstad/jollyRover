@@ -23,6 +23,7 @@ public:
 	int32_t maxMessageSize;
 	int32_t saveStateInterval;
 	int32_t networkUpdateInterval;
+	bool loopBack;
 	
 	void load(nlohmann::json& j);
 	

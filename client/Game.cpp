@@ -25,8 +25,11 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 	gameView = new GameView(window, renderer, &prototypes);
 
 	taskManager = new TaskManager();
-	network = new LoopBackNetwork(&gameUpdater);
-	//network = new Network();
+	if (S::config.loopBack)
+		network = new LoopBackNetwork(&gameUpdater);
+	else
+		network = new Network();
+		
 	network->connect();
 
 

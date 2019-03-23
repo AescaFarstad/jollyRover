@@ -6,7 +6,8 @@
 		"desktopPort":12745,
 		"saveStateInterval":3,
 		"maxMessageSize":3000,
-		"networkUpdateInterval":5
+		"networkUpdateInterval":5,
+		"loopBack":true
 	},
 	"logTags":
 	{
