@@ -106,26 +106,6 @@ int main(int argc, char* args[])
 		printf("Failed to create renderer %s\n", SDL_GetError());
 		return 0;
 	}
-
-	S::log.disableTags({
-		//LOG_TAGS::UNIQUE,
-		LOG_TAGS::NET,
-		LOG_TAGS::INPUT_,
-		LOG_TAGS::GAME,
-
-		LOG_TAGS::NET_MESSAGE,
-		LOG_TAGS::Z
-	});
-
-	S::log.enableTags({
-		//LOG_TAGS::UNIQUE,
-		//LOG_TAGS::NET,
-		//LOG_TAGS::GAME,
-		LOG_TAGS::ERROR_,
-
-		//LOG_TAGS::NET_MESSAGE,
-		LOG_TAGS::Z
-	});
 	
 	game = new Game(window, renderer);
 	

@@ -7,5 +7,36 @@
 		"saveStateInterval":3,
 		"maxMessageSize":3000,
 		"networkUpdateInterval":5
+	},
+	"logTags":
+	{
+		"all there are":[
+			"UNIQUE",
+			"ERROR_",
+			"ANONYMOS",
+			
+			"NET",
+			"GAME",
+			"TASK",
+			"INPUT_",
+			
+			"NET_MESSAGE",
+			"SUBTASK",
+			
+			"Z"
+		],
+		"enable":[
+			"ERROR_",
+			"Z"
+		],
+		"disable":[
+			"NET",
+			"GAME",
+			"TASK",
+			"INPUT_",
+			"NET_MESSAGE",
+			"SUBTASK",
+			"Z"
+		]
 	}
 }

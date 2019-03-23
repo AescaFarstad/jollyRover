@@ -25,6 +25,11 @@ public:
 	int32_t networkUpdateInterval;
 	
 	void load(nlohmann::json& j);
+	
+private:
+	void loadLogTags(nlohmann::json& j);
+	void setTagByName(std::string name, bool value);
+	void setTagByTag(LOG_TAGS tag, bool value);
 };
 
 namespace S

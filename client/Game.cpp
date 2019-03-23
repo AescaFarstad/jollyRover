@@ -211,7 +211,7 @@ void Game::loadConfig()
 	std::ifstream file("out/config.json");
 	json j = json::parse(file);
 	file.close();
-	S::config.load(j);
+	S::config.load(j);	
 }
 
 
