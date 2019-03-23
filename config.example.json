@@ -1,0 +1,11 @@
+{
+	"globalConfig":
+	{
+		"host":"192.168.1.58",
+		"webPort":12880,
+		"desktopPort":12745,
+		"saveStateInterval":3,
+		"maxMessageSize":3000,
+		"networkUpdateInterval":5
+	}
+}

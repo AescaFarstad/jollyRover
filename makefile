@@ -56,7 +56,7 @@ local: $(SUBOBJ_LOCAL)
 web: $(SUBOBJ_WEB)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets/
-	$(WEB_COMPILER) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 --use-preload-plugins -s WASM=0 -s USE_WEBGL2=1 -s TRACE_WEBGL_CALLS=1 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -v -s ASSERTIONS=1 -s SAFE_HEAP=1 -o $(WEB_TARGET).html $(SUBOBJ_WEB) --embed-file out/prototypes.json --preload-file out/assets
+	$(WEB_COMPILER) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 --use-preload-plugins -s WASM=0 -s USE_WEBGL2=1 -s TRACE_WEBGL_CALLS=1 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -v -s ASSERTIONS=1 -s SAFE_HEAP=1 -o $(WEB_TARGET).html $(SUBOBJ_WEB) --embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
 server: $(SUBOBJ_SERVER)

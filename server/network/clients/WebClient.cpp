@@ -43,8 +43,8 @@ std::unique_ptr<NetworkPacket> WebClient::poll()
 	}
 	else
 	{
-		char buffer[GAME_CONFIG::maxMessageSize];
-		int bytes = SDLNet_TCP_Recv(socket, buffer, GAME_CONFIG::maxMessageSize);
+		char buffer[S::config.maxMessageSize];
+		int bytes = SDLNet_TCP_Recv(socket, buffer, S::config.maxMessageSize);
 		if (bytes <= 0)
 		{
 			wasDisconnected = true;

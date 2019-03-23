@@ -34,6 +34,7 @@ public:
 	void update();
 	void handleEvent(SDL_Event* event);
 	void loadPrototypes();
+	void loadConfig();
 
 private:
 	void handleGenericRequest(GenericRequestMessage* request);

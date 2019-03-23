@@ -18,9 +18,9 @@ UndeterminedClient::~UndeterminedClient()
 
 std::unique_ptr<NetworkPacket> UndeterminedClient::poll()
 {
-	char buffer[GAME_CONFIG::maxMessageSize];
+	char buffer[S::config.maxMessageSize];
 
-	int bytes = SDLNet_TCP_Recv(socket, buffer, GAME_CONFIG::maxMessageSize);
+	int bytes = SDLNet_TCP_Recv(socket, buffer, S::config.maxMessageSize);
 
 	if (bytes <= 0)
 	{
@@ -31,7 +31,7 @@ std::unique_ptr<NetworkPacket> UndeterminedClient::poll()
 	{
 		int32_t code;
 		Serializer::read(code, buffer);
-		if (code == GAME_CONFIG::simpleClientCode)
+		if (code == S::config.simpleClientCode)
 		{
 			isSimpleClient = true;
 			onClientDetermined(this);

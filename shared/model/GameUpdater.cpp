@@ -15,12 +15,12 @@ void GameUpdater::update(uint32_t time)
 	if (lastValidTimeStamp < state->timeStamp)
 		rewindToPrecedingState(lastValidTimeStamp);
 
-	while (state->timeStamp < time - GAME_CONFIG::logicStepSize)
+	while (state->timeStamp < time - prototypes->variables.fixedStepDuration)
 	{		
-		std::vector<InputMessage*>* inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + GAME_CONFIG::logicStepSize);
-		logic.update(state.get(), GAME_CONFIG::logicStepSize, *inputs, prototypes);
+		std::vector<InputMessage*>* inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + prototypes->variables.fixedStepDuration);
+		logic.update(state.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
 		lastValidTimeStamp = state->timeStamp;
-		if (state->time.performedSteps % GAME_CONFIG::saveStateInterval == 0)
+		if (state->time.performedSteps % S::config.saveStateInterval == 0)
 			saveState(state.get());
 		delete inputs;
 	}
@@ -51,10 +51,10 @@ std::unique_ptr<GameState> GameUpdater::getNewStateByStamp(uint32_t stamp)
 	result->deserialize(*s);
 	result->propagatePrototypes(prototypes);
 
-	while (result->timeStamp < stamp - GAME_CONFIG::logicStepSize)
+	while (result->timeStamp < stamp - prototypes->variables.fixedStepDuration)
 	{
-		std::vector<InputMessage*>* inputs = getThisFrameInputs(result->timeStamp, result->timeStamp + GAME_CONFIG::logicStepSize);
-		logic.update(result.get(), GAME_CONFIG::logicStepSize, *inputs, prototypes);
+		std::vector<InputMessage*>* inputs = getThisFrameInputs(result->timeStamp, result->timeStamp + prototypes->variables.fixedStepDuration);
+		logic.update(result.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
 		delete inputs;
 	}
 
@@ -76,8 +76,8 @@ std::unique_ptr<GameState> GameUpdater::getNewStateBySteps(int32_t steps)
 
 	while (result->time.performedSteps < steps && result->timeStamp < state->timeStamp)
 	{
-		std::vector<InputMessage*>* inputs = getThisFrameInputs(result->timeStamp, result->timeStamp + GAME_CONFIG::logicStepSize);
-		logic.update(result.get(), GAME_CONFIG::logicStepSize, *inputs, prototypes);
+		std::vector<InputMessage*>* inputs = getThisFrameInputs(result->timeStamp, result->timeStamp + prototypes->variables.fixedStepDuration);
+		logic.update(result.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
 		delete inputs;
 	}
 

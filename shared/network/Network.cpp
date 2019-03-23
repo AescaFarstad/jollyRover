@@ -43,18 +43,18 @@ void Network::connect()
 {
 	SDLNet_Init();
 	IPaddress ip;
-	SDLNet_ResolveHost(&ip, GAME_CONFIG::host, GAME_CONFIG::port);
+	SDLNet_ResolveHost(&ip, S::config.host, S::config.port);
 	socket = SDLNet_TCP_Open(&ip);
 
 	S::log.add("connect status: " + std::string(socket == nullptr ? "false" : "true"), {LOG_TAGS::NET});
-	S::log.add("ip, port: " + std::string(GAME_CONFIG::host) + " " + std::to_string(GAME_CONFIG::port), {LOG_TAGS::NET});
+	S::log.add("ip, port: " + std::string(S::config.host) + " " + std::to_string(S::config.port), {LOG_TAGS::NET});
 
 	SDLNet_TCP_AddSocket(socketSet, socket);
 	isConnected = socket != nullptr;
-	if (isConnected && !GAME_CONFIG::IS_WEB)
+	if (isConnected && !S::config.IS_WEB)
 	{
 		char codeMsg[4];
-		Serializer::write(GAME_CONFIG::simpleClientCode, codeMsg);
+		Serializer::write(S::config.simpleClientCode, codeMsg);
 		SDLNet_TCP_Send(socket, codeMsg, 4);
 	}
 }
@@ -64,7 +64,7 @@ void Network::update()
 	if (!isConnected)
 		return;
 
-	activeSockets = SDLNet_CheckSockets(socketSet, GAME_CONFIG::networkUpdateInterval);
+	activeSockets = SDLNet_CheckSockets(socketSet, S::config.networkUpdateInterval);
 
 	if (activeSockets == -1)
 	{

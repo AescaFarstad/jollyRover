@@ -10,6 +10,8 @@ public:
 	VariableProto();
 	~VariableProto();
 
+	int32_t fixedStepDuration;
+	
 	int32_t fieldWidth;
 	int32_t fieldHeight;
 	

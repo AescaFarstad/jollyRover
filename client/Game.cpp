@@ -19,12 +19,14 @@
 
 Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 {
+	loadConfig();
 	loadPrototypes();
 
 	gameView = new GameView(window, renderer, &prototypes);
 
 	taskManager = new TaskManager();
 	network = new LoopBackNetwork(&gameUpdater);
+	//network = new Network();
 	network->connect();
 
 
@@ -194,14 +196,6 @@ void Game::handleEvent(SDL_Event* event)
 		
 }
 
-
-#ifdef __EMSCRIPTEN__
-	#include <SDL_image.h>
-#else 
-	#include <SDL2/SDL_image.h>
-#endif
-
-
 void Game::loadPrototypes()
 {
 	std::ifstream file("out/prototypes.json");
@@ -210,6 +204,14 @@ void Game::loadPrototypes()
 	prototypes.load(j);
 	
 	//std::ifstream file2("out/assets/sheet_tanks.png");
+}
+
+void Game::loadConfig()
+{
+	std::ifstream file("out/config.json");
+	json j = json::parse(file);
+	file.close();
+	S::config.load(j);
 }
 
 

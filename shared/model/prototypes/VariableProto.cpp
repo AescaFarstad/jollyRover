@@ -10,6 +10,8 @@ VariableProto::~VariableProto()
 
 void VariableProto::load(json &source)
 {
+	fixedStepDuration = source.at("fixedStepDuration");
+	
 	fieldWidth = source.at("fieldWidth");
 	fieldHeight = source.at("fieldHeight");
 

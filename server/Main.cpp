@@ -109,6 +109,14 @@ void loadPrototypes()
 	prototypes.load(j);
 }
 
+void loadConfig()
+{
+	std::ifstream file("out/config.json");
+	json j = json::parse(file);
+	file.close();
+	S::config.load(j);
+}
+
 void mainLoop()
 {
 	SDL_Event e;
@@ -178,9 +186,11 @@ int main()
 
 	initLog();
 
-	network.init();
 
 	loadPrototypes();
+	loadConfig();
+	
+	network.init();
 
 	messageBuffer = new std::unique_ptr<NetworkMessage>[SERVER_CONST::messageBufferSize + 1];
 	std::unique_ptr<GameState> state = std::make_unique<GameState>();

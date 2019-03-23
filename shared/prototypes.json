@@ -1,5 +1,6 @@
 {
 	"variables":{
+		"fixedStepDuration": 10,
 		"fieldWidth": 1280,
 		"fieldHeight": 720,
 		"routeStepSize": 20,

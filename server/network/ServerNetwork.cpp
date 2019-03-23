@@ -45,10 +45,10 @@ ServerNetwork::~ServerNetwork()
 void ServerNetwork::init()
 {
 	IPaddress ip;
-	SDLNet_ResolveHost(&ip, NULL, GAME_CONFIG::port);
+	SDLNet_ResolveHost(&ip, NULL, S::config.port);
 	serverSocketRaw = SDLNet_TCP_Open(&ip);
 
-	SDLNet_ResolveHost(&ip, NULL, 12880);
+	SDLNet_ResolveHost(&ip, NULL, S::config.webPort);
 	serverSocketWeb = SDLNet_TCP_Open(&ip);
 
 	std::vector<TCPsocket> clients;
