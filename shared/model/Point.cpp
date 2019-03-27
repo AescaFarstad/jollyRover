@@ -60,6 +60,26 @@ float Point::distanceTo(const Point &anotherPoint)
 	);
 }
 
+float Point::distanceTo(const float x, const float y)
+{
+	return std::sqrt(
+			(this->x - x)*(this->x - x) +
+			(this->y - y)*(this->y - y)
+	);
+}
+
+float Point::sqDistanceTo(const Point &anotherPoint)
+{
+	return (anotherPoint.x - x)*(anotherPoint.x - x) +
+			(anotherPoint.y - y)*(anotherPoint.y - y);
+}
+
+float Point::sqDistanceTo(const float x, const float y)
+{
+	return (this->x - x)*(this->x - x) +
+			(this->y - y)*(this->y - y);
+}
+
 Point Point::subtract(const Point &anotherPoint)
 {
 	return Point(x - anotherPoint.x, y - anotherPoint.y);

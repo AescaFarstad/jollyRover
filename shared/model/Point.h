@@ -28,6 +28,9 @@ public:
 	std::string toString();
 
 	float distanceTo(const Point& anotherPoint);
+	float distanceTo(const float x, const float y);
+	float sqDistanceTo(const Point& anotherPoint);
+	float sqDistanceTo(const float x, const float y);
 	Point subtract(const Point& anotherPoint);
 	void subtract(const Point& anotherPoint, Point &out);
 	Point add(const Point& anotherPoint);
