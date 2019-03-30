@@ -66,6 +66,8 @@ server: $(SUBOBJ_SERVER)
 	rsync -r assets/ out/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
 
+all: local server web
+
 $(OBJDIR_CLIENT_LOCAL)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
 	$(LOCAL_COMPILER) $(CXXFLAGS) $(INC_PARAMS_CLIENT) $(LOCAL_FLAGS) -c -o $@ $<	
