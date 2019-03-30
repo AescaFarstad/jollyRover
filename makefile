@@ -1,11 +1,18 @@
 EMSCRIPTEN ?= ../../emsdk/emscripten/1.38.24
 WEB_COMPILER := $(EMSCRIPTEN)/em++
-LOCAL_COMPILER = $(CXX)
-OUT=out
-WEB_TARGET=$(OUT)/web
-LOCAL_TARGET=$(OUT)/local
-SERVER_TARGET=$(OUT)/server
-CXXFLAGS = -g -Wall -c -std=c++14 -D_REENTRANT -MMD -MF $(subst .bc,.d,$@)
+LOCAL_COMPILER := $(CXX)
+
+OUT := out
+WEB_TARGET := $(OUT)/web
+LOCAL_TARGET := $(OUT)/local
+SERVER_TARGET := $(OUT)/server
+
+AUTODEPS = -MMD -MF $(subst .bc,.d,$@)
+COMPILE_FLAGS := -g -Wall -c -std=c++14 -D_REENTRANT $(CXXFLAGS)
+LINK_FLAGS := -std=c++14 -Wl,-rpath=/usr/lib/ $(LDFLAGS)
+
+LOCAL_LIBS := -lSDL2 -lSDL2_net -lSDL2_image -lutil
+SERVER_LIBS := -lSDL2 -lSDL2_net -lutil
 
 DIR_CLIENT =client
 DIR_CLIENT +=client/view
@@ -49,7 +56,7 @@ SUBOBJ_SERVER=$(foreach d, $(OBJS_SERVER), $(OBJDIR_CLIENT_SERVER)/$d)
 
 
 local: $(SUBOBJ_LOCAL)
-	$(LOCAL_COMPILER) -std=c++14 -Wl,-rpath=/usr/lib/ -o $(LOCAL_TARGET) $(INC_PARAMS) $(SUBOBJ_LOCAL) -lSDL2 -lSDL2_net -lSDL2_image -lutil 
+	$(LOCAL_COMPILER) $(LINK_FLAGS) $(LOCAL_LIBS) -o $(LOCAL_TARGET) $(SUBOBJ_LOCAL)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
@@ -57,11 +64,14 @@ local: $(SUBOBJ_LOCAL)
 web: $(SUBOBJ_WEB)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets/
-	$(WEB_COMPILER) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 --use-preload-plugins -s WASM=0 -s USE_WEBGL2=1 -s TRACE_WEBGL_CALLS=1 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -v -s ASSERTIONS=1 -s SAFE_HEAP=1 -o $(WEB_TARGET).html $(SUBOBJ_WEB) --embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets
+	$(WEB_COMPILER) \
+		-s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 \
+		-s WASM=0 -s TRACE_WEBGL_CALLS=1 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
+		--use-preload-plugins -v -o $(WEB_TARGET).html $(SUBOBJ_WEB) --embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
 server: $(SUBOBJ_SERVER)
-	$(LOCAL_COMPILER) -std=c++14 -Wl,-rpath=/usr/lib/ -o $(SERVER_TARGET) $(SUBOBJ_SERVER) -lSDL2 -lSDL2_net -lutil 
+	$(LOCAL_COMPILER) $(LINK_FLAGS) $(SERVER_LIBS) -o $(SERVER_TARGET) $(SUBOBJ_SERVER)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
@@ -70,15 +80,15 @@ all: local server web
 
 $(OBJDIR_CLIENT_LOCAL)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
-	$(LOCAL_COMPILER) $(CXXFLAGS) $(INC_PARAMS_CLIENT) $(LOCAL_FLAGS) -c -o $@ $<	
+	$(LOCAL_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) $(LOCAL_FLAGS) -c -o $@ $<
 	
 $(OBJDIR_CLIENT_WEB)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
-	$(WEB_COMPILER) $(CXXFLAGS) $(INC_PARAMS_CLIENT) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -c -o $@ $<	
+	$(WEB_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -c -o $@ $<
 	
 $(OBJDIR_CLIENT_SERVER)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
-	$(LOCAL_COMPILER) $(CXXFLAGS) $(INC_PARAMS_SERVER) $(LOCAL_FLAGS) -c -o $@ $<	
+	$(LOCAL_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_SERVER) $(LOCAL_FLAGS) -c -o $@ $<
 
 -include $(SUBOBJ_LOCAL:.bc=.d)
 -include $(SUBOBJ_WEB:.bc=.d)
