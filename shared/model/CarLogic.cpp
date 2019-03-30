@@ -21,7 +21,7 @@ void CarLogic::update(CarRide &ride, PlayerTest &player, GameState* state, Proto
 	{
 		passedThisStep = moveCar(passedThisStep);
 	}
-	if (ride.routeIndex == ride.route.size() - 1)
+	if ((uint16_t)ride.routeIndex == ride.route.size() - 1)
 	{
 		ride.isFinished = true;
 	}	

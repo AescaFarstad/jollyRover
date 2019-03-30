@@ -22,8 +22,7 @@ void Prototypes::load(json &source)
 	formations = source.at("formations").get<std::vector<FormationProto>>();
 	auto allObjectives = source.at("objectives").get<std::vector<ObjectiveProto>>();
 	
-	for(auto& force : forces)
-		objectives.emplace_back();
+	objectives.resize(forces.size());
 	
 	for(auto& o : allObjectives)
 	{

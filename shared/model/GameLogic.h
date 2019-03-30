@@ -23,7 +23,7 @@ public:
 
 	static bool testEdgeIsValid(Point& from, Point& to, std::vector<Obstacle>& obstacles);
 	static bool testRouteIsValid(std::vector<Point>& route, Prototypes* prototypes);
-	static bool buildRouteToTarget(Point& target, std::vector<RoutePoint>& route, Prototypes* prototypes);
+	static void buildRouteToTarget(Point& target, std::vector<RoutePoint>& route, Prototypes* prototypes);
 	static bool isRouteAnglePositive(std::vector<RoutePoint>& route, Point& target, Prototypes* prototypes);
 
 private:

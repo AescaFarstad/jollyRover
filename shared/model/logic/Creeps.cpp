@@ -64,8 +64,7 @@ namespace Creeps
 		void preprocessCreeps(GameState* state, Prototypes* prototypes)
 		{
 			state->forceStrength_.clear();
-			for(auto& i : prototypes->forces)
-				state->forceStrength_.push_back(0);
+			state->forceStrength_.resize(prototypes->forces.size());
 				
 			for(CreepState& creep : state->creeps)
 			{
@@ -304,14 +303,14 @@ namespace Creeps
 					
 					if (p1.x == p2.x)
 					{
-						if (p1.y > p2.y == creep.movement_.y > 0)
+						if ((p1.y > p2.y) == (creep.movement_.y > 0))
 							target = &p1;
 						else
 							target = &p2;
 					}
 					else
 					{
-						if (p1.x > p2.x == creep.movement_.x > 0)
+						if ((p1.x > p2.x) == (creep.movement_.x > 0))
 							target = &p1;
 						else
 							target = &p2;
