@@ -22,10 +22,13 @@ class SpatialMap
 public:
 	SpatialMap<T>();
 	SpatialMap<T>(int32_t gridSize, Point AA, Point BB);
-	~SpatialMap() = default;
+	~SpatialMap() = default;	
+	SpatialMap<T>& operator=(SpatialMap<T>&& that);	
+	SpatialMap<T>& operator=(SpatialMap<T>& that) = delete;
+	SpatialMap<T>(SpatialMap<T>&& that) = delete;
+	SpatialMap<T>(SpatialMap<T>& that) = delete;
 	
-	bool m_isValid;
-	
+	bool m_isValid;	
 	
 	void set(std::vector<T>& data);
 	std::vector<T*> getInRadius(Point& origin, int32_t radius);
@@ -51,7 +54,40 @@ private:
 };
 
 template <typename T>
-void traceMap(std::vector<std::vector<std::vector<T*>>>& map)
+SpatialMap<T>& SpatialMap<T>::operator=(SpatialMap<T>&& that)
+{
+	std::cout << "move assigment\n";
+	m_isValid = that.m_isValid;
+	
+	m_map[0][0] = std::move(that.m_map[0][0]);
+	m_map[1][0] = std::move(that.m_map[1][0]);
+	m_map[0][1] = std::move(that.m_map[0][1]);
+	m_map[1][1] = std::move(that.m_map[1][1]);
+	
+	m_gridOffset[0][0] = that.m_gridOffset[0][0];
+	m_gridOffset[1][0] = that.m_gridOffset[1][0];
+	m_gridOffset[0][1] = that.m_gridOffset[0][1];
+	m_gridOffset[1][1] = that.m_gridOffset[1][1];
+	
+	m_offsetByMap[&m_map[0][0]] = &m_gridOffset[0][0];
+	m_offsetByMap[&m_map[1][0]] = &m_gridOffset[1][0];
+	m_offsetByMap[&m_map[0][1]] = &m_gridOffset[0][1];
+	m_offsetByMap[&m_map[1][1]] = &m_gridOffset[1][1];
+	
+	m_rest = std::move(that.m_rest);
+	
+	m_safetyBuffer = that.m_safetyBuffer;
+	m_totalSize = that.m_totalSize;
+	m_gridSize = that.m_gridSize;
+	m_AA = std::move(that.m_AA);
+	m_BB = std::move(that.m_BB);
+	m_dimensions = std::move(that.m_dimensions);
+	
+	return *this;
+}
+
+template <typename T>
+void traceMap(std::vector<std::vector<std::vector<T*>>>& map, std::vector<T*>& m_rest)
 {
 	std::cout << map.size() << "\n";
 	for(auto& m : map)
@@ -59,9 +95,24 @@ void traceMap(std::vector<std::vector<std::vector<T*>>>& map)
 		std::cout << "\t" << m.size() << "\n";
 		for(auto& n : m)
 		{
-			std::cout << "\t\t" << n.size() << "\n";
+			if (!n.size())
+				continue;
+			//std::cout << "\t\t" << n.size() << "\n";
+			std::string tmp = "";
+			for(auto& r : n)
+			{
+				tmp += std::to_string(r->object.prototypeId) + ",";
+			}
+			std::cout << "\t\t" << n.size() << " " << tmp << "\n";
 		}
 	}
+	
+	std::string tmp = "rest:";
+	for(auto& m : m_rest)
+	{
+		tmp += std::to_string(m->object.prototypeId) + ",";
+	}
+	std::cout << "\t\t" << m_rest.size() << " " << tmp << "\n";
 };
 
 template <typename T>
@@ -139,6 +190,8 @@ void SpatialMap<T>::clearMap(std::vector<std::vector<std::vector<T*>>>& map, int
 		y.clear();
 		y.reserve(expectedCount);
 	}
+	m_rest.clear();
+	m_rest.reserve(expectedCount);
 }
 
 template <typename T>
@@ -201,6 +254,7 @@ std::vector<std::vector<std::vector<T*>>>& SpatialMap<T>::findBestMap(Point& ori
 	
 	return m_map[gx][gy];
 }
+
 
 template <typename T>
 std::vector<T*> SpatialMap<T>::getInRadius(Point& origin, int32_t radius)

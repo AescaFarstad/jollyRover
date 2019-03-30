@@ -7,6 +7,8 @@ void from_json(const json &j, CreepProto &creep)
 	creep.maxHealth = j.at("maxHealth");
 	creep.speed = j.at("speed");
 	creep.speed /= 1000;
+	creep.weight = j.at("weight");
+	creep.size = j.at("size");
 	
 	creep.loot = j.at("loot");
 	creep.strength = j.at("strength");

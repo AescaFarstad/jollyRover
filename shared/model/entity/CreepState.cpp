@@ -32,6 +32,11 @@ void CreepState::propagatePrototypes(std::vector<CreepProto>& creepProtos, std::
 	
 }
 
+const Point& CreepState::getLocation()
+{
+	return unit.location;
+}
+
 
 void Serializer::write(const CREEP_MODE& value, SerializationStream& stream)
 {

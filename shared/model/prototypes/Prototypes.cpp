@@ -49,4 +49,11 @@ void Prototypes::postProcess()
 			formation.strength += creeps[slot.creepType].strength;
 		}
 	}
+	
+	variables.maxCreepSize = 0;
+	for(auto& creep : creeps)
+	{
+		if (variables.maxCreepSize < creep.size)
+			variables.maxCreepSize = creep.size;
+	}
 }

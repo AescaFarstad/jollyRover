@@ -64,11 +64,10 @@ std::unique_ptr<GameState> GameUpdater::getNewStateByStamp(uint32_t stamp)
 std::unique_ptr<GameState> GameUpdater::getNewStateBySteps(int32_t steps)
 {
 	auto result = std::make_unique<GameState>();
-	using IterType = decltype(stepsByStamps.begin());
-	using IterType2 = decltype(*stepsByStamps.begin());
-	uint32_t stamp = std::min_element(stepsByStamps.begin(), stepsByStamps.end(), [](IterType2& a, IterType2& b){
-			return a < b;
-		})->second;
+	using IterType = decltype(stampsBySteps.begin());
+	using IterType2 = decltype(*stampsBySteps.begin());
+	
+	uint32_t stamp = stampsBySteps.lower_bound(steps)->second;
 	SerializationStream* s = statesByStamps.at(stamp).get();
 	result->deserialize(*s);
 	s->seekAbsolute(0);
@@ -118,5 +117,5 @@ void GameUpdater::saveState(GameState* state)
 	state->serialize(*stream.get());
 	stream->seekAbsolute(0);
 	statesByStamps[state->timeStamp] = std::move(stream);
-	stepsByStamps[state->timeStamp] = state->time.performedSteps;
+	stampsBySteps[state->time.performedSteps] = state->timeStamp;
 }

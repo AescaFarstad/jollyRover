@@ -22,7 +22,11 @@ public:
 	int32_t maxRouteSteps;
 	float stepAngleWindow;
 	
+	float creepRestitution;
+	
 	int32_t intensity;
+	
+	int32_t maxCreepSize;
 	
 
 	void load(json &source);

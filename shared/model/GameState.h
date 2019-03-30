@@ -7,6 +7,7 @@
 #include <Projectile.h>
 #include <FormationState.h>
 #include <Prototypes.h>
+#include <SpatialMap.h>
 #include <vector>
 /*
 class ForceState
@@ -36,7 +37,8 @@ public:
 	uint32_t timeStamp;
 	uint32_t idCounter;
 	
-	std::vector<int> _forceStrength;
+	std::vector<int> forceStrength_;
+	SpatialMap<CreepState> creepMap_;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;

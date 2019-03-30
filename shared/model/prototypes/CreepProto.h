@@ -32,6 +32,8 @@ public:
 	int32_t loot;
 	int32_t strength;
 	int16_t weapon;
+	int32_t weight;
+	int16_t size;
 
 private:
 

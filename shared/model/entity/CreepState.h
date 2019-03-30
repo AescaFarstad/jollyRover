@@ -24,10 +24,13 @@ public:
 	
 	CreepProto* _creepProto;
 	WeaponProto* _weaponProto;
+	Point movement_;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
 	void propagatePrototypes(std::vector<CreepProto>& creepProtos, std::vector<WeaponProto>& weaponProtos);
+	
+	const Point& getLocation();
 
 private:
 

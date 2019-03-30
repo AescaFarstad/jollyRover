@@ -4,6 +4,13 @@ namespace Creeps
 {
 	using namespace CreepsInternal;
 	
+	void checkCreepProtos(std::vector<CreepState> creeps, Prototypes* prototypes)
+	{
+		for(auto& creep : creeps)
+			if (creep._creepProto != &prototypes->creeps[creep.object.prototypeId])
+				THROW_FATAL_ERROR("frefer");
+	}
+	
 	void handleCreeps(GameState* state, Prototypes* prototypes, int timePassed)
 	{
 		preprocessCreeps(state, prototypes);
@@ -13,24 +20,40 @@ namespace Creeps
 		{
 			if (!force.alwaysOn)
 				continue;
-			if (state->_forceStrength[force.id] < prototypes->variables.intensity)
+			if (state->forceStrength_[force.id] < prototypes->variables.intensity)
 			{
 				FormationProto& formation = state->random.getFromVector(prototypes->formations);
 				spawnFormation(state, prototypes, force, formation);
-				state->_forceStrength[force.id] += formation.strength;
+				state->forceStrength_[force.id] += formation.strength;
 			}
 		}
+			
+		for(auto& creep : state->creeps)
+			creep.movement_.scaleTo(0);
 		
+		if (!state->creepMap_.m_isValid)
+		{
+			Point BB(prototypes->variables.fieldWidth + 100, prototypes->variables.fieldHeight + 100);
+			state->creepMap_ = SpatialMap<CreepState>(50, Point(-100, -100), BB);
+		}
+		state->creepMap_.set(state->creeps);
+		
+		
+			
 		processFormations(state, prototypes, timePassed);
 		processCreeps(state, prototypes, timePassed);
 		processProjectiles(state, prototypes, timePassed);
 		
 		
+		pushOutCreeps(state, prototypes, timePassed);
+		for(auto& creep : state->creeps)
+			creep.unit.location += creep.movement_;
 		
 		
 		removeDeadProjectiles(state);
 		removeDeadCreeps(state);
 		removeDeadFormations(state);
+		
 	}
 	
 	
@@ -39,9 +62,9 @@ namespace Creeps
 		
 		void preprocessCreeps(GameState* state, Prototypes* prototypes)
 		{
-			state->_forceStrength.clear();
+			state->forceStrength_.clear();
 			for(auto& i : prototypes->forces)
-				state->_forceStrength.push_back(0);
+				state->forceStrength_.push_back(0);
 				
 			for(CreepState& creep : state->creeps)
 			{
@@ -49,7 +72,7 @@ namespace Creeps
 				{
 					THROW_FATAL_ERROR("Prototypes are not resolved");
 				}
-				state->_forceStrength[creep.unit.force] += creep._creepProto->strength;
+				state->forceStrength_[creep.unit.force] += creep._creepProto->strength;
 			}
 		}
 		
@@ -214,7 +237,7 @@ namespace Creeps
 				step.scaleTo(stepSize);	
 				nextLoc = creep.unit.location + step;
 			}
-			creep.unit.location = nextLoc;
+			creep.movement_ = step;
 		}
 		
 		CreepState* creepByid(int32_t id, std::vector<CreepState>& creeps)
@@ -243,6 +266,43 @@ namespace Creeps
 			}
 			
 			return bestCreep;
+		}
+		
+		void pushOutCreeps(GameState* state, Prototypes* prototypes, int timePassed)
+		{
+			for(auto& creep : state->creeps)
+			{
+				std::vector<CreepState*> possibleCollisions = state->creepMap_.getInRadius(
+						creep.unit.location, creep._creepProto->size + prototypes->variables.maxCreepSize);
+				
+				for(auto& creep2 : possibleCollisions)
+				{
+					if (creep2 >= &creep)
+						continue;
+						
+					int32_t collisionRadius = creep._creepProto->size + creep2->_creepProto->size;
+					Point creep2Creep = creep.unit.location - creep2->unit.location;
+					if (creep2Creep.getLength() == 0)
+						creep2Creep.x = 0.1;
+					float penetration = (collisionRadius - creep2Creep.getLength()) / 2;
+					if (penetration > 0)
+					{
+						//float direction = creep2Creep.asAngle();
+						int32_t totalWeight = creep._creepProto->weight + creep2->_creepProto->weight;
+						float force = penetration * prototypes->variables.creepRestitution / totalWeight;
+						
+						if (creep.unit.force == creep2->unit.force && creep.object.prototypeId != creep2->object.prototypeId)
+							force /= 10;
+						
+						creep2Creep.scaleTo(force * creep2->_creepProto->weight);
+						creep.movement_ += creep2Creep;
+						
+						creep2Creep.scaleTo(force * creep._creepProto->weight);
+						creep2->movement_ -= creep2Creep;
+						
+					}
+				}
+			}
 		}
 		
 		void spawnProjectile(Point& from, Point& to, const WeaponProto* prototype, GameState* state)

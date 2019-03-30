@@ -20,6 +20,7 @@ void VariableProto::load(json &source)
 	maxRouteSteps = source.at("maxRouteSteps");
 
 	stepAngleWindow = source.at("stepAngleWindow");
+	creepRestitution = source.at("creepRestitution");
 	
 	intensity = source.at("war").at("intensity");
 	

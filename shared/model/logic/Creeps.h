@@ -23,6 +23,8 @@ namespace Creeps
 		void performCreepAttack(CreepState& creep, Unit& target, GameState* state, int timePassed);
 		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed);
 		
+		void pushOutCreeps(GameState* state, Prototypes* prototypes, int timePassed);
+		
 		CreepState* creepByid(int32_t id, std::vector<CreepState>& creeps);
 		CreepState* getBestAssaultTargetForCreep(CreepState& creep, std::vector<CreepState>& creeps);
 		
