@@ -34,6 +34,11 @@ void Point::setToNaN()
 	y = std::numeric_limits<float>::quiet_NaN();
 }
 
+bool Point::isNaN()
+{
+	return std::isnan(x) || std::isnan(y);
+}
+
 float Point::getLength()
 {
 	return std::sqrt(x*x + y*y);

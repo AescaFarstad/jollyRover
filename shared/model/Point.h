@@ -23,6 +23,7 @@ public:
 
 	void scaleTo(float length);
 	void setToNaN();
+	bool isNaN();
 	float getLength();
 	float asAngle();
 	std::string toString();

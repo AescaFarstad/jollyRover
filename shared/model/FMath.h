@@ -9,6 +9,7 @@ class Edge;
 namespace FMath
 {
 	const float EPSILON = 0.001f;
+	const float F_MAX = std::numeric_limits<float>::max();
 
 	Point getEdgeIntersection(Edge &e1, Edge &e2);
 	Point getLinesIntersection(Point &s11, Point &s12, Point &s21, Point &s22);

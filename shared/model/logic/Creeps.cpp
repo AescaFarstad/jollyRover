@@ -46,6 +46,7 @@ namespace Creeps
 		
 		
 		pushOutCreeps(state, prototypes, timePassed);
+		preventCreepObstacleCollision(state, prototypes);
 		for(auto& creep : state->creeps)
 			creep.unit.location += creep.movement_;
 		
@@ -268,6 +269,62 @@ namespace Creeps
 			return bestCreep;
 		}
 		
+		void preventCreepObstacleCollision(GameState* state, Prototypes* prototypes)
+		{
+			for(auto& creep : state->creeps)
+			{
+				Point nextLoc = creep.unit.location + creep.movement_;
+				Obstacle* obstacle = Field::findObstacle(nextLoc, prototypes);
+				
+				if (obstacle)
+				{
+					float bestDistance = FMath::F_MAX;					
+					Edge creepEdge(&creep.unit.location, &nextLoc);
+					Edge* bestEdge = nullptr;
+					
+					for(auto& edge : obstacle->edges)
+					{
+						Point intersection = FMath::getEdgeIntersection(creepEdge, edge);
+						if (!intersection.isNaN())
+						{
+							float distance = creep.unit.location.distanceTo(intersection);
+							if (distance < bestDistance)
+							{
+								bestDistance = distance;
+								bestEdge = &edge;
+							}
+						}
+					}
+					
+					if (bestEdge == nullptr)
+						continue;
+					Point& p1 = *bestEdge->p1;
+					Point& p2 = *bestEdge->p2;
+					Point* target;
+					
+					if (p1.x == p2.x)
+					{
+						if (p1.y > p2.y == creep.movement_.y > 0)
+							target = &p1;
+						else
+							target = &p2;
+					}
+					else
+					{
+						if (p1.x > p2.x == creep.movement_.x > 0)
+							target = &p1;
+						else
+							target = &p2;
+					}
+					
+					float length = creep.movement_.getLength();
+					creep.movement_ = *target - creep.unit.location;
+					creep.movement_.scaleTo(length);
+					
+				}				
+			}
+		}	
+		
 		void pushOutCreeps(GameState* state, Prototypes* prototypes, int timePassed)
 		{
 			for(auto& creep : state->creeps)
@@ -303,6 +360,7 @@ namespace Creeps
 					}
 				}
 			}
+			
 		}
 		
 		void spawnProjectile(Point& from, Point& to, const WeaponProto* prototype, GameState* state)
