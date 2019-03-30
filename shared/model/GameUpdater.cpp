@@ -81,6 +81,18 @@ std::unique_ptr<GameState> GameUpdater::getNewStateBySteps(int32_t steps)
 	return result;
 }
 
+std::unique_ptr<GameState> GameUpdater::getFirstState()
+{
+	auto result = std::make_unique<GameState>();
+	 
+	SerializationStream* s = std::min_element(statesByStamps.begin(), statesByStamps.end())->second.get();
+	result->deserialize(*s);
+	s->seekAbsolute(0);
+	result->propagatePrototypes(prototypes);
+
+	return result;
+}
+
 uint32_t GameUpdater::getExecutionStamp(InputMessage* input)
 {
 	return input->serverStamp;

@@ -34,9 +34,9 @@ namespace Creeps
 		if (!state->creepMap_.m_isValid)
 		{
 			Point BB(prototypes->variables.fieldWidth + 100, prototypes->variables.fieldHeight + 100);
-			state->creepMap_ = SpatialMap<CreepState>(50, Point(-100, -100), BB);
+			state->creepMap_ = SpatialMap<CreepState>(50, true, Point(-100, -100), BB);
 		}
-		state->creepMap_.set(state->creeps);
+		state->creepMap_.setUnique(state->creeps);
 		
 		
 			
@@ -115,6 +115,18 @@ namespace Creeps
 			CreepState& creep = state->creeps.back();
 			creep._creepProto = &(prototypes->creeps[type]);
 			creep._weaponProto = &(prototypes->weapons[creep._creepProto->weapon]);
+			
+			creep.numWhiskers = creep._creepProto->whiskers + 1;
+			for(int8_t i = 0; i < creep.numWhiskers; i++)
+			{
+				creep.whiskers[i] = state->random.get(i * 0.7f, i * 1.3f) / creep.numWhiskers * creep._creepProto->maxWhiskerLength;
+				if (i > 0 && creep.whiskers[i] - creep.whiskers[i - 1] < 10)
+					creep.whiskers[i] = creep.whiskers[i - 1] + 10;
+			}
+			for(int8_t i = creep.numWhiskers; i < CreepState::MAX_WHISKER_COUNT; i++)
+			{
+				creep.whiskers[i] = -1;
+			}
 			
 			creep.object.prototypeId = type;
 			creep.object.id = state->idCounter++;
@@ -211,31 +223,40 @@ namespace Creeps
 			float stepSize = creep._creepProto->speed * timePassed;
 			step.scaleTo(stepSize);
 			
-			Point nextLoc = creep.unit.location + step;
-			Obstacle* obstacle = Field::findObstacle(nextLoc, prototypes);
-			if (obstacle)
+			for(auto& whisker : creep.whiskers)
 			{
-				Point creepToTarget = target - creep.unit.location;
-				float direction = creepToTarget.crossProduct(obstacle->centroid - creep.unit.location);
-				
-				Point* bestPoint = nullptr;
-				float bestDistance = std::numeric_limits<float>::max();
-				for(auto& vert : obstacle->vertices)
+				if (whisker < 0 || whisker > (target - creep.unit.location).getLength())
+					break;
+					
+				Point whiskerStep = step;
+				whiskerStep.scaleTo(1 + whisker);
+				Point nextLoc = creep.unit.location + whiskerStep;
+				Obstacle* obstacle = Field::findObstacle(nextLoc, prototypes);
+				if (obstacle)
 				{
-					float vertDir = creepToTarget.crossProduct(vert - creep.unit.location);
-					if (vertDir * direction < 0)
+					Point creepToTarget = target - creep.unit.location;
+					float direction = creepToTarget.crossProduct(obstacle->centroid - creep.unit.location);
+					
+					Point* bestPoint = nullptr;
+					float bestDistance = FMath::F_MAX;
+					for(auto& vert : obstacle->vertices)
 					{
-						float distance = vert.distanceTo(creep.unit.location);
-						if (distance < bestDistance)
+						float vertDir = creepToTarget.crossProduct(vert - creep.unit.location);
+						if ((vertDir < 0) != (direction < 0))
 						{
-							bestDistance = distance;
-							bestPoint = &vert;
+							float distance = vert.distanceTo(creep.unit.location);
+							if (distance < bestDistance)
+							{
+								bestDistance = distance;
+								bestPoint = &vert;
+							}
 						}
 					}
+					step = *bestPoint - creep.unit.location;
+					step.scaleTo(stepSize);
+					creep.movement_ = step;
+					return;
 				}
-				step = *bestPoint - creep.unit.location;
-				step.scaleTo(stepSize);	
-				nextLoc = creep.unit.location + step;
 			}
 			creep.movement_ = step;
 		}
@@ -318,7 +339,7 @@ namespace Creeps
 					
 					float length = creep.movement_.getLength();
 					creep.movement_ = *target - creep.unit.location;
-					creep.movement_.scaleTo(length);
+					creep.movement_.scaleTo(length / 2);
 					
 				}				
 			}

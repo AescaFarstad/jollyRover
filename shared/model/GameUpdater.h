@@ -25,6 +25,7 @@ public:
 	void addNewInput(std::unique_ptr<InputMessage> input);
 	std::unique_ptr<GameState> getNewStateByStamp(uint32_t stamp);
 	std::unique_ptr<GameState> getNewStateBySteps(int32_t steps);
+	std::unique_ptr<GameState> getFirstState();
 
 private:
 	std::vector<std::unique_ptr<InputMessage>> inputs;

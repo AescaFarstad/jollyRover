@@ -10,6 +10,7 @@
 #include <FormationProto.h>
 #include <ObjectiveProto.h>
 #include <ForceProto.h>
+#include <SpatialMap.h>
 
 using json = nlohmann::json;
 
@@ -28,6 +29,7 @@ public:
 	std::vector<ForceProto> forces;
 	std::vector<FormationProto> formations;
 	std::vector<std::vector<ObjectiveProto>> objectives;
+	SpatialMap<Obstacle> obstacleMap;
 	
 	void postProcess();
 

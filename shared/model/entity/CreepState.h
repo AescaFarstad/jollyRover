@@ -11,16 +11,21 @@ enum class CREEP_MODE : int32_t
 	RETREAT = 3
 };
 
+
 class CreepState
 {
 public:
 	CreepState();
 	~CreepState() = default;
 	
+	static const int8_t MAX_WHISKER_COUNT = 32;
+	
 	Object object;
 	Unit unit;
 	Weapon weapon;
 	CREEP_MODE mode;
+	int16_t whiskers[MAX_WHISKER_COUNT];
+	int8_t numWhiskers;
 	
 	CreepProto* _creepProto;
 	WeaponProto* _weaponProto;

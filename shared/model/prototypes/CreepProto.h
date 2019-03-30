@@ -34,6 +34,8 @@ public:
 	int16_t weapon;
 	int32_t weight;
 	int16_t size;
+	int8_t whiskers;
+	int16_t maxWhiskerLength;
 
 private:
 

@@ -115,6 +115,24 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 		});
 	}, "wait for game state from the server and load the game");
 
+	auto testPerformance = [this](std::unique_ptr<Callback> callback) {
+			GameUpdater gu;
+			auto state = std::make_unique<GameState>(892422);
+			gu.load(std::move(state), &prototypes);
+			
+			int32_t startTime = SDL_GetTicks();
+			for(int i = 0; i < 100; i++)
+			{
+				gu.update(i * 1000 + 100);
+				S::log.add(std::to_string(i) + "%");
+			}
+			S::log.add("Finished in " + std::to_string(SDL_GetTicks() - startTime));
+			S::log.add("Performance buffer: " + std::to_string((float)100 * 1000 / (SDL_GetTicks() - startTime)));
+			
+			callback->execute();
+		};
+	//loadGameTask->pushAsync(testPerformance, "testPerformance");
+	
 	loadGameTask->exec();
 
 

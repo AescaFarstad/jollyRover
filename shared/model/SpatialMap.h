@@ -21,7 +21,7 @@ class SpatialMap
 {
 public:
 	SpatialMap<T>();
-	SpatialMap<T>(int32_t gridSize, Point AA, Point BB);
+	SpatialMap<T>(int32_t gridSize, bool useLayeredMap, Point AA, Point BB);
 	~SpatialMap() = default;	
 	SpatialMap<T>& operator=(SpatialMap<T>&& that);	
 	SpatialMap<T>& operator=(SpatialMap<T>& that) = delete;
@@ -30,8 +30,10 @@ public:
 	
 	bool m_isValid;	
 	
-	void set(std::vector<T>& data);
+	void setUnique(std::vector<T>& data);
+	void setNonUnique(std::vector<T>& data);
 	std::vector<T*> getInRadius(Point& origin, int32_t radius);
+	std::vector<T*> getInCell(Point& origin);
 	template <typename F>
 	std::vector<T*> getNearest(Point& origin, F predicate);
 	
@@ -46,6 +48,7 @@ private:
 	Point m_AA;
 	Point m_BB;
 	Point m_dimensions;
+	bool m_useLayeredMap;
 	
 	
 	std::vector<std::vector<std::vector<T*>>>& findBestMap(Point& origin, int32_t radius);
@@ -82,6 +85,7 @@ SpatialMap<T>& SpatialMap<T>::operator=(SpatialMap<T>&& that)
 	m_AA = std::move(that.m_AA);
 	m_BB = std::move(that.m_BB);
 	m_dimensions = std::move(that.m_dimensions);
+	m_useLayeredMap = std::move(that.m_useLayeredMap);
 	
 	return *this;
 }
@@ -123,10 +127,11 @@ SpatialMap<T>::SpatialMap()
 }
 
 template <typename T>
-SpatialMap<T>::SpatialMap(int32_t gridSize, Point AA, Point BB)
+SpatialMap<T>::SpatialMap(int32_t gridSize, bool useLayeredMap, Point AA, Point BB)
 {
 	m_isValid = true;
 	m_gridSize = gridSize;
+	m_useLayeredMap = useLayeredMap;
 	m_dimensions = BB - AA;
 	m_AA = AA;
 	m_AA -= Point(gridSize/2, gridSize/2); //buffer
@@ -195,7 +200,7 @@ void SpatialMap<T>::clearMap(std::vector<std::vector<std::vector<T*>>>& map, int
 }
 
 template <typename T>
-void SpatialMap<T>::set(std::vector<T>& data)
+void SpatialMap<T>::setUnique(std::vector<T>& data)
 {
 	if (!m_isValid)
 		THROW_FATAL_ERROR("Spatial map is not valid.");
@@ -203,6 +208,10 @@ void SpatialMap<T>::set(std::vector<T>& data)
 	float density = data.size() / (m_map[0][0].size() * m_map[0][0][0].size());
 	density *= 2;
 	clearMap(m_map[0][0], density);
+	
+	if (!m_useLayeredMap)
+		density = 0;
+		
 	clearMap(m_map[1][0], density);
 	clearMap(m_map[0][1], density);
 	clearMap(m_map[1][1], density);	
@@ -214,7 +223,8 @@ void SpatialMap<T>::set(std::vector<T>& data)
 			m_rest.push_back(&iter);
 		else
 		{
-			for(size_t g = 0; g < 4; g++)
+			size_t numMaps = m_useLayeredMap ? 4 : 1;
+			for(size_t g = 0; g < numMaps; g++)
 			{
 				int32_t gx = g % 2;
 				int32_t gy = g / 2;
@@ -226,6 +236,97 @@ void SpatialMap<T>::set(std::vector<T>& data)
 		
 	}
 	m_totalSize = data.size();
+}
+
+template <typename T>
+void SpatialMap<T>::setNonUnique(std::vector<T>& data)
+{
+	if (!m_isValid)
+		THROW_FATAL_ERROR("Spatial map is not valid.");
+		
+	float density = data.size() / (m_map[0][0].size() * m_map[0][0][0].size());
+	density *= 4;
+	clearMap(m_map[0][0], density);
+	
+	if (!m_useLayeredMap)
+		density = 0;
+		
+	clearMap(m_map[1][0], density);
+	clearMap(m_map[0][1], density);
+	clearMap(m_map[1][1], density);	
+	
+	Point vert[4] = {Point(0, 0), Point(0, m_gridSize), Point(m_gridSize, 0), Point(m_gridSize, m_gridSize)};
+	Edge protoEdges[4] = {
+		Edge(&vert[0], &vert[1]),
+		Edge(&vert[0], &vert[2]),
+		Edge(&vert[1], &vert[3]),
+		Edge(&vert[2], &vert[3])
+		};
+	
+	for(auto& iter : data)
+	{
+		const Point& AA = iter.getAA();
+		const Point& BB = iter.getBB();
+		const Point& CC = iter.getCenter();
+		
+		size_t numMaps = m_useLayeredMap ? 4 : 1;
+		for(size_t g = 0; g < numMaps; g++)
+		{
+			int32_t gx = g % 2;
+			int32_t gy = g / 2;
+			
+			auto& map = m_map[gx][gy];
+			
+			Point& offset = m_gridOffset[gx][gy];
+			
+			int32_t fromX = std::max(0.0f, (AA.x - m_AA.x - offset.x) / m_gridSize);
+			int32_t fromY = std::max(0.0f, (AA.y -  m_AA.y - offset.y) / m_gridSize);
+			
+			int32_t toX = std::min((float)map.size() - 1,    std::ceil((BB.x - m_AA.x - offset.x) / m_gridSize));
+			int32_t toY = std::min((float)map[0].size() - 1, std::ceil((BB.y - m_AA.y - offset.y) / m_gridSize));
+			
+			int32_t offsetX = - m_AA.x + offset.x;
+			int32_t offsetY = - m_AA.y + offset.y;
+			for(int32_t x = fromX; x <= toX; x++)
+			{
+				for(int32_t y = fromY; y <= toY; y++)
+				{
+					Point cellCenter((x + 0.5) * m_gridSize - offsetX, (y + 0.5) * m_gridSize - offsetY);
+					if (iter.hitTest(cellCenter))
+					{
+						map[x][y].push_back(&iter);
+						continue;
+					}
+					
+					
+					for(auto& edge : protoEdges)
+					{
+						Point fromP(x * m_gridSize - offsetX + edge.p1->x, y * m_gridSize - offsetY + edge.p1->y);
+						Point toP(x * m_gridSize - offsetX + edge.p2->x, y * m_gridSize - offsetY + edge.p2->y);
+						Edge testEdge(&fromP, &toP);
+						
+						if (iter.hitTest(testEdge))
+						{
+							map[x][y].push_back(&iter);
+							goto edgeTestFinish;
+						}
+					}
+					edgeTestFinish:{}/**/
+				}
+			}
+					
+			int32_t x = (CC.x - m_AA.x - m_gridOffset[gx][gy].x) / m_gridSize;
+			int32_t y = (CC.y - m_AA.y - m_gridOffset[gx][gy].y) / m_gridSize;
+			if (map[x][y].end() != std::find(map[x][y].begin(), map[x][y].end(), &iter))
+				map[x][y].push_back(&iter);
+		}	
+	}
+	m_totalSize = 0;
+	for(auto&gx : m_map)
+	for(auto&gy : gx)
+	for(auto&x : gy)
+	for(auto&y : x)
+		m_totalSize+= y.size();	
 }
 
 template <typename T>
@@ -262,7 +363,7 @@ std::vector<T*> SpatialMap<T>::getInRadius(Point& origin, int32_t radius)
 	if (!m_isValid)
 		THROW_FATAL_ERROR("Spatial map is not valid.");
 		
-	auto& map = findBestMap(origin, radius);
+	auto& map = m_useLayeredMap ? findBestMap(origin, radius) : m_map[0][0];
 	
 	Point* offset = m_offsetByMap[&map];
 	
@@ -320,4 +421,24 @@ std::vector<T*> SpatialMap<T>::getInRadius(Point& origin, int32_t radius)
 	}
 	
 	return result;
+}
+
+template <typename T>
+std::vector<T*> SpatialMap<T>::getInCell(Point& origin)
+{
+	if (!m_isValid)
+		THROW_FATAL_ERROR("Spatial map is not valid.");
+		
+	if (origin.x < m_AA.x || origin.y < m_AA.y || origin.x > m_BB.x || origin.y > m_BB.y)
+		return m_rest;
+		
+	auto& map = m_map[0][0];
+	
+	Point& offset = m_gridOffset[0][0];
+	
+	int32_t x = (origin.x - m_AA.x - offset.x) / m_gridSize;
+	int32_t y = (origin.y - m_AA.y - offset.y) / m_gridSize;
+	
+	return map[x][y];
+	
 }

@@ -13,6 +13,9 @@ void CreepState::deserialize(SerializationStream &stream)
 	Serializer::read(unit, stream);
 	Serializer::read(weapon, stream);
 	Serializer::read(mode, stream);
+	Serializer::read(numWhiskers, stream);
+	for(size_t i = 0; i < numWhiskers; i++)
+		Serializer::read(whiskers[i], stream);
 	_creepProto = nullptr;
 	_weaponProto = nullptr;
 }
@@ -23,6 +26,10 @@ void CreepState::serialize(SerializationStream &stream) const
 	Serializer::write(unit, stream);
 	Serializer::write(weapon, stream);
 	Serializer::write(mode, stream);
+	Serializer::write(numWhiskers, stream);
+	for(size_t i = 0; i < numWhiskers; i++)
+		Serializer::write(whiskers[i], stream);
+		
 }
 
 void CreepState::propagatePrototypes(std::vector<CreepProto>& creepProtos, std::vector<WeaponProto>& weaponProtos)

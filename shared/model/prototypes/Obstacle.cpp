@@ -1,12 +1,5 @@
 #include <Obstacle.h>
 
-Obstacle::Obstacle()
-{
-}
-
-Obstacle::~Obstacle()
-{
-}
 
 Obstacle::Obstacle(Obstacle const &other)
 {
@@ -44,6 +37,38 @@ bool Obstacle::isInside(Point &p)
 	return oddNodes;
 }
 
+const Point& Obstacle::getAA()
+{
+	return AA;
+}
+
+const Point& Obstacle::getBB()
+{	
+	return BB;
+}
+	
+const Point& Obstacle::getCenter()
+{	
+	return centroid;
+}
+
+bool Obstacle::hitTest(Point& p)
+{
+	return isInside(p);
+}
+
+bool Obstacle::hitTest(Edge& e)
+{
+	if (isInside(*e.p1) || isInside(*e.p2))
+		return true;
+	for(auto& edge : edges)
+	{
+		if (!FMath::getEdgeIntersection(edge, e).isNaN())
+			return true;
+	}
+	return false;
+}
+	
 void from_json(const json &j, Obstacle &obstacle)
 {
 	obstacle.vertices = j.at("vertices").get<std::vector<Point>>();

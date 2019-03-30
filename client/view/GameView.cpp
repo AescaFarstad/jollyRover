@@ -66,6 +66,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawCreeps();
 	drawProjectiles();
 	//rendery(renderer, loadedSurface, ltexture);
+	
 }
 
 

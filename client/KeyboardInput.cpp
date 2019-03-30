@@ -141,6 +141,17 @@ namespace KeyboardInput
 				network.send(&loadMsg);
 				break;
 			};
+			case KEYBOARD_ACTIONS::REVERT_FULL :
+			{
+				LoadGameMessage loadMsg;
+				auto state = gameUpdater.getFirstState();
+				auto stream = SerializationStream::createExp();
+				state->serialize(*stream);
+				loadMsg.stateLength = stream->getLength();
+				loadMsg.state = stream->readAll();
+				network.send(&loadMsg);
+				break;
+			};
 			case KEYBOARD_ACTIONS::RIGHT :
 			case KEYBOARD_ACTIONS::LEFT :
 			case KEYBOARD_ACTIONS::FORWARD :

@@ -55,4 +55,12 @@ void Prototypes::postProcess()
 		if (variables.maxCreepSize < creep.size)
 			variables.maxCreepSize = creep.size;
 	}
+	
+	int32_t padding = 100;
+	Point from(-padding, -padding);
+	Point to(variables.fieldWidth + padding, variables.fieldHeight + padding);
+	
+	obstacleMap = SpatialMap<Obstacle>(10, false, from, to);
+	obstacleMap.setNonUnique(obstacles);
+	
 }

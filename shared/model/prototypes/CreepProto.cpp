@@ -1,4 +1,5 @@
 #include <CreepProto.h>
+#include <CreepState.h>
 
 void from_json(const json &j, CreepProto &creep)
 {
@@ -9,6 +10,11 @@ void from_json(const json &j, CreepProto &creep)
 	creep.speed /= 1000;
 	creep.weight = j.at("weight");
 	creep.size = j.at("size");
+	creep.whiskers = j.at("whiskers");
+	creep.maxWhiskerLength = j.at("maxWhiskerLength");
+	
+	if (creep.whiskers > CreepState::MAX_WHISKER_COUNT - 1)
+		THROW_FATAL_ERROR("Too manu whiskers!");
 	
 	creep.loot = j.at("loot");
 	creep.strength = j.at("strength");

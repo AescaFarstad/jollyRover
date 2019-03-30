@@ -40,6 +40,8 @@ Keyboard::Keyboard()
 	actionByButton[SDL_SCANCODE_KP_MINUS] = KEYBOARD_ACTIONS::REVERT25;
 	actionByButton[SDL_SCANCODE_KP_PLUS] = KEYBOARD_ACTIONS::REVERT125;
 	
+	actionByButton[SDL_SCANCODE_KP_PERIOD] = KEYBOARD_ACTIONS::REVERT_FULL;
+	
 	for(uint16_t i = 0; i < 128; i++)
 		buttonByAction[(int)actionByButton[i]] = i;
 
