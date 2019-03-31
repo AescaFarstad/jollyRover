@@ -56,7 +56,7 @@ SUBOBJ_SERVER=$(foreach d, $(OBJS_SERVER), $(OBJDIR_CLIENT_SERVER)/$d)
 
 
 local: $(SUBOBJ_LOCAL)
-	$(LOCAL_COMPILER) $(LINK_FLAGS) $(LOCAL_LIBS) -o $(LOCAL_TARGET) $(SUBOBJ_LOCAL)
+	$(LOCAL_COMPILER) $(LINK_FLAGS) -o $(LOCAL_TARGET) $(SUBOBJ_LOCAL) $(LOCAL_LIBS)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
@@ -71,7 +71,7 @@ web: $(SUBOBJ_WEB)
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
 server: $(SUBOBJ_SERVER)
-	$(LOCAL_COMPILER) $(LINK_FLAGS) $(SERVER_LIBS) -o $(SERVER_TARGET) $(SUBOBJ_SERVER)
+	$(LOCAL_COMPILER) $(LINK_FLAGS) -o $(SERVER_TARGET) $(SUBOBJ_SERVER) $(SERVER_LIBS)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
