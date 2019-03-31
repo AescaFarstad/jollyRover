@@ -29,6 +29,10 @@ void GameState::propagatePrototypes(Prototypes* prototypes)
 	{
 		creep.propagatePrototypes(prototypes->creeps, prototypes->weapons);
 	}
+	for(auto& formation : formations)
+	{
+		//formation.propagatePrototypes(prototypes->formations, prototypes->objectives);
+	}
 }
 
 void GameState::serialize(SerializationStream& stream) const 

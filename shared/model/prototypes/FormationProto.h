@@ -32,6 +32,8 @@ public:
 	FORMATION_TYPE type;
 	std::vector<FormationSlotProto> slots;
 	int32_t strength;
+	Point AA;
+	Point BB;
 };
 
 void from_json(const json &j, FormationSlotProto &slot);

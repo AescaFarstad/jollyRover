@@ -1,8 +1,9 @@
+
 #include <json.hpp>
 #include <Point.h>
 using json = nlohmann::json;
 
-enum OBJECTIVE_TYPE
+enum class OBJECTIVE_TYPE : int8_t
 {
 	OIL,
 	POINT

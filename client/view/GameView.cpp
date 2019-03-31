@@ -1,4 +1,5 @@
 #include <GameView.h>
+#include <Creeps.h>
 
 
 GameView::GameView(SDL_Window* window, SDL_Renderer* renderer, Prototypes* prototypes)
@@ -65,6 +66,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawCars();
 	drawCreeps();
 	drawProjectiles();
+	drawFormations();
 	//rendery(renderer, loadedSurface, ltexture);
 	
 }
@@ -303,6 +305,107 @@ void GameView::drawProjectiles()
 			rect.w = rectSize;
 			rect.h = rectSize;
 			SDL_RenderDrawRect(renderer, &rect);			
+		}
+	}
+}
+
+void GameView::drawFormations()
+{
+	
+	uint32_t color = 0xdddd00;
+	setColor(color);
+	
+	for (auto& form : state->formations)
+	{
+		FormationProto& proto = prototypes->formations[form.object.prototypeId];
+		
+		Point AB(proto.AA.x, proto.BB.y);
+		Point BA(proto.BB.x, proto.AA.y);
+		
+		//------------------------------------------------
+		Point p1 = form.location + proto.AA.rotate(form.orientation);
+		Point p2 = form.location + AB.rotate(form.orientation);
+		Point p3 = form.location + proto.BB.rotate(form.orientation);
+		Point p4 = form.location + BA.rotate(form.orientation);
+		
+		SDL_Point points[4];
+		
+		points[0].x = p1.x;
+		points[0].y = p1.y;		
+		points[1].x = p2.x;
+		points[1].y = p2.y;
+		points[2].x = p3.x;
+		points[2].y = p3.y;
+		points[3].x = p4.x;
+		points[3].y = p4.y;
+		
+		SDL_RenderDrawLines(renderer, points, 4);
+		
+		//--------------------------------------------------------
+		int padding = 2;
+		Point pi1 = form.location + (proto.AA + Point(padding, padding)).rotate(form.orientation);
+		Point pi2 = form.location + (AB + Point(padding, -padding)).rotate(form.orientation);
+		Point pi3 = form.location + (proto.BB + Point(-padding, -padding)).rotate(form.orientation);
+		Point pi4 = form.location + (BA + Point(-padding, padding)).rotate(form.orientation);
+		
+		
+		points[0].x = pi1.x;
+		points[0].y = pi1.y;		
+		points[1].x = pi2.x;
+		points[1].y = pi2.y;
+		points[2].x = pi3.x;
+		points[2].y = pi3.y;
+		points[3].x = pi4.x;
+		points[3].y = pi4.y;
+		
+		SDL_RenderDrawLines(renderer, points, 4);
+		
+		//-------------------------------------------------------------------
+		Point pt1 = form.targetLocation + proto.AA.rotate(form.targetOrientation);
+		Point pt2 = form.targetLocation + AB.rotate(form.targetOrientation);
+		Point pt3 = form.targetLocation + proto.BB.rotate(form.targetOrientation);
+		Point pt4 = form.targetLocation + BA.rotate(form.targetOrientation);
+		
+		SDL_RenderDrawLine(renderer, p1.x, p1.y, pt2.x, pt2.y);
+		SDL_RenderDrawLine(renderer, p4.x, p4.y, pt3.x, pt3.y);
+		
+		points[0].x = pt1.x;
+		points[0].y = pt1.y;		
+		points[1].x = pt2.x;
+		points[1].y = pt2.y;
+		points[2].x = pt3.x;
+		points[2].y = pt3.y;
+		points[3].x = pt4.x;
+		points[3].y = pt4.y;
+		
+		SDL_RenderDrawLines(renderer, points, 4);
+		
+		for (size_t i = 0; i < form.slots.size(); i++)
+		{
+			int slotSize = 4;
+			
+			auto& slot = form.slots[i];
+			Point slotLocation = Creeps::getCurrentSlotLocation(form, i);
+				
+			SDL_Rect rect;
+			rect.x = slotLocation.x - slotSize/2;
+			rect.y = slotLocation.y - slotSize/2;
+			rect.w = slotSize;
+			rect.h = slotSize;
+			SDL_RenderDrawRect(renderer, &rect);			
+			
+			if (slot > 0)
+			{
+				slotSize /=2;
+				rect.x = slotLocation.x - slotSize/2;
+				rect.y = slotLocation.y - slotSize/2;
+				rect.w = slotSize;
+				rect.h = slotSize;
+				SDL_RenderDrawRect(renderer, &rect);
+				
+				auto creep = std::find_if(state->creeps.begin(), state->creeps.end(), [slot](CreepState& creep){ return creep.object.id == slot; });
+				SDL_RenderDrawLine(renderer, slotLocation.x, slotLocation.y, creep->unit.location.x, creep->unit.location.y);
+			}
 		}
 	}
 }

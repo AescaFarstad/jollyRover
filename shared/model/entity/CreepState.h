@@ -26,6 +26,9 @@ public:
 	CREEP_MODE mode;
 	int16_t whiskers[MAX_WHISKER_COUNT];
 	int8_t numWhiskers;
+	int32_t formationId;
+	int8_t formationsSlot;
+	
 	
 	CreepProto* _creepProto;
 	WeaponProto* _weaponProto;

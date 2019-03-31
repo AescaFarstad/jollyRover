@@ -20,21 +20,32 @@ public:
 class FormationState
 {
 public:
-	FormationState() = default;;
-	~FormationState() = default;;
+	FormationState() = default;
+	~FormationState() = default;
+	
+	static const int8_t MAX_FORMATION_COUNT = 32;
 	
 	Object object;
 	int16_t objectiveID;
 	int16_t force;
-	float direction;
-	Point _location;
-	bool _isDisposed;
-	FormationProto* _prototype;	
 	std::vector<int32_t> slots;
+	float speedMulti;
+	float speed;
+	float angularSpeed;	
+	Point location;
+	Point targetLocation;
+	float orientation;
+	float targetOrientation;
+	
+	bool isDisposed_;
+	FormationProto* formationPrototype_;
+	//ObjectiveProto* objectivePrototype_;
 	
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
+	
+	//void propagatePrototypes(std::vector<FormationProto>& formations, std::vector<std::vector<ObjectiveProto>>& objectives);
 
 };
 	

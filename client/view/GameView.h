@@ -46,6 +46,7 @@ private:
 	void drawCars();
 	void drawCreeps();
 	void drawProjectiles();
+	void drawFormations();
 	
  SDL_Surface* loadedSurface;
  SDL_Texture* ltexture;

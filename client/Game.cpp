@@ -114,7 +114,7 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 			delete cb;
 		});
 	}, "wait for game state from the server and load the game");
-
+	/*
 	auto testPerformance = [this](std::unique_ptr<Callback> callback) {
 			GameUpdater gu;
 			auto state = std::make_unique<GameState>(892422);
@@ -131,7 +131,7 @@ Game::Game(SDL_Window* window, SDL_Renderer* renderer)
 			
 			callback->execute();
 		};
-	//loadGameTask->pushAsync(testPerformance, "testPerformance");
+	loadGameTask->pushAsync(testPerformance, "testPerformance");*/
 	
 	loadGameTask->exec();
 

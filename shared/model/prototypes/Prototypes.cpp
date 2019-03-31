@@ -47,6 +47,21 @@ void Prototypes::postProcess()
 		{
 			formation.strength += creeps[slot.creepType].strength;
 		}
+		
+		formation.AA.x = FMath::F_MAX;
+		formation.AA.y = FMath::F_MAX;
+		formation.BB.x = -FMath::F_MAX;
+		formation.BB.y = -FMath::F_MAX;
+		
+		for(auto& slot : formation.slots)
+		{
+			auto& creep = this->creeps[slot.creepType];
+			
+			formation.AA.x = std::min(formation.AA.x, slot.offset.x - creep.size);
+			formation.AA.y = std::min(formation.AA.y, slot.offset.x - creep.size);
+			formation.BB.x = std::max(formation.BB.x, slot.offset.x + creep.size);
+			formation.BB.y = std::max(formation.BB.y, slot.offset.x + creep.size);
+		}
 	}
 	
 	variables.maxCreepSize = 0;
@@ -62,5 +77,9 @@ void Prototypes::postProcess()
 	
 	obstacleMap = SpatialMap<Obstacle>(10, false, from, to);
 	obstacleMap.setNonUnique(obstacles);
+	
+	
+	
+	
 	
 }
