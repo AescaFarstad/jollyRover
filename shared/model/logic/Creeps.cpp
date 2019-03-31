@@ -1,4 +1,5 @@
 #include <Creeps.h>
+#include <FMath.h>
 
 namespace Creeps
 {
@@ -305,6 +306,10 @@ namespace Creeps
 		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed)
 		{
 			Point step = target - creep.unit.location;
+			
+			if (step.getLength() == 0)
+				return;
+			
 			float stepSize = creep._creepProto->speed * timePassed;
 			step.scaleTo(stepSize);
 			

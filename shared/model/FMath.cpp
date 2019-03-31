@@ -1,7 +1,7 @@
-#include "FMath.h"
+#include <FMath.h>
 
 
-float lerp(float x1, float y1, float x2, float y2, float argument)
+float FMath::lerp(float x1, float y1, float x2, float y2, float argument)
 {
 	if (x1 == x2)
 		return y1 == y2 ? y1 : std::numeric_limits<float>::quiet_NaN();
@@ -122,7 +122,7 @@ float firstQuarterSin(float angle)
 {
 	float index = angle / (float)M_PI * 2 * (SIN_VALUES_LENGTH - 1);
 				
-	return lerp(std::floor(index), SIN_VALUES[(int)(std::floor(index))], std::ceil(index), SIN_VALUES[(int)(std::ceil(index))], index);
+	return FMath::lerp(std::floor(index), SIN_VALUES[(int)(std::floor(index))], std::ceil(index), SIN_VALUES[(int)(std::ceil(index))], index);
 		
 }
 
