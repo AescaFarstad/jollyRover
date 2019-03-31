@@ -9,7 +9,7 @@
 		"stepAngleWindow": 3.14,
 		"creepRestitution": 0.5,
 		"war":{
-			"intensity": 40000
+			"intensity": 1000
 		}
 	},
 	"forces":[
@@ -356,23 +356,33 @@
 			"type":"assault",
 			"slots":[
 				{
-					"offset":{ "x":25, "y":10 },
+					"offset":{ "x":15, "y":10 },
 					"creepType":0,
 					"optional":false
 				},
 				{
-					"offset":{ "x":-25, "y":10 },
+					"offset":{ "x":-15, "y":10 },
 					"creepType":0,
 					"optional":false
 				},
 				{
-					"offset":{ "x":75, "y":10 },
+					"offset":{ "x":45, "y":10 },
 					"creepType":0,
 					"optional":false
 				},
 				{
-					"offset":{ "x":-75, "y":10 },
+					"offset":{ "x":-45, "y":10 },
 					"creepType":0,
+					"optional":false
+				},
+				{
+					"offset":{ "x":5, "y":40 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "x":-5, "y":40 },
+					"creepType":1,
 					"optional":false
 				},
 				{
@@ -386,22 +396,22 @@
 					"optional":false
 				},
 				{
-					"offset":{ "x":45, "y":40 },
+					"offset":{ "x":25, "y":40 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":-45, "y":40 },
+					"offset":{ "x":-25, "y":40 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":75, "y":40 },
+					"offset":{ "x":5, "y":70 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":-75, "y":40 },
+					"offset":{ "x":-5, "y":70 },
 					"creepType":1,
 					"optional":false
 				},
@@ -416,24 +426,24 @@
 					"optional":false
 				},
 				{
-					"offset":{ "x":45, "y":70 },
+					"offset":{ "x":25, "y":70 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":-45, "y":70 },
+					"offset":{ "x":-25, "y":70 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":75, "y":70 },
+					"offset":{ "x":5, "y":100 },
 					"creepType":1,
-					"optional":false
+					"optional":true
 				},
 				{
-					"offset":{ "x":-75, "y":70 },
+					"offset":{ "x":-5, "y":100 },
 					"creepType":1,
-					"optional":false
+					"optional":true
 				},
 				{
 					"offset":{ "x":15, "y":100 },
@@ -446,32 +456,22 @@
 					"optional":true
 				},
 				{
-					"offset":{ "x":45, "y":100 },
+					"offset":{ "x":25, "y":100 },
 					"creepType":1,
 					"optional":true
 				},
 				{
-					"offset":{ "x":-45, "y":100 },
+					"offset":{ "x":-25, "y":100 },
 					"creepType":1,
 					"optional":true
 				},
 				{
-					"offset":{ "x":75, "y":100 },
-					"creepType":1,
-					"optional":true
-				},
-				{
-					"offset":{ "x":-75, "y":100 },
-					"creepType":1,
-					"optional":true
-				},
-				{
-					"offset":{ "x":120, "y":50 },
+					"offset":{ "x":50, "y":50 },
 					"creepType":0,
 					"optional":true
 				},
 				{
-					"offset":{ "x":-120, "y":50 },
+					"offset":{ "x":-50, "y":50 },
 					"creepType":0,
 					"optional":true
 				}				
@@ -487,42 +487,42 @@
 					"optional":false
 				},
 				{
-					"offset":{ "x":25, "y":30 },
+					"offset":{ "x":15, "y":30 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":-25, "y":30 },
+					"offset":{ "x":-15, "y":30 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":55, "y":35 },
+					"offset":{ "x":25, "y":35 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":-55, "y":35 },
+					"offset":{ "x":-25, "y":35 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":25, "y":60 },
+					"offset":{ "x":15, "y":60 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":-25, "y":60 },
+					"offset":{ "x":-15, "y":60 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":55, "y":65 },
+					"offset":{ "x":25, "y":65 },
 					"creepType":1,
 					"optional":false
 				},
 				{
-					"offset":{ "x":-55, "y":65 },
+					"offset":{ "x":-25, "y":65 },
 					"creepType":1,
 					"optional":false
 				},
@@ -532,22 +532,22 @@
 					"optional":true
 				},
 				{
-					"offset":{ "x":15, "y":110 },
+					"offset":{ "x":5, "y":110 },
 					"creepType":1,
 					"optional":true
 				},
 				{
-					"offset":{ "x":-15, "y":110 },
+					"offset":{ "x":-5, "y":110 },
 					"creepType":1,
 					"optional":true
 				},
 				{
-					"offset":{ "x":45, "y":110 },
+					"offset":{ "x":25, "y":110 },
 					"creepType":1,
 					"optional":true
 				},
 				{
-					"offset":{ "x":-45, "y":110 },
+					"offset":{ "x":-25, "y":110 },
 					"creepType":1,
 					"optional":true
 				}

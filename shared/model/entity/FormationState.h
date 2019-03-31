@@ -1,6 +1,7 @@
 #include <ISerializable.h>
 #include <BaseEntities.h>
 #include <FormationProto.h>
+#include <ObjectiveProto.h>
 #include <Point.h>
 
 /*
@@ -39,13 +40,13 @@ public:
 	
 	bool isDisposed_;
 	FormationProto* formationPrototype_;
-	//ObjectiveProto* objectivePrototype_;
+	ObjectiveProto* objectivePrototype_;
 	
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
 	
-	//void propagatePrototypes(std::vector<FormationProto>& formations, std::vector<std::vector<ObjectiveProto>>& objectives);
+	void propagatePrototypes(std::vector<FormationProto>& formations, std::vector<std::vector<ObjectiveProto>>& objectives);
 
 };
 	

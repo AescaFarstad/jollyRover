@@ -14,7 +14,7 @@ void FormationState::deserialize(SerializationStream &stream)
 	Serializer::read(angularSpeed, stream);
 	Serializer::readVector(slots, stream);
 	formationPrototype_ = nullptr;
-	//objectivePrototype_ = nullptr;
+	objectivePrototype_ = nullptr;
 	isDisposed_ = false;
 }
 
@@ -33,7 +33,7 @@ void FormationState::serialize(SerializationStream &stream) const
 	Serializer::writeVector(slots, stream);
 }
 
-/*
+
 void FormationState::propagatePrototypes(std::vector<FormationProto>& formations, std::vector<std::vector<ObjectiveProto>>& objectives)
 {
 	formationPrototype_ = &(formations[object.prototypeId]);
@@ -42,4 +42,4 @@ void FormationState::propagatePrototypes(std::vector<FormationProto>& formations
 	else
 		objectivePrototype_ = nullptr;
 	
-}*/
+}

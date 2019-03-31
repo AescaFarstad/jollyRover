@@ -31,7 +31,7 @@ void GameState::propagatePrototypes(Prototypes* prototypes)
 	}
 	for(auto& formation : formations)
 	{
-		//formation.propagatePrototypes(prototypes->formations, prototypes->objectives);
+		formation.propagatePrototypes(prototypes->formations, prototypes->objectives);
 	}
 }
 

@@ -1,4 +1,4 @@
-
+#pragma once
 #include <json.hpp>
 #include <Point.h>
 using json = nlohmann::json;

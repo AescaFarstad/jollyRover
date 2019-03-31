@@ -311,7 +311,6 @@ void GameView::drawProjectiles()
 
 void GameView::drawFormations()
 {
-	
 	uint32_t color = 0xdddd00;
 	setColor(color);
 	
@@ -323,12 +322,12 @@ void GameView::drawFormations()
 		Point BA(proto.BB.x, proto.AA.y);
 		
 		//------------------------------------------------
-		Point p1 = form.location + proto.AA.rotate(form.orientation);
-		Point p2 = form.location + AB.rotate(form.orientation);
-		Point p3 = form.location + proto.BB.rotate(form.orientation);
-		Point p4 = form.location + BA.rotate(form.orientation);
+		Point p1 = form.location + proto.AA.rotate(form.orientation + M_PI / 2);
+		Point p2 = form.location + AB.rotate(form.orientation + M_PI / 2);
+		Point p3 = form.location + proto.BB.rotate(form.orientation + M_PI / 2);
+		Point p4 = form.location + BA.rotate(form.orientation + M_PI / 2);
 		
-		SDL_Point points[4];
+		SDL_Point points[5];
 		
 		points[0].x = p1.x;
 		points[0].y = p1.y;		
@@ -338,15 +337,17 @@ void GameView::drawFormations()
 		points[2].y = p3.y;
 		points[3].x = p4.x;
 		points[3].y = p4.y;
+		points[4].x = p1.x;
+		points[4].y = p1.y;
 		
-		SDL_RenderDrawLines(renderer, points, 4);
+		SDL_RenderDrawLines(renderer, points, 5);
 		
 		//--------------------------------------------------------
 		int padding = 2;
-		Point pi1 = form.location + (proto.AA + Point(padding, padding)).rotate(form.orientation);
-		Point pi2 = form.location + (AB + Point(padding, -padding)).rotate(form.orientation);
-		Point pi3 = form.location + (proto.BB + Point(-padding, -padding)).rotate(form.orientation);
-		Point pi4 = form.location + (BA + Point(-padding, padding)).rotate(form.orientation);
+		Point pi1 = form.location + (proto.AA + Point(padding, padding)).rotate(form.orientation + M_PI / 2);
+		Point pi2 = form.location + (AB + Point(padding, -padding)).rotate(form.orientation + M_PI / 2);
+		Point pi3 = form.location + (proto.BB + Point(-padding, -padding)).rotate(form.orientation + M_PI / 2);
+		Point pi4 = form.location + (BA + Point(-padding, padding)).rotate(form.orientation + M_PI / 2);
 		
 		
 		points[0].x = pi1.x;
@@ -357,8 +358,10 @@ void GameView::drawFormations()
 		points[2].y = pi3.y;
 		points[3].x = pi4.x;
 		points[3].y = pi4.y;
+		points[4].x = pi1.x;
+		points[4].y = pi1.y;
 		
-		SDL_RenderDrawLines(renderer, points, 4);
+		SDL_RenderDrawLines(renderer, points, 5);
 		
 		//-------------------------------------------------------------------
 		Point pt1 = form.targetLocation + proto.AA.rotate(form.targetOrientation);
@@ -366,8 +369,8 @@ void GameView::drawFormations()
 		Point pt3 = form.targetLocation + proto.BB.rotate(form.targetOrientation);
 		Point pt4 = form.targetLocation + BA.rotate(form.targetOrientation);
 		
-		SDL_RenderDrawLine(renderer, p1.x, p1.y, pt2.x, pt2.y);
-		SDL_RenderDrawLine(renderer, p4.x, p4.y, pt3.x, pt3.y);
+		SDL_RenderDrawLine(renderer, p1.x, p1.y, pt1.x, pt1.y);
+		SDL_RenderDrawLine(renderer, p4.x, p4.y, pt4.x, pt4.y);
 		
 		points[0].x = pt1.x;
 		points[0].y = pt1.y;		
@@ -377,8 +380,10 @@ void GameView::drawFormations()
 		points[2].y = pt3.y;
 		points[3].x = pt4.x;
 		points[3].y = pt4.y;
+		points[4].x = pt1.x;
+		points[4].y = pt1.y;
 		
-		SDL_RenderDrawLines(renderer, points, 4);
+		SDL_RenderDrawLines(renderer, points, 5);
 		
 		for (size_t i = 0; i < form.slots.size(); i++)
 		{
@@ -404,7 +409,8 @@ void GameView::drawFormations()
 				SDL_RenderDrawRect(renderer, &rect);
 				
 				auto creep = std::find_if(state->creeps.begin(), state->creeps.end(), [slot](CreepState& creep){ return creep.object.id == slot; });
-				SDL_RenderDrawLine(renderer, slotLocation.x, slotLocation.y, creep->unit.location.x, creep->unit.location.y);
+				if (creep != state->creeps.end())
+					SDL_RenderDrawLine(renderer, slotLocation.x, slotLocation.y, creep->unit.location.x, creep->unit.location.y);
 			}
 		}
 	}
