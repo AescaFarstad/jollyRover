@@ -50,10 +50,10 @@ namespace KeyboardInput
 				network.send(&timeMsg);
 				break;
 			};
-			case KEYBOARD_ACTIONS::TIME_SCALE_T_3 :
+			case KEYBOARD_ACTIONS::TIME_SCALE_T_5 :
 			{
 				InputTimeMessage timeMsg;
-				timeMsg.forcedTimeScale = 3;
+				timeMsg.forcedTimeScale = 5;
 				timeMsg.modifyForcedTimeScale = true;
 				network.send(&timeMsg);
 				break;
@@ -79,10 +79,10 @@ namespace KeyboardInput
 				network.send(&timeMsg);
 				break;
 			};
-			case KEYBOARD_ACTIONS::TIME_SCALE3 :
+			case KEYBOARD_ACTIONS::TIME_SCALE5 :
 			{
 				InputTimeMessage timeMsg;
-				timeMsg.timeScale = 3;
+				timeMsg.timeScale = 5;
 				timeMsg.modifyTimeScale = true;
 				timeMsg.allowSteps = -1;
 				timeMsg.modifyAllowSteps = true;
@@ -177,11 +177,11 @@ namespace KeyboardInput
 		{		
 			case KEYBOARD_ACTIONS::TIME_SCALE_T_03 :
 			case KEYBOARD_ACTIONS::TIME_SCALE_T_1 :
-			case KEYBOARD_ACTIONS::TIME_SCALE_T_3 :
+			case KEYBOARD_ACTIONS::TIME_SCALE_T_5 :
 			{
 				if (!keyboard.isDown[keyboard.buttonByAction[(int)KEYBOARD_ACTIONS::TIME_SCALE_T_03]] &&
 					!keyboard.isDown[keyboard.buttonByAction[(int)KEYBOARD_ACTIONS::TIME_SCALE_T_1]] &&
-					!keyboard.isDown[keyboard.buttonByAction[(int)KEYBOARD_ACTIONS::TIME_SCALE_T_3]]
+					!keyboard.isDown[keyboard.buttonByAction[(int)KEYBOARD_ACTIONS::TIME_SCALE_T_5]]
 				)
 				{
 				InputTimeMessage timeMsg;
@@ -194,7 +194,7 @@ namespace KeyboardInput
 			};
 			case KEYBOARD_ACTIONS::TIME_SCALE03 :
 			case KEYBOARD_ACTIONS::TIME_SCALE1 :
-			case KEYBOARD_ACTIONS::TIME_SCALE3 :
+			case KEYBOARD_ACTIONS::TIME_SCALE5 :
 			case KEYBOARD_ACTIONS::TIME_STEP1 :
 			case KEYBOARD_ACTIONS::TIME_STEP5 :
 			case KEYBOARD_ACTIONS::TIME_STEP25 :

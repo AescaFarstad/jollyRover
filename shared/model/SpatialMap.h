@@ -59,7 +59,6 @@ private:
 template <typename T>
 SpatialMap<T>& SpatialMap<T>::operator=(SpatialMap<T>&& that)
 {
-	std::cout << "move assigment\n";
 	m_isValid = that.m_isValid;
 	
 	m_map[0][0] = std::move(that.m_map[0][0]);

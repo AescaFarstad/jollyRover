@@ -30,7 +30,7 @@ void GameUpdater::load(std::unique_ptr<GameState> state, Prototypes* prototypes)
 {
 	this->state = std::move(state);
 	lastValidTimeStamp = this->state->timeStamp;
-	saveState(this->state.get());
+	//saveState(this->state.get());
 	this->state->propagatePrototypes(prototypes);
 
 	this->prototypes = prototypes;

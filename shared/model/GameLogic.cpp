@@ -315,17 +315,22 @@ void GameLogic::handleGameLoad(LoadGameMessage* input, Prototypes* prototypes)
 	auto stream = SerializationStream::createExp();
 	auto stamp = state->timeStamp;
 	TimeState time = state->time;
+	auto players = state->players;
+	
 	stream->write(input->state, input->stateLength); 
 	stream->seekAbsolute(0);
 	state->deserialize(*stream);
-	state->propagatePrototypes(prototypes);
+	
 	
 	state->timeStamp = stamp;
 	if (time.allowedSteps > 0)
 		state->time.allowedSteps = time.allowedSteps - time.performedSteps + state->time.performedSteps;
 	state->time.forcedTimeScale = time.forcedTimeScale;	
 	state->time.timeScale = time.timeScale;
+	//state->players = players;
 	//TODO keep existing players in game
+	
+	state->propagatePrototypes(prototypes);
 }
 
 PlayerTest* GameLogic::playerByLogin(int32_t login)
