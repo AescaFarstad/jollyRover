@@ -15,7 +15,7 @@ SeededRandom::SeededRandom(uint32_t seed)
 
 void SeededRandom::initFromSeed(uint32_t seed)
 {
-	this->seed = seed;
+	this->m_seed = seed;
 }
 
 
@@ -40,16 +40,16 @@ float SeededRandom::get(float min, float max)
 
 float SeededRandom::get()
 {
-	seed = (uint32_t)(((uint64_t)48271 * seed) % 2147483647);
-	return seed / 2147483647.f;
+	m_seed = (uint32_t)(((uint64_t)48271 * m_seed) % 2147483647);
+	return m_seed / 2147483647.f;
 }
 
 void SeededRandom::deserialize(SerializationStream & stream)
 {
-	Serializer::read(seed, stream);
+	Serializer::read(m_seed, stream);
 }
 
 void SeededRandom::serialize(SerializationStream & stream) const
 {
-	Serializer::write(seed, stream);
+	Serializer::write(m_seed, stream);
 }

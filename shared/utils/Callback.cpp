@@ -2,64 +2,63 @@
 
 Callback::Callback()
 {
-	pendingCallback = nullptr;
-	isValid = false;
-	id = S::getId();
+	m_pendingCallback = nullptr;
+	m_isValid = false;
 }
 
 Callback::Callback(std::function<void()> function)
 {
-	this->function = function;
-	isValid = true;
-	pendingCallback = nullptr;
+	this->m_function = function;
+	m_isValid = true;
+	m_pendingCallback = nullptr;
 }
 
 Callback::~Callback()
 {
-	if (pendingCallback != nullptr)
-		pendingCallback->disconnect();
+	if (m_pendingCallback != nullptr)
+		m_pendingCallback->disconnect();
 }
 
 Callback::Callback(Callback&& that)
 {
-	pendingCallback = that.pendingCallback;
-	if (pendingCallback)
-		pendingCallback->callback = this;
-	isValid = that.isValid;
-	that.isValid = false;
+	m_pendingCallback = that.m_pendingCallback;
+	if (m_pendingCallback)
+		m_pendingCallback->callback = this;
+	m_isValid = that.m_isValid;
+	that.m_isValid = false;
 }
 
 Callback& Callback::operator=(Callback&& that)
 {
 	if (this != &that)
 	{
-		pendingCallback = that.pendingCallback;
-		if (pendingCallback)
-			pendingCallback->callback = this;
-		isValid = that.isValid;
-		that.isValid = false;		
+		m_pendingCallback = that.m_pendingCallback;
+		if (m_pendingCallback)
+			m_pendingCallback->callback = this;
+		m_isValid = that.m_isValid;
+		that.m_isValid = false;		
 	}
 	return *this;
 }
  
 void Callback::execute()
 {
-	if (isValid)
+	if (m_isValid)
 	{
-		isValid = false;
-		if (pendingCallback != nullptr)
-			pendingCallback->disconnect();
-		function();
+		m_isValid = false;
+		if (m_pendingCallback != nullptr)
+			m_pendingCallback->disconnect();
+		m_function();
 	}
 }
 
 std::unique_ptr<PendingCallback> Callback::createPendingCallback()
 {
-	if (pendingCallback)
+	if (m_pendingCallback)
 		THROW_FATAL_ERROR("Creating pending callback when one already exists");
 	std::unique_ptr<PendingCallback> result = std::make_unique<PendingCallback>();
 	result->callback = this;
-	pendingCallback = result.get();
+	m_pendingCallback = result.get();
 	return result;
 }
 
@@ -80,7 +79,7 @@ PendingCallback::PendingCallback(PendingCallback&& that)
 {
 	callback = that.callback;
 	if (callback)
-		callback->pendingCallback = this;
+		callback->m_pendingCallback = this;
 	that.callback = nullptr;
 }
 
@@ -91,7 +90,7 @@ PendingCallback& PendingCallback::operator=(PendingCallback&& that)
 	{
 		callback = that.callback;
 		if (callback)
-			callback->pendingCallback = this;
+			callback->m_pendingCallback = this;
 		that.callback = nullptr;		
 	}
 	return *this;
@@ -101,7 +100,7 @@ void PendingCallback::disconnect()
 {
 	if (callback != nullptr)
 	{
-		callback->pendingCallback = nullptr;
+		callback->m_pendingCallback = nullptr;
 		callback = nullptr;
 	}
 }
@@ -110,8 +109,8 @@ void PendingCallback::cancel()
 {
 	if (callback != nullptr)
 	{
-		callback->isValid = false;
-		callback->pendingCallback = nullptr;
+		callback->m_isValid = false;
+		callback->m_pendingCallback = nullptr;
 		callback = nullptr;
 	}
 }
@@ -129,7 +128,7 @@ DeathNotice::DeathNotice(DeathNotice&& that) : Callback::Callback(std::move(that
 
 std::unique_ptr<PendingCallback> DeathNotice::subscribe(std::function<void()> function)
 {
-	this->function = function;
-	isValid = true;
+	this->m_function = function;
+	m_isValid = true;
 	return createPendingCallback();
 }

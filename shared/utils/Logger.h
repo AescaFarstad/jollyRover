@@ -40,18 +40,18 @@ class Logger
 {
 public:
 	Logger();
-	Logger(std::initializer_list<LOG_TAGS> enabledTags, std::initializer_list<LOG_TAGS> disabledTags);
+	Logger(std::initializer_list<LOG_TAGS> m_enabledTags, std::initializer_list<LOG_TAGS> m_disabledTags);
 	~Logger();
 
 	void add(std::string message, std::initializer_list<LOG_TAGS> tags);
 	void add(std::string message);
-	void enableTags(std::initializer_list<LOG_TAGS> enabledTags);
+	void enableTags(std::initializer_list<LOG_TAGS> m_enabledTags);
 	void disableTags(std::initializer_list<LOG_TAGS> disabledtags);
 
 private:
-	std::vector<LogMessage> messages;
-	std::vector<LOG_TAGS> enabledTags;
-	std::vector<LOG_TAGS> disabledTags;
+	std::vector<LogMessage> m_messages;
+	std::vector<LOG_TAGS> m_enabledTags;
+	std::vector<LOG_TAGS> m_disabledTags;
 
 	bool isReportable(std::initializer_list<LOG_TAGS> tags);
 	void report(LogMessage* msg);

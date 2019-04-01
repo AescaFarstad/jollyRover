@@ -19,7 +19,7 @@ void Logger::add(std::string message, std::initializer_list<LOG_TAGS> tags)
 	LogMessage* msg = new LogMessage();
 	msg->message = message;
 	msg->stamp = SDL_GetTicks();
-	messages.push_back(*msg);
+	m_messages.push_back(*msg);
 
 	if (isReportable(tags))
 		report(msg);
@@ -32,23 +32,23 @@ void Logger::add(std::string message)
 
 void Logger::enableTags(std::initializer_list<LOG_TAGS> enabledTags)
 {
-	this->enabledTags.insert(this->enabledTags.end(), enabledTags.begin(), enabledTags.end());
-	for (LOG_TAGS i : enabledTags)
+	this->m_enabledTags.insert(this->m_enabledTags.end(), enabledTags.begin(), enabledTags.end());
+	for (LOG_TAGS i : m_enabledTags)
 	{
-		auto toDelete = std::find(disabledTags.begin(), disabledTags.end(), i);
-		if (toDelete != disabledTags.end())
-			this->disabledTags.erase(toDelete);
+		auto toDelete = std::find(m_disabledTags.begin(), m_disabledTags.end(), i);
+		if (toDelete != m_disabledTags.end())
+			this->m_disabledTags.erase(toDelete);
 	}
 }
 
 void Logger::disableTags(std::initializer_list<LOG_TAGS> disabledTags)
 {
-	this->disabledTags.insert(this->disabledTags.end(), disabledTags.begin(), disabledTags.end());
-	for (LOG_TAGS i : disabledTags)
+	this->m_disabledTags.insert(this->m_disabledTags.end(), disabledTags.begin(), disabledTags.end());
+	for (LOG_TAGS i : m_disabledTags)
 	{
-		auto toDelete = std::find(enabledTags.begin(), enabledTags.end(), i);
-		if (toDelete != enabledTags.end())
-			this->enabledTags.erase(toDelete);
+		auto toDelete = std::find(m_enabledTags.begin(), m_enabledTags.end(), i);
+		if (toDelete != m_enabledTags.end())
+			this->m_enabledTags.erase(toDelete);
 	}
 }
 
@@ -59,9 +59,9 @@ bool Logger::isReportable(std::initializer_list<LOG_TAGS> tags)
 
 	for (LOG_TAGS i : tags)
 	{
-		if (!accept && std::find(enabledTags.begin(), enabledTags.end(), i) != enabledTags.end())
+		if (!accept && std::find(m_enabledTags.begin(), m_enabledTags.end(), i) != m_enabledTags.end())
 			accept = true;
-		if (!reject && std::find(disabledTags.begin(), disabledTags.end(), i) != disabledTags.end())
+		if (!reject && std::find(m_disabledTags.begin(), m_disabledTags.end(), i) != m_disabledTags.end())
 			reject = true;
 	}
 	return accept || !reject;

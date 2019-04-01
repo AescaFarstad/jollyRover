@@ -26,17 +26,18 @@ public:
 	GameView(SDL_Window* window, SDL_Renderer* renderer, Prototypes* prototypes);
 	~GameView();
 
-	SDL_Window* window;
-	SDL_Renderer* renderer; 
-	Prototypes* prototypes;
-
 	void render(GameState* state, RouteInput* routeInput);
-private:
-	bool isInitialized;
-	GameState* state;
-	RouteInput* routeInput;
 	
-	ViewController<CreepState, CreepView> creepViews; 
+private:
+
+	SDL_Window* m_window;
+	SDL_Renderer* m_renderer; 
+	Prototypes* m_prototypes;
+	bool m_isInitialized;
+	GameState* m_state;
+	RouteInput* m_routeInput;
+	
+	ViewController<CreepState, CreepView> m_creepViews; 
 
 	void init();
 	void setColor(uint32_t color);
@@ -47,9 +48,6 @@ private:
 	void drawCreeps();
 	void drawProjectiles();
 	void drawFormations();
-	
- SDL_Surface* loadedSurface;
- SDL_Texture* ltexture;
 	
 };
 

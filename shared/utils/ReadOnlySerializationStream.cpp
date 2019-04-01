@@ -25,18 +25,18 @@ private:
 
 ReadOnlySerializationStream::ReadOnlySerializationStream(const char* data, size_t length)
 {
-	grower = new StreamNoGrower();
+	m_grower = new StreamNoGrower();
 	CharBlock* newBlock = new CharBlock(length);
 	newBlock->block = const_cast<char*>(data);
 	newBlock->occupied = length;
-	blocks.push_back(newBlock);
-	cursor.block = newBlock;
-	cursor.index = 0;
+	m_blocks.push_back(newBlock);
+	m_cursor.block = newBlock;
+	m_cursor.index = 0;
 }
 
 ReadOnlySerializationStream::~ReadOnlySerializationStream()
 {
-	blocks.clear();
+	m_blocks.clear();
 }
 
 void ReadOnlySerializationStream::write(const char * data, size_t length)

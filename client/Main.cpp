@@ -19,20 +19,20 @@
 
 namespace MainInternal
 {
+	const int SCREEN_WIDTH = 640;
+	const int SCREEN_HEIGHT = 480;
+	const int MAX_TIME_PER_FRAME = 100;
+	const int MIN_TIME_PER_FRAME = 10;
 
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-const int MAX_TIME_PER_FRAME = 100;
-const int MIN_TIME_PER_FRAME = 10;
+	SDL_Window* window = NULL;
+	SDL_Renderer* renderer = NULL;
+	Game* game;
 
-SDL_Window* window = NULL;
-SDL_Renderer* renderer = NULL;
-Game* game;
-
-bool isFinished = false;
-int lastTicks = 0;
-FPSMeter fpsMeter;
+	bool isFinished = false;
+	int lastTicks = 0;
+	FPSMeter fpsMeter;
 }
+
 using namespace MainInternal;
 
 void mainLoop(void* arg)

@@ -9,16 +9,17 @@ public:
 	FPSMeter();
 	~FPSMeter() = default;
 	
-	size_t frameCount;
+	size_t frameCount();
 	
 	void registerFrame(size_t ticks);
 	std::string report();
 	size_t getMeasurementDuration();
 	
 private:
-	size_t lastMeasurement;
-	size_t lastCount;;
-	size_t time;
+	size_t m_frameCount;
+	size_t m_lastMeasurement;
+	size_t m_lastCount;
+	size_t m_time;
 };
 
 

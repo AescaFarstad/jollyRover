@@ -9,7 +9,7 @@ class Callback
 	friend PendingCallback;
 public:
 	Callback();
-	Callback(std::function<void()> function);
+	Callback(std::function<void()> m_function);
 	~Callback();
 	Callback(const Callback& that) = delete;
 	Callback& operator=(const Callback& that) = delete;
@@ -18,12 +18,11 @@ public:
 
 	void execute();
 	std::unique_ptr<PendingCallback> createPendingCallback();
-	int32_t id;
 
 protected:
-	PendingCallback* pendingCallback;
-	bool isValid;
-	std::function<void()> function;
+	PendingCallback* m_pendingCallback;
+	bool m_isValid;
+	std::function<void()> m_function;
 };
 
 class PendingCallback
@@ -49,7 +48,7 @@ public:
 	~DeathNotice();
 	DeathNotice(const DeathNotice& that) = delete;
 	DeathNotice(DeathNotice&& that);
-	std::unique_ptr<PendingCallback> subscribe(std::function<void()> function);
+	std::unique_ptr<PendingCallback> subscribe(std::function<void()> m_function);
 
 private:
 

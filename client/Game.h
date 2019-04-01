@@ -19,17 +19,6 @@ class Game
 public:
 	Game(SDL_Window* window, SDL_Renderer* renderer);
 	~Game();
-	Network* network;
-	TaskManager* taskManager;
-	GameUpdater gameUpdater;
-	GameView* gameView;
-	RouteInput* routeInput;
-	Prototypes prototypes;
-
-	Keyboard keyboard;
-	int32_t login;
-	std::vector<int8_t> password;
-	int64_t clientToServerDelta;
 
 	void update();
 	void handleEvent(SDL_Event* event);
@@ -37,6 +26,19 @@ public:
 	void loadConfig();
 
 private:
+
+	Network* m_network;
+	TaskManager* m_taskManager;
+	GameUpdater m_gameUpdater;
+	GameView* m_gameView;
+	RouteInput* m_routeInput;
+	Prototypes m_prototypes;
+
+	Keyboard m_keyboard;
+	int32_t m_login;
+	std::vector<int8_t> m_password;
+	int64_t m_clientToServerDelta;
+	
 	void handleGenericRequest(GenericRequestMessage* request);
 	void addNetworkBindings();
 	void handleGameInput(std::unique_ptr<NetworkMessage>);

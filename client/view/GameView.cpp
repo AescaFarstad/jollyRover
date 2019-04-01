@@ -4,11 +4,11 @@
 
 GameView::GameView(SDL_Window* window, SDL_Renderer* renderer, Prototypes* prototypes)
 {
-	this->window = window;
-	this->renderer = renderer;
-	this->prototypes = prototypes;
+	this->m_window = window;
+	this->m_renderer = renderer;
+	this->m_prototypes = prototypes;
 
-	isInitialized = false;
+	m_isInitialized = false;
 	
 }
 
@@ -54,11 +54,11 @@ void rendery(SDL_Renderer *renderer, SDL_Surface *surf, SDL_Texture *texture)
 	}*/
 void GameView::render(GameState* state, RouteInput* routeInput)
 {
-	if (!isInitialized)
+	if (!m_isInitialized)
 		init();
 
-	this->state = state;
-	this->routeInput = routeInput;
+	this->m_state = state;
+	this->m_routeInput = routeInput;
 
 	drawPlayers();
 	drawObstacles();
@@ -74,17 +74,17 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 
 void GameView::init()
 {
-	SDL_SetWindowSize(window, prototypes->variables.fieldWidth, prototypes->variables.fieldHeight);
-	isInitialized = true;
-	loadedSurface = IMG_Load("out/assets/sheet_tanks.png");
-	if(!loadedSurface) {
-    	printf("IMG_Load: %s\n", IMG_GetError());}
-	ltexture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
+	SDL_SetWindowSize(m_window, m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight);
+	m_isInitialized = true;
+	//loadedSurface = IMG_Load("out/assets/sheet_tanks.png");
+	//if(!loadedSurface) {
+    //	printf("IMG_Load: %s\n", IMG_GetError());}
+	//ltexture = SDL_CreateTextureFromSurface(m_renderer, loadedSurface);
 }
 
 void GameView::setColor(uint32_t color)
 {
-	SDL_SetRenderDrawColor(renderer, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff, 0xFF);
+	SDL_SetRenderDrawColor(m_renderer, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff, 0xFF);
 }
 
 void GameView::drawPlayers()
@@ -102,16 +102,16 @@ void GameView::drawPlayers()
 		0xff7700
 	};
 
-	for (size_t i = 0; i < state->players.size(); i++)
+	for (size_t i = 0; i < m_state->players.size(); i++)
 	{
 		setColor(colors[i]);
 
 		SDL_Rect rect;
-		rect.x = state->players[i].x + 200;
-		rect.y = state->players[i].y + 200;
+		rect.x = m_state->players[i].x + 200;
+		rect.y = m_state->players[i].y + 200;
 		rect.w = 5;
 		rect.h = 5;
-		SDL_RenderFillRect(renderer, &rect);
+		SDL_RenderFillRect(m_renderer, &rect);
 	}
 }
 
@@ -122,7 +122,7 @@ void GameView::drawObstacles()
 
 	setColor(obstacleColor);
 
-	for (auto &obstacle : prototypes->obstacles)
+	for (auto &obstacle : m_prototypes->obstacles)
 	{
 		size_t count = obstacle.vertices.size() + 1;
 		SDL_Point* points = new SDL_Point[count];
@@ -133,7 +133,7 @@ void GameView::drawObstacles()
 		}
 		points[count - 1].x = obstacle.vertices[0].x;
 		points[count - 1].y = obstacle.vertices[0].y;
-		SDL_RenderDrawLines(renderer, points, count);
+		SDL_RenderDrawLines(m_renderer, points, count);
 		delete[] points;
 		
 		SDL_Rect rect;
@@ -141,7 +141,7 @@ void GameView::drawObstacles()
 		rect.y = obstacle.centroid.y - centroidSize/2;
 		rect.w = centroidSize;
 		rect.h = centroidSize;
-		SDL_RenderDrawRect(renderer, &rect);
+		SDL_RenderDrawRect(m_renderer, &rect);
 	}
 }
 
@@ -152,25 +152,25 @@ void GameView::drawInput()
 	uint32_t lastColor = 0;
 	int rectSize = 6;
 
-	for (size_t i = 1; i < routeInput->route.size(); i++)
+	for (size_t i = 1; i < m_routeInput->route.size(); i++)
 	{
-		bool isValidEdge = routeInput->route[i].isValid_;
+		bool isValidEdge = m_routeInput->route[i].isValid_;
 		uint32_t newColor = isValidEdge ? validColor : invalidColor;
 		if (lastColor != newColor)
 		{
 			setColor(newColor);
 			lastColor = newColor;
 		}
-		SDL_RenderDrawLine(renderer,
-			(int)routeInput->route[i - 1].location.x,
-			(int)routeInput->route[i - 1].location.y,
-			(int)routeInput->route[i].location.x,
-			(int)routeInput->route[i].location.y
+		SDL_RenderDrawLine(m_renderer,
+			(int)m_routeInput->route[i - 1].location.x,
+			(int)m_routeInput->route[i - 1].location.y,
+			(int)m_routeInput->route[i].location.x,
+			(int)m_routeInput->route[i].location.y
 		);
 
 		//S::log.add(std::to_string(i) + " draw " + routeInput->route[i - 1].toString() + " -> " + routeInput->route[i].toString());
 
-		newColor = routeInput->route[i].isValid_ ? validColor : invalidColor;
+		newColor = m_routeInput->route[i].isValid_ ? validColor : invalidColor;
 		if (lastColor != newColor)
 		{
 			setColor(newColor);
@@ -178,11 +178,11 @@ void GameView::drawInput()
 		}
 
 		SDL_Rect rect;
-		rect.x = routeInput->route[i].location.x - rectSize / 2;
-		rect.y = routeInput->route[i].location.y - rectSize / 2;
+		rect.x = m_routeInput->route[i].location.x - rectSize / 2;
+		rect.y = m_routeInput->route[i].location.y - rectSize / 2;
 		rect.w = rectSize;
 		rect.h = rectSize;
-		SDL_RenderDrawRect(renderer, &rect);
+		SDL_RenderDrawRect(m_renderer, &rect);
 	}
 }
 
@@ -193,13 +193,13 @@ void GameView::drawCars()
 	int carSize = 8;
 	setColor(color);
 
-	for (PlayerTest &player : state->players)
+	for (PlayerTest &player : m_state->players)
 	{
 		for (CarRide &ride : player.activeCars)
 		{
 			for (size_t i = ride.routeIndex + 1; i < ride.route.size(); i++)
 			{
-				SDL_RenderDrawLine(renderer,
+				SDL_RenderDrawLine(m_renderer,
 					(int)ride.route[i - 1].x,
 					(int)ride.route[i - 1].y,
 					(int)ride.route[i].x,
@@ -211,7 +211,7 @@ void GameView::drawCars()
 				rect.y = ride.route[i].y - rectSize / 2;
 				rect.w = rectSize;
 				rect.h = rectSize;
-				SDL_RenderDrawRect(renderer, &rect);
+				SDL_RenderDrawRect(m_renderer, &rect);
 			}
 
 			Point carLocation = ride.route[ride.routeIndex + 1] - ride.route[ride.routeIndex];
@@ -223,7 +223,7 @@ void GameView::drawCars()
 			carRect.y = carLocation.y - carSize / 2;
 			carRect.w = carSize;
 			carRect.h = carSize;
-			SDL_RenderFillRect(renderer, &carRect);
+			SDL_RenderFillRect(m_renderer, &carRect);
 		}
 	}
 }
@@ -231,14 +231,14 @@ void GameView::drawCars()
 
 void GameView::drawCreeps()
 {	
-	creepViews.render(renderer, state->creeps, state, prototypes);
+	m_creepViews.render(m_renderer, m_state->creeps, m_state, m_prototypes);
 	return;
 	uint32_t color = 0xff0000;
 	int rectSize1 = 10;
 	int rectSize2 = 6;
 	setColor(color);
 	
-	for (CreepState &creep : state->creeps)
+	for (CreepState &creep : m_state->creeps)
 	{
 		int rectSize = creep.weapon.prototypeId == 1 ? rectSize1 : rectSize2;
 		SDL_Rect rect;
@@ -246,7 +246,7 @@ void GameView::drawCreeps()
 		rect.y = creep.unit.location.y - rectSize/2;
 		rect.w = rectSize;
 		rect.h = rectSize;
-		SDL_RenderDrawRect(renderer, &rect);
+		SDL_RenderDrawRect(m_renderer, &rect);
 		
 		if (creep.unit.force == 1)
 		{
@@ -256,7 +256,7 @@ void GameView::drawCreeps()
 			rect.y = creep.unit.location.y - rectSize/2;
 			rect.w = rectSize;
 			rect.h = rectSize;
-			SDL_RenderDrawRect(renderer, &rect);
+			SDL_RenderDrawRect(m_renderer, &rect);
 			
 			rectSize -= 2;		
 			
@@ -264,7 +264,7 @@ void GameView::drawCreeps()
 			rect.y = creep.unit.location.y - rectSize/2;
 			rect.w = rectSize;
 			rect.h = rectSize;
-			SDL_RenderDrawRect(renderer, &rect);
+			SDL_RenderDrawRect(m_renderer, &rect);
 			
 		}
 	}
@@ -278,7 +278,7 @@ void GameView::drawProjectiles()
 	int rectSize = 2;
 	setColor(color);
 	
-	for (Projectile &projectile : state->projectiles)
+	for (Projectile &projectile : m_state->projectiles)
 	{
 		if (projectile.object.prototypeId != 3)
 		{
@@ -287,7 +287,7 @@ void GameView::drawProjectiles()
 			rect.y = projectile.location.y - rectSize/2;
 			rect.w = rectSize;
 			rect.h = rectSize;
-			SDL_RenderDrawRect(renderer, &rect);			
+			SDL_RenderDrawRect(m_renderer, &rect);			
 		}
 	}
 	
@@ -295,7 +295,7 @@ void GameView::drawProjectiles()
 	rectSize = 3;
 	setColor(color);
 	
-	for (Projectile &projectile : state->projectiles)
+	for (Projectile &projectile : m_state->projectiles)
 	{
 		if (projectile.object.prototypeId == 3)
 		{
@@ -304,7 +304,7 @@ void GameView::drawProjectiles()
 			rect.y = projectile.location.y - rectSize/2;
 			rect.w = rectSize;
 			rect.h = rectSize;
-			SDL_RenderDrawRect(renderer, &rect);			
+			SDL_RenderDrawRect(m_renderer, &rect);			
 		}
 	}
 }
@@ -314,9 +314,9 @@ void GameView::drawFormations()
 	uint32_t color = 0xdddd00;
 	setColor(color);
 	
-	for (auto& form : state->formations)
+	for (auto& form : m_state->formations)
 	{
-		FormationProto& proto = prototypes->formations[form.object.prototypeId];
+		FormationProto& proto = m_prototypes->formations[form.object.prototypeId];
 		
 		Point AB(proto.AA.x, proto.BB.y);
 		Point BA(proto.BB.x, proto.AA.y);
@@ -340,7 +340,7 @@ void GameView::drawFormations()
 		points[4].x = p1.x;
 		points[4].y = p1.y;
 		
-		SDL_RenderDrawLines(renderer, points, 5);
+		SDL_RenderDrawLines(m_renderer, points, 5);
 		
 		//--------------------------------------------------------
 		int padding = 2;
@@ -361,7 +361,7 @@ void GameView::drawFormations()
 		points[4].x = pi1.x;
 		points[4].y = pi1.y;
 		
-		SDL_RenderDrawLines(renderer, points, 5);
+		SDL_RenderDrawLines(m_renderer, points, 5);
 		
 		//-------------------------------------------------------------------
 		Point pt1 = form.targetLocation + proto.AA.rotate(form.targetOrientation + M_PI / 2);
@@ -369,8 +369,8 @@ void GameView::drawFormations()
 		Point pt3 = form.targetLocation + proto.BB.rotate(form.targetOrientation + M_PI / 2);
 		Point pt4 = form.targetLocation + BA.rotate(form.targetOrientation + M_PI / 2);
 		
-		SDL_RenderDrawLine(renderer, p1.x, p1.y, pt1.x, pt1.y);
-		SDL_RenderDrawLine(renderer, p4.x, p4.y, pt4.x, pt4.y);
+		SDL_RenderDrawLine(m_renderer, p1.x, p1.y, pt1.x, pt1.y);
+		SDL_RenderDrawLine(m_renderer, p4.x, p4.y, pt4.x, pt4.y);
 		
 		points[0].x = pt1.x;
 		points[0].y = pt1.y;		
@@ -383,7 +383,7 @@ void GameView::drawFormations()
 		points[4].x = pt1.x;
 		points[4].y = pt1.y;
 		
-		SDL_RenderDrawLines(renderer, points, 5);
+		SDL_RenderDrawLines(m_renderer, points, 5);
 		
 		for (size_t i = 0; i < form.slots.size(); i++)
 		{
@@ -397,7 +397,7 @@ void GameView::drawFormations()
 			rect.y = slotLocation.y - slotSize/2;
 			rect.w = slotSize;
 			rect.h = slotSize;
-			SDL_RenderDrawRect(renderer, &rect);			
+			SDL_RenderDrawRect(m_renderer, &rect);			
 			
 			if (slot > 0)
 			{
@@ -406,11 +406,11 @@ void GameView::drawFormations()
 				rect.y = slotLocation.y - slotSize/2;
 				rect.w = slotSize;
 				rect.h = slotSize;
-				SDL_RenderDrawRect(renderer, &rect);
+				SDL_RenderDrawRect(m_renderer, &rect);
 				
-				auto creep = std::find_if(state->creeps.begin(), state->creeps.end(), [slot](CreepState& creep){ return creep.object.id == slot; });
-				if (creep != state->creeps.end())
-					SDL_RenderDrawLine(renderer, slotLocation.x, slotLocation.y, creep->unit.location.x, creep->unit.location.y);
+				auto creep = std::find_if(m_state->creeps.begin(), m_state->creeps.end(), [slot](CreepState& creep){ return creep.object.id == slot; });
+				if (creep != m_state->creeps.end())
+					SDL_RenderDrawLine(m_renderer, slotLocation.x, slotLocation.y, creep->unit.location.x, creep->unit.location.y);
 			}
 		}
 	}

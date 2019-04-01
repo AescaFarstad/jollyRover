@@ -12,7 +12,7 @@ public:
 	CreepView() = default;
 	~CreepView() = default;
 	
-	int16_t id;
+	int16_t m_id;
 	
 	void render(SDL_Renderer* renderer, CreepState& creep, GameState* state, Prototypes* prototypes);
 	

@@ -1,11 +1,11 @@
 #include <SerializationStream.h>
 #include <assert.h>
 #include <cmath>
-bool SerializationStream::AGA = false;
+
 SerializationStream::SerializationStream(StreamGrower* grower)
 {
-	this->grower = grower;
-	grower->grow(this, 0);
+	this->m_grower = grower;
+	m_grower->grow(this, 0);
 }
 
 SerializationStream::SerializationStream()
@@ -15,59 +15,59 @@ SerializationStream::SerializationStream()
 SerializationStream::~SerializationStream()
 {
 	//printf("~SerializationStream()\n");
-	delete grower;
+	delete m_grower;
 	//printf("delete grower\n");
-	for (size_t i = 0; i < blocks.size(); i++)
+	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
-		delete blocks[i];
+		delete m_blocks[i];
 	}
 }
 
 const char* SerializationStream::read(size_t length)
 {
-	char* result = &cursor.block->block[cursor.index];
+	char* result = &m_cursor.block->block[m_cursor.index];
 	seekRelative(length);
 	return result;
 }
 
 char * SerializationStream::readAll()
 {
-	char* result = new char[totalLength];
-	size_t cursor = 0;
-	for (size_t i = 0; i < blocks.size(); i++)
+	char* result = new char[m_totalLength];
+	size_t m_cursor = 0;
+	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
-		memcpy(result + cursor, blocks[i]->block, blocks[i]->occupied);
-		cursor += blocks[i]->occupied;
+		memcpy(result + m_cursor, m_blocks[i]->block, m_blocks[i]->occupied);
+		m_cursor += m_blocks[i]->occupied;
 	}
 	return result;
 }
 
 char * SerializationStream::c_str()
 {
-	char* result = new char[totalLength + 1];
-	size_t cursor = 0;
-	for (size_t i = 0; i < blocks.size(); i++)
+	char* result = new char[m_totalLength + 1];
+	size_t m_cursor = 0;
+	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
-		memcpy(result + cursor, blocks[i]->block, blocks[i]->occupied);
-		cursor += blocks[i]->occupied;
+		memcpy(result + m_cursor, m_blocks[i]->block, m_blocks[i]->occupied);
+		m_cursor += m_blocks[i]->occupied;
 	}
-	result[totalLength] = '\0';
+	result[m_totalLength] = '\0';
 	return result;
 }
 
 char* SerializationStream::readAllAsHex()
 {
 	const char* code = "0123456789abcdef";
-	char* result = new char[totalLength * 3];
-	size_t cursor = 0;
-	for (size_t i = 0; i < blocks.size(); i++)
+	char* result = new char[m_totalLength * 3];
+	size_t m_cursor = 0;
+	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
-		for (size_t j = 0; j < blocks[i]->occupied; j++)
+		for (size_t j = 0; j < m_blocks[i]->occupied; j++)
 		{
-			result[cursor * 3] = code[(unsigned char)blocks[i]->block[j] / 16];
-			result[cursor * 3 + 1] = code[(unsigned char)blocks[i]->block[j] % 16];
-			result[cursor * 3 + 2] = ' ';
-			cursor++;
+			result[m_cursor * 3] = code[(unsigned char)m_blocks[i]->block[j] / 16];
+			result[m_cursor * 3 + 1] = code[(unsigned char)m_blocks[i]->block[j] % 16];
+			result[m_cursor * 3 + 2] = ' ';
+			m_cursor++;
 		}
 	}
 	return result;
@@ -75,7 +75,7 @@ char* SerializationStream::readAllAsHex()
 
 char * SerializationStream::readAllAsHex_c()
 {
-	return nullTerminate(readAllAsHex(), totalLength * 3);
+	return nullTerminate(readAllAsHex(), m_totalLength * 3);
 }
 
 char* SerializationStream::readAllAsBase64()
@@ -94,30 +94,30 @@ char* SerializationStream::nullTerminate(char* source, size_t length)
 
 char* SerializationStream::peek()
 {
-	return &cursor.block->block[cursor.index];
+	return &m_cursor.block->block[m_cursor.index];
 }
 
 void SerializationStream::seekAbsolute(size_t position)
 {
 	size_t passed = 0;
-	for (size_t i = 0; i < blocks.size(); i++)
+	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
-		if (passed + blocks[i]->occupied > position)
+		if (passed + m_blocks[i]->occupied > position)
 		{
-			cursor.block = blocks[i];
-			cursor.index = position - passed;
+			m_cursor.block = m_blocks[i];
+			m_cursor.index = position - passed;
 			return;
 		}
 		else
 		{
-			passed += blocks[i]->occupied;
+			passed += m_blocks[i]->occupied;
 		}
 
 	}
 	if (passed == position)
 	{
-		cursor.block = blocks.back();
-		cursor.index = cursor.block->occupied;
+		m_cursor.block = m_blocks.back();
+		m_cursor.index = m_cursor.block->occupied;
 		return;
 	}
 	printf(" ");
@@ -126,13 +126,13 @@ void SerializationStream::seekAbsolute(size_t position)
 
 void SerializationStream::seekRelative(size_t position)
 {
-	if (position + cursor.index > 0 && position + cursor.index <= cursor.block->occupied)
+	if (position + m_cursor.index > 0 && position + m_cursor.index <= m_cursor.block->occupied)
 	{
-		cursor.index = position + cursor.index;
-		if (cursor.index == cursor.block->occupied && cursor.block != blocks.back())
+		m_cursor.index = position + m_cursor.index;
+		if (m_cursor.index == m_cursor.block->occupied && m_cursor.block != m_blocks.back())
 		{
-			cursor.index = 0;
-			cursor.block = getNextBlock(cursor.block);
+			m_cursor.index = 0;
+			m_cursor.block = getNextBlock(m_cursor.block);
 		}
 	}
 	else
@@ -143,117 +143,99 @@ void SerializationStream::seekRelative(size_t position)
 
 void SerializationStream::seekEnd()
 {
-	cursor.block = blocks.back();
-	cursor.index = cursor.block->occupied;
+	m_cursor.block = m_blocks.back();
+	m_cursor.index = m_cursor.block->occupied;
 }
 
 size_t SerializationStream::getLength()
 {
-	return totalLength;
+	return m_totalLength;
 }
 
 void SerializationStream::writeSimple(const char* data, size_t length)
 {
 	for (size_t i = 0; i < length; i++)
 	{
-		cursor.block->block[cursor.index + i] = data[i];
+		m_cursor.block->block[m_cursor.index + i] = data[i];
 	}
-	cursor.index += length;
+	m_cursor.index += length;
 }
 
 //solve for total length
 void SerializationStream::write(const char* data, size_t length)
 {
-	if (SerializationStream::AGA)
-	{
-		const char* code = "0123456789ABCDEF";
-		char* result = new char[length * 3];
-		size_t cr = 0;
-		for (size_t i = 0; i < length; i++)
-		{
-				result[cr * 3] = code[(unsigned char)data[i] / 16];
-				result[cr * 3 + 1] = code[(unsigned char)data[i] % 16];
-				result[cr * 3 + 2] = ' ';
-				cr++;
-		}
-		std::string h;
-		h.assign(result, length * 3);
-		SerializationStream::AGA = false;
-		S::log.add("W:" + h);
-		SerializationStream::AGA = true;
-	}/**/
-	if (cursor.block == blocks.back())
+	if (m_cursor.block == m_blocks.back())
 	{
 		//we're at the end of the last block. grow if nesscessary and write
-		if (cursor.index + length >= cursor.block->capacity)//todo if fits exactly - writesimple and then grow
+		if (m_cursor.index + length >= m_cursor.block->capacity)//todo if fits exactly - writesimple and then grow
 		{
-			totalLength -= cursor.block->occupied - cursor.index;
-			cursor.block->occupied = cursor.index;
-			grower->grow(this, length);
+			m_totalLength -= m_cursor.block->occupied - m_cursor.index;
+			m_cursor.block->occupied = m_cursor.index;
+			m_grower->grow(this, length);
 		}
 		writeSimple(data, length);
-		cursor.block->occupied = cursor.index;
-		totalLength += length;
+		m_cursor.block->occupied = m_cursor.index;
+		m_totalLength += length;
 	}
 	else
 	{
 		//overwrite within the boundaries of one block
-		if (cursor.index + length < cursor.block->occupied)
+		if (m_cursor.index + length < m_cursor.block->occupied)
 		{
 			writeSimple(data, length);
 		}
 		else
 		{
-			bool dataFits = cursor.index + length < cursor.block->capacity;
-			size_t cutFromBeginningAmount = length - (cursor.block->occupied - cursor.index);
+			bool dataFits = m_cursor.index + length < m_cursor.block->capacity;
+			size_t cutFromBeginningAmount = length - (m_cursor.block->occupied - m_cursor.index);
 
 			//write to the end of one block and possibly delete some data from the next block
 			if (dataFits)
 			{
 				for (size_t i = 0; i < length; i++)
 				{
-					cursor.block->block[cursor.index + i] = data[i];
+					m_cursor.block->block[m_cursor.index + i] = data[i];
 				}
-				cursor.block->occupied = cursor.index + length;
+				m_cursor.block->occupied = m_cursor.index + length;
 
-				cursor.block = getNextBlock(cursor.block);
-				cursor.index = 0;
+				m_cursor.block = getNextBlock(m_cursor.block);
+				m_cursor.index = 0;
 
-				if (cutFromBeginningAmount > cursor.block->occupied)
+				if (cutFromBeginningAmount > m_cursor.block->occupied)
 				{
-					totalLength += cutFromBeginningAmount - cursor.block->occupied;
-					cutFromBeginningAmount = cursor.block->occupied;
+					m_totalLength += cutFromBeginningAmount - m_cursor.block->occupied;
+					cutFromBeginningAmount = m_cursor.block->occupied;
 				}
 
 				if (cutFromBeginningAmount > 0)
 				{
-					memmove(cursor.block->block, cursor.block->block + cutFromBeginningAmount, cursor.block->occupied - cutFromBeginningAmount);
-					cursor.block->occupied -= cutFromBeginningAmount;
+					memmove(m_cursor.block->block, m_cursor.block->block + cutFromBeginningAmount, m_cursor.block->occupied - cutFromBeginningAmount);
+					m_cursor.block->occupied -= cutFromBeginningAmount;
 				}
 			}
 			//delete data from the current block and rebuild the next block entirely
 			else
 			{
-				cursor.block->occupied = cursor.index;
-				CharBlock* nextBlock = getNextBlock(cursor.block);
+				m_cursor.block->occupied = m_cursor.index;
+				CharBlock* nextBlock = getNextBlock(m_cursor.block);
 				CharBlock* newBlock = new CharBlock(length + nextBlock->occupied);
 
-				if (cutFromBeginningAmount > cursor.block->occupied)
+				if (cutFromBeginningAmount > m_cursor.block->occupied)
 				{
-					totalLength += cutFromBeginningAmount - cursor.block->occupied;
-					cutFromBeginningAmount = cursor.block->occupied;
+					m_totalLength += cutFromBeginningAmount - m_cursor.block->occupied;
+					cutFromBeginningAmount = m_cursor.block->occupied;
 				}
 
 				memcpy(newBlock->block, data, length);
 				memcpy(newBlock->block + length, nextBlock->block + cutFromBeginningAmount, nextBlock->occupied - cutFromBeginningAmount);
-				cursor.block = newBlock;
-				cursor.index = length;
+				m_cursor.block = newBlock;
+				m_cursor.index = length;
 
-				for (size_t i = 0; i < blocks.size(); i++)
+				for (size_t i = 0; i < m_blocks.size(); i++)
 				{
-					if (blocks[i] == nextBlock)
+					if (m_blocks[i] == nextBlock)
 					{
-						blocks[i] = newBlock;
+						m_blocks[i] = newBlock;
 						delete nextBlock;
 						break;
 					}
@@ -272,23 +254,23 @@ std::unique_ptr<SerializationStream> SerializationStream::createExp(size_t base,
 void SerializationStream::grow(size_t blockSize)
 {
 	CharBlock* newBlock = new CharBlock(blockSize);
-	blocks.push_back(newBlock);
-	cursor.block = newBlock;
-	cursor.index = 0;
+	m_blocks.push_back(newBlock);
+	m_cursor.block = newBlock;
+	m_cursor.index = 0;
 }
 
 size_t SerializationStream::getAbsolutePosition()
 {
 	size_t passed = 0;
-	for (size_t i = 0; i < blocks.size(); i++)
+	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
-		if (blocks[i] != cursor.block)
+		if (m_blocks[i] != m_cursor.block)
 		{
-			passed += blocks[i]->occupied;
+			passed += m_blocks[i]->occupied;
 		}
 		else
 		{
-			passed += cursor.index;
+			passed += m_cursor.index;
 			break;
 		}
 	}
@@ -297,10 +279,10 @@ size_t SerializationStream::getAbsolutePosition()
 
 CharBlock* SerializationStream::getNextBlock(CharBlock* currentBlock)
 {
-	for (size_t i = 0; i < blocks.size(); i++)
+	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
-		if (blocks[i] == currentBlock)
-			return blocks[i + 1];
+		if (m_blocks[i] == currentBlock)
+			return m_blocks[i + 1];
 	}
 	return nullptr;
 }
@@ -320,12 +302,12 @@ void StreamGrower::grow(SerializationStream * stream, size_t minimum)
 
 size_t StreamGrower::getBlockCount(SerializationStream* stream)
 {
-	return stream->blocks.size();
+	return stream->m_blocks.size();
 }
 
 CharBlock * StreamGrower::getLastBlock(SerializationStream* stream)
 {
-	return stream->blocks.back();
+	return stream->m_blocks.back();
 }
 
 StreamGrowerExp::StreamGrowerExp(size_t base, size_t exponent)

@@ -44,7 +44,8 @@ void ResponseBinder::unbind(int32_t id)
 bool ResponseBinder::process(std::unique_ptr<NetworkMessage> msg)
 {
 	NetworkMessage* p_msg = msg.get();
-	for (auto i = bindings.begin(); i != bindings.end(); i++) {
+	for (auto i = bindings.begin(); i != bindings.end(); i++) 
+	{
 		if (match(i->binding.get(), p_msg))
 		{
 			S::log.add("apply binding " + i->binding->name + " " + std::to_string(i->binding->callOnce), {LOG_TAGS::NET});

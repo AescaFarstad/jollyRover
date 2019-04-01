@@ -17,12 +17,12 @@ public:
 	~RouteInput() = default;
 
 	std::vector<RoutePoint> route;
-	bool isInputActive;
-	bool isLoaded;
-	bool isCompletelyValid;
 
-	void load(GameState* state, Prototypes* prototypes);
+	void load(GameState* m_state, Prototypes* m_prototypes);
 	std::vector<Point> claimRoute();
+	
+	bool isCompletelyValid();
+	bool isLoaded();
 
 	void onMouseDown(SDL_MouseButtonEvent* event);
 	void onMouseUp(SDL_MouseButtonEvent* event);
@@ -30,8 +30,12 @@ public:
 
 private:
 
-	GameState* state;
-	Prototypes* prototypes;
+	bool m_isInputActive;
+	bool m_isCompletelyValid;
+	bool m_isLoaded;
+
+	GameState* m_state;
+	Prototypes* m_prototypes;
 	
 	void reset();
 

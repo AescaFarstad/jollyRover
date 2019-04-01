@@ -4,7 +4,7 @@
 #include <cassert>
 #include <json.hpp>
 
-#define THROW_FATAL_ERROR(ERROR_MSG) {printf( "FATAL ERROR: \n%s @ %d \n%s \n", __FILE__, __LINE__, #ERROR_MSG); assert(0);}
+#define THROW_FATAL_ERROR(ERROR_MSG) {printf( "FATAL ERROR: \n%s @ %d \n%s \n", __FILE__, __LINE__, #ERROR_MSG); abort();}
 
 class GameConfig
 {
@@ -40,56 +40,3 @@ namespace S
 	extern int32_t idCounter;
 	extern GameConfig config;
 }
-/*
-namespace std2
-{
-	template<typename T, typename L>
-	auto minElement(T& iterable, L&& expression)
-	{
-		auto result = iterable.begin();
-		
-		if (result == iterable.end())
-			return iterable.end();
-			
-		auto bestValue = expression(*result);
-		
-		auto iter = result;
-		auto end = iterable.end();
-		
-		while(++iter != end)
-		{
-			auto value = expression(*iter);
-			if (value < bestValue)
-			{
-				bestValue = value;
-				result = iter;
-			}
-		}
-		return result;
-	}
-	
-	template<typename T, typename L>
-	auto maxElement(T& iterable, L&& expression)
-	{
-		auto result = iterable.begin();
-		
-		if (result == iterable.end())
-			return iterable.end();
-			
-		auto bestValue = expression(*result);
-		
-		auto iter = result;
-		auto end = iterable.end();
-		
-		while(++iter != end)
-		{
-			auto value = expression(*iter);
-			if (value > bestValue)
-			{
-				bestValue = value;
-				result = iter;
-			}
-		}
-		return result;
-	}
-}*/

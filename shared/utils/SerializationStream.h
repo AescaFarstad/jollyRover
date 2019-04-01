@@ -18,7 +18,7 @@ class SerializationStream
 {
 	friend class StreamGrower;
 public:
-	SerializationStream(StreamGrower* grower);
+	SerializationStream(StreamGrower* m_grower);
 	SerializationStream();
 	virtual ~SerializationStream();
 
@@ -32,7 +32,6 @@ public:
 	void seekAbsolute(size_t position);
 	void seekRelative(size_t position);
 	void seekEnd();
-	static bool AGA;
 	size_t getLength();
 
 	void write(const char* data, size_t length);
@@ -40,10 +39,10 @@ public:
 	static std::unique_ptr<SerializationStream> createExp(size_t base  = 128, size_t exponent = 2);
 
 protected:
-	std::vector<CharBlock*> blocks;
-	size_t totalLength = 0;
-	StreamGrower* grower;
-	BlockCursor cursor;
+	std::vector<CharBlock*> m_blocks;
+	size_t m_totalLength = 0;
+	StreamGrower* m_grower;
+	BlockCursor m_cursor;
 
 	void grow(size_t blockSize); 
 	void writeSimple(const char* data, size_t length);

@@ -7,11 +7,11 @@ class SeededRandom
 {
 public:
 	SeededRandom();
-	SeededRandom(uint32_t seed);
+	SeededRandom(uint32_t m_seed);
 	~SeededRandom();
 
 
-	void initFromSeed(uint32_t seed);
+	void initFromSeed(uint32_t m_seed);
 	int32_t get(int32_t min, int32_t max);
 	int32_t getInt();
 	float get(float min, float max);
@@ -27,7 +27,7 @@ public:
 	void serialize(SerializationStream& stream) const;
 
 private:
-	uint32_t seed;
+	uint32_t m_seed;
 
 };
 
