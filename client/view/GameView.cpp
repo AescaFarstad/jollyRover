@@ -364,10 +364,10 @@ void GameView::drawFormations()
 		SDL_RenderDrawLines(renderer, points, 5);
 		
 		//-------------------------------------------------------------------
-		Point pt1 = form.targetLocation + proto.AA.rotate(form.targetOrientation);
-		Point pt2 = form.targetLocation + AB.rotate(form.targetOrientation);
-		Point pt3 = form.targetLocation + proto.BB.rotate(form.targetOrientation);
-		Point pt4 = form.targetLocation + BA.rotate(form.targetOrientation);
+		Point pt1 = form.targetLocation + proto.AA.rotate(form.targetOrientation + M_PI / 2);
+		Point pt2 = form.targetLocation + AB.rotate(form.targetOrientation + M_PI / 2);
+		Point pt3 = form.targetLocation + proto.BB.rotate(form.targetOrientation + M_PI / 2);
+		Point pt4 = form.targetLocation + BA.rotate(form.targetOrientation + M_PI / 2);
 		
 		SDL_RenderDrawLine(renderer, p1.x, p1.y, pt1.x, pt1.y);
 		SDL_RenderDrawLine(renderer, p4.x, p4.y, pt4.x, pt4.y);
