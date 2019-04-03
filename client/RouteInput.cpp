@@ -12,8 +12,8 @@ RouteInput::RouteInput()
 
 void RouteInput::load(GameState* state, Prototypes* prototypes)
 {
-	this->m_state = m_state;
-	this->m_prototypes = m_prototypes;
+	this->m_state = state;
+	this->m_prototypes = prototypes;
 	m_isLoaded = true;
 }
 
