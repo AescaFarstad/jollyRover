@@ -1,6 +1,10 @@
 #include <GameView.h>
 #include <Creeps.h>
 
+namespace S
+{	
+	TextureNames textures;
+}
 
 GameView::GameView(SDL_Window* window, SDL_Renderer* renderer, Prototypes* prototypes)
 {

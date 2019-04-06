@@ -51,3 +51,8 @@ private:
 	
 };
 
+namespace S
+{	
+	extern TextureNames textures;
+}
+

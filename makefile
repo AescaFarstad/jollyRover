@@ -16,6 +16,7 @@ SERVER_LIBS := -lSDL2 -lSDL2_net -lutil
 
 DIR_CLIENT =client
 DIR_CLIENT +=client/view
+DIR_CLIENT +=client/resources
 
 DIR_SERVER =server
 DIR_SERVER +=server/network
