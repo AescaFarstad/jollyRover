@@ -7,7 +7,8 @@
 		"saveStateInterval":3,
 		"maxMessageSize":3000,
 		"networkUpdateInterval":5,
-		"loopBack":true
+		"loopBack":true,
+		"windowLocation":{"x":640, "y":50}
 	},
 	"logTags":
 	{

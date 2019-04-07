@@ -9,12 +9,15 @@
 #ifdef __EMSCRIPTEN__
 	#include <emscripten.h>
 	#include <SDL.h>
+	#include <SDL_gpu.h>
 #elif LINUX
 	#include <pty.h>
 	#include <SDL2/SDL.h>
+	#include <SDL_gpu.h>
 #else
 	#include <windows.h>
 	#include <SDL2/SDL.h>
+	#include <SDL2/SDL_gpu.h>
 #endif
 
 namespace MainInternal
@@ -24,8 +27,8 @@ namespace MainInternal
 	const int MAX_TIME_PER_FRAME = 100;
 	const int MIN_TIME_PER_FRAME = 10;
 
-	SDL_Window* window = NULL;
-	SDL_Renderer* renderer = NULL;
+	GPU_Target* screen;
+	
 	Game* game;
 
 	bool isFinished = false;
@@ -42,9 +45,8 @@ void mainLoop(void* arg)
 	{
 		if (e.type == SDL_QUIT)
 		{
-			SDL_DestroyWindow(window);
-			SDL_Quit();
 			isFinished = true;
+			GPU_Quit();
 			break;
 		}
 		else
@@ -54,10 +56,9 @@ void mainLoop(void* arg)
 	}
 	int ticks = SDL_GetTicks();
 	int delta = ticks - lastTicks > MAX_TIME_PER_FRAME ? MAX_TIME_PER_FRAME : ticks - lastTicks;
-	if (delta >= MIN_TIME_PER_FRAME)
+	if (!isFinished && delta >= MIN_TIME_PER_FRAME)
 	{
-		SDL_SetRenderDrawColor(renderer, 0xFF, 0xFF, 0xFF, 0xFF);
-		SDL_RenderClear(renderer);
+		GPU_Clear(screen);
 
 		lastTicks = ticks;
 		game->update();/*
@@ -65,9 +66,12 @@ void mainLoop(void* arg)
 		if (fpsMeter.getMeasurementDuration() > 5000)
 			printf(fpsMeter.report().c_str());*/
 
-		SDL_RenderPresent(renderer);
+		GPU_Flip(screen);
 	}
 }
+
+void printRenderers();
+void printCurrentRenderer();
 
 int main(int argc, char* args[])
 {
@@ -91,23 +95,19 @@ int main(int argc, char* args[])
 		printf("Failed to initialize SDL %s\n", SDL_GetError());
 		return 0;
 	}
+	screen = GPU_InitRenderer(GPU_RENDERER_GLES_2, SCREEN_WIDTH, SCREEN_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
+	printRenderers();
+	printCurrentRenderer();
+	SDL_Window* window = SDL_GetWindowFromID(screen->context->windowID);
+	SDL_SetWindowPosition(window, S::config.window_X, S::config.window_Y);
 	
-	window = SDL_CreateWindow("smth", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-	SDL_SetWindowPosition(window, 640, 50);
-	if (window == NULL)
+	if (screen == NULL)
 	{
 		printf("Failed to create window %s\n", SDL_GetError());
 		return 0;
 	}
 	
-	renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
-	if (renderer == NULL)
-	{
-		printf("Failed to create renderer %s\n", SDL_GetError());
-		return 0;
-	}
-	
-	game = new Game(window, renderer);
+	game = new Game(screen);
 	
 #ifdef __EMSCRIPTEN__
 	printf("EMSCRIPTEN mode\n");
@@ -119,4 +119,51 @@ int main(int argc, char* args[])
 #endif
 
 	return 0;
+}
+
+void printRenderers()
+{
+	SDL_version compiled;
+	SDL_version linked;
+	GPU_RendererID* renderers;
+	int i;
+	int order_size;
+	GPU_RendererID order[GPU_RENDERER_ORDER_MAX];
+
+    GPU_SetDebugLevel(GPU_DEBUG_LEVEL_MAX);
+    
+    compiled = GPU_GetCompiledVersion();
+    linked = GPU_GetLinkedVersion();
+    if(compiled.major != linked.major || compiled.minor != linked.minor || compiled.patch != linked.patch)
+        GPU_Log("SDL_gpu v%d.%d.%d (compiled with v%d.%d.%d)\n", linked.major, linked.minor, linked.patch, compiled.major, compiled.minor, compiled.patch);
+    else
+        GPU_Log("SDL_gpu v%d.%d.%d\n", linked.major, linked.minor, linked.patch);
+    
+	renderers = (GPU_RendererID*)malloc(sizeof(GPU_RendererID)*GPU_GetNumRegisteredRenderers());
+	GPU_GetRegisteredRendererList(renderers);
+	
+	GPU_Log("\nAvailable renderers:\n");
+	for(i = 0; i < GPU_GetNumRegisteredRenderers(); i++)
+	{
+		GPU_Log("* %s (%d.%d)\n", renderers[i].name, renderers[i].major_version, renderers[i].minor_version);
+	}
+	GPU_Log("Renderer init order:\n");
+	
+	GPU_GetRendererOrder(&order_size, order);
+	for(i = 0; i < order_size; i++)
+	{
+		GPU_Log("%d) %s (%d.%d)\n", i+1, order[i].name, order[i].major_version, order[i].minor_version);
+	}
+	GPU_Log("\n");
+
+	free(renderers);
+}
+
+void printCurrentRenderer()
+{
+    GPU_Renderer* renderer = GPU_GetCurrentRenderer();
+    GPU_RendererID id = renderer->id;
+    
+	GPU_Log("Using renderer: %s (%d.%d)\n", id.name, id.major_version, id.minor_version);
+	//GPU_Log(" Shader versions supported: %d to %d\n\n", renderer->min_shader_version, renderer->max_shader_version);
 }

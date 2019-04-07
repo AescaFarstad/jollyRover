@@ -14,8 +14,10 @@
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL_image.h>
+	#include <SDL_gpu.h>
 #else 
 	#include <SDL2/SDL_image.h>
+	#include <SDL_gpu.h>
 #endif
 
 
@@ -23,7 +25,7 @@
 class GameView
 {
 public:
-	GameView(SDL_Window* window, SDL_Renderer* renderer, Prototypes* prototypes);
+	GameView(GPU_Target* screen, Prototypes* prototypes);
 	~GameView();
 
 	void render(GameState* state, RouteInput* routeInput);
@@ -31,6 +33,7 @@ public:
 private:
 
 	SDL_Window* m_window;
+	GPU_Target* m_screen; 
 	SDL_Renderer* m_renderer; 
 	Prototypes* m_prototypes;
 	bool m_isInitialized;
@@ -48,6 +51,7 @@ private:
 	void drawCreeps();
 	void drawProjectiles();
 	void drawFormations();
+	void drawGPU_Test();
 	
 };
 

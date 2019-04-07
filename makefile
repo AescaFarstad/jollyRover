@@ -8,10 +8,10 @@ LOCAL_TARGET := $(OUT)/local
 SERVER_TARGET := $(OUT)/server
 
 AUTODEPS = -MMD -MF $(subst .bc,.d,$@)
-COMPILE_FLAGS := -g -Wall -c -std=c++14 -D_REENTRANT $(CXXFLAGS)
-LINK_FLAGS := -std=c++14 -Wl,-rpath=/usr/lib/ $(LDFLAGS)
+COMPILE_FLAGS := -g -Wall -c -std=c++14 -D_REENTRANT $(CXXFLAGS) 
+LINK_FLAGS := -std=c++14  $(LDFLAGS)
 
-LOCAL_LIBS := -lSDL2 -lSDL2_net -lSDL2_image -lutil
+LOCAL_LIBS := -lSDL2_gpu -lSDL2 -lSDL2_net -lSDL2_image -lutil
 SERVER_LIBS := -lSDL2 -lSDL2_net -lutil
 
 DIR_CLIENT =client
@@ -37,7 +37,7 @@ DIR_SHARED +=shared/utils
 DIR_SHARED +=shared/model/ref
 
 
-INC_PARAMS_CLIENT=$(foreach d, $(DIR_CLIENT), -I$d) $(foreach d, $(DIR_SHARED), -I$d)
+INC_PARAMS_CLIENT=$(foreach d, $(DIR_CLIENT), -I$d) $(foreach d, $(DIR_SHARED), -I$d) -I/usr/include/SDL2/
 INC_PARAMS_SERVER=$(foreach d, $(DIR_SERVER), -I$d) $(foreach d, $(DIR_SHARED), -I$d)
 
 SOURCES_CLIENT = $(foreach d, $(DIR_CLIENT), $(wildcard $d/*.cpp)) $(foreach d, $(DIR_SHARED), $(wildcard $d/*.cpp))
@@ -65,9 +65,10 @@ web: $(SUBOBJ_WEB)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets/
 	$(WEB_COMPILER) \
-		-s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 \
+		-O2 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 \
 		-s WASM=0 -s TRACE_WEBGL_CALLS=1 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
-		--use-preload-plugins -v -o $(WEB_TARGET).html $(SUBOBJ_WEB) --embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets
+		--use-preload-plugins -v -o $(WEB_TARGET).html lib/SDL_gpu.bc $(SUBOBJ_WEB) \
+		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets --embed-file out/assets/sheet_tanks.png
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
 server: $(SUBOBJ_SERVER)
@@ -75,7 +76,7 @@ server: $(SUBOBJ_SERVER)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
-
+	
 all: local server web
 
 $(OBJDIR_CLIENT_LOCAL)/%.bc : %.cpp
@@ -84,7 +85,7 @@ $(OBJDIR_CLIENT_LOCAL)/%.bc : %.cpp
 	
 $(OBJDIR_CLIENT_WEB)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
-	$(WEB_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -c -o $@ $<
+	$(WEB_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -I/usr/local/include -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -c -o $@ $<
 	
 $(OBJDIR_CLIENT_SERVER)/%.bc : %.cpp
 	@mkdir -p $(dir $@)

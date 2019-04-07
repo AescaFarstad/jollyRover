@@ -2,10 +2,9 @@
 #include <Creeps.h>
 
 
-GameView::GameView(SDL_Window* window, SDL_Renderer* renderer, Prototypes* prototypes)
+GameView::GameView(GPU_Target* screen, Prototypes* prototypes)
 {
-	this->m_window = window;
-	this->m_renderer = renderer;
+	this->m_screen = screen;
 	this->m_prototypes = prototypes;
 
 	m_isInitialized = false;
@@ -13,8 +12,22 @@ GameView::GameView(SDL_Window* window, SDL_Renderer* renderer, Prototypes* proto
 }
 
 
+#define MAX_SPRITES 50000
+int numSprites = 1600;
+
+float x[MAX_SPRITES];
+float y[MAX_SPRITES];
+float velx[MAX_SPRITES];
+float vely[MAX_SPRITES];
+float angle[MAX_SPRITES];
+float angleD[MAX_SPRITES];
+int i;
+int lastTime;
+GPU_Image* image;
+
 GameView::~GameView()
 {
+      GPU_FreeImage(image);
 }
 /*
 void rendery(SDL_Renderer *renderer, SDL_Surface *surf, SDL_Texture *texture)
@@ -59,34 +72,95 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 
 	this->m_state = state;
 	this->m_routeInput = routeInput;
-
+/*
 	drawPlayers();
 	drawObstacles();
 	drawInput();
 	drawCars();
 	drawCreeps();
 	drawProjectiles();
-	drawFormations();
+	drawFormations();*/
 	//rendery(renderer, loadedSurface, ltexture);
-	
+	drawGPU_Test();
 }
-
 
 void GameView::init()
 {
+	m_window = SDL_GetWindowFromID(m_screen->context->windowID);
 	SDL_SetWindowSize(m_window, m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight);
+	GPU_SetWindowResolution(m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight);
+	SDL_SetWindowPosition(m_window, S::config.window_X, S::config.window_Y);
 	m_isInitialized = true;
-	//loadedSurface = IMG_Load("out/assets/sheet_tanks.png");
-	//if(!loadedSurface) {
-    //	printf("IMG_Load: %s\n", IMG_GetError());}
-	//ltexture = SDL_CreateTextureFromSurface(m_renderer, loadedSurface);
+	
+	for(i = 0; i < MAX_SPRITES; i++)
+	{
+		x[i] = rand()%m_screen->w;
+		y[i] = rand()%m_screen->h;
+		velx[i] = 10 + rand()%m_screen->w/10;
+		vely[i] = 10 + rand()%m_screen->h/10;
+		angle[i] = rand()%100 * M_PI / 50;
+		angleD[i] = ((rand() % 100) - 50) / 0.5f;
+	}
+	lastTime = SDL_GetTicks();
+	image = GPU_LoadImage("out/assets/sheet_tanks.png");
+	if (!image)
+		THROW_FATAL_ERROR("IMG IS NULL")
+	GPU_SetSnapMode(image, GPU_SNAP_NONE);
 }
 
 void GameView::setColor(uint32_t color)
 {
-	SDL_SetRenderDrawColor(m_renderer, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff, 0xFF);
+	//SDL_SetRenderDrawColor(m_renderer, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff, 0xFF);
 }
 
+void GameView::drawGPU_Test()
+{
+	int time = SDL_GetTicks();
+	if (lastTime == 0)
+		lastTime = time;
+		
+	float dt = (time - lastTime) / 1000.f;
+	
+	lastTime = time;
+	
+	for(i = 0; i < numSprites; i++)
+    {
+        x[i] += velx[i]*dt;
+        y[i] += vely[i]*dt;
+		angle[i] += angleD[i]*dt;
+        if(x[i] < 0)
+        {
+            x[i] = 0;
+            velx[i] = -velx[i];
+        }
+        else if(x[i]> m_screen->w)
+        {
+            x[i] = m_screen->w;
+            velx[i] = -velx[i];
+        }
+        
+        if(y[i] < 0)
+        {
+            y[i] = 0;
+            vely[i] = -vely[i];
+        }
+        else if(y[i]> m_screen->h)
+        {
+            y[i] = m_screen->h;
+            vely[i] = -vely[i];
+        }
+    }
+	GPU_Rect srcR2;
+	srcR2.x = 0;
+	srcR2.y = 385;
+	srcR2.w = 100;
+	srcR2.h = 95;
+	
+	for(i = 0; i < numSprites; i++)
+    {
+		GPU_BlitTransform(image, &srcR2, m_screen, x[i], y[i], angle[i], 1, 1); 
+    }
+}
 void GameView::drawPlayers()
 {
 	uint32_t colors[10] = {

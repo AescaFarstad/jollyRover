@@ -17,12 +17,12 @@
 #include <GameState.h>
 #include <KeyboardInput.h>
 
-Game::Game(SDL_Window* window, SDL_Renderer* renderer)
+Game::Game(GPU_Target* screen)
 {
 	loadConfig();
 	loadPrototypes();
 
-	m_gameView = new GameView(window, renderer, &m_prototypes);
+	m_gameView = new GameView(screen, &m_prototypes);
 
 	m_taskManager = new TaskManager();
 	if (S::config.loopBack)

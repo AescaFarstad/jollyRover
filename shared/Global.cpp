@@ -25,6 +25,8 @@ void GameConfig::load(nlohmann::json& j)
 	std::string host = jconfig.at("host");
 	memcpy(S::config.host, host.c_str(), host.length() + 1);
 	S::config.loopBack = jconfig.at("loopBack");
+	S::config.window_X = jconfig.at("windowLocation").at("x");
+	S::config.window_Y = jconfig.at("windowLocation").at("y");
 	loadLogTags(j);
 }
 

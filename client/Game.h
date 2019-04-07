@@ -2,8 +2,10 @@
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL.h>
+	#include <SDL_gpu.h>
 #else 
 	#include <SDL2/SDL.h>
+	#include <SDL_gpu.h>
 #endif
 
 #include <Network.h>
@@ -17,7 +19,7 @@
 class Game
 {
 public:
-	Game(SDL_Window* window, SDL_Renderer* renderer);
+	Game(GPU_Target* screen);
 	~Game();
 
 	void update();

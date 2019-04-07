@@ -24,6 +24,8 @@ public:
 	int32_t saveStateInterval;
 	int32_t networkUpdateInterval;
 	bool loopBack;
+	int32_t window_X;
+	int32_t window_Y;
 	
 	void load(nlohmann::json& j);
 	
