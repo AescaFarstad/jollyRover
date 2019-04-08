@@ -5,22 +5,14 @@
 #include <ViewController.h>
 #include <CreepView.h>
 #include <memory>
+#include <SDL_gpu.h>
 #ifdef __EMSCRIPTEN__
+	#include <SDL_image.h>
 	#include <SDL.h>
 #else 
 	#include <SDL2/SDL.h>
-#endif
-
-
-#ifdef __EMSCRIPTEN__
-	#include <SDL_image.h>
-	#include <SDL_gpu.h>
-#else 
 	#include <SDL2/SDL_image.h>
-	#include <SDL_gpu.h>
 #endif
-
-
 
 class GameView
 {
@@ -34,7 +26,6 @@ private:
 
 	SDL_Window* m_window;
 	GPU_Target* m_screen; 
-	SDL_Renderer* m_renderer; 
 	Prototypes* m_prototypes;
 	bool m_isInitialized;
 	GameState* m_state;

@@ -2,6 +2,7 @@
 #include <Game.h>
 #include <SystemInfo.h>
 #include <FPSMeter.h>
+#include <SDL_gpu.h>
 
 //#define WINDOWS 1
 #define LINUX 1
@@ -9,15 +10,12 @@
 #ifdef __EMSCRIPTEN__
 	#include <emscripten.h>
 	#include <SDL.h>
-	#include <SDL_gpu.h>
 #elif LINUX
 	#include <pty.h>
-	#include <SDL2/SDL.h>
-	#include <SDL_gpu.h>
+	#include <SDL.h>
 #else
 	#include <windows.h>
 	#include <SDL2/SDL.h>
-	#include <SDL2/SDL_gpu.h>
 #endif
 
 namespace MainInternal

@@ -1,5 +1,6 @@
 #include <GameView.h>
 #include <Creeps.h>
+#include <ViewUtil.h>
 
 
 GameView::GameView(GPU_Target* screen, Prototypes* prototypes)
@@ -11,60 +12,11 @@ GameView::GameView(GPU_Target* screen, Prototypes* prototypes)
 	
 }
 
-
-#define MAX_SPRITES 50000
-int numSprites = 1600;
-
-float x[MAX_SPRITES];
-float y[MAX_SPRITES];
-float velx[MAX_SPRITES];
-float vely[MAX_SPRITES];
-float angle[MAX_SPRITES];
-float angleD[MAX_SPRITES];
-int i;
-int lastTime;
-GPU_Image* image;
-
 GameView::~GameView()
 {
-      GPU_FreeImage(image);
+	
 }
-/*
-void rendery(SDL_Renderer *renderer, SDL_Surface *surf, SDL_Texture *texture)
-	{
-		SDL_Rect srcR;
-		srcR.x = 573;
-		srcR.y = 275;
-		srcR.w = 83;
-		srcR.h = 78;
-		
-		SDL_Rect srcR2;
-		srcR2.x = 0;
-		srcR2.y = 384;
-		srcR2.w = 100;
-		srcR2.h = 97;
-			//x="573" y="275" width="83" height="78" x="0" y="384" width="100" height="97"
-		
-		SDL_Rect dst;
-		SDL_Rect dst2;
-		for(size_t i = 0; i < 15000; i++)
-		{
-			dst.x = i % 1280;
-			dst.y = i / 1280;
-			dst.w = 20;
-			dst.h = 20;
-			SDL_RenderCopyEx(renderer, texture, &srcR, &dst, 0, NULL, SDL_FLIP_NONE);
-			
-			int h = i + 100000;
-			
-			dst2.x = h % 1280;
-			dst2.y = h / 1280;
-			dst2.w = 40;
-			dst2.h = 40;
-			SDL_RenderCopyEx(renderer, texture, &srcR2, &dst2, 0, NULL, SDL_FLIP_NONE);
-		}
-		
-	}*/
+
 void GameView::render(GameState* state, RouteInput* routeInput)
 {
 	if (!m_isInitialized)
@@ -72,16 +24,17 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 
 	this->m_state = state;
 	this->m_routeInput = routeInput;
-/*
+	
+	SDL_Color white = colorFromHex(0xffffff);
+	GPU_RectangleFilled(m_screen, 0, 0, m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight, white);
+
 	drawPlayers();
 	drawObstacles();
 	drawInput();
 	drawCars();
 	drawCreeps();
 	drawProjectiles();
-	drawFormations();*/
-	//rendery(renderer, loadedSurface, ltexture);
-	drawGPU_Test();
+	drawFormations();	
 }
 
 void GameView::init()
@@ -92,180 +45,114 @@ void GameView::init()
 	SDL_SetWindowPosition(m_window, S::config.window_X, S::config.window_Y);
 	m_isInitialized = true;
 	
-	for(i = 0; i < MAX_SPRITES; i++)
-	{
-		x[i] = rand()%m_screen->w;
-		y[i] = rand()%m_screen->h;
-		velx[i] = 10 + rand()%m_screen->w/10;
-		vely[i] = 10 + rand()%m_screen->h/10;
-		angle[i] = rand()%100 * M_PI / 50;
-		angleD[i] = ((rand() % 100) - 50) / 0.5f;
-	}
-	lastTime = SDL_GetTicks();
-	image = GPU_LoadImage("out/assets/sheet_tanks.png");
-	if (!image)
-		THROW_FATAL_ERROR("IMG IS NULL")
-	GPU_SetSnapMode(image, GPU_SNAP_NONE);
 }
 
-void GameView::setColor(uint32_t color)
-{
-	//SDL_SetRenderDrawColor(m_renderer, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff, 0xFF);
-}
-
-void GameView::drawGPU_Test()
-{
-	int time = SDL_GetTicks();
-	if (lastTime == 0)
-		lastTime = time;
-		
-	float dt = (time - lastTime) / 1000.f;
-	
-	lastTime = time;
-	
-	for(i = 0; i < numSprites; i++)
-    {
-        x[i] += velx[i]*dt;
-        y[i] += vely[i]*dt;
-		angle[i] += angleD[i]*dt;
-        if(x[i] < 0)
-        {
-            x[i] = 0;
-            velx[i] = -velx[i];
-        }
-        else if(x[i]> m_screen->w)
-        {
-            x[i] = m_screen->w;
-            velx[i] = -velx[i];
-        }
-        
-        if(y[i] < 0)
-        {
-            y[i] = 0;
-            vely[i] = -vely[i];
-        }
-        else if(y[i]> m_screen->h)
-        {
-            y[i] = m_screen->h;
-            vely[i] = -vely[i];
-        }
-    }
-	GPU_Rect srcR2;
-	srcR2.x = 0;
-	srcR2.y = 385;
-	srcR2.w = 100;
-	srcR2.h = 95;
-	
-	for(i = 0; i < numSprites; i++)
-    {
-		GPU_BlitTransform(image, &srcR2, m_screen, x[i], y[i], angle[i], 1, 1); 
-    }
-}
 void GameView::drawPlayers()
 {
-	uint32_t colors[10] = {
-		0x000000,
-		0xff0000,
-		0x00ff00,
-		0x0000ff,
-		0xffff00,
-		0x00ffff,
-		0xff00ff,
-		0x777777,
-		0x0077ff,
-		0xff7700
+	SDL_Color colors[10] = {
+		colorFromHex(0x000000),
+		colorFromHex(0xff0000),
+		colorFromHex(0x00ff00),
+		colorFromHex(0x0000ff),
+		colorFromHex(0xffff00),
+		colorFromHex(0x00ffff),
+		colorFromHex(0xff00ff),
+		colorFromHex(0x777777),
+		colorFromHex(0x0077ff),
+		colorFromHex(0xff7700)
 	};
 
 	for (size_t i = 0; i < m_state->players.size(); i++)
 	{
-		setColor(colors[i]);
-
-		SDL_Rect rect;
-		rect.x = m_state->players[i].x + 200;
-		rect.y = m_state->players[i].y + 200;
-		rect.w = 5;
-		rect.h = 5;
-		SDL_RenderFillRect(m_renderer, &rect);
+		GPU_RectangleFilled(
+			m_screen, 
+			m_state->players[i].x + 200,
+			m_state->players[i].y + 200,
+			m_state->players[i].x + 205,
+			m_state->players[i].y + 205, 
+			colors[i]);
 	}
 }
 
 void GameView::drawObstacles()
 {
-	uint32_t obstacleColor = 0x004477;
-	int centroidSize = 4;
-
-	setColor(obstacleColor);
+	SDL_Color obstacleColor = colorFromHex(0x004477);
 
 	for (auto &obstacle : m_prototypes->obstacles)
 	{
-		size_t count = obstacle.vertices.size() + 1;
-		SDL_Point* points = new SDL_Point[count];
-		for (size_t i = 0; i < count - 1; i++)
+		size_t count = obstacle.vertices.size();
+		float* points = new float[(count * 2)];
+		for (size_t i = 0; i < count * 2; i+=2)
 		{
-			points[i].x = obstacle.vertices[i].x;
-			points[i].y = obstacle.vertices[i].y;
+			points[i] = obstacle.vertices[i / 2].x;
+			points[i + 1] = obstacle.vertices[i / 2].y;
 		}
-		points[count - 1].x = obstacle.vertices[0].x;
-		points[count - 1].y = obstacle.vertices[0].y;
-		SDL_RenderDrawLines(m_renderer, points, count);
+		//points[count - 2] = obstacle.vertices[0].x;
+		//points[count - 1] = obstacle.vertices[0].y;
+		
+		GPU_Polygon(m_screen, count, points, obstacleColor);
 		delete[] points;
 		
-		SDL_Rect rect;
-		rect.x = obstacle.centroid.x - centroidSize/2;
-		rect.y = obstacle.centroid.y - centroidSize/2;
-		rect.w = centroidSize;
-		rect.h = centroidSize;
-		SDL_RenderDrawRect(m_renderer, &rect);
-	}
+		int32_t centroidSize = 4;
+		GPU_Rectangle(m_screen, 
+			obstacle.centroid.x - centroidSize/2, 
+			obstacle.centroid.y - centroidSize/2,
+			obstacle.centroid.x + centroidSize/2,
+			obstacle.centroid.y + centroidSize/2,
+			obstacleColor);
+	}/*
+	float* points = new float[6];
+	points[0] = 100;
+	points[1] = 100;
+	points[2] = 50;
+	points[3] = 150;
+	points[4] = 150;
+	points[5] = 150;
+	
+	GPU_Polygon(m_screen, 3, points, obstacleColor);
+	
+	delete[] points;*/
+	
 }
 
 void GameView::drawInput()
 {
-	uint32_t validColor = 0x00ff00;
-	uint32_t invalidColor = 0xff0000;
-	uint32_t lastColor = 0;
+	SDL_Color validColor = colorFromHex(0x00ff00);
+	SDL_Color invalidColor = colorFromHex(0xff0000);
 	int rectSize = 6;
 
 	for (size_t i = 1; i < m_routeInput->route.size(); i++)
 	{
 		bool isValidEdge = m_routeInput->route[i].isValid_;
-		uint32_t newColor = isValidEdge ? validColor : invalidColor;
-		if (lastColor != newColor)
-		{
-			setColor(newColor);
-			lastColor = newColor;
-		}
-		SDL_RenderDrawLine(m_renderer,
-			(int)m_routeInput->route[i - 1].location.x,
-			(int)m_routeInput->route[i - 1].location.y,
-			(int)m_routeInput->route[i].location.x,
-			(int)m_routeInput->route[i].location.y
+		SDL_Color& newColor = isValidEdge ? validColor : invalidColor;
+		GPU_Line(m_screen,
+			m_routeInput->route[i - 1].location.x,
+			m_routeInput->route[i - 1].location.y,
+			m_routeInput->route[i].location.x,
+			m_routeInput->route[i].location.y,
+			newColor
 		);
 
 		//S::log.add(std::to_string(i) + " draw " + routeInput->route[i - 1].toString() + " -> " + routeInput->route[i].toString());
 
-		newColor = m_routeInput->route[i].isValid_ ? validColor : invalidColor;
-		if (lastColor != newColor)
-		{
-			setColor(newColor);
-			lastColor = newColor;
-		}
+		SDL_Color& newColor2 = m_routeInput->route[i].isValid_ ? validColor : invalidColor;
 
-		SDL_Rect rect;
-		rect.x = m_routeInput->route[i].location.x - rectSize / 2;
-		rect.y = m_routeInput->route[i].location.y - rectSize / 2;
-		rect.w = rectSize;
-		rect.h = rectSize;
-		SDL_RenderDrawRect(m_renderer, &rect);
+		GPU_Rectangle(
+			m_screen, 
+			m_routeInput->route[i].location.x - rectSize / 2,
+			m_routeInput->route[i].location.y - rectSize / 2,
+			m_routeInput->route[i].location.x + rectSize / 2,
+			m_routeInput->route[i].location.y + rectSize / 2,
+			newColor2
+			);
 	}
 }
 
 void GameView::drawCars()
 {
-	uint32_t color = 0x0000ff;
+	SDL_Color color = colorFromHex(0x0000ff);
 	int rectSize = 4;
 	int carSize = 8;
-	setColor(color);
 
 	for (PlayerTest &player : m_state->players)
 	{
@@ -273,31 +160,36 @@ void GameView::drawCars()
 		{
 			for (size_t i = ride.routeIndex + 1; i < ride.route.size(); i++)
 			{
-				SDL_RenderDrawLine(m_renderer,
-					(int)ride.route[i - 1].x,
-					(int)ride.route[i - 1].y,
-					(int)ride.route[i].x,
-					(int)ride.route[i].y
+				GPU_Line(
+					m_screen,
+					ride.route[i - 1].x,
+					ride.route[i - 1].y,
+					ride.route[i].x,
+					ride.route[i].y,
+					color
 				);
-
-				SDL_Rect rect;
-				rect.x = ride.route[i].x - rectSize / 2;
-				rect.y = ride.route[i].y - rectSize / 2;
-				rect.w = rectSize;
-				rect.h = rectSize;
-				SDL_RenderDrawRect(m_renderer, &rect);
+				GPU_Rectangle(
+					m_screen,
+					ride.route[i].x - rectSize / 2,
+					ride.route[i].y - rectSize / 2,
+					ride.route[i].x + rectSize / 2,
+					ride.route[i].y + rectSize / 2,
+					color
+				);
 			}
 
 			Point carLocation = ride.route[ride.routeIndex + 1] - ride.route[ride.routeIndex];
 			carLocation.scaleTo(ride.progress * carLocation.getLength());
 			carLocation += ride.route[ride.routeIndex];
 
-			SDL_Rect carRect;
-			carRect.x = carLocation.x - carSize / 2;
-			carRect.y = carLocation.y - carSize / 2;
-			carRect.w = carSize;
-			carRect.h = carSize;
-			SDL_RenderFillRect(m_renderer, &carRect);
+			GPU_RectangleFilled(
+					m_screen,
+					carLocation.x - carSize / 2,
+					carLocation.y - carSize / 2,
+					carLocation.x + carSize / 2,
+					carLocation.y + carSize / 2,
+					color
+				);
 		}
 	}
 }
@@ -305,88 +197,31 @@ void GameView::drawCars()
 
 void GameView::drawCreeps()
 {	
-	m_creepViews.render(m_renderer, m_state->creeps, m_state, m_prototypes);
-	return;
-	uint32_t color = 0xff0000;
-	int rectSize1 = 10;
-	int rectSize2 = 6;
-	setColor(color);
-	
-	for (CreepState &creep : m_state->creeps)
-	{
-		int rectSize = creep.weapon.prototypeId == 1 ? rectSize1 : rectSize2;
-		SDL_Rect rect;
-		rect.x = creep.unit.location.x - rectSize/2;
-		rect.y = creep.unit.location.y - rectSize/2;
-		rect.w = rectSize;
-		rect.h = rectSize;
-		SDL_RenderDrawRect(m_renderer, &rect);
-		
-		if (creep.unit.force == 1)
-		{
-			rectSize -= 2;		
-			
-			rect.x = creep.unit.location.x - rectSize/2;
-			rect.y = creep.unit.location.y - rectSize/2;
-			rect.w = rectSize;
-			rect.h = rectSize;
-			SDL_RenderDrawRect(m_renderer, &rect);
-			
-			rectSize -= 2;		
-			
-			rect.x = creep.unit.location.x - rectSize/2;
-			rect.y = creep.unit.location.y - rectSize/2;
-			rect.w = rectSize;
-			rect.h = rectSize;
-			SDL_RenderDrawRect(m_renderer, &rect);
-			
-		}
-	}
+	m_creepViews.render(m_screen, m_state->creeps, m_state, m_prototypes);
 }
 
 
 void GameView::drawProjectiles()
 {
-	
-	uint32_t color = 0xff00ff;
+	SDL_Color color = colorFromHex(0xff00ff);
 	int rectSize = 2;
-	setColor(color);
 	
 	for (Projectile &projectile : m_state->projectiles)
 	{
-		if (projectile.object.prototypeId != 3)
-		{
-			SDL_Rect rect;
-			rect.x = projectile.location.x - rectSize/2;
-			rect.y = projectile.location.y - rectSize/2;
-			rect.w = rectSize;
-			rect.h = rectSize;
-			SDL_RenderDrawRect(m_renderer, &rect);			
-		}
-	}
-	
-	color = 0x0;
-	rectSize = 3;
-	setColor(color);
-	
-	for (Projectile &projectile : m_state->projectiles)
-	{
-		if (projectile.object.prototypeId == 3)
-		{
-			SDL_Rect rect;
-			rect.x = projectile.location.x - rectSize/2;
-			rect.y = projectile.location.y - rectSize/2;
-			rect.w = rectSize;
-			rect.h = rectSize;
-			SDL_RenderDrawRect(m_renderer, &rect);			
-		}
+		GPU_Rectangle(
+			m_screen,
+			projectile.location.x - rectSize/2,
+			projectile.location.y - rectSize/2,
+			projectile.location.x + rectSize/2,
+			projectile.location.y + rectSize/2,
+			color
+		);	
 	}
 }
 
 void GameView::drawFormations()
 {
-	uint32_t color = 0xdddd00;
-	setColor(color);
+	SDL_Color color = colorFromHex(0xdddd00);
 	
 	for (auto& form : m_state->formations)
 	{
@@ -401,20 +236,20 @@ void GameView::drawFormations()
 		Point p3 = form.location + proto.BB.rotate(form.orientation + M_PI / 2);
 		Point p4 = form.location + BA.rotate(form.orientation + M_PI / 2);
 		
-		SDL_Point points[5];
+		float points[10];
 		
-		points[0].x = p1.x;
-		points[0].y = p1.y;		
-		points[1].x = p2.x;
-		points[1].y = p2.y;
-		points[2].x = p3.x;
-		points[2].y = p3.y;
-		points[3].x = p4.x;
-		points[3].y = p4.y;
-		points[4].x = p1.x;
-		points[4].y = p1.y;
+		points[0] = p1.x;
+		points[1] = p1.y;		
+		points[2] = p2.x;
+		points[3] = p2.y;
+		points[4] = p3.x;
+		points[5] = p3.y;
+		points[6] = p4.x;
+		points[7] = p4.y;
+		points[8] = p1.x;
+		points[9] = p1.y;
 		
-		SDL_RenderDrawLines(m_renderer, points, 5);
+		GPU_Polygon(m_screen, 5, points, color);
 		
 		//--------------------------------------------------------
 		int padding = 2;
@@ -424,18 +259,18 @@ void GameView::drawFormations()
 		Point pi4 = form.location + (BA + Point(-padding, padding)).rotate(form.orientation + M_PI / 2);
 		
 		
-		points[0].x = pi1.x;
-		points[0].y = pi1.y;		
-		points[1].x = pi2.x;
-		points[1].y = pi2.y;
-		points[2].x = pi3.x;
-		points[2].y = pi3.y;
-		points[3].x = pi4.x;
-		points[3].y = pi4.y;
-		points[4].x = pi1.x;
-		points[4].y = pi1.y;
+		points[0] = pi1.x;
+		points[1] = pi1.y;		
+		points[2] = pi2.x;
+		points[3] = pi2.y;
+		points[4] = pi3.x;
+		points[5] = pi3.y;
+		points[6] = pi4.x;
+		points[7] = pi4.y;
+		points[8] = pi1.x;
+		points[9] = pi1.y;
 		
-		SDL_RenderDrawLines(m_renderer, points, 5);
+		GPU_Polygon(m_screen, 5, points, color);
 		
 		//-------------------------------------------------------------------
 		Point pt1 = form.targetLocation + proto.AA.rotate(form.targetOrientation + M_PI / 2);
@@ -443,21 +278,22 @@ void GameView::drawFormations()
 		Point pt3 = form.targetLocation + proto.BB.rotate(form.targetOrientation + M_PI / 2);
 		Point pt4 = form.targetLocation + BA.rotate(form.targetOrientation + M_PI / 2);
 		
-		SDL_RenderDrawLine(m_renderer, p1.x, p1.y, pt1.x, pt1.y);
-		SDL_RenderDrawLine(m_renderer, p4.x, p4.y, pt4.x, pt4.y);
 		
-		points[0].x = pt1.x;
-		points[0].y = pt1.y;		
-		points[1].x = pt2.x;
-		points[1].y = pt2.y;
-		points[2].x = pt3.x;
-		points[2].y = pt3.y;
-		points[3].x = pt4.x;
-		points[3].y = pt4.y;
-		points[4].x = pt1.x;
-		points[4].y = pt1.y;
+		GPU_Line(m_screen, p1.x, p1.y, pt1.x, pt1.y, color);
+		GPU_Line(m_screen, p4.x, p4.y, pt4.x, pt4.y, color);
 		
-		SDL_RenderDrawLines(m_renderer, points, 5);
+		points[0] = pt1.x;
+		points[1] = pt1.y;		
+		points[2] = pt2.x;
+		points[3] = pt2.y;
+		points[4] = pt3.x;
+		points[5] = pt3.y;
+		points[6] = pt4.x;
+		points[7] = pt4.y;
+		points[8] = pt1.x;
+		points[9] = pt1.y;
+		
+		GPU_Polygon(m_screen, 5, points, color);
 		
 		for (size_t i = 0; i < form.slots.size(); i++)
 		{
@@ -466,25 +302,40 @@ void GameView::drawFormations()
 			auto& slot = form.slots[i];
 			Point slotLocation = Creeps::getCurrentSlotLocation(form, i);
 				
-			SDL_Rect rect;
-			rect.x = slotLocation.x - slotSize/2;
-			rect.y = slotLocation.y - slotSize/2;
-			rect.w = slotSize;
-			rect.h = slotSize;
-			SDL_RenderDrawRect(m_renderer, &rect);			
+			
+			GPU_Rectangle(
+				m_screen,
+				slotLocation.x - slotSize/2,
+				slotLocation.y - slotSize/2,
+				slotLocation.x + slotSize/2,
+				slotLocation.y + slotSize/2,
+				color
+			);
 			
 			if (slot > 0)
 			{
 				slotSize /=2;
-				rect.x = slotLocation.x - slotSize/2;
-				rect.y = slotLocation.y - slotSize/2;
-				rect.w = slotSize;
-				rect.h = slotSize;
-				SDL_RenderDrawRect(m_renderer, &rect);
+				GPU_Rectangle(
+					m_screen,
+					slotLocation.x - slotSize/2,
+					slotLocation.y - slotSize/2,
+					slotLocation.x + slotSize/2,
+					slotLocation.y + slotSize/2,
+					color
+				);
 				
 				auto creep = std::find_if(m_state->creeps.begin(), m_state->creeps.end(), [slot](CreepState& creep){ return creep.object.id == slot; });
 				if (creep != m_state->creeps.end())
-					SDL_RenderDrawLine(m_renderer, slotLocation.x, slotLocation.y, creep->unit.location.x, creep->unit.location.y);
+				{
+					GPU_Line(
+						m_screen, 
+						slotLocation.x, 
+						slotLocation.y, 
+						creep->unit.location.x, 
+						creep->unit.location.y, 
+						color
+					);
+				}
 			}
 		}
 	}

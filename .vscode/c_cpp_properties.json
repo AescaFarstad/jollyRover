@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}",
                 "/usr/include/SDL2/",
+                "/usr/local/include/SDL_gpu/",
                 "${workspaceFolder}/client",
                 "${workspaceFolder}/client/view",
                 "${workspaceFolder}/shared",
@@ -23,6 +24,7 @@
 				"path": [
                 "${workspaceFolder}",
                 "/usr/include/SDL2/",
+                "/usr/local/include/SDL_gpu/",
                 "${workspaceFolder}/client",
                 "${workspaceFolder}/client/view",
                 "${workspaceFolder}/shared",

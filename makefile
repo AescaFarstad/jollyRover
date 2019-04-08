@@ -37,7 +37,7 @@ DIR_SHARED +=shared/utils
 DIR_SHARED +=shared/model/ref
 
 
-INC_PARAMS_CLIENT=$(foreach d, $(DIR_CLIENT), -I$d) $(foreach d, $(DIR_SHARED), -I$d) -I/usr/include/SDL2/
+INC_PARAMS_CLIENT=$(foreach d, $(DIR_CLIENT), -I$d) $(foreach d, $(DIR_SHARED), -I$d) -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu
 INC_PARAMS_SERVER=$(foreach d, $(DIR_SERVER), -I$d) $(foreach d, $(DIR_SHARED), -I$d)
 
 SOURCES_CLIENT = $(foreach d, $(DIR_CLIENT), $(wildcard $d/*.cpp)) $(foreach d, $(DIR_SHARED), $(wildcard $d/*.cpp))
@@ -85,7 +85,7 @@ $(OBJDIR_CLIENT_LOCAL)/%.bc : %.cpp
 	
 $(OBJDIR_CLIENT_WEB)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
-	$(WEB_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -I/usr/local/include/SDL_gpu -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -c -o $@ $<
+	$(WEB_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -c -o $@ $<
 	
 $(OBJDIR_CLIENT_SERVER)/%.bc : %.cpp
 	@mkdir -p $(dir $@)

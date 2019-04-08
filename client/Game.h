@@ -2,10 +2,8 @@
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL.h>
-	#include <SDL_gpu.h>
 #else 
-	#include <SDL2/SDL.h>
-	#include <SDL_gpu.h>
+	#include <SDL.h>
 #endif
 
 #include <Network.h>
@@ -15,6 +13,7 @@
 #include <TaskManager.h>
 #include <Prototypes.h>
 #include <RouteInput.h>
+#include <SDL_gpu.h>
 
 class Game
 {
