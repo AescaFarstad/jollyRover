@@ -33,6 +33,7 @@ public:
 	CreepProto* _creepProto;
 	WeaponProto* _weaponProto;
 	Point movement_;
+	Point targetLoc_;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;

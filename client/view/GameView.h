@@ -6,6 +6,8 @@
 #include <CreepView.h>
 #include <memory>
 #include <SDL_gpu.h>
+#include <Renderer.h>
+
 #ifdef __EMSCRIPTEN__
 	#include <SDL_image.h>
 	#include <SDL.h>
@@ -30,6 +32,8 @@ private:
 	bool m_isInitialized;
 	GameState* m_state;
 	RouteInput* m_routeInput;
+	Renderer m_renderer;
+	GPU_Image* m_image;
 	
 	ViewController<CreepState, CreepView> m_creepViews; 
 

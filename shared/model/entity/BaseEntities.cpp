@@ -19,6 +19,7 @@ void Unit::deserialize(SerializationStream &stream)
 	Serializer::read(force, stream);
 	Serializer::read(health, stream);
 	Serializer::read(location, stream);
+	Serializer::read(voluntaryMovement, stream);
 }
 
 void Unit::serialize(SerializationStream &stream) const
@@ -26,6 +27,7 @@ void Unit::serialize(SerializationStream &stream) const
 	Serializer::write(force, stream);
 	Serializer::write(health, stream);
 	Serializer::write(location, stream);
+	Serializer::write(voluntaryMovement, stream);
 }
 
 

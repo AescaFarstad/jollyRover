@@ -14,7 +14,8 @@ GameView::GameView(GPU_Target* screen, Prototypes* prototypes)
 
 GameView::~GameView()
 {
-	
+	if (m_image != nullptr)
+		GPU_FreeImage(m_image);
 }
 
 void GameView::render(GameState* state, RouteInput* routeInput)
@@ -43,6 +44,13 @@ void GameView::init()
 	SDL_SetWindowSize(m_window, m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight);
 	GPU_SetWindowResolution(m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight);
 	SDL_SetWindowPosition(m_window, S::config.window_X, S::config.window_Y);
+	
+	m_image = GPU_LoadImage("out/assets/atlas.png");
+ 	if (!m_image)
+ 		THROW_FATAL_ERROR("IMG IS NULL")
+ 	GPU_SetSnapMode(m_image, GPU_SNAP_NONE);
+	 
+	m_renderer.init(m_screen, m_image);
 	m_isInitialized = true;
 	
 }
@@ -87,8 +95,6 @@ void GameView::drawObstacles()
 			points[i] = obstacle.vertices[i / 2].x;
 			points[i + 1] = obstacle.vertices[i / 2].y;
 		}
-		//points[count - 2] = obstacle.vertices[0].x;
-		//points[count - 1] = obstacle.vertices[0].y;
 		
 		GPU_Polygon(m_screen, count, points, obstacleColor);
 		delete[] points;
@@ -100,19 +106,7 @@ void GameView::drawObstacles()
 			obstacle.centroid.x + centroidSize/2,
 			obstacle.centroid.y + centroidSize/2,
 			obstacleColor);
-	}/*
-	float* points = new float[6];
-	points[0] = 100;
-	points[1] = 100;
-	points[2] = 50;
-	points[3] = 150;
-	points[4] = 150;
-	points[5] = 150;
-	
-	GPU_Polygon(m_screen, 3, points, obstacleColor);
-	
-	delete[] points;*/
-	
+	}	
 }
 
 void GameView::drawInput()
@@ -197,7 +191,7 @@ void GameView::drawCars()
 
 void GameView::drawCreeps()
 {	
-	m_creepViews.render(m_screen, m_state->creeps, m_state, m_prototypes);
+	m_creepViews.render(&m_renderer, m_state->creeps, m_state, m_prototypes);
 }
 
 

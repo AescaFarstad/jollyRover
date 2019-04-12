@@ -16,6 +16,7 @@ SERVER_LIBS := -lSDL2 -lSDL2_net -lutil
 
 DIR_CLIENT =client
 DIR_CLIENT +=client/view
+DIR_CLIENT +=client/resources
 
 DIR_SERVER =server
 DIR_SERVER +=server/network
@@ -66,9 +67,10 @@ web: $(SUBOBJ_WEB)
 	rsync -r assets/ out/assets/
 	$(WEB_COMPILER) \
 		-O2 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 \
-		-s WASM=0 -s TRACE_WEBGL_CALLS=1 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
+		-s WASM=0 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
 		--use-preload-plugins -v -o $(WEB_TARGET).html lib/SDL_gpu.bc $(SUBOBJ_WEB) \
-		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets --embed-file out/assets/sheet_tanks.png
+		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets
+	sed -i 's/antialias\:false/antialias\:true/g' $(WEB_TARGET).js
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
 server: $(SUBOBJ_SERVER)

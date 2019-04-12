@@ -26,6 +26,7 @@ public:
 	bool isNaN();
 	float getLength();
 	float asAngle();
+	float asAngleInDegrees();
 	std::string toString();
 
 	float distanceTo(const Point& anotherPoint);

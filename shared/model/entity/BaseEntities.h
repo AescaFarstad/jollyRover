@@ -27,6 +27,7 @@ public:
 	int16_t force;
 	int32_t health;
 	Point location;
+	Point voluntaryMovement;
 	
 
 	void deserialize(SerializationStream& stream);

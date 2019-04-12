@@ -284,13 +284,14 @@ namespace Creeps
 				return;
 			}
 			
+			creep.targetLoc_ = target->unit.location;
 			if (target->unit.location.distanceTo(creep.unit.location) < creep._weaponProto->range)
 			{
 				performCreepAttack(creep, target->unit, state, timePassed);
 			}
 			else
 			{
-				moveCreepTowardsPoint(creep, target->unit.location, prototypes, timePassed);
+				moveCreepTowardsPoint(creep, target->unit.location, prototypes, timePassed);				
 			}
 		}
 		
@@ -349,10 +350,12 @@ namespace Creeps
 					step = *bestPoint - creep.unit.location;
 					step.scaleTo(stepSize);
 					creep.movement_ = step;
+					creep.unit.voluntaryMovement = step;
 					return;
 				}
 			}
 			creep.movement_ = step;
+			creep.unit.voluntaryMovement = step;
 		}
 		
 		CreepState* creepByid(int32_t id, std::vector<CreepState>& creeps)

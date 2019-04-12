@@ -1,6 +1,7 @@
 #include <GameState.h>
 #include <Prototypes.h>
 #include <SDL_gpu.h>
+#include <Renderer.h>
 #ifdef __EMSCRIPTEN__
 	#include <SDL.h>
 #else 
@@ -15,7 +16,7 @@ public:
 	
 	int16_t m_id;
 	
-	void render(GPU_Target* screen, CreepState& creep, GameState* state, Prototypes* prototypes);
+	void render(Renderer* renderer, CreepState& creep, GameState* state, Prototypes* prototypes);
 	
 	
 private:

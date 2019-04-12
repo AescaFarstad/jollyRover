@@ -49,6 +49,11 @@ float Point::asAngle()
 	return FMath::atan2(y, x);
 }
 
+float Point::asAngleInDegrees()
+{
+	return FMath::atan2(y, x) * 180 / M_PI;
+}
+
 std::string Point::toString()
 {
 	std::stringstream stream;

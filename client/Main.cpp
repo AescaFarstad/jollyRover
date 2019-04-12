@@ -9,6 +9,7 @@
 
 #ifdef __EMSCRIPTEN__
 	#include <emscripten.h>
+	#include <emscripten/html5.h>
 	#include <SDL.h>
 #elif LINUX
 	#include <pty.h>
@@ -85,14 +86,49 @@ int main(int argc, char* args[])
 		termios params;
 		openpty(&amaster, &slave, NULL, &params, NULL);
 	#endif
-#endif
-	printf("endiness: %s\n", (SystemInfo::instance->isBigEndian ? "big" : "little"));
+#else
+/*
+typedef struct EmscriptenWebGLContextAttributes {
+  EM_BOOL alpha;
+  EM_BOOL depth;
+  EM_BOOL stencil;
+  EM_BOOL antialias;
+  EM_BOOL premultipliedAlpha;
+  EM_BOOL preserveDrawingBuffer;
+  EM_BOOL preferLowPowerToHighPerformance;
+  EM_BOOL failIfMajorPerformanceCaveat;
 
-	if (SDL_Init(SDL_INIT_VIDEO) < 0)
-	{
-		printf("Failed to initialize SDL %s\n", SDL_GetError());
-		return 0;
-	}
+  int majorVersion;
+  int minorVersion;
+
+  EM_BOOL enableExtensionsByDefault;
+  EM_BOOL explicitSwapControl;
+  EM_BOOL renderViaOffscreenBackBuffer;
+} EmscriptenWebGLContextAttributes;
+*/
+	EmscriptenWebGLContextAttributes webGlContextAttributes{
+		EM_FALSE,
+		EM_FALSE,
+		EM_FALSE,
+		EM_TRUE,
+		EM_FALSE,
+		EM_FALSE,
+		EM_FALSE,
+		EM_FALSE,
+		
+		2,
+		0,
+		
+		EM_TRUE,
+		EM_FALSE,
+		EM_FALSE
+	};
+	emscripten_webgl_init_context_attributes(&webGlContextAttributes);
+#endif
+
+
+	printf("endiness: %s\n", (SystemInfo::instance->isBigEndian ? "big" : "little"));
+	
 	screen = GPU_InitRenderer(GPU_RENDERER_GLES_2, SCREEN_WIDTH, SCREEN_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
 	printRenderers();
 	printCurrentRenderer();
@@ -110,6 +146,18 @@ int main(int argc, char* args[])
 #ifdef __EMSCRIPTEN__
 	printf("EMSCRIPTEN mode\n");
 	emscripten_set_main_loop_arg(mainLoop, NULL, -1, true);
+	
+	emscripten_webgl_init_context_attributes(&webGlContextAttributes);
+	
+	EmscriptenWebGLContextAttributes attr;
+	attr.depth=true;
+	attr.antialias=true;
+	attr.alpha=true;
+	attr.stencil=true;
+	attr.majorVersion=3;
+	attr.minorVersion=3;
+	emscripten_webgl_init_context_attributes(&attr);
+	
 #else
 	printf("Endless loop mode\n");
 	while (!isFinished)
