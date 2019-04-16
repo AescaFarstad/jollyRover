@@ -24,6 +24,7 @@ public:
 	float y;
 
 	void scaleTo(float length);
+	void scaleBy(float value);
 	void setToNaN();
 	bool isNaN();
 	float getLength();

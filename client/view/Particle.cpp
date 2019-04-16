@@ -1,6 +1,12 @@
 #include <Particle.h>
 #include <FMath.h>
 
+Particle::Particle()
+{
+	texture = nullptr;
+	sequence = nullptr;
+}
+
 void Particle::render(Renderer* renderer, int32_t time)
 {
 	time -= delay;
@@ -11,7 +17,14 @@ void Particle::render(Renderer* renderer, int32_t time)
 	current.rotation = FMath::lerp(0, from.rotation, duration, to.rotation, time);
 	current.scale = FMath::lerp(0, from.scale, duration, to.scale, time);
 	current.tint = FMath::lerp(0, from.tint, duration, to.tint, time);
-		
-	renderer->blit(*texture, current);
-		
+	
+	if (sequence)
+	{
+		int32_t frame = FMath::lerp(0.f, 0.f, duration, sequence->frames.size(), time);
+		renderer->blit(sequence->frames[frame], current);
+	}
+	else
+	{
+		renderer->blit(*texture, current);
+	}
 }

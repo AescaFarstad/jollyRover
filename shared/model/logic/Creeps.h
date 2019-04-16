@@ -12,7 +12,7 @@ namespace Creeps
 	namespace CreepsInternal
 	{
 		CreepState& spawnCreep(int16_t type, const Point& location, GameState* state, Prototypes* prototypes);
-		void spawnProjectile(Point& from, Point& to, const WeaponProto* prototype, GameState* state);
+		void spawnProjectile(Point& from, Point& to, const WeaponProto* prototype, int16_t force, GameState* state);
 		
 		void preprocessCreeps(GameState* state, Prototypes* prototypes);
 		void spawnFormation(GameState* state, Prototypes* prototypes, ForceProto& forceProto, FormationProto &formationProto);

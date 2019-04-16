@@ -9,7 +9,7 @@ GameView::GameView(GPU_Target* screen, Prototypes* prototypes)
 	this->m_prototypes = prototypes;
 
 	m_isInitialized = false;
-	
+	m_loadCount = 0;
 }
 
 GameView::~GameView()
@@ -25,6 +25,13 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 
 	this->m_state = state;
 	this->m_routeInput = routeInput;
+	
+	if (state->loadCount != m_loadCount)
+	{
+		m_loadCount = state->loadCount;
+		m_projectileExplosions.clear();
+		m_unitDeaths.clear();
+	}
 	
 	SDL_Color white = colorFromHex(0xffffff);
 	GPU_RectangleFilled(m_screen, 0, 0, m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight, white);
@@ -405,6 +412,13 @@ void GameView::drawUnitExplosion()
 {
 	if (!m_state->isEventLoggerEnabled)
 		return;
+	m_unitDeaths.render(
+			&m_renderer, 
+			m_state->eventLogger.unitDeaths.begin(), 
+			m_state->eventLogger.unitDeaths.end(),
+			m_state, 
+			m_prototypes
+		);	
 		/*
 	size_t unitsTotal = std::min(m_state->eventLogger.unitDeaths.size, m_state->eventLogger.unitDeaths.total);
 	int32_t minTime = m_state->time.time - m_prototypes->variables.maxEventAnimationTime;

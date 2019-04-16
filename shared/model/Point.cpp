@@ -35,6 +35,12 @@ void Point::scaleTo(float length)
 	}
 }
 
+void Point::scaleBy(float value)
+{
+	x *= value;
+	y *= value;
+}
+
 void Point::setToNaN()
 {
 	x = std::numeric_limits<float>::quiet_NaN();

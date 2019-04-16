@@ -34,6 +34,7 @@ public:
 	WeaponProto* _weaponProto;
 	Point movement_;
 	Point targetLoc_;
+	Point impact_;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;

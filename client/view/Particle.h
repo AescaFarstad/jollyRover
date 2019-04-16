@@ -5,7 +5,7 @@
 class Particle
 {
 public:
-	Particle() = default;
+	Particle();
 	
 	int32_t delay;
 	int32_t duration;

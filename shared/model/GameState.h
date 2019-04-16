@@ -37,6 +37,7 @@ public:
 	TimeState time;
 	uint32_t timeStamp;
 	uint32_t idCounter;
+	uint32_t loadCount;
 	bool isEventLoggerEnabled;
 	EventLogger eventLogger;
 	

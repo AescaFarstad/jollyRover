@@ -23,13 +23,13 @@ public:
 
     FixedCircularIterator<T, arraySize>& operator+=(const ptrdiff_t& movement)
 	{
-		m_ptr = (m_ptr - m_start + movement) % m_rawLength + m_start;
+		m_ptr = (m_ptr - m_start + movement) % arraySize + m_start;
 		return (*this);
 	}
 	
     FixedCircularIterator<T, arraySize>& operator-=(const ptrdiff_t& movement)	
 	{
-		m_ptr = (m_ptr - m_start + movement) % m_rawLength + m_start;
+		m_ptr = (m_ptr - m_start + movement) % arraySize + m_start;
 		return (*this);
 	}	
 	

@@ -315,6 +315,7 @@ void GameLogic::handleGameLoad(LoadGameMessage* input, Prototypes* prototypes)
 	auto stream = SerializationStream::createExp();
 	auto stamp = state->timeStamp;
 	TimeState time = state->time;
+	int32_t loadCount = state->loadCount;
 	auto players = state->players;
 	
 	stream->write(input->state, input->stateLength); 
@@ -327,6 +328,7 @@ void GameLogic::handleGameLoad(LoadGameMessage* input, Prototypes* prototypes)
 		state->time.allowedSteps = time.allowedSteps - time.performedSteps + state->time.performedSteps;
 	state->time.forcedTimeScale = time.forcedTimeScale;	
 	state->time.timeScale = time.timeScale;
+	state->loadCount = loadCount + 1;
 	//state->players = players;
 	//TODO keep existing players in game
 	

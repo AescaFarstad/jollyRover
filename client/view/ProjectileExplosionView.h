@@ -21,7 +21,9 @@ private:
 	int32_t m_endTime;
 	int32_t m_seed;
 	std::vector<Particle> particles;
+	std::vector<TextureDef> shreds;
 	
 };
 
 extern template void ProjectileExplosionView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes);
+extern template void ProjectileExplosionView::render<UnitDeathEvent>(Renderer* renderer, UnitDeathEvent& event, GameState* state, Prototypes* prototypes);

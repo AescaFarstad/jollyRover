@@ -4,6 +4,7 @@ void Projectile::deserialize(SerializationStream & stream)
 {
 	Serializer::read(object, stream);
 	Serializer::read(damage, stream);
+	Serializer::read(force, stream);
 	Serializer::read(splash, stream);
 	Serializer::read(speed, stream);
 	Serializer::read(target, stream);
@@ -14,6 +15,7 @@ void Projectile::serialize(SerializationStream & stream) const
 {
 	Serializer::write(object, stream);
 	Serializer::write(damage, stream);
+	Serializer::write(force, stream);
 	Serializer::write(splash, stream);
 	Serializer::write(speed, stream);
 	Serializer::write(target, stream);

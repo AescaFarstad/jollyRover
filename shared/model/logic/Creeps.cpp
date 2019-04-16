@@ -304,7 +304,7 @@ namespace Creeps
 			else
 			{
 				creep.weapon.attackCooldown = 1000000 / creep._weaponProto->attackSpeed;
-				spawnProjectile(creep.unit.location, target.location, creep._weaponProto, state);
+				spawnProjectile(creep.unit.location, target.location, creep._weaponProto, creep.unit.force, state);
 			}
 		}
 		
@@ -480,7 +480,7 @@ namespace Creeps
 			
 		}
 		
-		void spawnProjectile(Point& from, Point& to, const WeaponProto* prototype, GameState* state)
+		void spawnProjectile(Point& from, Point& to, const WeaponProto* prototype, int16_t force, GameState* state)
 		{
 			state->projectiles.emplace_back();
 			Projectile& projectile = state->projectiles.back();
@@ -494,6 +494,7 @@ namespace Creeps
 			projectile.damage = prototype->damage;
 			projectile.target = to;
 			projectile.location = from;
+			projectile.force = force;
 			
 			projectile.target.x += state->random.get(-1.0f, 1.0f) * distance * 0.1;
 			projectile.target.y += state->random.get(-1.0f, 1.0f) * distance * 0.1;
@@ -513,11 +514,21 @@ namespace Creeps
 				}
 				else
 				{
-					for(CreepState& creep : state->creeps)
+					direction.scaleBy(-1);
+					std::vector<CreepState*> localCreeps = state->creepMap_.getInRadius(proj.target, proj.splash + prototypes->variables.maxCreepSize);
+					for(auto& creep : localCreeps)
 					{
-						if (creep.unit.location.distanceTo(proj.target) < proj.splash)
+						int32_t r = proj.splash + creep->_creepProto->size;
+						if (creep->unit.location.sqDistanceTo(proj.target) < r*r)
 						{
-							creep.unit.health -= proj.damage;
+							creep->unit.health -= proj.damage;
+							if (creep->unit.health <= 0)
+							{
+								if (proj.force != creep->unit.force)
+									creep->impact_ = direction;
+								else
+									creep->impact_ = creep->unit.location - proj.target;
+							}
 						}
 					}
 					proj.damage = -1;
@@ -560,7 +571,7 @@ namespace Creeps
 						}
 					}
 					if (state->isEventLoggerEnabled)
-						state->eventLogger.addUnitDeath(state->time.time, creep.object.id, creep.object.prototypeId, creep.unit.location);
+						state->eventLogger.addUnitDeath(state->time.time, creep.object.id, creep.object.prototypeId, creep.unit.location, creep.unit.voluntaryMovement.asAngle(), creep.impact_);
 				}
 			}
 			

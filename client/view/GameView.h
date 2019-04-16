@@ -35,6 +35,9 @@ private:
 	Renderer m_renderer;
 	GPU_Image* m_image;	
 	ViewController<ProjectileExplosionView> m_projectileExplosions;	
+	ViewController<ProjectileExplosionView> m_unitDeaths;	
+	
+	int32_t m_loadCount;
 
 	void init();
 	void setColor(uint32_t color);

@@ -33,14 +33,15 @@ void ProjectileExplosionEvent::serialize(SerializationStream& stream) const
 	Serializer::write(location, stream);
 }
 
-UnitDeathEvent::UnitDeathEvent(int32_t id, int32_t stamp, int32_t unitId, int16_t prototypeId, Point location)
+UnitDeathEvent::UnitDeathEvent(int32_t id, int32_t stamp, int32_t unitId, int16_t prototypeId, Point location, float rotation, Point impact)
 {
 	this->stamp = stamp;
 	this->id = id;
 	this->unitId = unitId;
 	this->prototypeId = prototypeId;
 	this->location = location;
-	
+	this->rotation = rotation;
+	this->impact = impact;	
 }
 	
 void UnitDeathEvent::deserialize(SerializationStream& stream)
@@ -50,6 +51,8 @@ void UnitDeathEvent::deserialize(SerializationStream& stream)
 	Serializer::read(unitId, stream);
 	Serializer::read(prototypeId, stream);
 	Serializer::read(location, stream);
+	Serializer::read(rotation, stream);
+	Serializer::read(impact, stream);
 }
 
 void UnitDeathEvent::serialize(SerializationStream& stream) const 
@@ -59,6 +62,13 @@ void UnitDeathEvent::serialize(SerializationStream& stream) const
 	Serializer::write(unitId, stream);
 	Serializer::write(prototypeId, stream);
 	Serializer::write(location, stream);
+	Serializer::write(rotation, stream);
+	Serializer::write(impact, stream);
+}
+
+int32_t UnitDeathEvent::getId()
+{
+	return id;
 }
 
 EventLogger::EventLogger()

@@ -23,13 +23,17 @@ class UnitDeathEvent
 {
 public:
 	UnitDeathEvent() = default;
-	UnitDeathEvent(int32_t id, int32_t stamp, int32_t unitId, int16_t prototypeId, Point location);
+	UnitDeathEvent(int32_t id, int32_t stamp, int32_t unitId, int16_t prototypeId, Point location, float rotation, Point impact);
 	
 	int32_t stamp;
 	int32_t id;
 	int32_t unitId;
 	int16_t prototypeId;
 	Point location;
+	float rotation;
+	Point impact;
+	
+	int32_t getId();
 	
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;

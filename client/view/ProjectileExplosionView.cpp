@@ -16,9 +16,105 @@ void ProjectileExplosionView::render(Renderer* renderer, T& event, GameState* st
 	}	
 }
 
-void ProjectileExplosionView::init(int32_t seed, ProjectileExplosionEvent& event, GameState* state)
+void ProjectileExplosionView::init(int32_t seed, UnitDeathEvent& event, GameState* state)
 {	
-	m_startTime = state->time.time;
+	m_startTime = event.stamp;
+	m_seed = seed;
+	SeededRandom random(seed);
+	
+	if (event.prototypeId == 0)
+	{
+		Particle p;
+		p.sequence = &S::sequences.explosion;
+		p.delay = 0;
+		p.duration = 300;
+		m_endTime = m_startTime + p.duration;
+		p.from.location = event.location;
+		p.from.location.x += random.get(-10.f, 10.f);
+		p.from.location.y += random.get(-10.f, 10.f);
+		p.from.rotation = random.get(0.f, 2*M_PI);
+		p.from.scale = 1;
+		p.from.tint = colorFromHex(0xffffff, 0xff);
+		p.to = p.from;
+		particles.push_back(p);
+		
+		int32_t wShreds = random.get(5, 8);
+		int32_t hShreds = random.get(5, 8);
+		
+		p.sequence = nullptr;
+		shreds.reserve(wShreds * hShreds);
+		
+		int32_t baseDuration = random.get(400, 900);
+		
+		
+		for(int32_t i = 0; i < wShreds; i++)
+		{
+			for(int32_t j = 0; j < hShreds; j++)
+			{
+				shreds.emplace_back();
+				TextureDef& td = shreds.back();
+				GPU_Rect& origin = S::textures.tanks_2.tankBody_sand.rect;
+				
+				td.rect.x = origin.x + origin.w * i / wShreds;
+				td.rect.y = origin.y + origin.h * j / hShreds;
+				td.rect.w = origin.w / wShreds;
+				td.rect.h = origin.h / hShreds;
+				
+				p.sequence = nullptr;
+				p.texture = &td;
+				p.duration = baseDuration + random.get(0, 600);
+				
+				p.from.rotation = event.rotation;
+				
+				Point c2c = Point(origin.w * (i + 0.5) / wShreds,  origin.h * (j + 0.5) / hShreds) - Point(origin.w/2, origin.h/2);
+				c2c.rotate(p.from.rotation, c2c);  
+				p.from.location = event.location + c2c;
+				
+				p.from.scale = 1;
+				p.from.tint = colorFromHex(0xdddddd, 0xff);
+				
+				if (event.impact.getLength() > 0)
+				{
+					auto imp = event.impact;
+					imp.scaleTo(origin.w/3 + origin.h/3);
+					c2c += imp;
+				}	
+				c2c.scaleBy(random.get(1.f, 3.f));
+				c2c.rotate(random.get(-0.05f, 0.05f));
+				
+				p.to = p.from;
+				p.to.location = event.location + c2c;
+				p.to.tint = colorFromHex(0x666666, 0x11);
+				if (random.get() > 0.7)
+					p.to.rotation += random.get((float)-M_PI * 10, (float)M_PI * 10); 
+				
+				m_endTime = std::max(m_endTime, m_startTime + p.delay + p.duration);
+				particles.push_back(p);
+			}
+		}
+	}
+	else
+	{
+		Particle p;
+		p.texture = &S::textures.tanks_1.Smoke.smokeOrange0;
+		p.delay = 0;
+		p.duration = random.get(4500, 14500);
+		m_endTime = m_startTime + p.duration;
+		p.from.location = event.location;
+		p.from.rotation = random.get(0.f, 2*M_PI);
+		p.from.scale = 0.1;
+		p.from.tint = colorFromHex(0xffffff, 0xff);		
+		p.to = p.from;
+		p.to.tint.a = 0x10;
+		p.to.scale = 0.2;
+		particles.push_back(p);
+	}
+}
+
+
+void ProjectileExplosionView::init(int32_t seed, ProjectileExplosionEvent& event, GameState* state)
+{
+	m_startTime = event.stamp;
 	m_endTime = 0;
 	m_seed = seed;
 	SeededRandom random(seed);
@@ -82,5 +178,7 @@ void ProjectileExplosionView::init(int32_t seed, ProjectileExplosionEvent& event
 	
 }
 
+
 template void ProjectileExplosionView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes);
+template void ProjectileExplosionView::render<UnitDeathEvent>(Renderer* renderer, UnitDeathEvent& event, GameState* state, Prototypes* prototypes);
 	

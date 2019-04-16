@@ -11,6 +11,7 @@ public:
 	
 	Object object;
 	int32_t damage;
+	int16_t force;
 	int32_t splash;
 	int32_t speed;
 	Point target;
