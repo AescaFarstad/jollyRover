@@ -231,7 +231,7 @@ namespace Creeps
 				balance /= creepBalanceCount;
 				//balance = std::min(-maxDisabalance, balance);
 				
-				formation.speedMulti = FMath::lerp(0, 0.9, -20, 0.5, balance);
+				formation.speedMulti = FMath::lerp(0, 0.9f, -20, 0.5f, balance);
 				formation.speedMulti = std::max(0.1f, formation.speedMulti);
 				
 				Point formation2Target = formation.targetLocation - formation.location;
@@ -486,7 +486,7 @@ namespace Creeps
 			Projectile& projectile = state->projectiles.back();
 			
 			auto distance = from.distanceTo(to);
-			
+					
 			projectile.object.id = state->idCounter++;
 			projectile.object.prototypeId = prototype->id;
 			projectile.speed = prototype->bulletSpeed;
@@ -527,36 +527,47 @@ namespace Creeps
 		
 		void removeDeadProjectiles(GameState* state)
 		{
+			if (state->isEventLoggerEnabled)
+			{
+				for(auto& p : state->projectiles)
+				{
+					if (p.damage == -1)
+						state->eventLogger.addProjectileExplosion(state->time.time, p.object.id, p.object.prototypeId, p.target);
+				}
+			}
+			
 			state->projectiles.erase(std::remove_if(state->projectiles.begin(), state->projectiles.end(), 
 			[](Projectile& proj){
 				return proj.damage == -1;
 				}
-			), state->projectiles.end());
+			),  state->projectiles.end());
 		}
 		
 		void removeDeadCreeps(GameState* state)
 		{
-			auto removeFrom = std::remove_if(state->creeps.begin(), state->creeps.end(), 
-			[](CreepState& creep){
-				return creep.unit.health <= 0;
-				});
-			auto iter = removeFrom;
-			while(iter != state->creeps.end())
+			for(auto& creep : state->creeps)
 			{
-				if (iter->formationId)
+				if (creep.unit.health <= 0)
 				{
-					auto formation = std::find_if(state->formations.begin(), state->formations.end(), [id = iter->formationId](FormationState& form){ 
-						return form.object.id == id;
-					});
-					if (formation != state->formations.end())
+					if (creep.formationId)
 					{
-						formation->isDisposed_ = true;
+						auto formation = std::find_if(state->formations.begin(), state->formations.end(), [id = creep.formationId](FormationState& form){ 
+							return form.object.id == id;
+						});
+						if (formation != state->formations.end())
+						{
+							formation->isDisposed_ = true;
+						}
 					}
+					if (state->isEventLoggerEnabled)
+						state->eventLogger.addUnitDeath(state->time.time, creep.object.id, creep.object.prototypeId, creep.unit.location);
 				}
-				iter++;
 			}
 			
-			state->creeps.erase(removeFrom,  state->creeps.end());
+			state->creeps.erase(std::remove_if(state->creeps.begin(), state->creeps.end(), 
+				[](CreepState& creep){
+					return creep.unit.health <= 0;
+					}),  state->creeps.end());
 		}
 		
 		void removeDeadFormations(GameState* state)

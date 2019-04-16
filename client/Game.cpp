@@ -103,7 +103,7 @@ Game::Game(GPU_Target* screen)
 			m_clientToServerDelta = m_network->timeSync.localToServerUpperBound(0);
 			S::log.add("server time delta: " + std::to_string(m_clientToServerDelta) + 
 					" uncertainty: " + std::to_string(m_network->timeSync.getUncertainty()), { LOG_TAGS::NET });
-			m_gameUpdater.load(std::unique_ptr<GameState>(gameStateMsg->state), &m_prototypes);
+			m_gameUpdater.load(std::unique_ptr<GameState>(gameStateMsg->state), &m_prototypes, true);
 			gameStateMsg->ownsState = false;
 			
 			addNetworkBindings();

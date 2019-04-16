@@ -22,6 +22,8 @@ void VariableProto::load(json &source)
 	stepAngleWindow = source.at("stepAngleWindow");
 	creepRestitution = source.at("creepRestitution");
 	
+	maxEventAnimationTime = source.at("maxEventAnimationTime");
+	
 	intensity = source.at("war").at("intensity");
 	
 	fieldCenter.x = fieldWidth/2;

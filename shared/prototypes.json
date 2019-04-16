@@ -8,6 +8,7 @@
 		"maxRouteSteps": 4400,
 		"stepAngleWindow": 3.14,
 		"creepRestitution": 0.5,
+		"maxEventAnimationTime": 1000,
 		"war":{
 			"intensity": 1000
 		}
@@ -210,7 +211,7 @@
 			"id": 0,
 			"name":"tank",
 			"maxHealth":200,
-			"speed": 50,
+			"speed": 80,
 			"strength":1000,
 			"loot": 100,
 			"weapon": 0,
@@ -223,7 +224,7 @@
 			"id": 1,
 			"name":"soldier",
 			"maxHealth":40,
-			"speed": 25,
+			"speed": 75,
 			"strength":10,
 			"loot": 0,		
 			"weapon": 1,

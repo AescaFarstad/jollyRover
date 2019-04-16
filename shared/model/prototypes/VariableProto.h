@@ -27,6 +27,7 @@ public:
 	int32_t intensity;
 	
 	int32_t maxCreepSize;
+	int32_t maxEventAnimationTime;
 	
 
 	void load(json &source);

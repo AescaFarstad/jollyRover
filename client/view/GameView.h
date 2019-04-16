@@ -2,11 +2,11 @@
 #include <GameState.h>
 #include <Prototypes.h>
 #include <RouteInput.h>
-#include <ViewController.h>
-#include <CreepView.h>
 #include <memory>
 #include <SDL_gpu.h>
 #include <Renderer.h>
+#include <ProjectileExplosionView.h>
+#include <ViewController.h>
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL_image.h>
@@ -33,9 +33,8 @@ private:
 	GameState* m_state;
 	RouteInput* m_routeInput;
 	Renderer m_renderer;
-	GPU_Image* m_image;
-	
-	ViewController<CreepState, CreepView> m_creepViews; 
+	GPU_Image* m_image;	
+	ViewController<ProjectileExplosionView> m_projectileExplosions;	
 
 	void init();
 	void setColor(uint32_t color);
@@ -46,7 +45,8 @@ private:
 	void drawCreeps();
 	void drawProjectiles();
 	void drawFormations();
-	void drawGPU_Test();
+	void drawProjectileExplosion();
+	void drawUnitExplosion();
 	
 };
 

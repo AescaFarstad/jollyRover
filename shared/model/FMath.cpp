@@ -7,6 +7,26 @@ float FMath::lerp(float x1, float y1, float x2, float y2, float argument)
 		return y1 == y2 ? y1 : std::numeric_limits<float>::quiet_NaN();
 	return (argument  - x1) * (y1 - y2) / (x1 - x2) + y1;
 }
+
+
+Point FMath::lerp(float x1, Point& p1, float x2, Point& p2, float argument)
+{
+	if (x1 == x2)
+		return p1 == p2 ? p1 : Point::getNullPoint();
+	return Point(lerp(x1, p1.x, x2, p2.x, argument), lerp(x1, p1.y, x2, p2.y, argument));
+}
+
+uint8_t FMath::lerp(float x1, uint8_t y1, float x2, uint8_t y2, float argument)
+{
+	if (x1 == x2)
+		return y1 == y2 ? y1 : 0;
+	float rawValue = lerp(x1, (float)y1, x2, (float)y2, argument);
+	if (rawValue < 0)
+		rawValue = 0;
+	if (rawValue > std::numeric_limits<uint8_t>::max())
+		rawValue = std::numeric_limits<uint8_t>::max();
+	return (uint8_t)rawValue;
+}
 	
 Point FMath::getEdgeIntersection(Edge &e1, Edge &e2)
 {
@@ -143,4 +163,17 @@ float FMath::sin(float angle)
 float FMath::cos(float angle)
 {
 	return sin((float)M_PI / 2 - angle);
+}
+
+int32_t FMath::q_sdbm(int32_t number)
+{
+	int32_t out = 0;
+    int c;
+	unsigned char *str = (unsigned char *)&number;
+	for(size_t i = 0; i < sizeof(int32_t); i++)
+	{
+		c = *str++;
+		out = c + (out << 6) + (out << 16) - out;
+	}
+	return out;
 }

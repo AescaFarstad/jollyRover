@@ -1,4 +1,5 @@
 #include <GameUpdater.h>
+#include <EventLogger.h>
 #include <algorithm>
 
 //input with time T is not yet applied to state with stamp T
@@ -26,15 +27,16 @@ void GameUpdater::update(uint32_t time)
 	}
 }
 
-void GameUpdater::load(std::unique_ptr<GameState> state, Prototypes* prototypes)
+void GameUpdater::load(std::unique_ptr<GameState> state, Prototypes* prototypes, bool enableEventLogger)
 {
 	this->state = std::move(state);
 	lastValidTimeStamp = this->state->timeStamp;
 	//saveState(this->state.get());
+	this->state->isEventLoggerEnabled = enableEventLogger;
+	
 	this->state->propagatePrototypes(prototypes);
 
 	this->prototypes = prototypes;
-
 	isLoaded = true;
 }
 

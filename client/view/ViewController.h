@@ -4,7 +4,7 @@
 #include <Renderer.h>
 #include <SDL_gpu.h>
 
-template <typename T, typename V>
+template <typename V>
 class ViewController
 {
 public:
@@ -12,13 +12,31 @@ public:
 	~ViewController() = default;
 	
 	
-	void render(Renderer* renderer, std::vector<T> &array, GameState* state, Prototypes* prototypes)
+	template<typename T>
+	void render(Renderer* renderer, T begin, T end, GameState* state, Prototypes* prototypes)
 	{
-		for(T& i : array)
-			m_views[i.object.id].render(renderer, i, state, prototypes);
+		size_t updateCount = 0;
+		while(begin != end)
+		{
+			auto& view = m_views[begin->getId()];
+			view.render(renderer, *begin, state, prototypes);
+			view.lastUpdate = state->timeStamp;
+			++updateCount;
+			++begin;
+		}
+		if (updateCount < m_views.size() - CLEAN_UP_SIZE)
+		{
+			for(auto it = m_views.begin(); it != m_views.end(); )
+			{
+				if(it->second.lastUpdate != state->timeStamp)
+					it = m_views.erase(it);
+				else
+					++it;
+			}
+		}
 	}
 	
 private:
-
+	static const size_t CLEAN_UP_SIZE = 100;
 	std::unordered_map<int16_t, V> m_views;
 };

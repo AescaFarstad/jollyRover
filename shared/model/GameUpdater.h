@@ -21,7 +21,7 @@ public:
 	bool isLoaded;
 
 	void update(uint32_t time);
-	void load(std::unique_ptr<GameState> state, Prototypes* prototypes);
+	void load(std::unique_ptr<GameState> state, Prototypes* prototypes, bool enableEventLogger);
 	void addNewInput(std::unique_ptr<InputMessage> input);
 	std::unique_ptr<GameState> getNewStateByStamp(uint32_t stamp);
 	std::unique_ptr<GameState> getNewStateBySteps(int32_t steps);

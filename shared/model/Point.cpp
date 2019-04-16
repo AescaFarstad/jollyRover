@@ -7,6 +7,13 @@ Point::Point(float x, float y)
 	this->y = y;
 }
 
+Point Point::getNullPoint()
+{
+	Point result;
+	result.setToNaN();
+	return result;
+}
+
 void Point::scaleTo(float length)
 {
 	if (length == 0)
@@ -168,4 +175,8 @@ Point operator+(const Point& x, const Point& y)
 Point operator-(const Point& x, const Point& y)
 {
 	return Point(x.x - y.x, x.y - y.y);
+}
+bool operator==(const Point& x, const Point& y)
+{
+	return x.x == y.x && x.y == y.y;
 }

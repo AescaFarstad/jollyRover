@@ -17,6 +17,8 @@ public:
 	~Point() = default;
 	Point(const Point&) = default;
 	Point& operator=(const Point&) = default;*/
+	
+	static Point getNullPoint();
 
 	float x;
 	float y;
@@ -55,3 +57,4 @@ private:
 void from_json(const json& j, Point& point);
 Point operator+(const Point& x, const Point& y);
 Point operator-(const Point& x, const Point& y);
+bool operator==(const Point& x, const Point& y);

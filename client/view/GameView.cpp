@@ -33,9 +33,11 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawObstacles();
 	drawInput();
 	drawCars();
+	drawUnitExplosion();	
 	drawCreeps();
 	drawProjectiles();
 	drawFormations();	
+	drawProjectileExplosion();	
 }
 
 void GameView::init()
@@ -49,6 +51,7 @@ void GameView::init()
  	if (!m_image)
  		THROW_FATAL_ERROR("IMG IS NULL")
  	GPU_SetSnapMode(m_image, GPU_SNAP_NONE);
+	GPU_SetBlending(m_image, 1);
 	 
 	m_renderer.init(m_screen, m_image);
 	m_isInitialized = true;
@@ -190,8 +193,43 @@ void GameView::drawCars()
 
 
 void GameView::drawCreeps()
-{	
-	m_creepViews.render(&m_renderer, m_state->creeps, m_state, m_prototypes);
+{
+	for(auto& creep : m_state->creeps)
+	{
+		SDL_Color color = colorFromHex(0xff0000);
+		//SDL_Color color2 = colorFromHex(0x0000ff);
+		if (creep.object.prototypeId != 0)
+		{
+			if (creep.unit.force == 0)
+				GPU_Circle(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep._creepProto->size, color);
+			else
+				GPU_CircleFilled(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep._creepProto->size, color);
+		}
+		else
+		{
+			float barrelAngle;
+			float bodyAngle = creep.unit.voluntaryMovement.asAngle();
+			
+			if (creep.targetLoc_.getLength() > 0)
+				barrelAngle = (creep.targetLoc_ - creep.unit.location).asAngle();
+			else
+				barrelAngle = bodyAngle;
+			
+			m_renderer.blit(S::textures.tanks_2.tankBody_sand, creep.unit.location, bodyAngle, 1);
+			m_renderer.blit(S::textures.tanks_2.tankSand_barrel1, creep.unit.location, barrelAngle, 1);
+			/*
+			auto scaledMovement = creep.unit.voluntaryMovement;
+			if (scaledMovement.getLength() > 0)
+			{
+				scaledMovement.scaleTo(100);
+				scaledMovement += creep.unit.location;
+				
+				GPU_Line(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, scaledMovement.x, scaledMovement.y, color);			
+			}
+			if (creep.targetLoc_.getLength() > 0)
+				GPU_Line(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep.targetLoc_.x, creep.targetLoc_.y, color2);*/
+		}
+	}
 }
 
 
@@ -333,4 +371,48 @@ void GameView::drawFormations()
 			}
 		}
 	}
+}
+
+void GameView::drawProjectileExplosion()
+{
+	if (!m_state->isEventLoggerEnabled)
+		return;
+	m_projectileExplosions.render(
+			&m_renderer, 
+			m_state->eventLogger.projectileExplosions.begin(), 
+			m_state->eventLogger.projectileExplosions.end(),
+			m_state, 
+			m_prototypes
+		);
+	/*
+	size_t projectilesTotal = std::min(m_state->eventLogger.projectileExplosions.size, m_state->eventLogger.projectileExplosions.total);
+	int32_t minTime = m_state->time.time - m_prototypes->variables.maxEventAnimationTime;
+	
+	for(size_t i = 0; i < projectilesTotal; i++)
+	{
+		ProjectileExplosionEvent& event = m_state->eventLogger.projectileExplosions.array[i];
+		if (event.stamp > minTime && event.stamp < m_state->time.time)
+		{
+			int32_t seed = FMath::q_sdbm(id);
+			if (m_seed != seed)
+				init(seed, state, prototypes);
+			m_renderer.blit(S::textures.tanks_1.Smoke.smokeGrey2, event.location, 0, 0.2, 0x55);
+		}
+	}*/
+}
+
+void GameView::drawUnitExplosion()
+{
+	if (!m_state->isEventLoggerEnabled)
+		return;
+		/*
+	size_t unitsTotal = std::min(m_state->eventLogger.unitDeaths.size, m_state->eventLogger.unitDeaths.total);
+	int32_t minTime = m_state->time.time - m_prototypes->variables.maxEventAnimationTime;
+	
+	for(size_t i = 0; i < unitsTotal; i++)
+	{
+		UnitDeathEvent& event = m_state->eventLogger.unitDeaths.array[i];
+		if (event.stamp > minTime && event.stamp < m_state->time.time)
+			m_renderer.blit(S::textures.tanks_1.Smoke.smokeOrange0, event.location, 0, 0.2, 0x55);
+	}*/
 }
