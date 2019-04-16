@@ -1,7 +1,8 @@
 #include <ProjectileExplosionView.h>
 #include <FMath.h>
 
-void ProjectileExplosionView::render(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes)
+template<typename T>
+void ProjectileExplosionView::render(Renderer* renderer, T& event, GameState* state, Prototypes* prototypes)
 {	
 	int32_t seed = FMath::q_sdbm(event.id);
 	if (m_seed != seed)
@@ -80,3 +81,6 @@ void ProjectileExplosionView::init(int32_t seed, ProjectileExplosionEvent& event
 	m_endTime += m_startTime;
 	
 }
+
+template void ProjectileExplosionView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes);
+	

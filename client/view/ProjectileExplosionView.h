@@ -1,7 +1,8 @@
 #pragma once
 #include <Renderer.h>
 #include <GameState.h>
-#include <MultiParticle.h>
+#include <EventLogger.h>
+#include <Particle.h>
 
 class ProjectileExplosionView
 {
@@ -10,8 +11,10 @@ public:
 	
 	uint32_t lastUpdate;
 	
-	void render(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes);
+	template<typename T>
+	void render(Renderer* renderer, T& event, GameState* state, Prototypes* prototypes);
 	void init(int32_t id, ProjectileExplosionEvent& event, GameState* state);
+	void init(int32_t id, UnitDeathEvent& event, GameState* state);
 	
 private:
 	int32_t m_startTime;
@@ -20,3 +23,5 @@ private:
 	std::vector<Particle> particles;
 	
 };
+
+extern template void ProjectileExplosionView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes);
