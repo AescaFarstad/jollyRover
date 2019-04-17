@@ -27,8 +27,11 @@ namespace Creeps
 			if (state->forceStrength_[force.id] < prototypes->variables.intensity)
 			{
 				FormationProto& formation = state->random.getFromVector(prototypes->formations);
-				spawnFormation(state, prototypes, force, formation);
-				state->forceStrength_[force.id] += formation.strength;
+				if (state->creeps.size() + formation.slots.size() < GameState::MAX_CREEPS)
+				{
+					spawnFormation(state, prototypes, force, formation);
+					state->forceStrength_[force.id] += formation.strength;
+				}
 			}
 		}
 			
@@ -157,6 +160,7 @@ namespace Creeps
 			
 			creep.object.prototypeId = type;
 			creep.object.id = state->idCounter++;
+			state->creepById_[creep.object.id] = &creep;
 			
 			creep.unit.health = creep._creepProto->maxHealth;
 			creep.unit.location = location;
@@ -556,6 +560,8 @@ namespace Creeps
 		
 		void removeDeadCreeps(GameState* state)
 		{
+			if (state->creeps.size() > GameState::MAX_CREEPS)
+				THROW_FATAL_ERROR("Creeps exceed maximum, pointers are invalid.");
 			for(auto& creep : state->creeps)
 			{
 				if (creep.unit.health <= 0)
@@ -575,10 +581,26 @@ namespace Creeps
 				}
 			}
 			
-			state->creeps.erase(std::remove_if(state->creeps.begin(), state->creeps.end(), 
-				[](CreepState& creep){
-					return creep.unit.health <= 0;
-					}),  state->creeps.end());
+			//Manuall std::remove_if with some additions to manage creepById pointers			
+			auto first = state->creeps.begin();
+			auto last = state->creeps.end();
+			auto predicate = [](CreepState& c){ return c.unit.health <= 0;};
+			first = std::find_if(first, last, predicate);
+			if (first != last)
+			{
+				auto removeFrom = first;
+				++first;
+				for (; first != last; ++first)
+				{
+					if (!predicate(*first))
+					{
+						*removeFrom = std::move(*first);
+						state->creepById_[removeFrom->object.id] = &*removeFrom;
+						++removeFrom;
+					}					
+				}
+				state->creeps.erase(removeFrom,  state->creeps.end());
+			}			
 		}
 		
 		void removeDeadFormations(GameState* state)

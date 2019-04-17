@@ -37,7 +37,7 @@ private:
 	ViewController<ProjectileExplosionView> m_projectileExplosions;	
 	ViewController<ProjectileExplosionView> m_unitDeaths;	
 	
-	int32_t m_loadCount;
+	uint32_t m_loadCount;
 
 	void init();
 	void setColor(uint32_t color);

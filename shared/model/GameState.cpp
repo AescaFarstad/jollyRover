@@ -4,6 +4,7 @@ GameState::GameState()
 {
 	timeStamp = 0;
 	idCounter = 1;
+	creeps.reserve(MAX_CREEPS);
 }
 
 GameState::GameState(uint32_t randomSeed) : GameState()
@@ -26,6 +27,8 @@ void GameState::deserialize(SerializationStream& stream)
 	Serializer::readVector(creeps, stream);
 	Serializer::readVector(projectiles, stream);
 	Serializer::readVector(formations, stream);
+	for(auto&creep : creeps)
+		creepById_[creep.object.id] = &creep;
 }
 
 void GameState::propagatePrototypes(Prototypes* prototypes)

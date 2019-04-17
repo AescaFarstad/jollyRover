@@ -27,6 +27,8 @@ public:
 	GameState(uint32_t randomSeed);
 	~GameState() = default;
 	
+	static const int32_t MAX_CREEPS = 1500;
+	
 	std::vector<CreepState> creeps;
 	std::vector<Projectile> projectiles;
 	//std::vector<ForceState> forces;
@@ -43,6 +45,7 @@ public:
 	
 	std::vector<int> forceStrength_;
 	SpatialMap<CreepState> creepMap_;
+	std::unordered_map<int32_t, CreepState*> creepById_;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
