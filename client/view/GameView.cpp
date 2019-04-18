@@ -43,7 +43,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawUnitExplosion();	
 	drawCreeps();
 	drawProjectiles();
-	drawFormations();	
+	//drawFormations();	
 	drawProjectileExplosion();	
 }
 
@@ -366,10 +366,12 @@ void GameView::drawFormations()
 				auto creep = std::find_if(m_state->creeps.begin(), m_state->creeps.end(), [slot](CreepState& creep){ return creep.object.id == slot; });
 				if (creep != m_state->creeps.end())
 				{
+					GPU_Circle(m_screen, creep->formationAttraction_.x, creep->formationAttraction_.y, 2, color);
+					GPU_Circle(m_screen, creep->formationAttraction_.x, creep->formationAttraction_.y, 5, color);
 					GPU_Line(
 						m_screen, 
-						slotLocation.x, 
-						slotLocation.y, 
+						creep->formationAttraction_.x, 
+						creep->formationAttraction_.y, 
 						creep->unit.location.x, 
 						creep->unit.location.y, 
 						color

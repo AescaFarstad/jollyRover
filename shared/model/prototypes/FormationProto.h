@@ -10,15 +10,28 @@ enum class FORMATION_TYPE : int32_t
 	TRANSPORT
 };
 
+
+class FormationSlotConnectionProto
+{
+public:
+	FormationSlotConnectionProto() = default;
+	~FormationSlotConnectionProto() = default;
+	
+	int32_t slot;
+	Point offset;	
+};
+
 class FormationSlotProto
 {
 public:
 	FormationSlotProto() = default;
 	~FormationSlotProto() = default;
 	
+	int32_t index;
 	Point offset;
 	int16_t creepType;
 	bool optional;
+	std::vector<FormationSlotConnectionProto> connections;
 	
 };
 
@@ -27,6 +40,8 @@ class FormationProto
 public:
 	FormationProto() = default;
 	~FormationProto() = default;
+	
+	static const int32_t CONNECTIONS = 5;
 	
 	int16_t id;
 	FORMATION_TYPE type;

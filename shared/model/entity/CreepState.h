@@ -35,6 +35,7 @@ public:
 	Point movement_;
 	Point targetLoc_;
 	Point impact_;
+	Point formationAttraction_;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;

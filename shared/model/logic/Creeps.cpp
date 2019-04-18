@@ -16,6 +16,11 @@ namespace Creeps
 	{
 		preprocessCreeps(state, prototypes);
 		
+		for(auto& creep : state->creeps)
+		{
+			if (state->creepById_[creep.object.id] != &creep)
+				THROW_FATAL_ERROR("creep pointer mismatch");
+		}
 		
 		
 		for(auto& force : prototypes->forces)
@@ -193,43 +198,54 @@ namespace Creeps
 				float balance = 0;
 				float maxDisabalance = 0;
 				int32_t creepBalanceCount = 1;
-				for(auto& creep : state->creeps)
+				for(auto& id : formation.slots)
 				{
-					if (creep.formationId == formation.object.id)
+					if (id < 0)
+						continue;
+					CreepState& creep = *state->creepById_[id];
+					Point formationSlotLocation = getCurrentSlotLocation(formation, creep.formationsSlot);
+					Point targetSlotLocation = getTargetSlotLocation(formation, creep.formationsSlot);
+					Point creep2Target = targetSlotLocation - creep.unit.location;
+					Point creep2Slot = formationSlotLocation - creep.unit.location;
+					
+					Obstacle* obstacle = Field::findObstacle(formationSlotLocation, prototypes);
+					
+					Point* target;
+					if (!obstacle)
 					{
-						Point formationSlotLocation = getCurrentSlotLocation(formation, creep.formationsSlot);
-						Point targetSlotLocation = getTargetSlotLocation(formation, creep.formationsSlot);
-						Point creep2Target = targetSlotLocation - creep.unit.location;
-						Point creep2Slot = formationSlotLocation - creep.unit.location;
+						creepBalanceCount++;
+						float creep2TargetL = creep2Target.getLength();
+						float creep2SlotL = creep2Slot.getLength();
 						
-						Obstacle* obstacle = Field::findObstacle(formationSlotLocation, prototypes);
-						
-						Point* target;
-						if (!obstacle)
+						if (creep2TargetL < creep2SlotL)
 						{
-							creepBalanceCount++;
-							float creep2TargetL = creep2Target.getLength();
-							float creep2SlotL = creep2Slot.getLength();
-							
-							if (creep2TargetL < creep2SlotL)
-							{
-								balance += creep2SlotL - creep2TargetL;
-								target = &targetSlotLocation;
-							}
-							else
-							{
-								balance -= creep2SlotL;
-								maxDisabalance = std::max(maxDisabalance, creep2SlotL);
-								target = &formationSlotLocation;
-							}							
+							balance += creep2SlotL - creep2TargetL;
+							target = &targetSlotLocation;
 						}
 						else
 						{
-							target = &targetSlotLocation;
-						}
-						
-						moveCreepTowardsPoint(creep, *target, prototypes, timePassed);						
+							balance -= creep2SlotL;
+							maxDisabalance = std::max(maxDisabalance, creep2SlotL);
+							target = &formationSlotLocation;
+						}							
 					}
+					else
+					{
+						target = &targetSlotLocation;
+					}
+					auto followCount = 0;
+					for(auto& connection : formation.formationPrototype_->slots[creep.formationsSlot].connections)
+					{
+						CreepState* partner = state->creepById_[formation.slots[connection.slot]];
+						if (partner && partner->unit.health > 0)
+						{
+							followCount++;
+							*target += partner->unit.location + connection.offset.rotate(formation.orientation);
+						}
+					}
+					target->scaleBy(1.f/(1.f + followCount));
+					creep.formationAttraction_ = *target;
+					moveCreepTowardsPoint(creep, *target, prototypes, timePassed);	
 				}				
 				
 				balance /= creepBalanceCount;
