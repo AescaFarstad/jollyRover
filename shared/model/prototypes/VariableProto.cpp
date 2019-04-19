@@ -20,11 +20,12 @@ void VariableProto::load(json &source)
 	maxRouteSteps = source.at("maxRouteSteps");
 
 	stepAngleWindow = source.at("stepAngleWindow");
-	creepRestitution = source.at("creepRestitution");
 	
 	maxEventAnimationTime = source.at("maxEventAnimationTime");
 	
 	intensity = source.at("war").at("intensity");
+	creepRestitution = source.at("war").at("creepRestitution");
+	formationNumConnections = source.at("war").at("formationNumConnections");
 	
 	fieldCenter.x = fieldWidth/2;
 	fieldCenter.y = fieldWidth/2;

@@ -41,8 +41,6 @@ public:
 	FormationProto() = default;
 	~FormationProto() = default;
 	
-	static const int32_t CONNECTIONS = 5;
-	
 	int16_t id;
 	FORMATION_TYPE type;
 	std::vector<FormationSlotProto> slots;

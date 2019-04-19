@@ -7,10 +7,11 @@
 		"minRouteSteps": 5,
 		"maxRouteSteps": 4400,
 		"stepAngleWindow": 3.14,
-		"creepRestitution": 0.5,
 		"maxEventAnimationTime": 1000,
 		"war":{
-			"intensity": 1000
+			"intensity": 10,
+			"creepRestitution": 0.5,
+			"formationNumConnections":2
 		}
 	},
 	"forces":[
@@ -22,7 +23,7 @@
 		},
 		{
 			"id": 1,
-			"spawn": { "x1":10, "y1":100, "x2":10, "y2":620  },
+			"spawn": { "x1":150, "y1":100, "x2":150, "y2":620  },
 			"freq":[10, 200],
 			"alwaysOn":true
 		},
@@ -352,207 +353,311 @@
 		}
 	],
 	"formations":[
+		
 		{
+
 			"id":0,
+
 			"type":"assault",
+
 			"slots":[
+
 				{
-					"offset":{ "x":15, "y":10 },
-					"creepType":0,
+
+					"offset":{ "x":10, "y":10 },
+
+					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":-15, "y":10 },
-					"creepType":0,
+
+					"offset":{ "x":-10, "y":10 },
+
+					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":45, "y":10 },
-					"creepType":0,
+
+					"offset":{ "x":30, "y":10 },
+
+					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":-45, "y":10 },
-					"creepType":0,
+
+					"offset":{ "x":-30, "y":10 },
+
+					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":5, "y":40 },
+
+					"offset":{ "x":50, "y":10 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":-5, "y":40 },
+
+					"offset":{ "x":-50, "y":10 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":15, "y":40 },
+
+					"offset":{ "x":70, "y":10 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":-15, "y":40 },
+
+					"offset":{ "x":-70, "y":10 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":25, "y":40 },
+
+					"offset":{ "x":90, "y":10 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":-25, "y":40 },
+
+					"offset":{ "x":-90, "y":10 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
+				
+
 				{
-					"offset":{ "x":5, "y":70 },
+
+					"offset":{ "x":0, "y":30 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":-5, "y":70 },
+
+					"offset":{ "x":-20, "y":30 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":15, "y":70 },
+
+					"offset":{ "x":20, "y":30 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":-15, "y":70 },
+
+					"offset":{ "x":-40, "y":30 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":25, "y":70 },
+
+					"offset":{ "x":40, "y":30 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":-25, "y":70 },
+
+					"offset":{ "x":-60, "y":30 },
+
 					"creepType":1,
+
 					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":5, "y":100 },
+
+					"offset":{ "x":60, "y":30 },
+
 					"creepType":1,
-					"optional":true
+
+					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":-5, "y":100 },
+
+					"offset":{ "x":-80, "y":30 },
+
 					"creepType":1,
-					"optional":true
+
+					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":15, "y":100 },
+
+					"offset":{ "x":80, "y":30 },
+
 					"creepType":1,
-					"optional":true
+
+					"optional":false
+
 				},
+
+				
+
 				{
-					"offset":{ "x":-15, "y":100 },
+
+					"offset":{ "x":10, "y":50 },
+
 					"creepType":1,
-					"optional":true
+
+					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":25, "y":100 },
+
+					"offset":{ "x":-10, "y":50 },
+
 					"creepType":1,
-					"optional":true
+
+					"optional":false
+
 				},
+
 				{
-					"offset":{ "x":-25, "y":100 },
+
+					"offset":{ "x":30, "y":50 },
+
 					"creepType":1,
-					"optional":true
+
+					"optional":false
+
 				},
+
 				{
+
+					"offset":{ "x":-30, "y":50 },
+
+					"creepType":1,
+
+					"optional":false
+
+				},
+
+				{
+
 					"offset":{ "x":50, "y":50 },
-					"creepType":0,
-					"optional":true
+
+					"creepType":1,
+
+					"optional":false
+
 				},
+
 				{
+
 					"offset":{ "x":-50, "y":50 },
-					"creepType":0,
-					"optional":true
-				}				
+
+					"creepType":1,
+
+					"optional":false
+
+				},
+
+				{
+
+					"offset":{ "x":70, "y":50 },
+
+					"creepType":1,
+
+					"optional":false
+
+				},
+
+				{
+
+					"offset":{ "x":-70, "y":50 },
+
+					"creepType":1,
+
+					"optional":false
+
+				},
+
+				{
+
+					"offset":{ "x":90, "y":50 },
+
+					"creepType":1,
+
+					"optional":false
+
+				},
+
+				{
+
+					"offset":{ "x":-90, "y":50 },
+
+					"creepType":1,
+
+					"optional":false
+
+				}	
+
 			]
-		},
-		{
-			"id":1,
-			"type":"assault",
-			"slots":[
-				{
-					"offset":{ "x":0, "y":10 },
-					"creepType":0,
-					"optional":false
-				},
-				{
-					"offset":{ "x":15, "y":30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-15, "y":30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":25, "y":35 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-25, "y":35 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":15, "y":60 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-15, "y":60 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":25, "y":65 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":-25, "y":65 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "x":0, "y":65 },
-					"creepType":0,
-					"optional":true
-				},
-				{
-					"offset":{ "x":5, "y":110 },
-					"creepType":1,
-					"optional":true
-				},
-				{
-					"offset":{ "x":-5, "y":110 },
-					"creepType":1,
-					"optional":true
-				},
-				{
-					"offset":{ "x":25, "y":110 },
-					"creepType":1,
-					"optional":true
-				},
-				{
-					"offset":{ "x":-25, "y":110 },
-					"creepType":1,
-					"optional":true
-				}
-			]
+
 		}
 	]
 }

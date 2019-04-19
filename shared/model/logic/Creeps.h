@@ -17,6 +17,7 @@ namespace Creeps
 		void preprocessCreeps(GameState* state, Prototypes* prototypes);
 		void spawnFormation(GameState* state, Prototypes* prototypes, ForceProto& forceProto, FormationProto &formationProto);
 		void processFormations(GameState* state, Prototypes* prototypes, int timePassed);
+		void optimiseFormation(FormationState& formation, GameState* state);
 		void processCreeps(GameState* state, Prototypes* prototypes, int timePassed);
 		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed);
 		

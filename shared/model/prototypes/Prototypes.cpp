@@ -78,7 +78,31 @@ void Prototypes::postProcess()
 	obstacleMap = SpatialMap<Obstacle>(10, false, from, to);
 	obstacleMap.setNonUnique(obstacles);
 	
-	
+	for(auto& formation : formations)
+	{
+		auto slots = formation.slots;
+		for(size_t i = 0; i < formation.slots.size(); i++)
+		{
+			std::sort(slots.begin(), slots.end(), 
+				[slot = formation.slots[i]](FormationSlotProto& a, FormationSlotProto& b)
+				{
+					if (a.index == slot.index)
+						return false;
+					if (b.index == slot.index)
+						return true;
+					if (a.optional != b.optional && !b.optional)
+						return false;
+					if (a.optional != b.optional && b.optional)
+						return true;
+					return b.offset.distanceTo(slot.offset) > a.offset.distanceTo(slot.offset);
+				});			
+				
+			for(size_t j = 0; j < variables.formationNumConnections; j++)
+			{
+				formation.slots[i].connections.push_back(FormationSlotConnectionProto{slots[j].index, formation.slots[i].offset - slots[j].offset});
+			}
+		}
+	}
 	
 	
 	

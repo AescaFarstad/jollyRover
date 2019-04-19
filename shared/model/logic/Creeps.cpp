@@ -71,12 +71,12 @@ namespace Creeps
 		
 	Point getCurrentSlotLocation(FormationState& formation, int32_t slot)
 	{
-		return formation.location + formation.formationPrototype_->slots[slot].offset.rotate(formation.orientation + M_PI / 2);			
+		return formation.location + formation.formationPrototype_->slots[slot].offset.rotate(formation.orientation);			
 	}
 	
 	Point getTargetSlotLocation(FormationState& formation, int32_t slot)
 	{
-		return formation.targetLocation + formation.formationPrototype_->slots[slot].offset.rotate(formation.targetOrientation + M_PI / 2);			
+		return formation.targetLocation + formation.formationPrototype_->slots[slot].offset.rotate(formation.targetOrientation);			
 	}
 	
 	
@@ -106,7 +106,6 @@ namespace Creeps
 			);
 			
 			float angle = prototypes->variables.fieldCenter.subtract(formationCenter).asAngle();
-			
 			state->formations.emplace_back();
 			FormationState& formation = state->formations.back();
 			formation.objectiveID = -1;
@@ -120,6 +119,7 @@ namespace Creeps
 			formation.speedMulti = 1;
 			formation.speed = FMath::F_MAX;
 			formation.angularSpeed = 0;
+			formation.spawnedAt = state->time.time;
 			
 			for(auto& slot : formationProto.slots)
 			{
@@ -184,6 +184,9 @@ namespace Creeps
 		{			
 			for(auto& formation : state->formations)
 			{
+				if ((state->time.time - formation.spawnedAt) % 1000 == 0)
+					optimiseFormation(formation, state);
+				
 				if (formation.objectiveID == -1)
 				{
 					ObjectiveProto& objective = state->random.getFromVector(prototypes->objectives[formation.force]);
@@ -234,6 +237,7 @@ namespace Creeps
 						target = &targetSlotLocation;
 					}
 					auto followCount = 0;
+					target->scaleBy(2);
 					for(auto& connection : formation.formationPrototype_->slots[creep.formationsSlot].connections)
 					{
 						CreepState* partner = state->creepById_[formation.slots[connection.slot]];
@@ -243,7 +247,7 @@ namespace Creeps
 							*target += partner->unit.location + connection.offset.rotate(formation.orientation);
 						}
 					}
-					target->scaleBy(1.f/(1.f + followCount));
+					target->scaleBy(1.f/(2.f + followCount));
 					creep.formationAttraction_ = *target;
 					moveCreepTowardsPoint(creep, *target, prototypes, timePassed);	
 				}				
@@ -266,6 +270,35 @@ namespace Creeps
 				else
 				{
 					formation.isDisposed_ = true;
+				}
+			}
+		}
+		
+		void optimiseFormation(FormationState& formation, GameState* state)
+		{
+			for(int32_t i = 0; i < formation.slots.size(); i++)
+			{
+				CreepState* creep1 = state->creepById_[formation.slots[i]];
+				if (!creep1 || creep1->unit.health <= 0)
+					continue;
+				for(int32_t j = i + 1; j < formation.slots.size(); j++)
+				{
+					CreepState* creep2 = state->creepById_[formation.slots[j]];
+					if (!creep2 || creep2->unit.health <= 0 || creep1->object.prototypeId != creep2->object.prototypeId)
+						continue;
+					if (creep1->unit.location.distanceTo(getCurrentSlotLocation(formation, i)) +
+						creep2->unit.location.distanceTo(getCurrentSlotLocation(formation, j)) >
+						creep1->unit.location.distanceTo(getCurrentSlotLocation(formation, j)) +
+						creep2->unit.location.distanceTo(getCurrentSlotLocation(formation, i)) + 5
+					)
+					{
+						creep1->formationsSlot = j;
+						creep2->formationsSlot = i;
+						formation.slots[i] = creep2->object.id;
+						formation.slots[j] = creep1->object.id;
+						//S::log.add("swapped " + std::to_string(creep1->object.id) + " " + std::to_string(creep2->object.id));
+						break;
+					}
 				}
 			}
 		}

@@ -270,10 +270,10 @@ void GameView::drawFormations()
 		Point BA(proto.BB.x, proto.AA.y);
 		
 		//------------------------------------------------
-		Point p1 = form.location + proto.AA.rotate(form.orientation + M_PI / 2);
-		Point p2 = form.location + AB.rotate(form.orientation + M_PI / 2);
-		Point p3 = form.location + proto.BB.rotate(form.orientation + M_PI / 2);
-		Point p4 = form.location + BA.rotate(form.orientation + M_PI / 2);
+		Point p1 = form.location + proto.AA.rotate(form.orientation);
+		Point p2 = form.location + AB.rotate(form.orientation);
+		Point p3 = form.location + proto.BB.rotate(form.orientation);
+		Point p4 = form.location + BA.rotate(form.orientation);
 		
 		float points[10];
 		
@@ -292,10 +292,10 @@ void GameView::drawFormations()
 		
 		//--------------------------------------------------------
 		int padding = 2;
-		Point pi1 = form.location + (proto.AA + Point(padding, padding)).rotate(form.orientation + M_PI / 2);
-		Point pi2 = form.location + (AB + Point(padding, -padding)).rotate(form.orientation + M_PI / 2);
-		Point pi3 = form.location + (proto.BB + Point(-padding, -padding)).rotate(form.orientation + M_PI / 2);
-		Point pi4 = form.location + (BA + Point(-padding, padding)).rotate(form.orientation + M_PI / 2);
+		Point pi1 = form.location + (proto.AA + Point(padding, padding)).rotate(form.orientation);
+		Point pi2 = form.location + (AB + Point(padding, -padding)).rotate(form.orientation);
+		Point pi3 = form.location + (proto.BB + Point(-padding, -padding)).rotate(form.orientation);
+		Point pi4 = form.location + (BA + Point(-padding, padding)).rotate(form.orientation);
 		
 		
 		points[0] = pi1.x;
@@ -312,10 +312,10 @@ void GameView::drawFormations()
 		GPU_Polygon(m_screen, 5, points, color);
 		
 		//-------------------------------------------------------------------
-		Point pt1 = form.targetLocation + proto.AA.rotate(form.targetOrientation + M_PI / 2);
-		Point pt2 = form.targetLocation + AB.rotate(form.targetOrientation + M_PI / 2);
-		Point pt3 = form.targetLocation + proto.BB.rotate(form.targetOrientation + M_PI / 2);
-		Point pt4 = form.targetLocation + BA.rotate(form.targetOrientation + M_PI / 2);
+		Point pt1 = form.targetLocation + proto.AA.rotate(form.targetOrientation);
+		Point pt2 = form.targetLocation + AB.rotate(form.targetOrientation);
+		Point pt3 = form.targetLocation + proto.BB.rotate(form.targetOrientation);
+		Point pt4 = form.targetLocation + BA.rotate(form.targetOrientation);
 		
 		
 		GPU_Line(m_screen, p1.x, p1.y, pt1.x, pt1.y, color);

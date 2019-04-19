@@ -12,7 +12,9 @@ void FormationState::deserialize(SerializationStream &stream)
 	Serializer::read(speed, stream);
 	Serializer::read(speedMulti, stream);
 	Serializer::read(angularSpeed, stream);
+	Serializer::read(spawnedAt, stream);
 	Serializer::readVector(slots, stream);
+	
 	formationPrototype_ = nullptr;
 	objectivePrototype_ = nullptr;
 	isDisposed_ = false;
@@ -30,6 +32,7 @@ void FormationState::serialize(SerializationStream &stream) const
 	Serializer::write(speed, stream);
 	Serializer::write(speedMulti, stream);
 	Serializer::write(angularSpeed, stream);
+	Serializer::write(spawnedAt, stream);
 	Serializer::writeVector(slots, stream);
 }
 

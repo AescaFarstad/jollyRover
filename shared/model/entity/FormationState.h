@@ -37,6 +37,7 @@ public:
 	Point targetLocation;
 	float orientation;
 	float targetOrientation;
+	int32_t spawnedAt;
 	
 	bool isDisposed_;
 	FormationProto* formationPrototype_;

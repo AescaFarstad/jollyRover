@@ -25,6 +25,7 @@ public:
 	float creepRestitution;
 	
 	int32_t intensity;
+	int32_t formationNumConnections;
 	
 	int32_t maxCreepSize;
 	int32_t maxEventAnimationTime;
