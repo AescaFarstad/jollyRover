@@ -11,7 +11,8 @@
 		"war":{
 			"intensity": 10,
 			"creepRestitution": 0.5,
-			"formationNumConnections":2
+			"additionalSpacing": 5,
+			"formationNumConnections":5
 		}
 	},
 	"forces":[
@@ -219,7 +220,11 @@
 			"size": 21,
 			"weight":10000,
 			"whiskers":3,
-			"maxWhiskerLength":150
+			"maxWhiskerLength":150,
+			"moveType":"tractor",
+			"angularSpeed":{"0":0.1, "1":0.01},
+			"acceleration":{"0":0.1, "1":0.01},
+			"normalFriction":0.9
 		},
 		{
 			"id": 1,
@@ -232,7 +237,8 @@
 			"size": 4,
 			"weight":10,
 			"whiskers":3,
-			"maxWhiskerLength":100
+			"maxWhiskerLength":100,
+			"moveType":"walker"
 		},
 		{
 			"id": 2,
@@ -245,7 +251,11 @@
 			"size": 5,
 			"weight":5,
 			"whiskers":3,
-			"maxWhiskerLength":100
+			"maxWhiskerLength":100,
+			"moveType":"tractor",
+			"angularSpeed":{"0":0.1, "1":0.01},
+			"acceleration":{"0":0.1, "1":0.01},
+			"normalFriction":0.9
 		},
 		{
 			"id": 3,
@@ -258,7 +268,11 @@
 			"size": 7,
 			"weight":1000,
 			"whiskers":3,
-			"maxWhiskerLength":100
+			"maxWhiskerLength":100,
+			"moveType":"tractor",
+			"angularSpeed":{"0":0.1, "1":0.01},
+			"acceleration":{"0":0.1, "1":0.01},
+			"normalFriction":0.9
 		}
 	],
 	"weapons":[
@@ -353,311 +367,149 @@
 		}
 	],
 	"formations":[
-		
 		{
-
 			"id":0,
-
 			"type":"assault",
-
 			"slots":[
-
 				{
-
-					"offset":{ "x":10, "y":10 },
-
+					"offset":{ "y":10, "x":-10 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-10, "y":10 },
-
+					"offset":{ "y":-10, "x":-10 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":30, "y":10 },
-
+					"offset":{ "y":30, "x":-10 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-30, "y":10 },
-
+					"offset":{ "y":-30, "x":-10 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":50, "y":10 },
-
+					"offset":{ "y":50, "x":-10 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-50, "y":10 },
-
+					"offset":{ "y":-50, "x":-10 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":70, "y":10 },
-
+					"offset":{ "y":70, "x":-10 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-70, "y":10 },
-
+					"offset":{ "y":-70, "x":-10 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":90, "y":10 },
-
+					"offset":{ "y":-90, "x":-10 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
-				{
-
-					"offset":{ "x":-90, "y":10 },
-
-					"creepType":1,
-
-					"optional":false
-
-				},
-
 				
-
 				{
-
-					"offset":{ "x":0, "y":30 },
-
+					"offset":{ "y":0, "x":-30 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-20, "y":30 },
-
+					"offset":{ "y":-20, "x":-30 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":20, "y":30 },
-
+					"offset":{ "y":20, "x":-30 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-40, "y":30 },
-
+					"offset":{ "y":-40, "x":-30 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":40, "y":30 },
-
+					"offset":{ "y":40, "x":-30 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-60, "y":30 },
-
+					"offset":{ "y":-60, "x":-30 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":60, "y":30 },
-
+					"offset":{ "y":60, "x":-30 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-80, "y":30 },
-
+					"offset":{ "y":-80, "x":-30 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":80, "y":30 },
-
+					"offset":{ "y":80, "x":-30 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				
-
 				{
-
-					"offset":{ "x":10, "y":50 },
-
+					"offset":{ "y":10, "x":-50 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-10, "y":50 },
-
+					"offset":{ "y":-10, "x":-50 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":30, "y":50 },
-
+					"offset":{ "y":30, "x":-50 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-30, "y":50 },
-
+					"offset":{ "y":-30, "x":-50 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":50, "y":50 },
-
+					"offset":{ "y":50, "x":-50 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-50, "y":50 },
-
+					"offset":{ "y":-50, "x":-50 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":70, "y":50 },
-
+					"offset":{ "y":70, "x":-50 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":-70, "y":50 },
-
+					"offset":{ "y":-70, "x":-50 },
 					"creepType":1,
-
 					"optional":false
-
 				},
-
 				{
-
-					"offset":{ "x":90, "y":50 },
-
+					"offset":{ "y":-90, "x":-50 },
 					"creepType":1,
-
 					"optional":false
-
-				},
-
-				{
-
-					"offset":{ "x":-90, "y":50 },
-
-					"creepType":1,
-
-					"optional":false
-
 				}	
-
 			]
-
 		}
+		
 	]
 }

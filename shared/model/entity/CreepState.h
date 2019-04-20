@@ -28,7 +28,10 @@ public:
 	int8_t numWhiskers;
 	int32_t formationId;
 	int8_t formationsSlot;
+	bool sensedAnObstacle;
 	
+	Point velocity;
+	float direction;	
 	
 	CreepProto* _creepProto;
 	WeaponProto* _weaponProto;

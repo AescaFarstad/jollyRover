@@ -1,6 +1,13 @@
 #pragma once
+#include <Point.h>
 #include <json.hpp>
 using json = nlohmann::json;
+
+enum class MOVE_TYPE : uint8_t
+{
+	WALKER,
+	TRACTOR
+};
 
 class WeaponProto
 {
@@ -36,6 +43,10 @@ public:
 	int16_t size;
 	int8_t whiskers;
 	int16_t maxWhiskerLength;
+	MOVE_TYPE moveType;
+	Point angularSpeed; //x - at 0 speed, y - at max speed
+	Point acceleration; //x - at 0 speed, y - at max speed
+	float normalFriction;
 
 private:
 

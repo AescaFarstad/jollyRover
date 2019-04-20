@@ -57,6 +57,12 @@ float Point::getLength()
 	return std::sqrt(x*x + y*y);
 }
 
+void Point::setFromAngle(float angle)
+{
+	x = FMath::cos(angle);
+	y = FMath::sin(angle);
+}
+
 float Point::asAngle()
 {
 	return FMath::atan2(y, x);
@@ -185,4 +191,16 @@ Point operator-(const Point& x, const Point& y)
 bool operator==(const Point& x, const Point& y)
 {
 	return x.x == y.x && x.y == y.y;
+}
+float operator*(const Point& x, const Point& y)
+{
+	return x.x * y.x + x.y * y.y;
+}
+Point operator*(const Point& x, const float& y)
+{
+	return Point(x.x * y, x.y * y);
+}
+Point operator*(const float& x, const Point& y)
+{
+	return Point(y.x * x, y.y * x);
 }

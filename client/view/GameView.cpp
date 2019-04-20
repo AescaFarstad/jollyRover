@@ -1,6 +1,8 @@
 #include <GameView.h>
 #include <Creeps.h>
 #include <ViewUtil.h>
+#include <VisualDebug.h>
+#include <FMath.h>
 
 
 GameView::GameView(GPU_Target* screen, Prototypes* prototypes)
@@ -45,6 +47,9 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawProjectiles();
 	//drawFormations();	
 	drawProjectileExplosion();	
+	drawDebugGraphics();
+	
+	lastTime = state->time.time;
 }
 
 void GameView::init()
@@ -362,7 +367,7 @@ void GameView::drawFormations()
 					slotLocation.y + slotSize/2,
 					color
 				);
-				
+				/*
 				auto creep = std::find_if(m_state->creeps.begin(), m_state->creeps.end(), [slot](CreepState& creep){ return creep.object.id == slot; });
 				if (creep != m_state->creeps.end())
 				{
@@ -376,7 +381,7 @@ void GameView::drawFormations()
 						creep->unit.location.y, 
 						color
 					);
-				}
+				}*/
 			}
 		}
 	}
@@ -431,4 +436,56 @@ void GameView::drawUnitExplosion()
 		if (event.stamp > minTime && event.stamp < m_state->time.time)
 			m_renderer.blit(S::textures.tanks_1.Smoke.smokeOrange0, event.location, 0, 0.2, 0x55);
 	}*/
+}
+
+void GameView::drawDebugGraphics()
+{
+	for(auto& line : S::visualDebug.lines)
+	{
+		SDL_Color color = colorFromHex(line.color, 0xff);
+		GPU_Line(m_screen, line.from.x, line.from.y, line.to.x, line.to.y, color);
+	}
+	
+	for(auto& arrow : S::visualDebug.arrows)
+	{
+		SDL_Color color = colorFromHex(arrow.color, 0xff);
+		GPU_Line(m_screen, arrow.from.x, arrow.from.y, arrow.to.x, arrow.to.y, color);
+		
+		Point vec = arrow.to - arrow.from;
+		
+		float angle = M_PI / 5;
+		float headSize = FMath::lerp(0.f, 0.f, 100.f, 8.f, vec.getLength());
+		headSize = std::min(headSize, 10.f);
+		headSize++;
+		
+		vec = vec.rotate(angle);
+		vec.scaleTo(headSize);
+		
+		Point branch = arrow.to - vec;
+		
+		GPU_Line(m_screen, arrow.to.x, arrow.to.y, branch.x, branch.y, color);
+		
+		vec = vec.rotate(-angle*2);
+		branch = arrow.to - vec;
+		
+		GPU_Line(m_screen, arrow.to.x, arrow.to.y, branch.x, branch.y, color);
+	}
+	
+	for(auto& rect : S::visualDebug.rects)
+	{
+		SDL_Color color = colorFromHex(rect.color, rect.alpha);
+		if (rect.fill)
+			GPU_RectangleFilled2(m_screen, rect.rect, color);
+		else
+			GPU_Rectangle2(m_screen, rect.rect, color);
+	}
+	
+	for(auto& circle : S::visualDebug.circles)
+	{
+		SDL_Color color = colorFromHex(circle.color, circle.alpha);
+		if (circle.fill)
+			GPU_CircleFilled(m_screen, circle.origin.x, circle.origin.y, circle.radius, color);
+		else
+			GPU_Circle(m_screen, circle.origin.x, circle.origin.y, circle.radius, color);
+	}
 }

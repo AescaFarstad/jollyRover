@@ -19,6 +19,27 @@ void from_json(const json &j, CreepProto &creep)
 	creep.loot = j.at("loot");
 	creep.strength = j.at("strength");
 	creep.weapon = j.at("weapon");
+	
+	std::string moveType = j.at("moveType");
+	if (moveType == "tractor")	
+		creep.moveType = MOVE_TYPE::TRACTOR;
+	else if (moveType == "walker")	
+		creep.moveType = MOVE_TYPE::WALKER;
+	else
+		THROW_FATAL_ERROR("Unknown creep move type: " + moveType);
+	
+	if (creep.moveType == MOVE_TYPE::TRACTOR)
+	{
+		creep.angularSpeed.x = j.at("angularSpeed").at("0");
+		creep.angularSpeed.y = j.at("angularSpeed").at("1");
+		creep.acceleration.x = j.at("acceleration").at("0");
+		creep.acceleration.y = j.at("acceleration").at("1");
+		creep.normalFriction = j.at("normalFriction");
+	}
+	else
+	{
+		creep.normalFriction = 0;
+	}
 }
 
 void from_json(const json &j, WeaponProto &weapon)

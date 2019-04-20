@@ -62,6 +62,7 @@ void Prototypes::postProcess()
 			formation.BB.x = std::max(formation.BB.x, slot.offset.x + creep.size);
 			formation.BB.y = std::max(formation.BB.y, slot.offset.y + creep.size);
 		}
+		formation.width = formation.BB.y - formation.AA.y;
 	}
 	
 	variables.maxCreepSize = 0;
@@ -78,8 +79,12 @@ void Prototypes::postProcess()
 	obstacleMap = SpatialMap<Obstacle>(10, false, from, to);
 	obstacleMap.setNonUnique(obstacles);
 	
+	
+	
 	for(auto& formation : formations)
 	{
+		formation.maxAngularSpeed = M_PI;
+		
 		auto slots = formation.slots;
 		for(size_t i = 0; i < formation.slots.size(); i++)
 		{
@@ -101,7 +106,13 @@ void Prototypes::postProcess()
 			{
 				formation.slots[i].connections.push_back(FormationSlotConnectionProto{slots[j].index, formation.slots[i].offset - slots[j].offset});
 			}
+			
+			// maxAngularSpeed
+			float slotAngularSpeed = creeps[formation.slots[i].creepType].speed / formation.slots[i].offset.getLength();
+			formation.maxAngularSpeed = std::min(formation.maxAngularSpeed, slotAngularSpeed);
 		}
+		
+		
 	}
 	
 	

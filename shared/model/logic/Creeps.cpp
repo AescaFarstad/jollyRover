@@ -1,5 +1,6 @@
 #include <Creeps.h>
 #include <FMath.h>
+#include <VisualDebug.h>
 
 namespace Creeps
 {
@@ -22,7 +23,6 @@ namespace Creeps
 				THROW_FATAL_ERROR("creep pointer mismatch");
 		}
 		
-		
 		for(auto& force : prototypes->forces)
 		{
 			if (state->formations.size() == FormationState::MAX_FORMATION_COUNT)
@@ -39,7 +39,7 @@ namespace Creeps
 				}
 			}
 		}
-			
+		
 		for(auto& creep : state->creeps)
 			creep.movement_.scaleTo(0);
 		
@@ -177,6 +177,8 @@ namespace Creeps
 			creep.formationId = -1;
 			creep.formationsSlot = -1;
 			
+			creep.sensedAnObstacle = false;
+			
 			return creep;
 		}
 		
@@ -194,13 +196,12 @@ namespace Creeps
 					formation.targetLocation = objective.location;
 					formation.targetOrientation = prototypes->variables.fieldCenter.subtract(objective.location).asAngle();
 					formation.objectivePrototype_ = &objective;
-					float expectedTravelTime = formation.targetLocation.subtract(formation.location).getLength() / formation.speed;
-					formation.angularSpeed = FMath::angleDelta(formation.orientation, formation.targetOrientation) / expectedTravelTime; 
 				}
 				
 				float balance = 0;
 				float maxDisabalance = 0;
 				int32_t creepBalanceCount = 1;
+				int32_t targetInObstacleCount = 0;
 				for(auto& id : formation.slots)
 				{
 					if (id < 0)
@@ -235,9 +236,11 @@ namespace Creeps
 					else
 					{
 						target = &targetSlotLocation;
+						targetInObstacleCount++;
 					}
 					auto followCount = 0;
-					target->scaleBy(2);
+					float targetPriority = creep.sensedAnObstacle ? 15 : 1;
+					target->scaleBy(targetPriority);
 					for(auto& connection : formation.formationPrototype_->slots[creep.formationsSlot].connections)
 					{
 						CreepState* partner = state->creepById_[formation.slots[connection.slot]];
@@ -247,30 +250,79 @@ namespace Creeps
 							*target += partner->unit.location + connection.offset.rotate(formation.orientation);
 						}
 					}
-					target->scaleBy(1.f/(2.f + followCount));
+					target->scaleBy(1.f/(targetPriority + followCount));
 					creep.formationAttraction_ = *target;
-					moveCreepTowardsPoint(creep, *target, prototypes, timePassed);	
+					moveCreepTowardsPoint(creep, *target, prototypes, timePassed);
+					
 				}				
 				
 				balance /= creepBalanceCount;
 				//balance = std::min(-maxDisabalance, balance);
+				Point formationDirection;
+				formationDirection.setFromAngle(formation.orientation);
+				auto cells = prototypes->obstacleMap.getCellsInRadius(formation.location, formation.formationPrototype_->width * 0.35, 0.2);
+				int32_t obstaclesAhead = 0;
+				for(auto& cell : cells)
+				{
+					if (cell.second->size() > 0 && ((cell.first - formation.location) * formationDirection) > 0 )
+					{
+						obstaclesAhead++;
+						VisualDebug::drawRect(cell.first, prototypes->obstacleMap.getCellSize() - 2, true, 0x0, 0x33);
+					}
+				}
+				VisualDebug::drawCircle(formation.location, formation.formationPrototype_->width * 0.5, true, 0x0, 0x11);
+				VisualDebug::drawArrow(formation.location, formation.location + (formationDirection * formation.formationPrototype_->width * 0.4), 0x0);
 				
-				formation.speedMulti = FMath::lerp(0, 0.9f, -20, 0.5f, balance);
+				formation.speedMulti = FMath::lerp(0, 0.8f + obstaclesAhead, -20 - obstaclesAhead, 0.5f, balance);
 				formation.speedMulti = std::max(0.1f, formation.speedMulti);
+				formation.speedMulti *= targetInObstacleCount + 1;
+				formation.speedMulti = std::min(8.f, formation.speedMulti);
 				
 				Point formation2Target = formation.targetLocation - formation.location;
-				float stepSize = timePassed * formation.speed * formation.speedMulti;
+				float desiredOrientation;
+				if (formation2Target.getLength() > 30)
+					desiredOrientation = formation2Target.asAngle();
+				else
+					desiredOrientation = formation.targetOrientation;
+				float aDelta = FMath::angleDelta(formation.orientation, desiredOrientation);
+				float speedRatio = FMath::lerp(0.f, 1.f, M_PI*M_PI / 16, 0, aDelta*aDelta);
+				speedRatio = std::min(speedRatio, 1.f);
+				speedRatio = std::max(speedRatio, 0.05f);
 				
+				float stepSize = timePassed * formation.speed * formation.speedMulti * speedRatio;
+				
+				Point dp;
+				dp.setFromAngle(desiredOrientation);
+				VisualDebug::drawArrow(formation.location, formation.location + (dp * 50), 0x0000ff);
+				
+				bool formationCanBeDesposed = true;
 				if (formation2Target.getLength() > stepSize)
 				{
 					formation2Target.scaleTo(stepSize);
 					formation.location += formation2Target;
-					formation.orientation += timePassed * formation.angularSpeed * formation.speedMulti;
+					formationCanBeDesposed = false;
 				}
 				else
 				{
-					formation.isDisposed_ = true;
+					speedRatio = 0;
+					formation.location = formation.targetLocation;
 				}
+				
+				float turnSize = timePassed * formation.formationPrototype_->maxAngularSpeed * (1 - speedRatio + 0.1);
+				
+				if (std::fabs(aDelta) > turnSize)
+				{
+					float turnDirection = aDelta > 0 ? 1 : -1;
+					formation.orientation += turnDirection * turnSize;
+					formationCanBeDesposed = false;
+				}
+				else
+				{
+					formation.orientation = desiredOrientation;
+				}
+				
+				formation.isDisposed_ = formationCanBeDesposed && balance > -3;
+				
 			}
 		}
 		
@@ -400,13 +452,21 @@ namespace Creeps
 							}
 						}
 					}
-					step = *bestPoint - creep.unit.location;
-					step.scaleTo(stepSize);
-					creep.movement_ = step;
-					creep.unit.voluntaryMovement = step;
-					return;
+					if (bestPoint)
+					{
+						step = *bestPoint - creep.unit.location;
+						if (step.getLength() > 0)
+						{
+							step.scaleTo(stepSize);
+							creep.movement_ = step;
+							creep.unit.voluntaryMovement = step;
+							creep.sensedAnObstacle = true;
+							return;						
+						}
+					}
 				}
 			}
+			creep.sensedAnObstacle = false;
 			creep.movement_ = step;
 			creep.unit.voluntaryMovement = step;
 		}
@@ -500,14 +560,14 @@ namespace Creeps
 			for(auto& creep : state->creeps)
 			{
 				std::vector<CreepState*> possibleCollisions = state->creepMap_.getInRadius(
-						creep.unit.location, creep._creepProto->size + prototypes->variables.maxCreepSize);
+						creep.unit.location, creep._creepProto->size + prototypes->variables.maxCreepSize + prototypes->variables.additionalSpacing);
 				
 				for(auto& creep2 : possibleCollisions)
 				{
 					if (creep2 >= &creep)
 						continue;
 						
-					int32_t collisionRadius = creep._creepProto->size + creep2->_creepProto->size;
+					int32_t collisionRadius = creep._creepProto->size + creep2->_creepProto->size + prototypes->variables.additionalSpacing;
 					Point creep2Creep = creep.unit.location - creep2->unit.location;
 					if (creep2Creep.getLength() == 0)
 						creep2Creep.x = 0.1;

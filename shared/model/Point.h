@@ -28,6 +28,7 @@ public:
 	void setToNaN();
 	bool isNaN();
 	float getLength();
+	void setFromAngle(float angle);
 	float asAngle();
 	float asAngleInDegrees();
 	std::string toString();
@@ -59,3 +60,6 @@ void from_json(const json& j, Point& point);
 Point operator+(const Point& x, const Point& y);
 Point operator-(const Point& x, const Point& y);
 bool operator==(const Point& x, const Point& y);
+float operator*(const Point& x, const Point& y);
+Point operator*(const Point& x, const float& y);
+Point operator*(const float& x, const Point& y);

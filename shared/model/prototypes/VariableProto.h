@@ -23,7 +23,7 @@ public:
 	float stepAngleWindow;
 	
 	float creepRestitution;
-	
+	int32_t additionalSpacing;	
 	int32_t intensity;
 	int32_t formationNumConnections;
 	

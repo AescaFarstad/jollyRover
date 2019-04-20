@@ -35,7 +35,8 @@ private:
 	Renderer m_renderer;
 	GPU_Image* m_image;	
 	ViewController<ProjectileExplosionView> m_projectileExplosions;	
-	ViewController<ProjectileExplosionView> m_unitDeaths;	
+	ViewController<ProjectileExplosionView> m_unitDeaths;
+	int32_t lastTime;	
 	
 	uint32_t m_loadCount;
 
@@ -50,6 +51,7 @@ private:
 	void drawFormations();
 	void drawProjectileExplosion();
 	void drawUnitExplosion();
+	void drawDebugGraphics();
 	
 };
 

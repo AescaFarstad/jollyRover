@@ -2,6 +2,7 @@
 #include <Keyboard.h>
 #include <Creeps.h>
 #include <InputTimeMessage.h>
+#include <VisualDebug.h>
 
 
 void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessage*> &inputs, Prototypes* prototypes)
@@ -41,6 +42,7 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 		if (time.forcedTimeScale > 0 && time.allowedSteps >= 0)
 			time.allowedSteps++;
 		state->time.performedSteps++;
+		VisualDebug::clear();
 	}
 		
 	state->time.time += ingameTimePassed;

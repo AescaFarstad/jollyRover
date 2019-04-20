@@ -45,6 +45,8 @@ public:
 	FORMATION_TYPE type;
 	std::vector<FormationSlotProto> slots;
 	int32_t strength;
+	int32_t width;
+	float maxAngularSpeed;
 	Point AA;
 	Point BB;
 };
