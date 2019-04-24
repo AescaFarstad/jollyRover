@@ -180,6 +180,7 @@ void Game::handleEvent(SDL_Event* event)
 	if (event->type == SDL_MOUSEMOTION)
 	{
 		m_routeInput->onMouseMove(&event->motion);
+		m_gameView->onMouseMove(&event->motion);
 		return;
 	}
 	

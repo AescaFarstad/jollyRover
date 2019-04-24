@@ -24,6 +24,8 @@ public:
 
 	void render(GameState* state, RouteInput* routeInput);
 	
+	void onMouseMove(SDL_MouseMotionEvent* event);
+	
 private:
 
 	SDL_Window* m_window;
@@ -52,6 +54,7 @@ private:
 	void drawProjectileExplosion();
 	void drawUnitExplosion();
 	void drawDebugGraphics();
+	
 	
 };
 

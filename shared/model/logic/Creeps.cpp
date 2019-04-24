@@ -58,6 +58,7 @@ namespace Creeps
 		
 		
 		pushOutCreeps(state, prototypes, timePassed);
+		pushCreepsOutOfObstacles(state, prototypes, timePassed);
 		preventCreepObstacleCollision(state, prototypes);
 		for(auto& creep : state->creeps)
 			creep.unit.location += creep.movement_;
@@ -131,6 +132,7 @@ namespace Creeps
 					creep.unit.force = forceProto.id;
 					creep.formationId = formation.object.id;
 					creep.formationsSlot = formation.slots.size();
+					creep.direction = formation.orientation;
 					formation.slots.push_back(creep.object.id);
 					formation.speed = std::min(formation.speed, creep._creepProto->speed);
 				}
@@ -202,6 +204,8 @@ namespace Creeps
 				float maxDisabalance = 0;
 				int32_t creepBalanceCount = 1;
 				int32_t targetInObstacleCount = 0;
+				float tractorFactor = 0;
+				int32_t tractorFactorCreeps = 0;
 				for(auto& id : formation.slots)
 				{
 					if (id < 0)
@@ -229,6 +233,11 @@ namespace Creeps
 						else
 						{
 							balance -= creep2SlotL;
+							if (creep._creepProto->moveType == MOVE_TYPE::TRACTOR)
+							{
+								tractorFactor += creep._creepProto->size / 5;
+								tractorFactorCreeps++;
+							}
 							maxDisabalance = std::max(maxDisabalance, creep2SlotL);
 							target = &formationSlotLocation;
 						}							
@@ -257,6 +266,7 @@ namespace Creeps
 				}				
 				
 				balance /= creepBalanceCount;
+				tractorFactor /= tractorFactorCreeps;
 				//balance = std::min(-maxDisabalance, balance);
 				Point formationDirection;
 				formationDirection.setFromAngle(formation.orientation);
@@ -321,7 +331,7 @@ namespace Creeps
 					formation.orientation = desiredOrientation;
 				}
 				
-				formation.isDisposed_ = formationCanBeDesposed && balance > -3;
+				formation.isDisposed_ = formationCanBeDesposed && balance > -3 - tractorFactor;
 				
 			}
 		}
@@ -415,6 +425,208 @@ namespace Creeps
 		
 		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed)
 		{
+			if (creep._creepProto->moveType == MOVE_TYPE::TRACTOR)
+				moveTractorTowardsPoint(creep, target, prototypes, timePassed);
+			else if (creep._creepProto->moveType == MOVE_TYPE::WALKER)
+				moveWalkerTowardsPoint(creep, target, prototypes, timePassed);
+		}
+		
+		void moveTractorTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed)
+		{
+			float breakAccel = -0.0005;
+			auto& proto = creep._creepProto;
+			float speed = creep.velocity.getLength();
+			float omniDirectionalSpeed = 0.002;
+			
+			if (VisualDebug::interestingId == creep.object.id)
+			{
+				Point(1, 0).distanceTo(2, 5);
+			}
+			// Friction
+			if (creep.velocity.getLength() > 0)
+			{
+				int32_t tp = timePassed;
+				float scale = 1;
+				while(tp)
+				{
+					scale *= 0.99; //TODO config
+					tp /= 5; // ~3 times per standard step size; //TODO config
+				}
+				creep.velocity.scaleBy(scale);				
+			}
+			
+			// Stop if reached the target
+			Point creep2Target = target - creep.unit.location;
+			
+			if (creep2Target.getLength() < creep._creepProto->size)
+			{
+				Point omniDirectionalStep = creep2Target;
+				if (omniDirectionalStep.getLength() > 0)
+					omniDirectionalStep.scaleTo(std::min(creep2Target.getLength(), omniDirectionalSpeed * timePassed));
+					
+					/**/
+				/*if (creep.velocity.getLength() > 0)
+				{
+					float accel = FMath::lerp(0, proto->acceleration.x, proto->speed, proto->acceleration.y, speed);
+					float accel = FMath::lerp(0, 0, creep._creepProto->size, accel, creep2Target.getLength());
+					accelerateTractor(creep, accel * timePassed);
+				}*/
+				accelerateTractor(creep, breakAccel * timePassed);
+				creep.movement_ = creep.velocity + omniDirectionalStep;
+				creep.unit.voluntaryMovement = creep.velocity;
+				return;
+			}
+			
+			/*
+			for(auto& whisker : creep.whiskers)
+			{
+				if (whisker < 0 )
+					break;
+				Point line = target - creep.unit.location;
+				if (line.getLength() == 0)	
+					return;
+				line.scaleTo(whisker);
+				VisualDebug::drawCircle(creep.unit.location + line, 3, false, 0x0000ff);
+			}*/
+			
+			Point nextTarget = avoidObstacles(creep, 4, target, prototypes);
+			creep2Target = nextTarget - creep.unit.location;
+			
+			// Move
+			bool targetIsUnreachableAtCurrentSpeed;
+			
+			float angularSpeed = FMath::lerp(0, proto->angularSpeed.x, proto->speed, proto->angularSpeed.y, speed);			
+			angularSpeed = std::max(0.001f, angularSpeed);
+			
+				
+			if (speed == 0)
+			{
+				targetIsUnreachableAtCurrentSpeed = false;				
+			}
+			else
+			{
+				float turnRadiusLength = speed / angularSpeed;
+				//turnRadiusLength -= omniDirectionalSpeed * nextTarget.distanceTo(creep.unit.location);
+				Point turnRadius;
+				turnRadius.setFromAngle(creep.direction);
+				turnRadius.scaleTo(turnRadiusLength);
+				Point unreachableCenter1 = creep.unit.location + turnRadius.rotate(M_PI_2);
+				Point unreachableCenter2 = creep.unit.location + turnRadius.rotate(-M_PI_2);
+				
+				float distance1 = unreachableCenter1.distanceTo(nextTarget);
+				float distance2 = unreachableCenter2.distanceTo(nextTarget);
+				targetIsUnreachableAtCurrentSpeed = distance1 < turnRadiusLength || distance2 < turnRadiusLength;
+				//-0.249051929
+				float velocityAsAngle = creep.velocity.asAngle();
+				
+				auto debugColor = targetIsUnreachableAtCurrentSpeed ? 0xff0000 : 0x00ff00;
+				if (VisualDebug::interestingId == creep.object.id)
+				{
+					VisualDebug::drawCircle(unreachableCenter1, turnRadiusLength, true, debugColor, 0x22);
+					VisualDebug::drawCircle(unreachableCenter2, turnRadiusLength, true, debugColor, 0x22);
+					
+					if (VisualDebug::interestingPoint != nextTarget)
+					{
+						VisualDebug::interestingPoint = nextTarget;
+						S::log.add(nextTarget.toString());
+					}
+				}/**/
+				VisualDebug::drawArrow(creep.unit.location, nextTarget, debugColor);
+				Point hh;
+				hh.setFromAngle(creep.direction);
+				hh.scaleTo(40);
+				VisualDebug::drawArrow(creep.unit.location, creep.unit.location + hh, 0x0000ff);
+				
+				
+				
+				
+			}
+			
+			float maxValidTurnRadius = creep2Target.getLength() / 2 / creep2Target.cos(creep.velocity.rotate(M_PI_2)); //TODO / 0			
+			maxValidTurnRadius = std::fabs(maxValidTurnRadius);
+			
+			float maxVelocity = angularSpeed * maxValidTurnRadius;
+			
+			float desiredDirection = creep2Target.asAngle();
+			float delta = FMath::angleDelta(desiredDirection, creep.direction);
+			float directionStep = angularSpeed * timePassed;
+			if (std::fabs(delta) < directionStep)
+				directionStep = std::fabs(delta);
+			if (delta > 0)
+				directionStep *= -1;
+				
+			creep.direction += directionStep;
+			creep.velocity = creep.velocity.rotate(directionStep);				
+													 
+			if (targetIsUnreachableAtCurrentSpeed)
+			{
+				accelerateTractor(creep, breakAccel * timePassed);
+			}
+			else
+			{
+				float accel = FMath::lerp(0, proto->acceleration.x, proto->speed, proto->acceleration.y, speed);
+				accel = std::max(0.001f, accel);
+				accel *= timePassed;
+				if (accel * 1.05 > maxVelocity - creep.velocity.getLength())
+					accel = (maxVelocity - creep.velocity.getLength()) / 1.05;
+				
+				accelerateTractor(creep, accel);
+				
+				if (VisualDebug::interestingId == creep.object.id)
+				{
+					speed = creep.velocity.getLength();
+					creep2Target = nextTarget - creep.unit.location + creep.velocity;
+					
+					float turnRadiusLength = speed / angularSpeed;
+					float maxValidTurnRadius2 = creep2Target.getLength() / 2 / creep2Target.cos(creep.velocity.rotate(M_PI_2)); //TODO / 0
+					maxValidTurnRadius2 = std::fabs(maxValidTurnRadius2);
+				
+					if (turnRadiusLength > maxValidTurnRadius)
+					{
+						Point(1, 0).distanceTo(2, 5);
+					}
+					if (turnRadiusLength > maxValidTurnRadius2)
+					{
+						Point(1, 0).distanceTo(2, 5);
+					}
+				}
+			}
+			
+			Point omniDirectionalStep = creep2Target;
+			if (omniDirectionalStep.getLength() > 0)
+				omniDirectionalStep.scaleTo(std::min(creep2Target.getLength(), omniDirectionalSpeed*timePassed));
+				
+			creep.movement_ = creep.velocity + omniDirectionalStep;
+			creep.unit.voluntaryMovement = creep.velocity;
+		}
+		
+		void accelerateTractor(CreepState& creep, float amount)
+		{
+			if (amount > 0)
+			{
+				creep.velocity += Point(amount, 0).rotate(creep.direction);
+			}
+			else
+			{
+				Point breakForce = Point(amount, 0).rotate(creep.direction);
+				
+				if (breakForce.getLength() > creep.velocity.getLength())
+				{
+					creep.velocity.x = 0;
+					creep.velocity.y = 0;
+				}
+				else
+				{
+					creep.velocity += breakForce;
+				}
+				
+			}
+			//S::log.add(std::to_string(creep.object.id) + " after accel: " + creep.velocity.toString());
+		}
+		
+		
+		void moveWalkerTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed)
+		{
 			Point step = target - creep.unit.location;
 			
 			if (step.getLength() == 0)
@@ -469,6 +681,67 @@ namespace Creeps
 			creep.sensedAnObstacle = false;
 			creep.movement_ = step;
 			creep.unit.voluntaryMovement = step;
+		}
+		
+		Point avoidObstacles(CreepState& creep, float stepSize, const Point& target, Prototypes* prototypes)
+		{
+			Point step = target - creep.unit.location;
+			if (step.getLength() == 0)
+				return target;
+			step.scaleTo(stepSize);
+			for(auto& whisker : creep.whiskers)
+			{
+				if (whisker < 0 || whisker > (target - creep.unit.location).getLength())
+					break;
+					
+				Point whiskerStep = step;
+				whiskerStep.scaleTo(1 + whisker);
+				Point nextLoc = creep.unit.location + whiskerStep;
+				Obstacle* obstacle = Field::findObstacle(nextLoc, prototypes);
+				if (obstacle)
+				{
+					Point creepToTarget = target - creep.unit.location;
+					float direction = creepToTarget.crossProduct(obstacle->centroid - creep.unit.location);
+					
+					Point* bestPoint = nullptr;
+					float bestDistance = FMath::F_MAX;
+					int32_t bestIndex = -1;
+					for(size_t i = 0; i < obstacle->vertices.size(); i++)
+					{
+						auto& vert = obstacle->vertices[i];
+						float vertDir = creepToTarget.crossProduct(vert - creep.unit.location);
+						if ((vertDir < 0) != (direction < 0))
+						{
+							float distance = vert.distanceTo(creep.unit.location);
+							if (distance < bestDistance)
+							{
+								bestDistance = distance;
+								bestPoint = &vert;
+								bestIndex = i;
+							}
+						}
+					}
+					if (bestPoint)
+					{
+						if (creep._creepProto->moveType == MOVE_TYPE::TRACTOR)
+						{
+							if (direction > 0) 
+							{
+								return obstacle->extendedVertices[1][bestIndex];
+							}
+							else
+							{
+								return obstacle->extendedVertices[0][bestIndex];
+							}
+						}
+						else
+						{
+							return *bestPoint;
+						}
+					}
+				}
+			}
+			return target;
 		}
 		
 		CreepState* creepByid(int32_t id, std::vector<CreepState>& creeps)
@@ -592,6 +865,25 @@ namespace Creeps
 			}
 			
 		}
+		
+		void pushCreepsOutOfObstacles(GameState* state, Prototypes* prototypes, int timePassed)
+		{
+			for(auto& creep : state->creeps)
+			{
+				if (!creep.unit.health <= 0)
+					continue;
+				
+				auto obstacle = Field::findObstacle(creep.unit.location, prototypes);
+				
+				if (!obstacle)
+					continue;
+				
+				Point force = creep.unit.location - obstacle->centroid;
+				force.scaleTo(0.1 * timePassed);
+				creep.movement_ += force;
+			}
+		}
+		
 		
 		void spawnProjectile(Point& from, Point& to, const WeaponProto* prototype, int16_t force, GameState* state)
 		{
@@ -718,6 +1010,9 @@ namespace Creeps
 			{
 				if (formation.isDisposed_)
 				{
+					formation.isDisposed_ = false;
+					formation.objectiveID = -1;
+					continue;
 					for(auto& slot : formation.slots)
 					{
 						if (slot > 0)

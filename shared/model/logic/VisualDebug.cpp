@@ -2,6 +2,9 @@
 
 namespace VisualDebug
 {
+	int32_t interestingId;
+	Point interestingPoint;
+	
 	void drawLine(Point from, Point to, uint32_t color)
 	{
 		S::visualDebug.lines.push_back(VisualDebugLine{from, to, color});

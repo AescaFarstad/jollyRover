@@ -26,12 +26,12 @@ public:
 	void scaleTo(float length);
 	void scaleBy(float value);
 	void setToNaN();
-	bool isNaN();
-	float getLength();
+	bool isNaN() const;
+	float getLength() const;
 	void setFromAngle(float angle);
-	float asAngle();
-	float asAngleInDegrees();
-	std::string toString();
+	float asAngle() const;
+	float asAngleInDegrees() const;
+	std::string toString() const;
 
 	float distanceTo(const Point& anotherPoint);
 	float distanceTo(const float x, const float y);
@@ -44,15 +44,17 @@ public:
 	Point rotate(const float angle);
 	void rotate(const float angle, Point &out);
 	float crossProduct(const Point &anotherPoint);
+	float cos(const Point &anotherPoint);
+	float sin(const Point &anotherPoint);
 	
 	void operator+=(const Point& p);
 	void operator-=(const Point& p);
+	void operator*=(const float& p);
+	void operator/=(const float& p);
 
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
-
-private:
 
 };
 
@@ -60,6 +62,7 @@ void from_json(const json& j, Point& point);
 Point operator+(const Point& x, const Point& y);
 Point operator-(const Point& x, const Point& y);
 bool operator==(const Point& x, const Point& y);
+bool operator!=(const Point& x, const Point& y);
 float operator*(const Point& x, const Point& y);
 Point operator*(const Point& x, const float& y);
 Point operator*(const float& x, const Point& y);

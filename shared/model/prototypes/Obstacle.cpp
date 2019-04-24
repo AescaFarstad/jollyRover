@@ -4,6 +4,8 @@
 Obstacle::Obstacle(Obstacle const &other)
 {
 	vertices = other.vertices;
+	extendedVertices[0] = other.extendedVertices[0];
+	extendedVertices[1] = other.extendedVertices[1];
 	edges = other.edges;
 	AA = other.AA;
 	BB = other.BB;
@@ -111,4 +113,24 @@ void from_json(const json &j, Obstacle &obstacle)
 	obstacle.centroid.y /= 6 * area;
 	
 	obstacle.edges.emplace_back(&obstacle.vertices.back(), &obstacle.vertices[0]);
+	
+	float extendSize = 5;
+	for (size_t i = 0; i < obstacle.vertices.size(); i++)
+	{
+		int32_t prev = (i - 1 + obstacle.vertices.size()) % obstacle.vertices.size();
+		int32_t next = (i + 1) % obstacle.vertices.size();
+		
+		auto& v1 = obstacle.vertices[prev];
+		auto& v2 = obstacle.vertices[i];
+		auto& v3 = obstacle.vertices[next];
+		
+		Point vec1 = v2 - v1;
+		Point vec2 = v2 - v3;
+		
+		vec1.scaleTo(extendSize);
+		vec2.scaleTo(extendSize);
+		
+		obstacle.extendedVertices[0].push_back(v2 + vec1);
+		obstacle.extendedVertices[1].push_back(v2 + vec2);
+	}
 }

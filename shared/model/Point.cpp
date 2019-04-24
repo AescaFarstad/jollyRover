@@ -47,12 +47,12 @@ void Point::setToNaN()
 	y = std::numeric_limits<float>::quiet_NaN();
 }
 
-bool Point::isNaN()
+bool Point::isNaN() const
 {
 	return std::isnan(x) || std::isnan(y);
 }
 
-float Point::getLength()
+float Point::getLength() const
 {
 	return std::sqrt(x*x + y*y);
 }
@@ -63,17 +63,17 @@ void Point::setFromAngle(float angle)
 	y = FMath::sin(angle);
 }
 
-float Point::asAngle()
+float Point::asAngle() const
 {
 	return FMath::atan2(y, x);
 }
 
-float Point::asAngleInDegrees()
+float Point::asAngleInDegrees() const
 {
 	return FMath::atan2(y, x) * 180 / M_PI;
 }
 
-std::string Point::toString()
+std::string Point::toString() const
 {
 	std::stringstream stream;
 	stream << "[" << std::fixed << std::setprecision(2) << x << ", " << std::fixed << std::setprecision(2) << y << "]";
@@ -149,6 +149,19 @@ float Point::crossProduct(const Point &anotherPoint)
 {
 	return x*anotherPoint.y - anotherPoint.x * y;
 }
+
+float Point::cos(const Point &anotherPoint)
+{
+	return (*this * anotherPoint) / (getLength() * anotherPoint.getLength());
+}
+
+float Point::sin(const Point &anotherPoint)
+{
+	float u1 = crossProduct(anotherPoint);
+	float u2 = getLength();
+	float u3 = anotherPoint.getLength();
+	return crossProduct(anotherPoint) / (getLength() * anotherPoint.getLength());
+}
 	
 void Point::operator+=(const Point& p)
 {
@@ -160,6 +173,19 @@ void Point::operator-=(const Point& p)
 {
 	x -= p.x;
 	y -= p.y;
+}
+
+	
+void Point::operator*=(const float& p)
+{
+	x *= p;
+	y *= p;
+}
+
+void Point::operator/=(const float& p)
+{
+	x /= p;
+	y /= p;
 }
 
 void Point::deserialize(SerializationStream &stream)
@@ -191,6 +217,10 @@ Point operator-(const Point& x, const Point& y)
 bool operator==(const Point& x, const Point& y)
 {
 	return x.x == y.x && x.y == y.y;
+}
+bool operator!=(const Point& x, const Point& y)
+{
+	return x.x != y.x || x.y != y.y;
 }
 float operator*(const Point& x, const Point& y)
 {

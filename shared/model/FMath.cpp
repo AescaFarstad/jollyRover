@@ -74,26 +74,68 @@ Point FMath::getLinesIntersection(Point &s11, Point &s12, Point &s21, Point &s22
 	return Point(intersectionX, intersectionY);
 }
 
+//https://www.dsprelated.com/showarticle/1052.php
+// Polynomial approximating arctangenet on the range -1,1.
+// Max error < 0.005 (or 0.29 degrees)
+float appAtan(float z)
+{
+    const float n1 = 0.97239411f;
+    const float n2 = -0.19194795f;
+    return (n1 + n2 * z * z) * z;
+}
+
 float FMath::atan2(float y, float x)
 {
-	float coeff_1 = (float)M_PI / 4;
-	float coeff_2 = 3 * coeff_1;
-	float abs_y = y > 0 ? y : -y;
-	float angle;
-
-	if (abs_y == 0)
-		return x >= 0 ? 0 : -(float)M_PI;
-
-	if (x >= 0)
-		angle = coeff_1 - coeff_1 * (x - abs_y) / (x + abs_y);
-	else
-		angle = coeff_2 - coeff_1 * (x + abs_y) / (abs_y - x);
-
-	if (y < 0)
-		return(-angle);
-	else
-		return(angle);
+    if (x != 0.0f)
+    {
+        if (fabsf(x) > fabsf(y))
+        {
+            const float z = y / x;
+            if (x > 0.0)
+            {
+                // atan2(y,x) = atan(y/x) if x > 0
+                return appAtan(z);
+            }
+            else if (y >= 0.0)
+            {
+                // atan2(y,x) = atan(y/x) + PI if x < 0, y >= 0
+                return appAtan(z) + M_PI;
+            }
+            else
+            {
+                // atan2(y,x) = atan(y/x) - PI if x < 0, y < 0
+                return appAtan(z) - M_PI;
+            }
+        }
+        else // Use property atan(y/x) = PI/2 - atan(x/y) if |y/x| > 1.
+        {
+            const float z = x / y;
+            if (y > 0.0)
+            {
+                // atan2(y,x) = PI/2 - atan(x/y) if |y/x| > 1, y > 0
+                return -appAtan(z) + M_PI_2;
+            }
+            else
+            {
+                // atan2(y,x) = -PI/2 - atan(x/y) if |y/x| > 1, y < 0
+                return -appAtan(z) - M_PI_2;
+            }
+        }
+    }
+    else
+    {
+        if (y > 0.0f) // x = 0, y > 0
+        {
+            return M_PI_2;
+        }
+        else if (y < 0.0f) // x = 0, y < 0
+        {
+            return -M_PI_2;
+        }
+    }
+    return 0.0f; // x,y = 0. Could return NaN instead.
 }
+
 
 float FMath::angleDelta(float from, float to)
 {

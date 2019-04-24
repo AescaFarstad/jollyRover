@@ -13,6 +13,7 @@ public:
 	Obstacle(Obstacle const& other);
 
 	std::vector<Point> vertices;
+	std::vector<Point> extendedVertices[2];
 	std::vector<Edge> edges;
 	Point AA;
 	Point BB;

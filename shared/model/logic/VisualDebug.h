@@ -42,6 +42,9 @@ namespace VisualDebug
 		
 		void clear();
 	};
+	
+	extern int32_t interestingId;
+	extern Point interestingPoint;
 
 	void drawLine(Point from, Point to, uint32_t color);
 	void drawArrow(Point from, Point to, uint32_t color);

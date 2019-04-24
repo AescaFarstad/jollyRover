@@ -3,6 +3,7 @@
 #include <ViewUtil.h>
 #include <VisualDebug.h>
 #include <FMath.h>
+#include <std2.h>
 
 
 GameView::GameView(GPU_Target* screen, Prototypes* prototypes)
@@ -47,9 +48,20 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawProjectiles();
 	//drawFormations();	
 	drawProjectileExplosion();	
-	drawDebugGraphics();
+	//drawDebugGraphics();
 	
 	lastTime = state->time.time;
+}
+
+void GameView::onMouseMove(SDL_MouseMotionEvent* event)
+{
+	if (!m_state)
+		return;
+	auto nearestCreep = std2::minElement(m_state->creeps, [event](CreepState& creep){return Point(event->x, event->y).distanceTo(creep.unit.location);});
+	if (Point(event->x, event->y).distanceTo(nearestCreep->unit.location) < 50)	
+		VisualDebug::interestingId = nearestCreep->object.id;
+	else
+		VisualDebug::interestingId = -1;
 }
 
 void GameView::init()
@@ -220,7 +232,11 @@ void GameView::drawCreeps()
 		else
 		{
 			float barrelAngle;
-			float bodyAngle = creep.unit.voluntaryMovement.asAngle();
+			float bodyAngle;
+			if (creep._creepProto->moveType == MOVE_TYPE::TRACTOR)
+				bodyAngle = creep.direction;
+			else
+				bodyAngle = creep.unit.voluntaryMovement.asAngle();
 			
 			if (creep.targetLoc_.getLength() > 0)
 				barrelAngle = (creep.targetLoc_ - creep.unit.location).asAngle();
