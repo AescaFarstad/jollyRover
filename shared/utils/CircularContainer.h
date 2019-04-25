@@ -160,6 +160,7 @@ void CircularContainer<T, arraySize>::deserialize(SerializationStream& stream)
 	Serializer::read(size, stream);
 	int32_t readLength = std::min(sizeof(array), (long unsigned int)total);
 	memcpy(&array, stream.read(array, readLength), readLength);
+	
 }
 
 template <typename T, uint32_t arraySize>
@@ -168,7 +169,7 @@ void CircularContainer<T, arraySize>::serialize(SerializationStream& stream) con
 	Serializer::write(cursor, stream);
 	Serializer::write(total, stream);
 	Serializer::write(size, stream);
-	stream.writeSimple(array, std::min((int)sizeof(array), (int)total));
+	stream.write(array, std::min((int)sizeof(array), (int)total));
 }
 
 template <typename T, uint32_t arraySize>
