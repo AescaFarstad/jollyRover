@@ -51,6 +51,7 @@ private:
 	void drawCreeps();
 	void drawProjectiles();
 	void drawFormations();
+	void drawFormationConnections();
 	void drawProjectileExplosion();
 	void drawUnitExplosion();
 	void drawDebugGraphics();

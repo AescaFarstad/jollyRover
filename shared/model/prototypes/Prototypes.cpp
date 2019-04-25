@@ -89,31 +89,37 @@ void Prototypes::postProcess()
 		for(size_t i = 0; i < formation.slots.size(); i++)
 		{
 			std::sort(slots.begin(), slots.end(), 
-				[slot = formation.slots[i]](FormationSlotProto& a, FormationSlotProto& b)
+				[this, slot = formation.slots[i]](FormationSlotProto& a, FormationSlotProto& b)
 				{
 					if (a.index == slot.index)
 						return false;
 					if (b.index == slot.index)
 						return true;
+						
 					if (a.optional != b.optional && !b.optional)
 						return false;
 					if (a.optional != b.optional && b.optional)
 						return true;
+					/*
+					if (a.creepType != b.creepType)
+						return b.creepType != slot.creepType;*/
+							
 					return b.offset.distanceTo(slot.offset) > a.offset.distanceTo(slot.offset);
 				});			
 				
-			for(size_t j = 0; j < variables.formationNumConnections; j++)
+			for(size_t j = 0; j < formation.connections && j < slots.size(); j++)
 			{
-				formation.slots[i].connections.push_back(FormationSlotConnectionProto{slots[j].index, formation.slots[i].offset - slots[j].offset});
+				if (creeps[slots[j].creepType].weight >= creeps[formation.slots[i].creepType].weight)
+					formation.slots[i].connections.push_back(FormationSlotConnectionProto{slots[j].index, formation.slots[i].offset - slots[j].offset});
 			}
 			
 			// maxAngularSpeed
 			float slotAngularSpeed = creeps[formation.slots[i].creepType].speed / formation.slots[i].offset.getLength();
 			formation.maxAngularSpeed = std::min(formation.maxAngularSpeed, slotAngularSpeed);
 		}
-		
-		
 	}
+	
+	//formations.erase(std::remove_if(formations.begin(), formations.end(), [](FormationProto& f){return !f.enabled;}), formations.end());
 	
 	
 	

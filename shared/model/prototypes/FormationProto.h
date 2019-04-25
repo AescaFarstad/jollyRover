@@ -42,10 +42,13 @@ public:
 	~FormationProto() = default;
 	
 	int16_t id;
+	bool enabled;
 	FORMATION_TYPE type;
 	std::vector<FormationSlotProto> slots;
 	int32_t strength;
 	int32_t width;
+	int32_t leader;
+	int32_t connections;
 	float maxAngularSpeed;
 	Point AA;
 	Point BB;

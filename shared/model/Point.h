@@ -33,19 +33,19 @@ public:
 	float asAngleInDegrees() const;
 	std::string toString() const;
 
-	float distanceTo(const Point& anotherPoint);
-	float distanceTo(const float x, const float y);
-	float sqDistanceTo(const Point& anotherPoint);
-	float sqDistanceTo(const float x, const float y);
-	Point subtract(const Point& anotherPoint);
+	float distanceTo(const Point& anotherPoint) const;
+	float distanceTo(const float x, const float y) const;
+	float sqDistanceTo(const Point& anotherPoint) const;
+	float sqDistanceTo(const float x, const float y) const;
+	Point subtract(const Point& anotherPoint) const;
 	void subtract(const Point& anotherPoint, Point &out);
-	Point add(const Point& anotherPoint);
+	Point add(const Point& anotherPoint) const;
 	void add(const Point& anotherPoint, Point &out);
-	Point rotate(const float angle);
+	Point rotate(const float angle) const;
 	void rotate(const float angle, Point &out);
-	float crossProduct(const Point &anotherPoint);
-	float cos(const Point &anotherPoint);
-	float sin(const Point &anotherPoint);
+	float crossProduct(const Point &anotherPoint) const;
+	float cos(const Point &anotherPoint) const;
+	float sin(const Point &anotherPoint) const;
 	
 	void operator+=(const Point& p);
 	void operator-=(const Point& p);

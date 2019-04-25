@@ -12,6 +12,7 @@ void from_json(const json &j, FormationSlotProto &slot)
 void from_json(const json &j, FormationProto &formation)
 {
 	formation.id = j.at("id");
+	formation.enabled = j.at("enabled");
 	
 	std::string strType = j.at("type");	
 	if (strType == "assault")
@@ -28,5 +29,8 @@ void from_json(const json &j, FormationProto &formation)
 	for(size_t i = 0; i < formation.slots.size(); i++)
 	{
 		formation.slots[i].index = i;
-	}	
+	}
+	
+	formation.leader = j.at("leader");
+	formation.connections = j.at("connections");
 }

@@ -29,12 +29,12 @@ namespace Creeps
 		void moveTractorTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed);
 		void accelerateTractor(CreepState& creep, float amount);
 		Point avoidObstacles(CreepState& creep, float stepSize, const Point& target, Prototypes* prototypes);
+		void moveUnitOutOfObstacle(CreepState& creep, Obstacle* obstacle, int32_t timePassed);
 		
 		void pushOutCreeps(GameState* state, Prototypes* prototypes, int timePassed);
 		void pushCreepsOutOfObstacles(GameState* state, Prototypes* prototypes, int timePassed);
 		void preventCreepObstacleCollision(GameState* state, Prototypes* prototypes);
 		
-		CreepState* creepByid(int32_t id, std::vector<CreepState>& creeps);
 		CreepState* getBestAssaultTargetForCreep(CreepState& creep, std::vector<CreepState>& creeps);
 		
 		void removeDeadProjectiles(GameState* state);

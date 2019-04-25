@@ -81,7 +81,7 @@ std::string Point::toString() const
 	return stream.str();
 }
 
-float Point::distanceTo(const Point &anotherPoint)
+float Point::distanceTo(const Point &anotherPoint) const
 {
 	return std::sqrt(
 			(anotherPoint.x - x)*(anotherPoint.x - x) +
@@ -89,7 +89,7 @@ float Point::distanceTo(const Point &anotherPoint)
 	);
 }
 
-float Point::distanceTo(const float x, const float y)
+float Point::distanceTo(const float x, const float y) const
 {
 	return std::sqrt(
 			(this->x - x)*(this->x - x) +
@@ -97,19 +97,19 @@ float Point::distanceTo(const float x, const float y)
 	);
 }
 
-float Point::sqDistanceTo(const Point &anotherPoint)
+float Point::sqDistanceTo(const Point &anotherPoint) const
 {
 	return (anotherPoint.x - x)*(anotherPoint.x - x) +
 			(anotherPoint.y - y)*(anotherPoint.y - y);
 }
 
-float Point::sqDistanceTo(const float x, const float y)
+float Point::sqDistanceTo(const float x, const float y) const
 {
 	return (this->x - x)*(this->x - x) +
 			(this->y - y)*(this->y - y);
 }
 
-Point Point::subtract(const Point &anotherPoint)
+Point Point::subtract(const Point &anotherPoint) const
 {
 	return Point(x - anotherPoint.x, y - anotherPoint.y);
 }
@@ -120,7 +120,7 @@ void Point::subtract(const Point &anotherPoint, Point &out)
 	out.y = y - anotherPoint.y;
 }
 
-Point Point::add(const Point & anotherPoint)
+Point Point::add(const Point & anotherPoint) const
 {
 	return Point(x + anotherPoint.x, y + anotherPoint.y);
 }
@@ -131,7 +131,7 @@ void Point::add(const Point & anotherPoint, Point & out)
 	out.y = y + anotherPoint.y;
 }
 
-Point Point::rotate(const float angle)
+Point Point::rotate(const float angle) const
 {
 	return Point(x * FMath::cos(angle) - y * FMath::sin(angle),  x * FMath::sin(angle) + y * FMath::cos(angle));
 }
@@ -145,21 +145,18 @@ void Point::rotate(const float angle, Point &out)
 	out.y = ny;
 }
 
-float Point::crossProduct(const Point &anotherPoint)
+float Point::crossProduct(const Point &anotherPoint) const
 {
 	return x*anotherPoint.y - anotherPoint.x * y;
 }
 
-float Point::cos(const Point &anotherPoint)
+float Point::cos(const Point &anotherPoint) const
 {
 	return (*this * anotherPoint) / (getLength() * anotherPoint.getLength());
 }
 
-float Point::sin(const Point &anotherPoint)
+float Point::sin(const Point &anotherPoint) const
 {
-	float u1 = crossProduct(anotherPoint);
-	float u2 = getLength();
-	float u3 = anotherPoint.getLength();
 	return crossProduct(anotherPoint) / (getLength() * anotherPoint.getLength());
 }
 	

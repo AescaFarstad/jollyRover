@@ -47,6 +47,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawCreeps();
 	drawProjectiles();
 	//drawFormations();	
+	//drawFormationConnections();	
 	drawProjectileExplosion();	
 	//drawDebugGraphics();
 	
@@ -55,7 +56,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 
 void GameView::onMouseMove(SDL_MouseMotionEvent* event)
 {
-	if (!m_state)
+	if (!m_state || !m_isInitialized)
 		return;
 	auto nearestCreep = std2::minElement(m_state->creeps, [event](CreepState& creep){return Point(event->x, event->y).distanceTo(creep.unit.location);});
 	if (Point(event->x, event->y).distanceTo(nearestCreep->unit.location) < 50)	
@@ -214,20 +215,37 @@ void GameView::drawCars()
 		}
 	}
 }
-
+#include <unordered_map>
+std::unordered_map<int32_t, float> last; //TODO convert to proper CreepView
 
 void GameView::drawCreeps()
 {
 	for(auto& creep : m_state->creeps)
 	{
-		SDL_Color color = colorFromHex(0xff0000);
+		SDL_Color color = colorFromHex(0xff0000, 0x99);
 		//SDL_Color color2 = colorFromHex(0x0000ff);
 		if (creep.object.prototypeId != 0)
-		{
+		{/*
 			if (creep.unit.force == 0)
 				GPU_Circle(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep._creepProto->size, color);
 			else
 				GPU_CircleFilled(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep._creepProto->size, color);
+				*/
+			
+			float bodyAngle = creep.unit.voluntaryMovement.asAngle();
+			float lastAngle = last[creep.object.id];
+			float delta = FMath::angleDelta(bodyAngle, lastAngle);
+			if (std::fabs(delta) > M_PI / (48.f + ((creep.object.id * 7)% 24)) )
+			{
+				if (delta > 0)
+					bodyAngle = lastAngle + M_PI / (48.f + ((creep.object.id * 7) % 24));
+				else
+					bodyAngle = lastAngle - M_PI / (48.f + ((creep.object.id * 7) % 24));
+			}
+			last[creep.object.id] = bodyAngle;
+			
+			TextureDef& texture = creep.unit.force == 0? S::textures.td.soldier2 : S::textures.td.soldier1;
+			m_renderer.blit(texture, creep.unit.location, bodyAngle + M_PI_2, 0.5);
 		}
 		else
 		{
@@ -257,6 +275,7 @@ void GameView::drawCreeps()
 			if (creep.targetLoc_.getLength() > 0)
 				GPU_Line(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep.targetLoc_.x, creep.targetLoc_.y, color2);*/
 		}
+		//GPU_CircleFilled(m_screen, creep.unit.location.x, creep.unit.location.y, creep._creepProto->size, color);
 	}
 }
 
@@ -276,6 +295,17 @@ void GameView::drawProjectiles()
 			projectile.location.y + rectSize/2,
 			color
 		);	
+	}
+}
+
+void GameView::drawFormationConnections()
+{
+	SDL_Color color = colorFromHex(0xff00ff);
+	
+	for (auto& form : m_state->formations)
+	{
+		FormationProto& proto = m_prototypes->formations[form.object.prototypeId];
+		
 	}
 }
 
@@ -383,7 +413,7 @@ void GameView::drawFormations()
 					slotLocation.y + slotSize/2,
 					color
 				);
-				/*
+				
 				auto creep = std::find_if(m_state->creeps.begin(), m_state->creeps.end(), [slot](CreepState& creep){ return creep.object.id == slot; });
 				if (creep != m_state->creeps.end())
 				{
@@ -397,7 +427,7 @@ void GameView::drawFormations()
 						creep->unit.location.y, 
 						color
 					);
-				}*/
+				}/**/
 			}
 		}
 	}

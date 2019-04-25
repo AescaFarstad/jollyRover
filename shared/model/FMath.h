@@ -14,6 +14,7 @@ namespace FMath
 
 	Point getEdgeIntersection(Edge &e1, Edge &e2);
 	Point getLinesIntersection(Point &s11, Point &s12, Point &s21, Point &s22);
+	float distanceToLine(const Point &from, const Point &l1, const Point &l2);
 
 	float lerp(float x1, float y1, float x2, float y2, float argument);
 	Point lerp(float x1, Point& p1, float x2, Point& p2, float argument);

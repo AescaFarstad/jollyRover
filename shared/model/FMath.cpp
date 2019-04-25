@@ -74,6 +74,22 @@ Point FMath::getLinesIntersection(Point &s11, Point &s12, Point &s21, Point &s22
 	return Point(intersectionX, intersectionY);
 }
 
+float FMath::distanceToLine(const Point &from, const Point &l1, const Point &l2)
+{
+	if (l1.x == l2.x)
+	{
+		if (l1.y == l2.y)
+			THROW_FATAL_ERROR("Invalid line");
+		return l1.y > l2.y ? from.x - l1.x  : l1.x - from.x;
+	}
+	
+	float a = l1.y - l2.y;
+	float b = l2.x - l1.x;
+	float c = l1.crossProduct(l2);
+	
+	return (a * from.x + b * from.y + c) / std::sqrt(a * a + b * b);
+}
+
 //https://www.dsprelated.com/showarticle/1052.php
 // Polynomial approximating arctangenet on the range -1,1.
 // Max error < 0.005 (or 0.29 degrees)

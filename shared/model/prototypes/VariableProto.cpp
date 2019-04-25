@@ -25,7 +25,6 @@ void VariableProto::load(json &source)
 	
 	intensity = source.at("war").at("intensity");
 	creepRestitution = source.at("war").at("creepRestitution");
-	formationNumConnections = source.at("war").at("formationNumConnections");
 	additionalSpacing = source.at("war").at("additionalSpacing");
 	
 	fieldCenter.x = fieldWidth/2;

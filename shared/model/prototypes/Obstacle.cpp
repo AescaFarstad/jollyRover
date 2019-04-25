@@ -124,13 +124,18 @@ void from_json(const json &j, Obstacle &obstacle)
 		auto& v2 = obstacle.vertices[i];
 		auto& v3 = obstacle.vertices[next];
 		
-		Point vec1 = v2 - v1;
-		Point vec2 = v2 - v3;
+		Point vec1 = v2 - v3;
+		Point vec2 = v2 - v1;
 		
 		vec1.scaleTo(extendSize);
 		vec2.scaleTo(extendSize);
 		
 		obstacle.extendedVertices[0].push_back(v2 + vec1);
 		obstacle.extendedVertices[1].push_back(v2 + vec2);
+		
+		Point cTo1 = obstacle.extendedVertices[0].back() - obstacle.centroid;
+		Point cTo2 = obstacle.extendedVertices[1].back() - obstacle.centroid;
+		if (cTo1.crossProduct(cTo2) < 0)
+			THROW_FATAL_ERROR("Incorrect obstacle");
 	}
 }
