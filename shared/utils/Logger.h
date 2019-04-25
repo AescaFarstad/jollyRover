@@ -22,6 +22,7 @@ enum class LOG_TAGS : int
 	GAME,
 	TASK,
 	INPUT_,
+	FILE_SYSTEM,
 
 
 	NET_MESSAGE,

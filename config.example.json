@@ -21,6 +21,7 @@
 			"GAME",
 			"TASK",
 			"INPUT_",
+			"FILE_SYSTEM",
 			
 			"NET_MESSAGE",
 			"SUBTASK",

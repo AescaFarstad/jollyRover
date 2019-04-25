@@ -15,6 +15,11 @@ public:
 	
 private: 
 	bool m_isReady;
+	bool m_isInitialized;
+	
+	void p_init();
+	void p_commit();
+	
 	
 };
 
