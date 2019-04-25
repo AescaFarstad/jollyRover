@@ -39,7 +39,9 @@ namespace KeyboardInput
 			{
 				InputTimeMessage timeMsg;
 				timeMsg.forcedTimeScale = 0.3;
+				timeMsg.forcedStepsAtOnce = 1;
 				timeMsg.modifyForcedTimeScale = true;
+				timeMsg.modifyForcedStepsAtOnce = true;
 				network.send(&timeMsg);
 				break;
 			};
@@ -47,15 +49,19 @@ namespace KeyboardInput
 			{
 				InputTimeMessage timeMsg;
 				timeMsg.forcedTimeScale = 1;
+				timeMsg.forcedStepsAtOnce = 1;
 				timeMsg.modifyForcedTimeScale = true;
+				timeMsg.modifyForcedStepsAtOnce = true;
 				network.send(&timeMsg);
 				break;
 			};
 			case KEYBOARD_ACTIONS::TIME_SCALE_T_5 :
 			{
 				InputTimeMessage timeMsg;
-				timeMsg.forcedTimeScale = 5;
+				timeMsg.forcedTimeScale = 3;
+				timeMsg.forcedStepsAtOnce = 3;
 				timeMsg.modifyForcedTimeScale = true;
+				timeMsg.modifyForcedStepsAtOnce = true;
 				network.send(&timeMsg);
 				break;
 			};
@@ -65,6 +71,8 @@ namespace KeyboardInput
 				InputTimeMessage timeMsg;
 				timeMsg.timeScale = 0.3;
 				timeMsg.modifyTimeScale = true;
+				timeMsg.stepsAtOnce = 1;
+				timeMsg.modifyStepsAtOnce = true;
 				timeMsg.allowSteps = -1;
 				timeMsg.modifyAllowSteps = true;
 				network.send(&timeMsg);
@@ -75,6 +83,8 @@ namespace KeyboardInput
 				InputTimeMessage timeMsg;
 				timeMsg.timeScale = 1;
 				timeMsg.modifyTimeScale = true;
+				timeMsg.stepsAtOnce = 1;
+				timeMsg.modifyStepsAtOnce = true;
 				timeMsg.allowSteps = -1;
 				timeMsg.modifyAllowSteps = true;
 				network.send(&timeMsg);
@@ -83,8 +93,10 @@ namespace KeyboardInput
 			case KEYBOARD_ACTIONS::TIME_SCALE5 :
 			{
 				InputTimeMessage timeMsg;
-				timeMsg.timeScale = 5;
+				timeMsg.timeScale = 3;
 				timeMsg.modifyTimeScale = true;
+				timeMsg.stepsAtOnce = 3;
+				timeMsg.modifyStepsAtOnce = true;
 				timeMsg.allowSteps = -1;
 				timeMsg.modifyAllowSteps = true;
 				network.send(&timeMsg);
@@ -174,6 +186,7 @@ namespace KeyboardInput
 					
 				S::persistentStorage.savedState = Serializer::copyThroughSerialization(*gameUpdater.state.get());
 				S::persistentStorage.commit();
+				S::log.add("Saved", {LOG_TAGS::UNIQUE});
 				break;
 			}
 			case KEYBOARD_ACTIONS::LOAD_GAME :
@@ -222,7 +235,9 @@ namespace KeyboardInput
 				{
 				InputTimeMessage timeMsg;
 				timeMsg.forcedTimeScale = -1;
+				timeMsg.forcedStepsAtOnce = -1;
 				timeMsg.modifyForcedTimeScale = true;
+				timeMsg.modifyForcedStepsAtOnce = true;
 				network.send(&timeMsg);
 				}
 				break;

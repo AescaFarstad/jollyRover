@@ -7,6 +7,8 @@ InputTimeMessage::InputTimeMessage()
 	modifyAllowSteps = false;
 	modifyForcedTimeScale = false;
 	modifyTimeScale = false;
+	modifyStepsAtOnce = false;
+	modifyForcedStepsAtOnce = false;
 }
 
 void InputTimeMessage::deserialize(SerializationStream& stream)
@@ -18,6 +20,10 @@ void InputTimeMessage::deserialize(SerializationStream& stream)
 	Serializer::read(modifyTimeScale, stream);
 	Serializer::read(forcedTimeScale, stream);
 	Serializer::read(modifyForcedTimeScale, stream);
+	Serializer::read(stepsAtOnce, stream);
+	Serializer::read(modifyStepsAtOnce, stream);
+	Serializer::read(forcedStepsAtOnce, stream);
+	Serializer::read(modifyForcedStepsAtOnce, stream);
 }
 
 void InputTimeMessage::serialize(SerializationStream& stream)
@@ -29,6 +35,10 @@ void InputTimeMessage::serialize(SerializationStream& stream)
 	Serializer::write(modifyTimeScale, stream);
 	Serializer::write(forcedTimeScale, stream);
 	Serializer::write(modifyForcedTimeScale, stream);
+	Serializer::write(stepsAtOnce, stream);
+	Serializer::write(modifyStepsAtOnce, stream);
+	Serializer::write(forcedStepsAtOnce, stream);
+	Serializer::write(modifyForcedStepsAtOnce, stream);
 }
 
 std::string InputTimeMessage::getName()

@@ -5,7 +5,7 @@
 #include <VisualDebug.h>
 
 
-void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessage*> &inputs, Prototypes* prototypes)
+void GameLogic::update(GameState* state, int32_t timePassed, std::vector<InputMessage*> &inputs, Prototypes* prototypes)
 {
 	this->state = state;
 
@@ -39,13 +39,21 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 	}
 	else
 	{
-		if (time.forcedTimeScale > 0 && time.allowedSteps >= 0)
-			time.allowedSteps++;
-		state->time.performedSteps++;
-		VisualDebug::clear();
+		int32_t stepsAtOnce = state->time.forcedStepsAtOnce > 0 ? state->time.forcedStepsAtOnce : state->time.stepsAtOnce;
+		for(int32_t i = 0; i < stepsAtOnce; i++)
+		{
+			if (time.forcedTimeScale > 0 && time.allowedSteps >= 0)
+				time.allowedSteps++;
+			state->time.performedSteps++;
+			VisualDebug::clear();
+			makeLogicStep(state, ingameTimePassed, prototypes);
+		}
 	}
-		
-	state->time.time += ingameTimePassed;
+}
+
+void GameLogic::makeLogicStep(GameState* state, int32_t timePassed, Prototypes* prototypes)
+{
+	state->time.time += timePassed;
 
 	for (size_t i = 0; i < state->players.size(); i++)
 	{
@@ -80,7 +88,7 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 
 		for (CarRide &ride : player.activeCars)
 		{
-			carLogic.update(ride, player, state, prototypes, ingameTimePassed);
+			carLogic.update(ride, player, state, prototypes, timePassed);
 		}
 
 		auto finishedCars = std::remove_if(player.activeCars.begin(), player.activeCars.end(), [](CarRide &ride) {
@@ -94,14 +102,7 @@ void GameLogic::update(GameState* state, int timePassed, std::vector<InputMessag
 		}
 
 	}
-	Creeps::handleCreeps(state, prototypes, ingameTimePassed);
-	/*
-	Creeps::spawnCreeps(state, prototypes, timePassed);
-	Creeps::processFormations(state, prototypes, timePassed);
-	Creeps::processCreeps(state, prototypes, timePassed);
-	Creeps::processProjectiles(state, prototypes, timePassed);
-	Creeps::removeDeadProjectiles(state);
-	Creeps::removeDeadCreeps(state);*/
+	Creeps::handleCreeps(state, prototypes, timePassed);
 }
 
 bool GameLogic::testRouteIsValid(std::vector<Point>& route, Prototypes* prototypes)
@@ -309,6 +310,16 @@ void GameLogic::handleTimeInput(InputTimeMessage* input, Prototypes* prototypes)
 	{
 		time.timeScale = input->timeScale;
 		S::log.add("time scale: " + std::to_string(time.timeScale), {LOG_TAGS::INPUT_});
+	}
+	if (input->modifyStepsAtOnce)
+	{
+		time.stepsAtOnce = input->stepsAtOnce;
+		S::log.add("steps at once: " + std::to_string(time.stepsAtOnce), {LOG_TAGS::INPUT_});
+	}
+	if (input->modifyForcedStepsAtOnce)
+	{
+		time.forcedStepsAtOnce = input->forcedStepsAtOnce;
+		S::log.add("tmp steps at once: " + std::to_string(time.forcedStepsAtOnce), {LOG_TAGS::INPUT_});
 	}
 }
 

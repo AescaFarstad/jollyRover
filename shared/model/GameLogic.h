@@ -18,8 +18,8 @@ public:
 
 	CarLogic carLogic;
 
-	void update(GameState* state, int timePassed, std::vector<InputMessage*>& inputs, Prototypes* prototypes);
-
+	void update(GameState* state, int32_t timePassed, std::vector<InputMessage*>& inputs, Prototypes* prototypes);
+	void makeLogicStep(GameState* state, int32_t timePassed, Prototypes* prototypes);
 
 	static bool testEdgeIsValid(Point& from, Point& to, std::vector<Obstacle>& obstacles);
 	static bool testRouteIsValid(std::vector<Point>& route, Prototypes* prototypes);

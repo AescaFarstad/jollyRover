@@ -13,6 +13,10 @@ public:
 	bool modifyTimeScale;
 	float forcedTimeScale;
 	bool modifyForcedTimeScale;
+	int32_t stepsAtOnce;
+	bool modifyStepsAtOnce;
+	int32_t forcedStepsAtOnce;
+	bool modifyForcedStepsAtOnce;
 
 	void deserialize(SerializationStream& stream) override;
 	void serialize(SerializationStream& stream) override;
