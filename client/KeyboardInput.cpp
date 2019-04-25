@@ -2,6 +2,7 @@
 #include <InputTimeMessage.h>
 #include <LoadGameMessage.h>
 #include <InputActionMessage.h>
+#include <PersistentStorage.h>
 
 namespace KeyboardInput
 {
@@ -163,6 +164,41 @@ namespace KeyboardInput
 				network.send(&im);
 				break;
 			}
+			case KEYBOARD_ACTIONS::SAVE_GAME :
+			{
+				if (!S::persistentStorage.isReady())
+				{
+					S::log.add("Can't save the game - persistent storage is not ready yet", {LOG_TAGS::ERROR_});
+					return;
+				}
+					
+				S::persistentStorage.savedState = Serializer::copyThroughSerialization(*gameUpdater.state.get());
+				S::persistentStorage.commit();
+				break;
+			}
+			case KEYBOARD_ACTIONS::LOAD_GAME :
+			{
+				if (!S::persistentStorage.isReady())
+				{
+					S::log.add("Can't load the game - persistent storage is not ready yet", {LOG_TAGS::ERROR_});
+					return;
+				}
+				
+				if (!S::persistentStorage.savedState)
+				{
+					S::log.add("Nothing to load", {LOG_TAGS::ERROR_});
+					return;
+				}
+				
+				LoadGameMessage loadMsg;
+				auto state = gameUpdater.getFirstState();
+				auto stream = SerializationStream::createExp();
+				S::persistentStorage.savedState->serialize(*stream);
+				loadMsg.stateLength = stream->getLength();
+				loadMsg.state = stream->readAll();
+				network.send(&loadMsg);
+				break;
+			}
 			default:
 			{
 				S::log.add("action not handled: " + std::to_string((int)code), {LOG_TAGS::ERROR_});
@@ -203,6 +239,8 @@ namespace KeyboardInput
 			case KEYBOARD_ACTIONS::REVERT5 :
 			case KEYBOARD_ACTIONS::REVERT25 :
 			case KEYBOARD_ACTIONS::REVERT125 :
+			case KEYBOARD_ACTIONS::LOAD_GAME :
+			case KEYBOARD_ACTIONS::SAVE_GAME :
 			break;
 			
 			case KEYBOARD_ACTIONS::RIGHT :

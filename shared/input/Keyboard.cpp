@@ -42,6 +42,9 @@ Keyboard::Keyboard()
 	
 	actionByButton[SDL_SCANCODE_KP_PERIOD] = KEYBOARD_ACTIONS::REVERT_FULL;
 	
+	actionByButton[SDL_SCANCODE_PAGEUP] = KEYBOARD_ACTIONS::SAVE_GAME;
+	actionByButton[SDL_SCANCODE_PAGEDOWN] = KEYBOARD_ACTIONS::LOAD_GAME;
+	
 	for(uint16_t i = 0; i < 128; i++)
 		buttonByAction[(int)actionByButton[i]] = i;
 

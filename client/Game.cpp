@@ -16,11 +16,14 @@
 #include <memory>
 #include <GameState.h>
 #include <KeyboardInput.h>
+#include <PersistentStorage.h>
 
 Game::Game(GPU_Target* screen)
 {
 	loadConfig();
 	loadPrototypes();
+	//S::persistentStorage.clean();
+	S::persistentStorage.init();
 
 	m_gameView = new GameView(screen, &m_prototypes);
 

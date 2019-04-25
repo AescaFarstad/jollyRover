@@ -69,5 +69,19 @@ namespace Serializer {
 			read(value[i], stream);
 		}
 	}
+	
+	template <typename T>
+	std::unique_ptr<T> copyThroughSerialization(const T& that)
+	{
+		auto result = std::make_unique<T>();
+		
+		auto s = SerializationStream::createExp();
+		Serializer::write(that, *s);
+		s->seekAbsolute(0);
+		
+		Serializer::read(*result.get(), *s);
+		
+		return std::move(result);
+	}
 }
 
