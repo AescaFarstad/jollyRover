@@ -252,7 +252,7 @@ void GameView::drawCreeps()
 			float barrelAngle;
 			float bodyAngle;
 			if (creep._creepProto->moveType == MOVE_TYPE::TRACTOR)
-				bodyAngle = creep.direction;
+				bodyAngle = creep.orientation;
 			else
 				bodyAngle = creep.unit.voluntaryMovement.asAngle();
 			

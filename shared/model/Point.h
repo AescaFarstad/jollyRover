@@ -19,6 +19,7 @@ public:
 	Point& operator=(const Point&) = default;*/
 	
 	static Point getNullPoint();
+	static Point fromAngle(float angle, float length = 1);
 
 	float x;
 	float y;

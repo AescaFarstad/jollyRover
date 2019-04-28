@@ -41,7 +41,7 @@ float SeededRandom::get(float min, float max)
 float SeededRandom::get()
 {
 	m_seed = (uint32_t)(((uint64_t)48271 * m_seed) % 2147483647);
-	return m_seed / 2147483647.f;
+	return m_seed / 2147483647.0;
 }
 
 void SeededRandom::deserialize(SerializationStream & stream)

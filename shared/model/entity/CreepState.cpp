@@ -16,7 +16,7 @@ void CreepState::deserialize(SerializationStream &stream)
 	Serializer::read(formationId, stream);
 	Serializer::read(formationsSlot, stream);
 	Serializer::read(velocity, stream);
-	Serializer::read(direction, stream);
+	Serializer::read(orientation, stream);
 	Serializer::read(sensedAnObstacle, stream);
 	Serializer::read(numWhiskers, stream);
 	for(int8_t i = 0; i < numWhiskers; i++)
@@ -34,7 +34,7 @@ void CreepState::serialize(SerializationStream &stream) const
 	Serializer::write(formationId, stream);
 	Serializer::write(formationsSlot, stream);
 	Serializer::write(velocity, stream);
-	Serializer::write(direction, stream);
+	Serializer::write(orientation, stream);
 	Serializer::write(sensedAnObstacle, stream);
 	Serializer::write(numWhiskers, stream);
 	for(int8_t i = 0; i < numWhiskers; i++)

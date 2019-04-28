@@ -221,7 +221,7 @@
 			"whiskers":9,
 			"maxWhiskerLength":150,
 			"moveType":"tractor",
-			"angularSpeed":{"0":0.002, "1":0.002},
+			"angularSpeed":0.002,
 			"acceleration":{"0":0.00005, "1":0.000005},
 			"breaksStrength":0.01,			
 			"normalFriction":0.9
@@ -253,7 +253,7 @@
 			"whiskers":3,
 			"maxWhiskerLength":100,
 			"moveType":"tractor",
-			"angularSpeed":{"0":0.1, "1":0.01},
+			"angularSpeed":0.002,
 			"acceleration":{"0":0.1, "1":0.01},
 			"normalFriction":0.9
 		},
@@ -270,7 +270,7 @@
 			"whiskers":3,
 			"maxWhiskerLength":100,
 			"moveType":"tractor",
-			"angularSpeed":{"0":0.1, "1":0.01},
+			"angularSpeed":0.002,
 			"acceleration":{"0":0.1, "1":0.01},
 			"normalFriction":0.9
 		}

@@ -14,6 +14,11 @@ Point Point::getNullPoint()
 	return result;
 }
 
+Point Point::fromAngle(float angle, float length)
+{
+	return Point(FMath::cos(angle) * length, FMath::sin(angle) * length);
+}
+
 void Point::scaleTo(float length)
 {
 	if (length == 0)

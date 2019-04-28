@@ -17,3 +17,23 @@ sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 # iptables -t nat -A PREROUTING -p tcp --dport 80 -j REDIRECT --to-port 12880
 
 cmake -G "Unix Makefiles" -DSDL_gpu_DEFAULT_DISABLE_OPENGL=ON -DSDL_gpu_DISABLE_GLES=OFF -DSDL_gpu_DISABLE_GLES_1=ON -DSDL_gpu_DISABLE_GLES_3=ON -DSDL_gpu_DEFAULT_BUILD_DEMOS=OFF -DSDL_gpu_BUILD_DEMOS=OFF
+
+выставлять направление в финальной формации
+солдаты виляют
+сброс цели, если цель близка, но недостижима долгое время
+
+следование за лидером
+
+разбить оптимизацию формации на кадры
+нормальные крип вью, без инклюда посреди GameView.cpp
+
+почистить Creeps.cpp
+
+отрисовка дебага в течении нескольких фреймов
+рендеринг текста
+
+------------------------------
+дрожание солдат в конце 
+пофиксить краш при перемотке
+сейв игры
+в финальном состоянии формации все должны доезжать не привязываясь к соседям

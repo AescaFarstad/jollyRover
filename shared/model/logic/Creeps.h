@@ -30,6 +30,7 @@ namespace Creeps
 		void accelerateTractor(CreepState& creep, float amount);
 		Point avoidObstacles(CreepState& creep, float stepSize, const Point& target, Prototypes* prototypes);
 		void moveUnitOutOfObstacle(CreepState& creep, Obstacle* obstacle, int32_t timePassed);
+		void changeCreepOrientation(CreepState& creep, float targetOrientation, int32_t timePassed);
 		
 		void pushOutCreeps(GameState* state, Prototypes* prototypes, int timePassed);
 		void pushCreepsOutOfObstacles(GameState* state, Prototypes* prototypes, int timePassed);

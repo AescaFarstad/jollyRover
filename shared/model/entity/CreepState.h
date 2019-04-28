@@ -31,7 +31,7 @@ public:
 	bool sensedAnObstacle;
 	
 	Point velocity;
-	float direction;	
+	float orientation;	
 	
 	CreepProto* _creepProto;
 	WeaponProto* _weaponProto;

@@ -44,7 +44,7 @@ public:
 	int8_t whiskers;
 	int16_t maxWhiskerLength;
 	MOVE_TYPE moveType;
-	Point angularSpeed; //x - at 0 speed, y - at max speed
+	float angularSpeed;
 	Point acceleration; //x - at 0 speed, y - at max speed
 	float normalFriction;
 

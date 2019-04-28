@@ -30,8 +30,7 @@ void from_json(const json &j, CreepProto &creep)
 	
 	if (creep.moveType == MOVE_TYPE::TRACTOR)
 	{
-		creep.angularSpeed.x = j.at("angularSpeed").at("0");
-		creep.angularSpeed.y = j.at("angularSpeed").at("1");
+		creep.angularSpeed = j.at("angularSpeed");
 		creep.acceleration.x = j.at("acceleration").at("0");
 		creep.acceleration.y = j.at("acceleration").at("1");
 		creep.normalFriction = j.at("normalFriction");
