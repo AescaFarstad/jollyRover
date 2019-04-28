@@ -47,9 +47,9 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawCreeps();
 	drawProjectiles();
 	//drawFormations();	
-	//drawFormationConnections();	
+	drawFormationConnections();	
 	drawProjectileExplosion();	
-	//drawDebugGraphics();
+	drawDebugGraphics();
 	
 	lastTime = state->time.time;
 }
@@ -224,7 +224,7 @@ void GameView::drawCreeps()
 	{
 		SDL_Color color = colorFromHex(0xff0000, 0x99);
 		//SDL_Color color2 = colorFromHex(0x0000ff);
-		if (creep.object.prototypeId != 0)
+		if (creep.object.prototypeId == 1)
 		{/*
 			if (creep.unit.force == 0)
 				GPU_Circle(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep._creepProto->size, color);
@@ -247,7 +247,7 @@ void GameView::drawCreeps()
 			TextureDef& texture = creep.unit.force == 0? S::textures.td.soldier2 : S::textures.td.soldier1;
 			m_renderer.blit(texture, creep.unit.location, bodyAngle + M_PI_2, 0.5);
 		}
-		else
+		else if (creep.object.prototypeId == 0)
 		{
 			float barrelAngle;
 			float bodyAngle;
@@ -274,6 +274,10 @@ void GameView::drawCreeps()
 			}
 			if (creep.targetLoc_.getLength() > 0)
 				GPU_Line(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep.targetLoc_.x, creep.targetLoc_.y, color2);*/
+		}		
+		else if (creep.object.prototypeId == 2)
+		{
+			m_renderer.blit(S::textures.tanks_2.tankBody_huge, creep.unit.location, creep.orientation, 1);
 		}
 		//GPU_CircleFilled(m_screen, creep.unit.location.x, creep.unit.location.y, creep._creepProto->size, color);
 	}
@@ -306,6 +310,19 @@ void GameView::drawFormationConnections()
 	{
 		FormationProto& proto = m_prototypes->formations[form.object.prototypeId];
 		
+		for (size_t i = 0; i < form.slots.size(); i++)
+		{
+			auto creep = m_state->creepById_[form.slots[i]];
+			if (creep && creep->unit.health > 0)
+			{
+				for(auto& neighbour : proto.slots[i].connections)
+				{
+					auto creep2 = m_state->creepById_[form.slots[neighbour.slot]];
+					if (creep2 && creep2->unit.health > 0)
+						GPU_Line(m_screen, creep->unit.location.x, creep->unit.location.y, creep2->unit.location.x, creep2->unit.location.y, color);
+				}
+			}
+		}
 	}
 }
 

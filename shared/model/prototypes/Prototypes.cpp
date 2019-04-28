@@ -89,11 +89,16 @@ void Prototypes::postProcess()
 		for(size_t i = 0; i < formation.slots.size(); i++)
 		{
 			std::sort(slots.begin(), slots.end(), 
-				[this, slot = formation.slots[i]](FormationSlotProto& a, FormationSlotProto& b)
-				{
+				[this, slot = formation.slots[i], leader = formation.leader](FormationSlotProto& a, FormationSlotProto& b)
+				{					
 					if (a.index == slot.index)
 						return false;
 					if (b.index == slot.index)
+						return true;
+					
+					if (leader >= 0 && b.index == leader)
+						return false;
+					if (leader >= 0 && a.index == leader)
 						return true;
 						
 					if (a.optional != b.optional && !b.optional)
@@ -109,7 +114,7 @@ void Prototypes::postProcess()
 				
 			for(size_t j = 0; j < formation.connections && j < slots.size(); j++)
 			{
-				if (creeps[slots[j].creepType].weight >= creeps[formation.slots[i].creepType].weight)
+				if (j == formation.leader || creeps[slots[j].creepType].weight >= creeps[formation.slots[i].creepType].weight)
 					formation.slots[i].connections.push_back(FormationSlotConnectionProto{slots[j].index, formation.slots[i].offset - slots[j].offset});
 			}
 			
