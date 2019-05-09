@@ -110,9 +110,9 @@ void Prototypes::postProcess()
 						return b.creepType != slot.creepType;*/
 							
 					return b.offset.distanceTo(slot.offset) > a.offset.distanceTo(slot.offset);
-				});			
+				});
 				
-			for(size_t j = 0; j < formation.connections && j < slots.size(); j++)
+			for(int32_t j = 0; j < formation.connections && j < (int32_t)slots.size(); j++)
 			{
 				if (j == formation.leader || creeps[slots[j].creepType].weight >= creeps[formation.slots[i].creepType].weight)
 					formation.slots[i].connections.push_back(FormationSlotConnectionProto{slots[j].index, formation.slots[i].offset - slots[j].offset});

@@ -47,7 +47,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawCreeps();
 	drawProjectiles();
 	//drawFormations();	
-	drawFormationConnections();	
+	//drawFormationConnections();	
 	drawProjectileExplosion();	
 	drawDebugGraphics();
 	
@@ -222,14 +222,14 @@ void GameView::drawCreeps()
 {
 	for(auto& creep : m_state->creeps)
 	{
-		SDL_Color color = colorFromHex(0xff0000, 0x99);
+		//SDL_Color color = colorFromHex(0xff0000, 0x99);
 		//SDL_Color color2 = colorFromHex(0x0000ff);
 		if (creep.object.prototypeId == 1)
 		{/*
 			if (creep.unit.force == 0)
-				GPU_Circle(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep._creepProto->size, color);
+				GPU_Circle(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep.creepProto_->size, color);
 			else
-				GPU_CircleFilled(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep._creepProto->size, color);
+				GPU_CircleFilled(m_renderer.getScreen(), creep.unit.location.x, creep.unit.location.y, creep.creepProto_->size, color);
 				*/
 			
 			float bodyAngle = creep.unit.voluntaryMovement.asAngle();
@@ -246,12 +246,15 @@ void GameView::drawCreeps()
 			
 			TextureDef& texture = creep.unit.force == 0? S::textures.td.soldier2 : S::textures.td.soldier1;
 			m_renderer.blit(texture, creep.unit.location, bodyAngle + M_PI_2, 0.5);
+			
+			//VisualDebug::drawArrow(creep.unit.location, creep.unit.location + Point::fromAngle(bodyAngle, 30), 0x0000ff);
+			//VisualDebug::drawArrow(creep.unit.location, creep.unit.location + Point::fromAngle(creep.unit.voluntaryMovement.asAngle(), 30), 0xff0000);
 		}
 		else if (creep.object.prototypeId == 0)
 		{
 			float barrelAngle;
 			float bodyAngle;
-			if (creep._creepProto->moveType == MOVE_TYPE::TRACTOR)
+			if (creep.creepProto_->moveType == MOVE_TYPE::TRACTOR)
 				bodyAngle = creep.orientation;
 			else
 				bodyAngle = creep.unit.voluntaryMovement.asAngle();
@@ -279,7 +282,7 @@ void GameView::drawCreeps()
 		{
 			m_renderer.blit(S::textures.tanks_2.tankBody_huge, creep.unit.location, creep.orientation, 1);
 		}
-		//GPU_CircleFilled(m_screen, creep.unit.location.x, creep.unit.location.y, creep._creepProto->size, color);
+		//GPU_CircleFilled(m_screen, creep.unit.location.x, creep.unit.location.y, creep.creepProto_->size, color);
 	}
 }
 

@@ -10,9 +10,9 @@ void FormationState::deserialize(SerializationStream &stream)
 	Serializer::read(location, stream);
 	Serializer::read(targetLocation, stream);
 	Serializer::read(speed, stream);
-	Serializer::read(speedMulti, stream);
 	Serializer::read(angularSpeed, stream);
 	Serializer::read(spawnedAt, stream);
+	Serializer::read(subObjective, stream);
 	Serializer::readVector(slots, stream);
 	
 	formationPrototype_ = nullptr;
@@ -30,9 +30,9 @@ void FormationState::serialize(SerializationStream &stream) const
 	Serializer::write(location, stream);
 	Serializer::write(targetLocation, stream);
 	Serializer::write(speed, stream);
-	Serializer::write(speedMulti, stream);
 	Serializer::write(angularSpeed, stream);
 	Serializer::write(spawnedAt, stream);
+	Serializer::write(subObjective, stream);
 	Serializer::writeVector(slots, stream);
 }
 
@@ -45,4 +45,16 @@ void FormationState::propagatePrototypes(std::vector<FormationProto>& formations
 	else
 		objectivePrototype_ = nullptr;
 	
+}
+
+void Serializer::write(const SUB_OBJECTIVE& value, SerializationStream& stream)
+{
+	Serializer::write((int32_t)value, stream);
+}
+
+void Serializer::read(SUB_OBJECTIVE& value, SerializationStream& stream)
+{
+	int32_t t;
+	Serializer::read(t, stream);
+	value = (SUB_OBJECTIVE)t;
 }

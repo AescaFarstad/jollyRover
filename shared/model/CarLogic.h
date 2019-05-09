@@ -18,7 +18,7 @@ public:
 	GameState* state;
 	Prototypes* prototypes;
 
-	void update(CarRide &ride, PlayerTest &player, GameState* state, Prototypes* prototypes, int timePassed);
+	void update(CarRide &ride, PlayerTest &player, GameState* state, Prototypes* prototypes, int32_t timePassed);
 
 private:
 

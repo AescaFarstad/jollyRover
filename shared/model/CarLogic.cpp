@@ -8,7 +8,7 @@ CarLogic::~CarLogic()
 {
 }
 
-void CarLogic::update(CarRide &ride, PlayerTest &player, GameState* state, Prototypes* prototypes, int timePassed)
+void CarLogic::update(CarRide &ride, PlayerTest &player, GameState* state, Prototypes* prototypes, int32_t timePassed)
 {
 	this->ride = &ride;
 	this->player = &player;

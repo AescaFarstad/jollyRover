@@ -34,6 +34,8 @@ void from_json(const json &j, CreepProto &creep)
 		creep.acceleration.x = j.at("acceleration").at("0");
 		creep.acceleration.y = j.at("acceleration").at("1");
 		creep.normalFriction = j.at("normalFriction");
+		creep.breaksStrength = j.at("breaksStrength");
+		creep.omniDirectionalSpeed = j.at("omniDirectionalSpeed");
 	}
 	else
 	{

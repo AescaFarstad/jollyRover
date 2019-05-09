@@ -223,7 +223,8 @@
 			"moveType":"tractor",
 			"angularSpeed":0.002,
 			"acceleration":{"0":0.00005, "1":0.000005},
-			"breaksStrength":0.01,			
+			"breaksStrength":0.0005,
+			"omniDirectionalSpeed":0.002,
 			"normalFriction":0.9
 		},
 		{
@@ -255,6 +256,8 @@
 			"moveType":"tractor",
 			"angularSpeed":0.001,
 			"acceleration":{"0":0.00003, "1":0.000003},
+			"breaksStrength":0.0005,
+			"omniDirectionalSpeed":0.002,
 			"normalFriction":0.9
 		},
 		{
@@ -272,6 +275,8 @@
 			"moveType":"tractor",
 			"angularSpeed":0.002,
 			"acceleration":{"0":0.1, "1":0.01},
+			"breaksStrength":0.0005,
+			"omniDirectionalSpeed":0.002,
 			"normalFriction":0.9
 		}
 	],
@@ -429,7 +434,7 @@
 			"type":"assault",
 			"connections":4,
 			"leader":-1,
-			"enabled":false,
+			"enabled":true,
 			"slots":[
 				{
 					"offset":{ "y":10, "x":-10 },

@@ -29,7 +29,6 @@ public:
 	SpatialMap<T>(SpatialMap<T>&& that) = delete;
 	SpatialMap<T>(SpatialMap<T>& that) = delete;
 	
-	bool m_isValid;	
 	
 	void setUnique(std::vector<T>& data);
 	void setNonUnique(std::vector<T>& data);
@@ -39,6 +38,7 @@ public:
 	template <typename F>
 	std::vector<T*> getNearest(Point& origin, F predicate);
 	int32_t getCellSize();
+	bool isValid();
 	
 private:
 	std::vector<std::vector<std::vector<T*>>> m_map[2][2]; //[gx][gy][x][y]items[]
@@ -52,7 +52,7 @@ private:
 	Point m_BB;
 	Point m_dimensions;
 	bool m_useLayeredMap;
-	
+	bool m_isValid;
 	
 	std::vector<std::vector<std::vector<T*>>>& findBestMap(Point& origin, int32_t radius);
 	void clearMap(std::vector<std::vector<std::vector<T*>>>& map, int32_t expectedCount);
@@ -490,4 +490,10 @@ template <typename T>
 int32_t SpatialMap<T>::getCellSize()
 {
 	return m_cellSize;
+}
+
+template <typename T>
+bool SpatialMap<T>::isValid()
+{
+	return m_isValid;
 }

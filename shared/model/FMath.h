@@ -17,6 +17,7 @@ namespace FMath
 	float distanceToLine(const Point &from, const Point &l1, const Point &l2);
 
 	float lerp(float x1, float y1, float x2, float y2, float argument);
+	float lerpClipped(float x1, float y1, float x2, float y2, float argument);
 	Point lerp(float x1, Point& p1, float x2, Point& p2, float argument);
 	///Does not overflow
 	uint8_t lerp(float x1, uint8_t y1, float x2, uint8_t y2, float argument);

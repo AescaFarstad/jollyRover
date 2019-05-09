@@ -2,74 +2,32 @@
 #include <FMath.h>
 #include <VisualDebug.h>
 #include <std2.h>
+#include <Field.h>
 
 namespace Creeps
 {
 	using namespace CreepsInternal;
 	
-	void checkCreepProtos(std::vector<CreepState> creeps, Prototypes* prototypes)
-	{
-		for(auto& creep : creeps)
-			if (creep._creepProto != &prototypes->creeps[creep.object.prototypeId])
-				THROW_FATAL_ERROR("frefer");
-	}
-	
-	void handleCreeps(GameState* state, Prototypes* prototypes, int timePassed)
+	void handleCreeps(GameState* state, Prototypes* prototypes, int32_t timePassed)
 	{
 		preprocessCreeps(state, prototypes);
-		
-		for(auto& creep : state->creeps)
-		{
-			if (state->creepById_[creep.object.id] != &creep)
-				THROW_FATAL_ERROR("creep pointer mismatch");
-		}
-		
-		for(auto& force : prototypes->forces)
-		{
-			if (state->formations.size() == FormationState::MAX_FORMATION_COUNT)
-				break;
-			if (!force.alwaysOn)
-				continue;			
-			if (state->forceStrength_[force.id] < prototypes->variables.intensity)
-			{
-				FormationProto formation;
-				do formation = state->random.getFromVector(prototypes->formations);	while(!formation.enabled);
-				if (state->creeps.size() + formation.slots.size() < GameState::MAX_CREEPS)
-				{
-					spawnFormation(state, prototypes, force, prototypes->formations[formation.id]);
-					state->forceStrength_[force.id] += formation.strength;
-				}
-			}
-		}
-		
-		for(auto& creep : state->creeps)
-			creep.movement_.scaleTo(0);
-		
-		if (!state->creepMap_.m_isValid)
-		{
-			Point BB(prototypes->variables.fieldWidth + 100, prototypes->variables.fieldHeight + 100);
-			state->creepMap_ = SpatialMap<CreepState>(50, true, Point(-100, -100), BB);
-		}
-		state->creepMap_.setUnique(state->creeps);
-		
-		
+		runDebugAsserts(state, prototypes);
+		spawnFormations(state, prototypes);
+		updateCache(state, prototypes);
 			
 		processFormations(state, prototypes, timePassed);
-		processCreeps(state, prototypes, timePassed);
-		processProjectiles(state, prototypes, timePassed);
 		
+		processProjectiles(state, prototypes, timePassed);		
 		
 		pushOutCreeps(state, prototypes, timePassed);
 		pushCreepsOutOfObstacles(state, prototypes, timePassed);
 		preventCreepObstacleCollision(state, prototypes);
-		for(auto& creep : state->creeps)
-			creep.unit.location += creep.movement_;
 		
+		applyCreepMovement(state);		
 		
 		removeDeadProjectiles(state);
 		removeDeadCreeps(state);
 		removeDeadFormations(state);
-		
 	}
 		
 	Point getCurrentSlotLocation(FormationState& formation, int32_t slot)
@@ -93,12 +51,59 @@ namespace Creeps
 				
 			for(CreepState& creep : state->creeps)
 			{
-				if (creep._creepProto == nullptr)
+				if (creep.creepProto_ == nullptr)
 				{
 					THROW_FATAL_ERROR("Prototypes are not resolved");
 				}
-				state->forceStrength_[creep.unit.force] += creep._creepProto->strength;
+				state->forceStrength_[creep.unit.force] += creep.creepProto_->strength;
 			}
+		}
+	
+		void runDebugAsserts(GameState* state, Prototypes* prototypes)
+		{
+			for(auto& creep : state->creeps)
+			{
+				if (state->creepById_[creep.object.id] != &creep)
+					THROW_FATAL_ERROR("creep pointer mismatch");
+			}
+			
+			for(auto& creep : state->creeps)
+				if (creep.creepProto_ != &prototypes->creeps[creep.object.prototypeId])
+					THROW_FATAL_ERROR("frefer");
+		}
+		
+		void spawnFormations(GameState* state, Prototypes* prototypes)
+		{
+			for(auto& force : prototypes->forces)
+			{
+				if (state->formations.size() == FormationState::MAX_FORMATION_COUNT)
+					break;
+				if (!force.alwaysOn)
+					continue;			
+				if (state->forceStrength_[force.id] < prototypes->variables.intensity)
+				{
+					FormationProto formation;
+					do formation = state->random.getFromVector(prototypes->formations);	while(!formation.enabled);
+					if (state->creeps.size() + formation.slots.size() < GameState::MAX_CREEPS)
+					{
+						spawnFormation(state, prototypes, force, prototypes->formations[formation.id]);
+						state->forceStrength_[force.id] += formation.strength;
+					}
+				}
+			}
+		}
+		
+		void updateCache(GameState* state, Prototypes* prototypes)
+		{
+			for(auto& creep : state->creeps)
+				creep.movement_.scaleTo(0);
+			
+			if (!state->creepMap_.isValid())
+			{
+				Point BB(prototypes->variables.fieldWidth + 100, prototypes->variables.fieldHeight + 100);
+				state->creepMap_ = SpatialMap<CreepState>(50, true, Point(-100, -100), BB);
+			}
+			state->creepMap_.setUnique(state->creeps);
 		}
 		
 		void spawnFormation(GameState* state, Prototypes* prototypes, ForceProto& forceProto, FormationProto& formationProto)
@@ -119,10 +124,10 @@ namespace Creeps
 			formation.isDisposed_ = false;
 			formation.orientation = angle;
 			formation.location = formationCenter;
-			formation.speedMulti = 1;
 			formation.speed = FMath::F_MAX;
 			formation.angularSpeed = 0;
 			formation.spawnedAt = state->time.time;
+			formation.subObjective = SUB_OBJECTIVE::NONE;
 			
 			for(auto& slot : formationProto.slots)
 			{
@@ -130,35 +135,31 @@ namespace Creeps
 				{
 					
 					CreepState& creep = spawnCreep(slot.creepType, getCurrentSlotLocation(formation, formation.slots.size()), state, prototypes);
-					creep.mode = CREEP_MODE::FORMATION;
 					creep.unit.force = forceProto.id;
 					creep.formationId = formation.object.id;
 					creep.formationsSlot = formation.slots.size();
 					creep.orientation = formation.orientation;
 					formation.slots.push_back(creep.object.id);
-					formation.speed = std::min(formation.speed, creep._creepProto->speed);
+					formation.speed = std::min(formation.speed, creep.creepProto_->speed);
 				}
 				else
 				{
 					formation.slots.push_back(-1);
-				}
-				
+				}				
 			}
-			
-		}
-		
+		}		
 		
 		CreepState& spawnCreep(int16_t type, const Point& location, GameState* state, Prototypes* prototypes)
 		{
 			state->creeps.emplace_back();
 			CreepState& creep = state->creeps.back();
-			creep._creepProto = &(prototypes->creeps[type]);
-			creep._weaponProto = &(prototypes->weapons[creep._creepProto->weapon]);
+			creep.creepProto_ = &(prototypes->creeps[type]);
+			creep.weaponProto_ = &(prototypes->weapons[creep.creepProto_->weapon]);
 			
-			creep.numWhiskers = creep._creepProto->whiskers + 1;
+			creep.numWhiskers = creep.creepProto_->whiskers + 1;
 			for(int8_t i = 0; i < creep.numWhiskers; i++)
 			{
-				creep.whiskers[i] = state->random.get(i * 0.7f, i * 1.3f) / creep.numWhiskers * creep._creepProto->maxWhiskerLength;
+				creep.whiskers[i] = state->random.get(i * 0.7f, i * 1.3f) / creep.numWhiskers * creep.creepProto_->maxWhiskerLength;
 				if (i > 0 && creep.whiskers[i] - creep.whiskers[i - 1] < 10)
 					creep.whiskers[i] = creep.whiskers[i - 1] + 10;
 			}
@@ -171,10 +172,10 @@ namespace Creeps
 			creep.object.id = state->idCounter++;
 			state->creepById_[creep.object.id] = &creep;
 			
-			creep.unit.health = creep._creepProto->maxHealth;
+			creep.unit.health = creep.creepProto_->maxHealth;
 			creep.unit.location = location;
 			
-			creep.weapon.prototypeId = creep._creepProto->weapon;
+			creep.weapon.prototypeId = creep.creepProto_->weapon;
 			creep.weapon.attackCooldown = 0;
 			creep.weapon.target = -1;
 			
@@ -186,13 +187,40 @@ namespace Creeps
 			return creep;
 		}
 		
-		void processFormations(GameState* state, Prototypes* prototypes, int timePassed)
+		void processFormations(GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{			
 			for(auto& formation : state->formations)
 			{
-				if ((state->time.time - formation.spawnedAt) % 500 < timePassed)
-					optimiseFormation(formation, state);
-				
+				switch (formation.subObjective)
+				{
+					case SUB_OBJECTIVE::NONE :
+					{
+						findObjective(formation, state, prototypes);
+						break;
+					}
+					case SUB_OBJECTIVE::MOVE :
+					{
+						moveFormation(formation, state, prototypes, timePassed);
+						break;
+					}
+					case SUB_OBJECTIVE::ASSAULT :
+					{
+						performAssault(formation, state, prototypes, timePassed);
+						break;
+					}
+					default:
+					{
+						THROW_FATAL_ERROR("subObjective not handled.");
+						break;
+					}
+				}
+			}
+		}
+		
+		void findObjective(FormationState& formation, GameState* state, Prototypes* prototypes)
+		{
+			if (formation.formationPrototype_->type == FORMATION_TYPE::ASSAULT)
+			{
 				if (formation.objectiveID == -1)
 				{
 					ObjectiveProto& objective = state->random.getFromVector(prototypes->objectives[formation.force]);
@@ -200,309 +228,288 @@ namespace Creeps
 					formation.targetLocation = objective.location;
 					formation.targetOrientation = prototypes->variables.fieldCenter.subtract(objective.location).asAngle();
 					formation.objectivePrototype_ = &objective;
+					
+					formation.subObjective = SUB_OBJECTIVE::MOVE;
 				}
-				
-				float balance = 0;
-				float maxDisabalance = 0;
-				int32_t creepBalanceCount = 1;
-				int32_t targetInObstacleCount = 0;
-				float tractorFactor = 0;
-				int32_t tractorFactorCreeps = 0;
-				bool formationIsInFinalPhase = formation.location.distanceTo(formation.targetLocation) < 20;
-				float orientationDifference = 0;
-				for(auto& id : formation.slots)
+				else
 				{
-					if (id < 0)
-						continue;
-					CreepState& creep = *state->creepById_[id];
-					Point formationSlotLocation = getCurrentSlotLocation(formation, creep.formationsSlot);
-					Point targetSlotLocation = getTargetSlotLocation(formation, creep.formationsSlot);
-					Point creep2Target = targetSlotLocation - creep.unit.location;
-					Point creep2Slot = formationSlotLocation - creep.unit.location;
+					formation.subObjective = SUB_OBJECTIVE::ASSAULT;
+					// or retreat / regroup if no enemies ...
+				}				
+			}
+		}
+		
+		void moveFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed)
+		{
+			tryOptimiseFormation(formation, state, timePassed);
+			
+			bool formationIsInFinalPhase = formation.location.distanceTo(formation.targetLocation) < 20;
+				
+			float avgMoveBalance = 0;
+			float maxMoveImbalance = 0;
+			int32_t creepMoveBalanceCount = 1;
+			
+			int32_t targetInObstacleCount = 0;
+			
+			float tractorMoveBalanceFactor = 0;
+			int32_t tractorCreepsCount = 0;
+			float avgOrientationImbalance = 0;
+			
+			for(auto& id : formation.slots)
+			{
+				if (id < 0)
+					continue;
 					
-					Obstacle* obstacle = Field::findObstacle(formationSlotLocation, prototypes);
+				CreepState& creep = *state->creepById_[id];
+				Point formationSlotLocation = getCurrentSlotLocation(formation, creep.formationsSlot);
+				Point targetSlotLocation = getTargetSlotLocation(formation, creep.formationsSlot);
+				Point creep2Target = targetSlotLocation - creep.unit.location;
+				Point creep2Slot = formationSlotLocation - creep.unit.location;
+				
+				Obstacle* obstacle = Field::findObstacle(formationSlotLocation, prototypes);
+				
+				Point* target;
+				if (!obstacle)
+				{
+					creepMoveBalanceCount++;
+					float creep2TargetL = creep2Target.getLength();
+					float creep2SlotL = creep2Slot.getLength();
 					
-					Point* target;
-					if (!obstacle)
+					if (creep2TargetL < creep2SlotL)
 					{
-						creepBalanceCount++;
-						float creep2TargetL = creep2Target.getLength();
-						float creep2SlotL = creep2Slot.getLength();
-						
-						if (creep2TargetL < creep2SlotL)
-						{
-							balance += creep2SlotL - creep2TargetL;
-							target = &targetSlotLocation;
-						}
-						else
-						{
-							balance -= creep2SlotL;
-							if (creep._creepProto->moveType == MOVE_TYPE::TRACTOR)
-							{
-								tractorFactor += creep._creepProto->size / 5;
-								tractorFactorCreeps++;
-								
-								orientationDifference += std::fabs(FMath::angleDelta(creep.orientation, formation.targetOrientation));
-								if (creep2TargetL < 1 && creep.velocity.getLength() == 0)
-									changeCreepOrientation(creep, formation.targetOrientation, timePassed);
-							}
-							maxDisabalance = std::max(maxDisabalance, creep2SlotL);
-							target = &formationSlotLocation;
-						}							
+						avgMoveBalance += creep2SlotL - creep2TargetL;
+						target = &targetSlotLocation;
 					}
 					else
 					{
-						target = &targetSlotLocation;
-						targetInObstacleCount++;
-					}
-					auto followCount = 0;
-					float targetPriority = creep.sensedAnObstacle || creep._creepProto->moveType == MOVE_TYPE::TRACTOR ? 15 : 2;
-					target->scaleBy(targetPriority);
-					if (!formationIsInFinalPhase)
-					{
-						for(auto& connection : formation.formationPrototype_->slots[creep.formationsSlot].connections)
+						avgMoveBalance -= creep2SlotL;
+						if (creep.creepProto_->moveType == MOVE_TYPE::TRACTOR)
 						{
-							CreepState* partner = state->creepById_[formation.slots[connection.slot]];
-							if (partner && partner->unit.health > 0)
-							{
-								followCount++;
-								*target += partner->unit.location + connection.offset.rotate(formation.orientation);
-							}
+							tractorMoveBalanceFactor += creep.creepProto_->size / 5;
+							tractorCreepsCount++;
+							
+							avgOrientationImbalance += std::fabs(FMath::angleDelta(creep.orientation, formation.targetOrientation));
+							if (creep2TargetL < 1 && creep.velocity.getLength() == 0)
+								changeTractorOrientation(creep, formation.targetOrientation, timePassed);
+						}
+						maxMoveImbalance = std::max(maxMoveImbalance, creep2SlotL);
+						target = &formationSlotLocation;
+					}							
+				}
+				else
+				{
+					target = &targetSlotLocation;
+					targetInObstacleCount++;
+				}
+				
+				int32_t partnerCount = 0;
+				float targetPriority = creep.sensedAnObstacle || creep.creepProto_->moveType == MOVE_TYPE::TRACTOR ? 15 : 2;
+				target->scaleBy(targetPriority);
+				if (!formationIsInFinalPhase)
+				{
+					for(auto& connection : formation.formationPrototype_->slots[creep.formationsSlot].connections)
+					{
+						CreepState* partner = state->creepById_[formation.slots[connection.slot]];
+						if (partner && partner->unit.health > 0)
+						{
+							partnerCount++;
+							*target += partner->unit.location + connection.offset.rotate(formation.orientation);
 						}
 					}
-					target->scaleBy(1.f/(targetPriority + followCount));
-					creep.formationAttraction_ = *target;
-					moveCreepTowardsPoint(creep, *target, prototypes, timePassed);
-					
-				}				
-				
-				balance /= creepBalanceCount;
-				if (tractorFactorCreeps > 0)
-					tractorFactor /= tractorFactorCreeps;
-				//balance = std::min(-maxDisabalance, balance);
-				Point formationDirection;
-				formationDirection.setFromAngle(formation.orientation);
-				auto cells = prototypes->obstacleMap.getCellsInRadius(formation.location, formation.formationPrototype_->width * 0.35, 0.2);
-				int32_t obstaclesAhead = 0;
-				for(auto& cell : cells)
-				{
-					if (cell.second->size() > 0 && ((cell.first - formation.location) * formationDirection) > 0 )
-					{
-						obstaclesAhead++;
-						//VisualDebug::drawRect(cell.first, prototypes->obstacleMap.getCellSize() - 2, true, 0x0, 0x33);
-					}
 				}
-				//VisualDebug::drawCircle(formation.location, formation.formationPrototype_->width * 0.5, true, 0x0, 0x11);
-				//VisualDebug::drawArrow(formation.location, formation.location + (formationDirection * formation.formationPrototype_->width * 0.4), 0x0);
-				
-				formation.speedMulti = FMath::lerp(0, 0.8f + obstaclesAhead, -20 - obstaclesAhead, 0.5f, balance);
-				formation.speedMulti = std::max(0.1f, formation.speedMulti);
-				formation.speedMulti *= targetInObstacleCount + 1;
-				formation.speedMulti = std::min(8.f, formation.speedMulti);
-				
-				Point formation2Target = formation.targetLocation - formation.location;
-				float desiredOrientation;
-				if (formation2Target.getLength() > 30)
-					desiredOrientation = formation2Target.asAngle();
-				else
-					desiredOrientation = formation.targetOrientation;
-				float aDelta = FMath::angleDelta(formation.orientation, desiredOrientation);
-				float speedRatio = FMath::lerp(0.f, 1.f, M_PI*M_PI / 16, 0, aDelta*aDelta);
-				speedRatio = std::min(speedRatio, 1.f);
-				speedRatio = std::max(speedRatio, 0.05f);
-				
-				float stepSize = timePassed * formation.speed * formation.speedMulti * speedRatio;
-				
-				Point dp;
-				dp.setFromAngle(desiredOrientation);
-				VisualDebug::drawArrow(formation.location, formation.location + (dp * 50), 0x0000ff);
-				
-				bool formationCanBeDesposed = true;
-				if (formation2Target.getLength() > stepSize)
-				{
-					formation2Target.scaleTo(stepSize);
-					formation.location += formation2Target;
-					formationCanBeDesposed = false;
-				}
-				else
-				{
-					speedRatio = 0;
-					formation.location = formation.targetLocation;
-				}
-				
-				float turnSize = timePassed * formation.formationPrototype_->maxAngularSpeed * (1 - speedRatio + 0.1);
-				
-				if (std::fabs(aDelta) > turnSize)
-				{
-					float turnDirection = aDelta > 0 ? 1 : -1;
-					formation.orientation += turnDirection * turnSize;
-					formationCanBeDesposed = false;
-				}
-				else
-				{
-					formation.orientation = desiredOrientation;
-				}
-				
-				formation.isDisposed_ = formationCanBeDesposed && balance > -1 - tractorFactor && orientationDifference < 0.1;
-				
+				target->scaleBy(1.f/(targetPriority + partnerCount));
+				creep.formationAttraction_ = *target;
+				moveCreepTowardsPoint(creep, *target, prototypes, timePassed);				
 			}
-		}
-		
-		void optimiseFormation(FormationState& formation, GameState* state)
-		{
-			for(int32_t i = 0; i < formation.slots.size(); i++)
+			
+			if (creepMoveBalanceCount > 0)
+				avgMoveBalance /= creepMoveBalanceCount;
+			if (tractorCreepsCount > 0)
 			{
-				CreepState* creep1 = state->creepById_[formation.slots[i]];
-				if (!creep1 || creep1->unit.health <= 0)
-					continue;
-					
-				float creep1ToSlotDistance = creep1->unit.location.distanceTo(getCurrentSlotLocation(formation, i));
-				for(int32_t j = 0; j < formation.slots.size(); j++)
-				{
-					if (i == j)
-						continue;
-					CreepState* creep2 = state->creepById_[formation.slots[j]];
-					if (!creep2 || creep2->unit.health <= 0 || creep1->object.prototypeId != creep2->object.prototypeId)
-						continue;
-					if (creep1ToSlotDistance > creep1->unit.location.distanceTo(getCurrentSlotLocation(formation, j)) &&
-						creep1ToSlotDistance > creep2->unit.location.distanceTo(getCurrentSlotLocation(formation, i))
-					)
-					{
-						creep1->formationsSlot = j;
-						creep2->formationsSlot = i;
-						formation.slots[i] = creep2->object.id;
-						formation.slots[j] = creep1->object.id;
-						//S::log.add("swapped " + std::to_string(creep1->object.id) + " " + std::to_string(creep2->object.id));
-						break;
-					}
-				}
+				tractorMoveBalanceFactor /= tractorCreepsCount;
+				avgOrientationImbalance /= tractorCreepsCount;
 			}
-		}
-		
-		void processCreeps(GameState* state, Prototypes* prototypes, int timePassed)
-		{
-			for(auto& creep : state->creeps)
+			
+			
+			Point formationDirection;
+			formationDirection.setFromAngle(formation.orientation);
+			auto cells = prototypes->obstacleMap.getCellsInRadius(formation.location, formation.formationPrototype_->width * 0.35, 0.2);
+			int32_t obstaclesAhead = 0;
+			for(auto& cell : cells)
 			{
-				switch (creep.mode)
+				if (cell.second->size() > 0 && ((cell.first - formation.location) * formationDirection) > 0 )
 				{
-					case CREEP_MODE::ASSAULT:
-						processCreepAssault(creep, state, prototypes, timePassed);
-						break;
-					case CREEP_MODE::RETREAT:
-						break;
-					default:
-						break;
+					obstaclesAhead++;
 				}
 			}
 			
-		}
-		
-		void processCreepAssault(CreepState& creep, GameState* state, Prototypes* prototypes, int timePassed)
-		{
-			if (creep.unit.health <= 0)
-				return;
+			float speedMulti = FMath::lerp(0, 0.8f + obstaclesAhead, -20 - obstaclesAhead, 0.5f, avgMoveBalance);
+			speedMulti = std::max(0.1f, speedMulti);
+			speedMulti *= targetInObstacleCount + 1;
+			speedMulti = std::min(8.f, speedMulti);
 			
-			CreepState* target = nullptr;
-			if (creep.weapon.target > 0)
-				target = state->creepById_[creep.weapon.target];
-			if (target == nullptr || target->unit.health <= 0)
-				target = getBestAssaultTargetForCreep(creep, state->creeps);
-			if (target == nullptr)
-			{
-				creep.weapon.target = -1;
-				return;
-			}
+			Point formation2Target = formation.targetLocation - formation.location;
+			float desiredOrientation;
+			if (formation2Target.getLength() > 30)
+				desiredOrientation = formation2Target.asAngle();
+			else
+				desiredOrientation = formation.targetOrientation;
+			float aDelta = FMath::angleDelta(formation.orientation, desiredOrientation);
+			float speedRatio = std::fabs(aDelta) > 0.05 ? 0.5 : 1;
 			
-			Obstacle* obstacle = Field::findObstacle(creep.unit.location, prototypes);
-			if (obstacle)
+			float stepSize = timePassed * formation.speed * speedMulti * speedRatio;			
+			
+			bool formationMovementComplete = true;
+			if (formation2Target.getLength() > stepSize)
 			{
-				moveUnitOutOfObstacle(creep, obstacle, timePassed);				
+				formation2Target.scaleTo(stepSize);
+				formation.location += formation2Target;
+				formationMovementComplete = false;
 			}
 			else
 			{
-				creep.targetLoc_ = target->unit.location;
-				if (target->unit.location.distanceTo(creep.unit.location) < creep._weaponProto->range)
+				speedRatio = 0;
+				formation.location = formation.targetLocation;
+			}
+			
+			float turnSize = timePassed * formation.formationPrototype_->maxAngularSpeed * (1 - speedRatio + 0.1);
+			
+			if (std::fabs(aDelta) > turnSize)
+			{
+				float turnDirection = aDelta > 0 ? 1 : -1;
+				formation.orientation += turnDirection * turnSize;
+				formationMovementComplete = false;
+			}
+			else
+			{
+				formation.orientation = desiredOrientation;
+			}
+			
+			if (formationMovementComplete && avgMoveBalance > -1 - tractorMoveBalanceFactor && avgOrientationImbalance < 0.1)
+				formation.subObjective = SUB_OBJECTIVE::NONE;
+		}
+		
+		void tryOptimiseFormation(FormationState& formation, GameState* state, int32_t timePassed)
+		{
+			size_t i = ((state->time.time - formation.spawnedAt) / timePassed) % formation.slots.size();
+			
+			CreepState* creep1 = state->creepById_[formation.slots[i]];
+			if (!creep1 || creep1->unit.health <= 0)
+				return;
+				
+			float creep1ToSlotDistance = creep1->unit.location.distanceTo(getCurrentSlotLocation(formation, i));
+			for(size_t j = 0; j < formation.slots.size(); j++)
+			{
+				if (i == j)
+					continue;
+				CreepState* creep2 = state->creepById_[formation.slots[j]];
+				if (!creep2 || creep2->unit.health <= 0 || creep1->object.prototypeId != creep2->object.prototypeId)
+					continue;
+				if (creep1ToSlotDistance > creep1->unit.location.distanceTo(getCurrentSlotLocation(formation, j)) &&
+					creep1ToSlotDistance > creep2->unit.location.distanceTo(getCurrentSlotLocation(formation, i))
+				)
 				{
-					performCreepAttack(creep, target->unit, state, timePassed);
+					creep1->formationsSlot = j;
+					creep2->formationsSlot = i;
+					formation.slots[i] = creep2->object.id;
+					formation.slots[j] = creep1->object.id;
+					return;
+				}
+			}
+		}
+		
+		void performAssault(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed)
+		{
+			for(auto& id : formation.slots)
+			{
+				if (id < 0)
+					continue;
+					
+				CreepState& creep = *state->creepById_[id];
+				
+				if (creep.unit.health <= 0)
+					return;
+				
+				CreepState* target = nullptr;
+				if (creep.weapon.target > 0)
+					target = state->creepById_[creep.weapon.target];
+				if (target == nullptr || target->unit.health <= 0)
+					target = getBestAssaultTargetForCreep(creep, state->creeps);
+				if (target == nullptr)
+				{
+					creep.weapon.target = -1;
+					return;
+				}
+				
+				Obstacle* obstacle = Field::findObstacle(creep.unit.location, prototypes);
+				if (obstacle)
+				{
+					moveUnitOutOfObstacle(creep, obstacle, timePassed);				
 				}
 				else
 				{
-					moveCreepTowardsPoint(creep, target->unit.location, prototypes, timePassed);				
-				}
-			}			
+					creep.targetLoc_ = target->unit.location;
+					if (target->unit.location.distanceTo(creep.unit.location) < creep.weaponProto_->range)
+					{
+						performCreepAttack(creep, target->unit, state, timePassed);
+					}
+					else
+					{
+						moveCreepTowardsPoint(creep, target->unit.location, prototypes, timePassed);				
+					}
+				}	
+			}
 		}
 		
-		void performCreepAttack(CreepState& creep, Unit& target, GameState* state, int timePassed)
+		void performCreepAttack(CreepState& creep, Unit& target, GameState* state, int32_t timePassed)
 		{
 			if (creep.weapon.attackCooldown > 0)
 			{
-				creep.weapon.attackCooldown -= timePassed;				
+				creep.weapon.attackCooldown -= timePassed;
 			}
 			else
 			{
-				creep.weapon.attackCooldown = 1000000 / creep._weaponProto->attackSpeed;
-				spawnProjectile(creep.unit.location, target.location, creep._weaponProto, creep.unit.force, state);
+				creep.weapon.attackCooldown = 1000000 / creep.weaponProto_->attackSpeed;
+				spawnProjectile(creep.unit.location, target.location, creep.weaponProto_, creep.unit.force, state);
 			}
 		}
 		
-		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed)
+		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed)
 		{
-			if (creep._creepProto->moveType == MOVE_TYPE::TRACTOR)
+			if (creep.creepProto_->moveType == MOVE_TYPE::TRACTOR)
 				moveTractorTowardsPoint(creep, target, prototypes, timePassed);
-			else if (creep._creepProto->moveType == MOVE_TYPE::WALKER)
+			else if (creep.creepProto_->moveType == MOVE_TYPE::WALKER)
 				moveWalkerTowardsPoint(creep, target, prototypes, timePassed);
 		}
 		
-		void moveTractorTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed)
+		void moveTractorTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed)
 		{
-			float breakAccel = -0.0005;
-			auto& proto = creep._creepProto;
+			auto& proto = creep.creepProto_;
+			float breakAccel = -creep.creepProto_->breaksStrength;
 			float speed = creep.velocity.getLength();
-			float omniDirectionalSpeed = 0.002;
-			
-			// Friction
-			if (creep.velocity.getLength() > 0)
-			{
-				int32_t tp = timePassed;
-				float scale = 1;
-				while(tp)
-				{
-					scale *= 0.99; //TODO config
-					tp /= 5; // ~3 times per standard step size; //TODO config
-				}
-				creep.velocity.scaleBy(scale);				
-			}
-			
-			// Stop if reached the target
-			Point creep2Target = target - creep.unit.location;
+			float omniSpeed = creep.creepProto_->omniDirectionalSpeed;
+						
+						
+			Point nextTarget = avoidObstacles(creep, std::min(4.f, target.distanceTo(creep.unit.location)), target, prototypes);
+			Point creep2Target = nextTarget - creep.unit.location;
 			
 			float timeToLoseSpeed = -speed / breakAccel;
-			float breakDistance = speed * timeToLoseSpeed / 2 + omniDirectionalSpeed * timeToLoseSpeed; 
-			if (creep2Target.getLength() < breakDistance * 1.05 + 1)
+			float breakDistance = speed * timeToLoseSpeed / 2 + omniSpeed * timeToLoseSpeed; 
+			if (nextTarget == target && creep2Target.getLength() < breakDistance * 1.05 + 1)
 			{
 				Point omniDirectionalStep = creep2Target;
 				if (omniDirectionalStep.getLength() > 0)
-					omniDirectionalStep.scaleTo(std::min(creep2Target.getLength(), omniDirectionalSpeed * timePassed));
+					omniDirectionalStep.scaleTo(std::min(creep2Target.getLength(), omniSpeed * timePassed));
 					
-					/**/
-				/*if (creep.velocity.getLength() > 0)
-				{
-					float accel = FMath::lerp(0, proto->acceleration.x, proto->speed, proto->acceleration.y, speed);
-					float accel = FMath::lerp(0, 0, creep._creepProto->size, accel, creep2Target.getLength());
-					accelerateTractor(creep, accel * timePassed);
-				}*/
 				accelerateTractor(creep, breakAccel * timePassed);
 				creep.movement_ = creep.velocity + omniDirectionalStep;
 				creep.unit.voluntaryMovement = creep.velocity;
 				return;
 			}
 			
-			Point nextTarget = avoidObstacles(creep, 4, target, prototypes);
-			creep2Target = nextTarget - creep.unit.location;
-			
 			// Move
 			bool targetIsUnreachableAtCurrentSpeed;			
-			float angularSpeed = creep._creepProto->angularSpeed;
+			float angularSpeed = creep.creepProto_->angularSpeed;
 			
 				
 			if (speed == 0)
@@ -512,10 +519,8 @@ namespace Creeps
 			else
 			{
 				float turnRadiusLength = speed / angularSpeed;
-				//turnRadiusLength -= omniDirectionalSpeed * nextTarget.distanceTo(creep.unit.location);
-				Point turnRadius;
-				turnRadius.setFromAngle(creep.orientation);
-				turnRadius.scaleTo(turnRadiusLength);
+				//turnRadiusLength -= omniSpeed * nextTarget.distanceTo(creep.unit.location);
+				Point turnRadius = Point::fromAngle(creep.orientation, turnRadiusLength);
 				Point unreachableCenter1 = creep.unit.location + turnRadius.rotate(M_PI_2);
 				Point unreachableCenter2 = creep.unit.location + turnRadius.rotate(-M_PI_2);
 				
@@ -527,29 +532,28 @@ namespace Creeps
 			float maxValidTurnRadius = creep2Target.getLength() / 2 / creep2Target.cos(creep.velocity.rotate(M_PI_2)); //TODO / 0			
 			maxValidTurnRadius = std::fabs(maxValidTurnRadius);
 			
-			float maxVelocity = angularSpeed * maxValidTurnRadius;
+			float maxSpeed = angularSpeed * maxValidTurnRadius;
 			
 			float desiredDirection = creep2Target.asAngle();
-			changeCreepOrientation(creep, desiredDirection, timePassed);				
-													 
+			changeTractorOrientation(creep, desiredDirection, timePassed);				
+			
 			if (targetIsUnreachableAtCurrentSpeed)
 			{
 				accelerateTractor(creep, breakAccel * timePassed);
 			}
 			else
 			{
-				float accel = FMath::lerp(0, proto->acceleration.x, proto->speed, proto->acceleration.y, speed);
-				accel = std::max(0.001f, accel);
-				accel *= timePassed;
-				if (accel * 1.05 > maxVelocity - creep.velocity.getLength())
-					accel = (maxVelocity - creep.velocity.getLength()) / 1.05;
+				float accel = timePassed * FMath::lerpClipped(0, proto->acceleration.x, proto->speed, proto->acceleration.y, speed);
+				
+				if (accel * 1.05 > maxSpeed - speed)
+					accel = (maxSpeed - speed) / 1.05;
 				
 				accelerateTractor(creep, accel);
 			}
 			
 			Point omniDirectionalStep = creep2Target;
-			if (omniDirectionalStep.getLength() > 0)
-				omniDirectionalStep.scaleTo(std::min(creep2Target.getLength(), omniDirectionalSpeed*timePassed));
+			if (creep2Target.getLength() > 0)
+				omniDirectionalStep.scaleTo(std::min(creep2Target.getLength(), omniSpeed * timePassed));
 				
 			creep.movement_ = creep.velocity + omniDirectionalStep;
 			creep.unit.voluntaryMovement = creep.velocity;
@@ -579,9 +583,9 @@ namespace Creeps
 		}
 		
 		
-		void moveWalkerTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int timePassed)
+		void moveWalkerTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed)
 		{
-			float stepSize = creep._creepProto->speed * timePassed;
+			float stepSize = creep.creepProto_->speed * timePassed;
 			Point nextTarget = avoidObstacles(creep, stepSize, target, prototypes);
 			creep.sensedAnObstacle = nextTarget != target;
 			
@@ -654,18 +658,18 @@ namespace Creeps
 					[from = creep.unit.location](Edge& edge){return FMath::distanceToLine(from, *edge.p1, *edge.p2);});
 					
 			Point step = (*nearestEdge->p2 - *nearestEdge->p1).rotate(M_PI_2);
-			step.scaleTo(creep._creepProto->speed * timePassed);
+			step.scaleTo(creep.creepProto_->speed * timePassed);
 			creep.movement_ = step;
 		}
 		
 		
-		void changeCreepOrientation(CreepState& creep, float targetOrientation, int32_t timePassed)
+		void changeTractorOrientation(CreepState& creep, float targetOrientation, int32_t timePassed)
 		{
-			if (creep._creepProto->moveType != MOVE_TYPE::TRACTOR)
+			if (creep.creepProto_->moveType != MOVE_TYPE::TRACTOR)
 				return;				
 			
 			float delta = FMath::angleDelta(targetOrientation, creep.orientation);
-			float directionStep = creep._creepProto->angularSpeed * timePassed;
+			float directionStep = creep.creepProto_->angularSpeed * timePassed;
 			if (std::fabs(delta) < directionStep)
 			{
 				creep.orientation = targetOrientation;
@@ -749,19 +753,19 @@ namespace Creeps
 			}
 		}	
 		
-		void pushOutCreeps(GameState* state, Prototypes* prototypes, int timePassed)
+		void pushOutCreeps(GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{
 			for(auto& creep : state->creeps)
 			{
 				std::vector<CreepState*> possibleCollisions = state->creepMap_.getInRadius(
-						creep.unit.location, creep._creepProto->size + prototypes->variables.maxCreepSize + prototypes->variables.additionalSpacing);
+						creep.unit.location, creep.creepProto_->size + prototypes->variables.maxCreepSize + prototypes->variables.additionalSpacing);
 				
 				for(auto& creep2 : possibleCollisions)
 				{
 					if (creep2 >= &creep)
 						continue;
 						
-					int32_t collisionRadius = creep._creepProto->size + creep2->_creepProto->size + prototypes->variables.additionalSpacing;
+					int32_t collisionRadius = creep.creepProto_->size + creep2->creepProto_->size + prototypes->variables.additionalSpacing;
 					Point creep2Creep = creep.unit.location - creep2->unit.location;
 					if (creep2Creep.getLength() == 0)
 						creep2Creep.x = 0.1;
@@ -769,16 +773,16 @@ namespace Creeps
 					if (penetration > 0)
 					{
 						//float direction = creep2Creep.asAngle();
-						int32_t totalWeight = creep._creepProto->weight + creep2->_creepProto->weight;
+						int32_t totalWeight = creep.creepProto_->weight + creep2->creepProto_->weight;
 						float force = penetration * prototypes->variables.creepRestitution / totalWeight;
 						
 						if (creep.unit.force == creep2->unit.force && creep.object.prototypeId != creep2->object.prototypeId)
 							force /= 10;
 						
-						creep2Creep.scaleTo(force * creep2->_creepProto->weight);
+						creep2Creep.scaleTo(force * creep2->creepProto_->weight);
 						creep.movement_ += creep2Creep;
 						
-						creep2Creep.scaleTo(force * creep._creepProto->weight);
+						creep2Creep.scaleTo(force * creep.creepProto_->weight);
 						creep2->movement_ -= creep2Creep;
 						
 					}
@@ -787,11 +791,11 @@ namespace Creeps
 			
 		}
 		
-		void pushCreepsOutOfObstacles(GameState* state, Prototypes* prototypes, int timePassed)
+		void pushCreepsOutOfObstacles(GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{
 			for(auto& creep : state->creeps)
 			{
-				if (!creep.unit.health <= 0)
+				if (creep.unit.health <= 0)
 					continue;
 				
 				auto obstacle = Field::findObstacle(creep.unit.location, prototypes);
@@ -803,6 +807,12 @@ namespace Creeps
 				force.scaleTo(0.1 * timePassed);
 				creep.movement_ += force;
 			}
+		}
+		
+		void applyCreepMovement(GameState* state)
+		{
+			for(auto& creep : state->creeps)
+				creep.unit.location += creep.movement_;		
 		}
 		
 		
@@ -826,7 +836,7 @@ namespace Creeps
 			projectile.target.y += state->random.get(-1.0f, 1.0f) * distance * 0.1;
 		}
 		
-		void processProjectiles(GameState* state, Prototypes* prototypes, int timePassed)
+		void processProjectiles(GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{
 			for(auto& proj : state->projectiles)
 			{
@@ -844,7 +854,7 @@ namespace Creeps
 					std::vector<CreepState*> localCreeps = state->creepMap_.getInRadius(proj.target, proj.splash + prototypes->variables.maxCreepSize);
 					for(auto& creep : localCreeps)
 					{
-						int32_t r = proj.splash + creep->_creepProto->size;
+						int32_t r = proj.splash + creep->creepProto_->size;
 						if (creep->unit.location.sqDistanceTo(proj.target) < r*r)
 						{
 							creep->unit.health -= proj.damage;
@@ -888,6 +898,7 @@ namespace Creeps
 			{
 				if (creep.unit.health <= 0)
 				{
+					/*
 					if (creep.formationId)
 					{
 						auto formation = std::find_if(state->formations.begin(), state->formations.end(), [id = creep.formationId](FormationState& form){ 
@@ -898,6 +909,8 @@ namespace Creeps
 							formation->isDisposed_ = true;
 						}
 					}
+					TODO clean formation
+					*/
 					if (state->isEventLoggerEnabled)
 						state->eventLogger.addUnitDeath(state->time.time, creep.object.id, creep.object.prototypeId, creep.unit.location, creep.unit.voluntaryMovement.asAngle(), creep.impact_);
 				}
@@ -931,18 +944,12 @@ namespace Creeps
 			{
 				if (formation.isDisposed_)
 				{
-					formation.isDisposed_ = false;
-					formation.objectiveID = -1;
-					continue;
 					for(auto& slot : formation.slots)
 					{
 						if (slot > 0)
 						{
-							for(auto& creep : state->creeps)
-							{
-								if (creep.object.id == slot)
-									creep.mode = CREEP_MODE::ASSAULT;
-							}						
+							THROW_FATAL_ERROR("not implemented");
+							//TODO			
 						}
 					}
 				}			

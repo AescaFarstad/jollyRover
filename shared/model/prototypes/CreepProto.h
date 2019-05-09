@@ -46,6 +46,8 @@ public:
 	MOVE_TYPE moveType;
 	float angularSpeed;
 	Point acceleration; //x - at 0 speed, y - at max speed
+	float breaksStrength;
+	float omniDirectionalSpeed;
 	float normalFriction;
 
 private:

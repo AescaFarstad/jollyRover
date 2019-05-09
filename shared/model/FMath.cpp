@@ -8,6 +8,14 @@ float FMath::lerp(float x1, float y1, float x2, float y2, float argument)
 	return (argument  - x1) * (y1 - y2) / (x1 - x2) + y1;
 }
 
+float FMath::lerpClipped(float x1, float y1, float x2, float y2, float argument)
+{
+	float min = std::min(y1, y2);
+	float max = std::max(y1, y2);
+	
+	return std::min(max, std::max(min, lerp(x1, y1, x2, y2, argument)));
+}
+
 
 Point FMath::lerp(float x1, Point& p1, float x2, Point& p2, float argument)
 {

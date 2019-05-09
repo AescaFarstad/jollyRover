@@ -4,19 +4,17 @@
 #include <ObjectiveProto.h>
 #include <Point.h>
 
-/*
-class FormationSlot
+enum class SUB_OBJECTIVE
 {
-public:
-	FormationSlot() = default;
-	~FormationSlot() = default;
-	
-
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
-
+	NONE,
+	MOVE,
+	ASSAULT,
+	APPROACH,
+	HARVEST,
+	RETREAT,
+	ESCAPE,
+	RESUPPLY
 };
-*/
 
 class FormationState
 {
@@ -30,7 +28,6 @@ public:
 	int16_t objectiveID;
 	int16_t force;
 	std::vector<int32_t> slots;
-	float speedMulti;
 	float speed;
 	float angularSpeed;	
 	Point location;
@@ -38,6 +35,7 @@ public:
 	float orientation;
 	float targetOrientation;
 	int32_t spawnedAt;
+	SUB_OBJECTIVE subObjective;
 	
 	bool isDisposed_;
 	FormationProto* formationPrototype_;
@@ -51,3 +49,9 @@ public:
 
 };
 	
+
+namespace Serializer {
+
+	void write(const SUB_OBJECTIVE& value, SerializationStream& stream);
+	void read(SUB_OBJECTIVE& value, SerializationStream& stream);
+}
