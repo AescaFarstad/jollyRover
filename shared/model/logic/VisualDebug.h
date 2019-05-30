@@ -48,6 +48,7 @@ namespace VisualDebug
 
 	void drawLine(Point from, Point to, uint32_t color);
 	void drawArrow(Point from, Point to, uint32_t color);
+	void drawArrow(Point from, Point to, int32_t length, uint32_t color);
 	void drawRect(Point from, Point to, bool fill, uint32_t color, uint8_t alpha = 0xff);
 	void drawRect(float x1, float y1, float w, float h, bool fill, uint32_t color, uint8_t alpha = 0xff);
 	void drawRect(Point center, float size, bool fill, uint32_t color, uint8_t alpha = 0xff);

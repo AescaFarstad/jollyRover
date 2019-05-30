@@ -57,6 +57,14 @@
 			"ignoreFailures": true 
 		}
       ]
-    }
+    },
+	{
+		"name": "lldb c",
+		"type": "lldb",
+		"request": "launch",
+		"program": "${workspaceFolder}/out/local",
+		"args": [],
+		"preLaunchTask": "em lc",
+	}
   ]
 }

@@ -164,6 +164,11 @@ float Point::sin(const Point &anotherPoint) const
 {
 	return crossProduct(anotherPoint) / (getLength() * anotherPoint.getLength());
 }
+
+float Point::projectOnto(const Point &anotherPoint) const
+{
+	return *this * anotherPoint / anotherPoint.getLength();
+}
 	
 void Point::operator+=(const Point& p)
 {

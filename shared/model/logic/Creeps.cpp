@@ -63,13 +63,28 @@ namespace Creeps
 		{
 			for(auto& creep : state->creeps)
 			{
-				if (state->creepById_[creep.object.id] != &creep)
+				auto& mapCreep = state->creepById_[creep.object.id];
+				if (mapCreep != &creep)
+					THROW_FATAL_ERROR("creep pointer mismatch");
+				if (mapCreep->object.id != creep.object.id)
 					THROW_FATAL_ERROR("creep pointer mismatch");
 			}
 			
 			for(auto& creep : state->creeps)
 				if (creep.creepProto_ != &prototypes->creeps[creep.object.prototypeId])
 					THROW_FATAL_ERROR("frefer");
+					
+			for(auto& form : state->formations)
+			{	
+				for(size_t i = 0; i < form.slots.size(); i++)
+				{
+					for(size_t j = i + 1; j < form.slots.size(); j++)
+					{
+						if (form.slots[i] == form.slots[j] && form.slots[i] != -1)
+							THROW_FATAL_ERROR("same creeps in different slots");
+					}
+				}
+			}
 		}
 		
 		void spawnFormations(GameState* state, Prototypes* prototypes)
@@ -159,7 +174,7 @@ namespace Creeps
 			creep.numWhiskers = creep.creepProto_->whiskers + 1;
 			for(int8_t i = 0; i < creep.numWhiskers; i++)
 			{
-				creep.whiskers[i] = state->random.get(i * 0.7f, i * 1.3f) / creep.numWhiskers * creep.creepProto_->maxWhiskerLength;
+				creep.whiskers[i] = state->random.get((i + 1) * 0.7f, (i + 1) * 1.3f) / creep.numWhiskers * creep.creepProto_->maxWhiskerLength;
 				if (i > 0 && creep.whiskers[i] - creep.whiskers[i - 1] < 10)
 					creep.whiskers[i] = creep.whiskers[i - 1] + 10;
 			}
@@ -260,7 +275,11 @@ namespace Creeps
 				if (id < 0)
 					continue;
 					
-				CreepState& creep = *state->creepById_[id];
+				CreepState* creepP = state->creepById_[id];
+				CreepState& creep = *creepP;
+				if (!creepP || creepP->unit.health <= 0)
+					continue;
+					
 				Point formationSlotLocation = getCurrentSlotLocation(formation, creep.formationsSlot);
 				Point targetSlotLocation = getTargetSlotLocation(formation, creep.formationsSlot);
 				Point creep2Target = targetSlotLocation - creep.unit.location;
@@ -425,9 +444,10 @@ namespace Creeps
 				if (id < 0)
 					continue;
 					
-				CreepState& creep = *state->creepById_[id];
+				CreepState* creepP = state->creepById_[id];
+				CreepState& creep = *creepP;
 				
-				if (creep.unit.health <= 0)
+				if (!creepP || creep.unit.health <= 0)
 					return;
 				
 				CreepState* target = nullptr;
@@ -449,7 +469,7 @@ namespace Creeps
 				else
 				{
 					creep.targetLoc_ = target->unit.location;
-					if (target->unit.location.distanceTo(creep.unit.location) < creep.weaponProto_->range)
+					if (target->unit.location.distanceTo(creep.unit.location) < creep.weaponProto_->range + target->creepProto_->size)
 					{
 						performCreepAttack(creep, target->unit, state, timePassed);
 					}
@@ -488,10 +508,11 @@ namespace Creeps
 			float breakAccel = -creep.creepProto_->breaksStrength;
 			float speed = creep.velocity.getLength();
 			float omniSpeed = creep.creepProto_->omniDirectionalSpeed;
-						
-						
-			Point nextTarget = avoidObstacles(creep, std::min(4.f, target.distanceTo(creep.unit.location)), target, prototypes);
-			Point creep2Target = nextTarget - creep.unit.location;
+			
+			Point creep2Target = target - creep.unit.location;
+			float testStep = creep.velocity.projectOnto(creep2Target) + omniSpeed;
+			Point nextTarget = avoidObstacles(creep, std::min(testStep, creep2Target.getLength()), target, prototypes);
+			creep2Target = nextTarget - creep.unit.location;
 			
 			float timeToLoseSpeed = -speed / breakAccel;
 			float breakDistance = speed * timeToLoseSpeed / 2 + omniSpeed * timeToLoseSpeed; 
@@ -597,56 +618,47 @@ namespace Creeps
 			creep.unit.voluntaryMovement = finalStep;
 		}
 		
-		Point avoidObstacles(CreepState& creep, float stepSize, const Point& target, Prototypes* prototypes)
+		Point avoidObstacles(CreepState& creep, float stepSize, Point& target, Prototypes* prototypes)
 		{
 			Point step = target - creep.unit.location;
 			if (step.getLength() == 0)
 				return target;
-			step.scaleTo(stepSize);
-			for(auto& whisker : creep.whiskers)
+						
+			for(int32_t i = -2; i < (int32_t)creep.whiskers.size(); i++)
 			{
-				if (whisker < 0 || whisker > (target - creep.unit.location).getLength())
+				float whisker;
+				if (i == -2)
+					whisker = stepSize;
+				else if (i == -1)
+					whisker = stepSize * 1.1;
+				else if (creep.whiskers[i] > 0)
+					whisker = creep.whiskers[i];
+					
+				if (whisker <= 0 || whisker > (target - creep.unit.location).getLength())
 					break;
 					
 				Point whiskerStep = step;
-				if (whisker > 0)
 					whiskerStep.scaleTo(whisker);
 				Point nextLoc = creep.unit.location + whiskerStep;
 				Obstacle* obstacle = Field::findObstacle(nextLoc, prototypes);
 				if (obstacle)
 				{
-					Point creepToTarget = target - creep.unit.location;
-					float direction = creepToTarget.crossProduct(obstacle->centroid - creep.unit.location);
+					Edge* bestEdge = Field::nearestIntersectedEdge(creep.unit.location, target, obstacle->edges, obstacle->extendedEdges);
 					
-					Point* bestPoint = nullptr;
-					float bestDistance = FMath::F_MAX;
-					int32_t bestIndex = -1;
-					for(size_t i = 0; i < obstacle->vertices.size(); i++)
-					{
-						auto& vert = obstacle->vertices[i];
-						float vertDir = creepToTarget.crossProduct(vert - creep.unit.location);
-						if ((vertDir < 0) != (direction < 0))
-						{
-							float distance = vert.distanceTo(creep.unit.location);
-							if (distance < bestDistance)
-							{
-								bestDistance = distance;
-								bestPoint = &vert;
-								bestIndex = i;
-							}
-						}
-					}
-					if (bestPoint)
-					{
-						if (direction > 0) 
-						{
-							return obstacle->extendedVertices[1][bestIndex];
-						}
-						else
-						{
-							return obstacle->extendedVertices[0][bestIndex];
-						}
-					}
+					if (!bestEdge)
+						return target; // Can happen because of rounding errors
+					
+					Point creepToTarget = target - creep.unit.location;
+					Point creepToCentroid = obstacle->centroid - creep.unit.location;
+					Point creepToP1 = *bestEdge->p1 - creep.unit.location;
+					
+					float creepSide = creepToCentroid.crossProduct(creepToTarget);
+					float p1Side = creepToCentroid.crossProduct(creepToP1);
+					
+					if ((creepSide > 0) == (p1Side > 0))
+						return *bestEdge->p1;
+					else
+						return *bestEdge->p2;
 				}
 			}
 			return target;
@@ -716,23 +728,7 @@ namespace Creeps
 				
 				if (obstacle)
 				{
-					float bestDistance = FMath::F_MAX;					
-					Edge creepEdge(&creep.unit.location, &nextLoc);
-					Edge* bestEdge = nullptr;
-					
-					for(auto& edge : obstacle->edges)
-					{
-						Point intersection = FMath::getEdgeIntersection(creepEdge, edge);
-						if (!intersection.isNaN())
-						{
-							float distance = creep.unit.location.distanceTo(intersection);
-							if (distance < bestDistance)
-							{
-								bestDistance = distance;
-								bestEdge = &edge;
-							}
-						}
-					}
+					Edge* bestEdge = Field::nearestIntersectedEdge(creep.unit.location, nextLoc, obstacle->edges, obstacle->edges);
 					
 					if (bestEdge == nullptr)
 						continue;
@@ -911,8 +907,6 @@ namespace Creeps
 					}
 					TODO clean formation
 					*/
-					if (state->isEventLoggerEnabled)
-						state->eventLogger.addUnitDeath(state->time.time, creep.object.id, creep.object.prototypeId, creep.unit.location, creep.unit.voluntaryMovement.asAngle(), creep.impact_);
 				}
 			}
 			
@@ -924,6 +918,8 @@ namespace Creeps
 			if (first != last)
 			{
 				auto removeFrom = first;
+				removeDeadCreep(*first, state);
+				state->creepById_.erase(first->object.id);
 				++first;
 				for (; first != last; ++first)
 				{
@@ -932,14 +928,46 @@ namespace Creeps
 						*removeFrom = std::move(*first);
 						state->creepById_[removeFrom->object.id] = &*removeFrom;
 						++removeFrom;
+					}
+					else
+					{
+						state->creepById_.erase(first->object.id);
+						removeDeadCreep(*first, state);						
 					}					
 				}
 				state->creeps.erase(removeFrom,  state->creeps.end());
 			}			
 		}
 		
+		void removeDeadCreep(CreepState& creep, GameState* state)
+		{
+			state->creepById_.erase(creep.object.id);
+			auto formation = std::find_if(state->formations.begin(), state->formations.end(), [&creep](FormationState& f) {
+				return f.object.id == creep.formationId;
+				});
+			formation->slots[creep.formationsSlot] = -1;
+			if (state->isEventLoggerEnabled)
+			{	
+				state->eventLogger.addUnitDeath(state->time.time, creep.object.id, creep.object.prototypeId, creep.unit.location, 													creep.unit.voluntaryMovement.asAngle(), creep.impact_);
+			}
+		}
+		
 		void removeDeadFormations(GameState* state)
 		{
+			for(auto& formation : state->formations)
+			{
+				bool hasCreeps = false;
+				for(auto& slot : formation.slots)
+				{
+					if (slot > 0)
+					{
+						hasCreeps = true;
+						break;
+					}
+				}
+				if (!hasCreeps)
+					formation.isDisposed_ = true;
+			}
 			for(auto& formation : state->formations)
 			{
 				if (formation.isDisposed_)

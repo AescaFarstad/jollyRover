@@ -15,6 +15,7 @@ public:
 	std::vector<Point> vertices;
 	std::vector<Point> extendedVertices[2];
 	std::vector<Edge> edges;
+	std::vector<Edge> extendedEdges;
 	Point AA;
 	Point BB;
 	Point centroid;

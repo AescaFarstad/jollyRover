@@ -11,7 +11,7 @@
 		"war":{
 			"intensity": 400,
 			"creepRestitution": 0.6,
-			"additionalSpacing": 4
+			"additionalSpacing": 5
 		}
 	},
 	"forces":[
@@ -651,7 +651,7 @@
 					"optional":false
 				},
 				{
-					"offset":{ "y":50, "x":-20 },
+					"offset":{ "y":60, "x":-20 },
 					"creepType":1,
 					"optional":false
 				},
@@ -661,7 +661,7 @@
 					"optional":false
 				},
 				{
-					"offset":{ "y":50, "x":-30 },
+					"offset":{ "y":60, "x":-30 },
 					"creepType":1,
 					"optional":false
 				},
@@ -671,7 +671,7 @@
 					"optional":false
 				},
 				{
-					"offset":{ "y":50, "x":-40 },
+					"offset":{ "y":60, "x":-40 },
 					"creepType":1,
 					"optional":false
 				},
@@ -681,7 +681,7 @@
 					"optional":false
 				},
 				{
-					"offset":{ "y":50, "x":-50 },
+					"offset":{ "y":60, "x":-50 },
 					"creepType":1,
 					"optional":false
 				},
@@ -692,7 +692,7 @@
 					"optional":false
 				},
 				{
-					"offset":{ "y":-50, "x":-20 },
+					"offset":{ "y":-60, "x":-20 },
 					"creepType":1,
 					"optional":false
 				},
@@ -702,7 +702,7 @@
 					"optional":false
 				},
 				{
-					"offset":{ "y":-50, "x":-30 },
+					"offset":{ "y":-60, "x":-30 },
 					"creepType":1,
 					"optional":false
 				},
@@ -712,7 +712,7 @@
 					"optional":false
 				},
 				{
-					"offset":{ "y":-50, "x":-40 },
+					"offset":{ "y":-60, "x":-40 },
 					"creepType":1,
 					"optional":false
 				},
@@ -722,7 +722,7 @@
 					"optional":false
 				},
 				{
-					"offset":{ "y":-50, "x":-50 },
+					"offset":{ "y":-60, "x":-50 },
 					"creepType":1,
 					"optional":false
 				}

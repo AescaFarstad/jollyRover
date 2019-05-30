@@ -32,7 +32,7 @@ namespace Creeps
 		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed);
 		void moveWalkerTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed);
 		void moveTractorTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed);
-		Point avoidObstacles(CreepState& creep, float stepSize, const Point& target, Prototypes* prototypes);
+		Point avoidObstacles(CreepState& creep, float stepSize, Point& target, Prototypes* prototypes);
 		
 		void processProjectiles(GameState* state, Prototypes* prototypes, int32_t timePassed);		
 		
@@ -43,6 +43,7 @@ namespace Creeps
 		
 		void removeDeadProjectiles(GameState* state);
 		void removeDeadCreeps(GameState* state);
+		void removeDeadCreep(CreepState& creep, GameState* state);
 		void removeDeadFormations(GameState* state);
 	}
 }

@@ -1,16 +1,17 @@
 #include <Obstacle.h>
 
-
 Obstacle::Obstacle(Obstacle const &other)
 {
 	vertices = other.vertices;
 	extendedVertices[0] = other.extendedVertices[0];
+	extendedVertices[1] = other.extendedVertices[1];
 	extendedVertices[1] = other.extendedVertices[1];
 	edges = other.edges;
 	AA = other.AA;
 	BB = other.BB;
 	centroid = other.centroid;
 
+	//The important bit:
 	for (size_t i = 1; i < vertices.size(); i++)
 	{
 		edges[i - 1].p1 = &vertices[i - 1];
@@ -18,6 +19,13 @@ Obstacle::Obstacle(Obstacle const &other)
 	}
 	edges.back().p1 = &vertices.back();
 	edges.back().p2 = &vertices[0];
+	
+	for (size_t i = 0; i < vertices.size(); i++)
+	{
+		int32_t next = (i + 1) % vertices.size();		
+		extendedEdges.emplace_back(&extendedVertices[0][i], &extendedVertices[1][next]);
+	}
+	//end of the important bit
 }
 
 bool Obstacle::isInside(Point &p)
@@ -136,6 +144,15 @@ void from_json(const json &j, Obstacle &obstacle)
 		Point cTo1 = obstacle.extendedVertices[0].back() - obstacle.centroid;
 		Point cTo2 = obstacle.extendedVertices[1].back() - obstacle.centroid;
 		if (cTo1.crossProduct(cTo2) < 0)
-			THROW_FATAL_ERROR("Incorrect obstacle");
+			THROW_FATAL_ERROR("Incorrect obstacle");		
+	}
+	
+	//Extended edges
+	for (size_t i = 0; i < obstacle.vertices.size(); i++)
+	{
+		int32_t next = (i + 1) % obstacle.vertices.size();
+		
+		//extended edge is the same edge but longer
+		obstacle.extendedEdges.emplace_back(&obstacle.extendedVertices[0][i], &obstacle.extendedVertices[1][next]);
 	}
 }

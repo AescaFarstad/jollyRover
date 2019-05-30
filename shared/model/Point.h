@@ -47,6 +47,7 @@ public:
 	float crossProduct(const Point &anotherPoint) const;
 	float cos(const Point &anotherPoint) const;
 	float sin(const Point &anotherPoint) const;
+	float projectOnto(const Point &anotherPoint) const;
 	
 	void operator+=(const Point& p);
 	void operator-=(const Point& p);

@@ -16,7 +16,7 @@ public:
 	Object object;
 	Unit unit;
 	Weapon weapon;
-	int16_t whiskers[MAX_WHISKER_COUNT];
+	std::array<int16_t, MAX_WHISKER_COUNT> whiskers;
 	int8_t numWhiskers;
 	int32_t formationId;
 	int8_t formationsSlot;

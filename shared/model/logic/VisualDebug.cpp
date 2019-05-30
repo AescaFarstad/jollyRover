@@ -12,7 +12,19 @@ namespace VisualDebug
 
 	void drawArrow(Point from, Point to, uint32_t color)
 	{
+		if (to.subtract(from).getLength() == 0)
+			return;
 		S::visualDebug.arrows.push_back(VisualDebugLine{from, to, color});
+	}
+
+	void drawArrow(Point from, Point to, int32_t length, uint32_t color)
+	{
+		Point realTo = to - from;
+		if (realTo.getLength() == 0)
+			return;
+		realTo.scaleTo(length);
+		realTo += from;
+		S::visualDebug.arrows.push_back(VisualDebugLine{from, realTo, color});
 	}
 
 	void drawRect(Point from, Point to, bool fill, uint32_t color, uint8_t alpha)

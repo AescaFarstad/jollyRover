@@ -335,6 +335,9 @@ void GameView::drawFormations()
 	
 	for (auto& form : m_state->formations)
 	{
+		if (form.subObjective == SUB_OBJECTIVE::ASSAULT)
+			continue;
+			
 		FormationProto& proto = m_prototypes->formations[form.object.prototypeId];
 		
 		Point AB(proto.AA.x, proto.BB.y);
