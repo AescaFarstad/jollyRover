@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include <SDL_gpu.h>
 
 class TextureDef 
@@ -9,8 +10,17 @@ public:
 	GPU_Rect rect;
 };
 
+class TextureFolder 
+{	
+public:	
+	std::string name;
+	std::vector<TextureFolder*> folders;
+	std::vector<TextureDef*> textures;
+};
+
+
 // /tanks_1/Bullets
-class r_xhrer 
+class r_xhrer : public TextureFolder
 {
 public:	
 	r_xhrer();
@@ -66,7 +76,7 @@ public:
 	TextureDef bulletYellow_outline;
 };
 // /tanks_1/Environment
-class r_jr3fj 
+class r_jr3fj : public TextureFolder
 {
 public:	
 	r_jr3fj();
@@ -78,7 +88,7 @@ public:
 	TextureDef treeSmall;
 };
 // /tanks_1/Obstacles
-class r_ir8mj 
+class r_ir8mj : public TextureFolder
 {
 public:	
 	r_ir8mj();
@@ -108,7 +118,7 @@ public:
 	TextureDef sandbagBrown;
 };
 // /tanks_1/Smoke
-class r_mt6ul 
+class r_mt6ul : public TextureFolder
 {
 public:	
 	r_mt6ul();
@@ -164,7 +174,7 @@ public:
 	TextureDef smokeYellow5;
 };
 // /tanks_1/Tanks
-class r_byo84 
+class r_byo84 : public TextureFolder
 {
 public:	
 	r_byo84();
@@ -216,7 +226,7 @@ public:
 	TextureDef tracksSmall;
 };
 // /tanks_2
-class r_alp0p 
+class r_alp0p : public TextureFolder
 {
 public:	
 	r_alp0p();
@@ -234,12 +244,12 @@ public:
 	TextureDef barrelRed_side;
 	// 30 x 30
 	TextureDef barrelRed_top;
-	// 34 x 26
-	TextureDef barrelRust_side;
 	// 30 x 30
 	TextureDef barrelRust_top;
 	// 34 x 34
 	TextureDef barricadeMetal;
+	// 34 x 26
+	TextureDef barrelRust_side;
 	// 34 x 34
 	TextureDef barricadeWood;
 	// 16 x 10
@@ -416,6 +426,8 @@ public:
 	TextureDef tankBody_green_outline;
 	// 74 x 64
 	TextureDef tankBody_huge;
+	// 78 x 68
+	TextureDef tankBody_huge_outline;
 	// 42 x 40
 	TextureDef tankBody_red;
 	// 46 x 44
@@ -426,8 +438,6 @@ public:
 	TextureDef tankBody_sand_outline;
 	// 32 x 18
 	TextureDef tankDark_barrel1;
-	// 78 x 68
-	TextureDef tankBody_huge_outline;
 	// 36 x 22
 	TextureDef tankDark_barrel1_outline;
 	// 32 x 14
@@ -506,19 +516,19 @@ public:
 	TextureDef treeBrown_twigs;
 	// 70 x 70
 	TextureDef treeGreen_large;
-	// 16 x 14
-	TextureDef treeGreen_leaf;
-	// 42 x 42
-	TextureDef treeGreen_small;
-	// 28 x 32
-	TextureDef treeGreen_twigs;
 	// 54 x 50
 	TextureDef wireCrooked;
 	// 76 x 24
 	TextureDef wireStraight;
+	// 28 x 32
+	TextureDef treeGreen_twigs;
+	// 16 x 14
+	TextureDef treeGreen_leaf;
+	// 42 x 42
+	TextureDef treeGreen_small;
 };
 // /td
-class r_hbzjo 
+class r_hbzjo : public TextureFolder
 {
 public:	
 	r_hbzjo();
@@ -613,15 +623,17 @@ public:
 	// 70 x 70
 	TextureDef towerDefense_tile282;
 	// 70 x 70
-	TextureDef towerDefense_tile286;
+	TextureDef towerDefense_tile283;
 	// 70 x 70
 	TextureDef towerDefense_tile284;
+	// 70 x 70
+	TextureDef towerDefense_tile285;
+	// 70 x 70
+	TextureDef towerDefense_tile286;
 	// 70 x 70
 	TextureDef towerDefense_tile287;
 	// 70 x 70
 	TextureDef towerDefense_tile288;
-	// 70 x 70
-	TextureDef towerDefense_tile285;
 	// 70 x 70
 	TextureDef towerDefense_tile289;
 	// 70 x 70
@@ -632,8 +644,6 @@ public:
 	TextureDef tree2;
 	// 70 x 70
 	TextureDef tree3;
-	// 70 x 70
-	TextureDef towerDefense_tile283;
 	// 70 x 70
 	TextureDef tree4;
 	// 70 x 70
@@ -660,7 +670,7 @@ public:
 	TextureDef turret9;
 };
 // /tanks_1
-class r_i9ox9 
+class r_i9ox9 : public TextureFolder
 {
 public:	
 	r_i9ox9();
@@ -673,7 +683,7 @@ public:
 	
 };
 // 
-class TextureNames 
+class TextureNames : public TextureFolder
 {
 public:	
 	TextureNames();
