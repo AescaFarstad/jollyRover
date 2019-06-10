@@ -7,12 +7,11 @@
 #endif
 
 #include <Network.h>
-#include <GameUpdater.h>
-#include <GameView.h>
+#include <GameMode.h>
+#include <TextureMode.h>
 #include <Keyboard.h>
 #include <TaskManager.h>
 #include <Prototypes.h>
-#include <RouteInput.h>
 #include <SDL_gpu.h>
 
 class Game
@@ -21,6 +20,7 @@ public:
 	Game(GPU_Target* screen);
 	~Game();
 
+	void load();
 	void update();
 	void handleEvent(SDL_Event* event);
 	void loadPrototypes();
@@ -30,15 +30,15 @@ private:
 
 	Network* m_network;
 	TaskManager* m_taskManager;
-	GameUpdater m_gameUpdater;
-	GameView* m_gameView;
-	RouteInput* m_routeInput;
 	Prototypes m_prototypes;
+	
+	std::vector<Mode*> m_modes;
+	GameMode m_gameMode;
+	Mode* m_activeMode; 
 
 	Keyboard m_keyboard;
 	int32_t m_login;
 	std::vector<int8_t> m_password;
-	int64_t m_clientToServerDelta;
 	
 	void handleGenericRequest(GenericRequestMessage* request);
 	void addNetworkBindings();

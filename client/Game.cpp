@@ -15,7 +15,6 @@
 #include <fstream>
 #include <memory>
 #include <GameState.h>
-#include <KeyboardInput.h>
 #include <PersistentStorage.h>
 
 Game::Game(GPU_Target* screen)
@@ -23,22 +22,24 @@ Game::Game(GPU_Target* screen)
 	loadConfig();
 	loadPrototypes();
 	//S::persistentStorage.clean();
-	S::persistentStorage.init();
-
-	m_gameView = new GameView(screen, &m_prototypes);
+	S::persistentStorage.init();	
 
 	m_taskManager = new TaskManager();
+	
 	if (S::config.loopBack)
-		m_network = new LoopBackNetwork(&m_gameUpdater);
+		m_network = new LoopBackNetwork(m_gameMode.getGameUpdater());
 	else
-		m_network = new Network();
-		
+		m_network = new Network();		
 	m_network->connect();
+		
+	m_modes.push_back(&m_gameMode);
+	m_gameMode.init(screen, &m_prototypes, m_network);
+	m_activeMode = &m_gameMode;
+	
+}
 
-
-	m_routeInput = new RouteInput();
-
-
+void Game::load()
+{
 	auto loadGameTask = std::make_unique<ConsequtiveTask>();
 	//std::unique_ptr<ConsequtiveTask> loadGameTask(new ConsequtiveTask);
 
@@ -103,10 +104,10 @@ Game::Game(GPU_Target* screen)
 		m_network->interceptOnce(MessageTypes::TYPE_GAME_STATE_MSG, [this, cb = callback.release()](std::unique_ptr<NetworkMessage> message) {
 
 			GameStateMessage* gameStateMsg = dynamic_cast<GameStateMessage*>(message.release());
-			m_clientToServerDelta = m_network->timeSync.localToServerUpperBound(0);
-			S::log.add("server time delta: " + std::to_string(m_clientToServerDelta) + 
+			int64_t clientToServerDelta = m_network->timeSync.localToServerUpperBound(0);
+			S::log.add("server time delta: " + std::to_string(clientToServerDelta) + 
 					" uncertainty: " + std::to_string(m_network->timeSync.getUncertainty()), { LOG_TAGS::NET });
-			m_gameUpdater.load(std::unique_ptr<GameState>(gameStateMsg->state), &m_prototypes, true);
+			m_gameMode.loadGame(std::unique_ptr<GameState>(gameStateMsg->state), clientToServerDelta);
 			gameStateMsg->ownsState = false;
 			
 			addNetworkBindings();
@@ -140,57 +141,39 @@ Game::Game(GPU_Target* screen)
 	m_taskManager->push(std::move(loadGameTask));
 }
 
-Game::~Game()
-{
-}
-
 void Game::update()
 {
 	m_taskManager->update();
 	m_network->update();
-
-	if (m_gameUpdater.isLoaded)
-	{
-		m_gameUpdater.update(SDL_GetTicks() + m_clientToServerDelta);
-		if (!m_routeInput->isLoaded())
-		{	
-			m_routeInput->load(m_gameUpdater.state.get(), &m_prototypes);
-		}
-		if (m_routeInput->isCompletelyValid())
-		{
-			auto route = m_routeInput->claimRoute();
-			InputRouteMessage nim(route);
-			m_network->send(&nim);
-		}
-		m_gameView->render(m_gameUpdater.state.get(), m_routeInput);
-	}
+	
+	for(auto& mode : m_modes)
+		mode->update(mode == m_activeMode);
 }
 
 void Game::handleEvent(SDL_Event* event)
 {
 	if (event->type == SDL_MOUSEBUTTONDOWN)
 	{
-		m_routeInput->onMouseDown(&event->button);
+		m_activeMode->onMouseDown(&event->button);
 		return;
 	}
 
 	if (event->type == SDL_MOUSEBUTTONUP)
 	{
-		m_routeInput->onMouseUp(&event->button);
+		m_activeMode->onMouseUp(&event->button);
 		return;
 	}
 
 	if (event->type == SDL_MOUSEMOTION)
 	{
-		m_routeInput->onMouseMove(&event->motion);
-		m_gameView->onMouseMove(&event->motion);
+		m_activeMode->onMouseMove(&event->motion);
 		return;
 	}
 	
 	if (
 		(event->type != SDL_KEYDOWN && 
 		 event->type != SDL_KEYUP) || false
-		//keyboard.actionByButton[event->key.keysym.scancode] == KEYBOARD_ACTIONS::NONE
+		//keyboard.actionByButton[event->key.keysym.scancode] == GAME_KEYBOARD_ACTIONS::NONE
 		)
 		return;
 	switch (event->type) 
@@ -200,7 +183,7 @@ void Game::handleEvent(SDL_Event* event)
 			{
 				//printf("Key press detected\n");
 				m_keyboard.isDown[event->key.keysym.scancode] = true;
-				KeyboardInput::handleKeyDown(m_keyboard.actionByButton[event->key.keysym.scancode], m_keyboard, *m_network, m_gameUpdater);
+				m_activeMode->handleKeyDown(event->key.keysym.scancode, m_keyboard);
 			}
 			break;
 
@@ -209,7 +192,7 @@ void Game::handleEvent(SDL_Event* event)
 			{
 				//printf("Key release detected\n");
 				m_keyboard.isDown[event->key.keysym.scancode] = false;
-				KeyboardInput::handleKeyUp(m_keyboard.actionByButton[event->key.keysym.scancode], m_keyboard, *m_network, m_gameUpdater);
+				m_activeMode->handleKeyUp(event->key.keysym.scancode, m_keyboard);
 			}
 			break;
 
@@ -238,11 +221,10 @@ void Game::loadConfig()
 }
 
 
-
 void Game::handleGameInput(std::unique_ptr<NetworkMessage> message)
 {
 	InputMessage* t = dynamic_cast<InputMessage*>(message.release());
-	m_gameUpdater.addNewInput(std::unique_ptr<InputMessage>(t));
+	m_gameMode.addNewInput(std::unique_ptr<InputMessage>(t));
 }
 
 void Game::addNetworkBindings()
@@ -309,8 +291,10 @@ void Game::addNetworkBindings()
 		Serializer::write(*gameStateMsg->state, stream1);
 		S::log.add("SERVER STATE (" + std::to_string(gameStateMsg->state->timeStamp) + ")\n\t" +
 			Serializer::toHex(stream1.readAll(), stream1.getLength()), { LOG_TAGS::UNIQUE });
-
-		auto myState = m_gameUpdater.getNewStateByStamp(gameStateMsg->state->timeStamp);
+		
+		GameUpdater* gameUpdater = m_gameMode.getGameUpdater();
+		
+		auto myState = gameUpdater->getNewStateByStamp(gameStateMsg->state->timeStamp);
 		Serializer::write(*gameStateMsg->state, stream2);
 
 		if (stream1.getLength() != stream2.getLength() ||
@@ -324,12 +308,12 @@ void Game::addNetworkBindings()
 		S::log.add("CURRENT STATE (" + std::to_string(gameUpdater->state->timeStamp) + ")\n\t" +
 		Serializer::toHex(stream3.readAll(), stream3.getLength()), { LOG_TAGS::UNIQUE });*/
 		std::string logStr = "PLAYER LOCATIONS: \n\t";
-		for (size_t i = 0; i < m_gameUpdater.state->players.size(); i++)
+		for (size_t i = 0; i < gameUpdater->state->players.size(); i++)
 		{
 			logStr += "[";
-			logStr += std::to_string(m_gameUpdater.state->players[i].x);
+			logStr += std::to_string(gameUpdater->state->players[i].x);
 			logStr += ":";
-			logStr += std::to_string(m_gameUpdater.state->players[i].y);
+			logStr += std::to_string(gameUpdater->state->players[i].y);
 			logStr += "] ";
 		}
 		S::log.add(logStr + "\n\n", { LOG_TAGS::UNIQUE });

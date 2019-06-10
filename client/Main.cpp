@@ -53,6 +53,7 @@ void mainLoop(void*)
 			game->handleEvent(&e);
 		}
 	}
+	
 	int ticks = SDL_GetTicks();
 	int delta = ticks - lastTicks > MAX_TIME_PER_FRAME ? MAX_TIME_PER_FRAME : ticks - lastTicks;
 	if (!isFinished && delta >= MIN_TIME_PER_FRAME)
@@ -60,7 +61,9 @@ void mainLoop(void*)
 		GPU_Clear(screen);
 
 		lastTicks = ticks;
-		game->update();/*
+		game->update();
+		
+		/*
 		fpsMeter.registerFrame(ticks);
 		if (fpsMeter.getMeasurementDuration() > 5000)
 			printf(fpsMeter.report().c_str());*/
@@ -130,18 +133,20 @@ typedef struct EmscriptenWebGLContextAttributes {
 	printf("endiness: %s\n", (SystemInfo::instance->isBigEndian ? "big" : "little"));
 	
 	screen = GPU_InitRenderer(GPU_RENDERER_GLES_2, SCREEN_WIDTH, SCREEN_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
-	printRenderers();
-	printCurrentRenderer();
-	SDL_Window* window = SDL_GetWindowFromID(screen->context->windowID);
-	SDL_SetWindowPosition(window, S::config.window_X, S::config.window_Y);
-	
 	if (screen == NULL)
 	{
 		printf("Failed to create window %s\n", SDL_GetError());
 		return 1;
 	}
 	
+	printRenderers();
+	printCurrentRenderer();
+	
+	SDL_Window* window = SDL_GetWindowFromID(screen->context->windowID);
+	SDL_SetWindowPosition(window, S::config.window_X, S::config.window_Y);	
+	
 	game = new Game(screen);
+	game->load();
 	
 #ifdef __EMSCRIPTEN__
 	printf("EMSCRIPTEN mode\n");

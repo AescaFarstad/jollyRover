@@ -3,6 +3,7 @@
 #include <Creeps.h>
 #include <InputTimeMessage.h>
 #include <VisualDebug.h>
+#include <GameKeyboardActions.h>
 
 
 void GameLogic::update(GameState* state, int32_t timePassed, std::vector<InputMessage*> &inputs, Prototypes* prototypes)
@@ -219,24 +220,24 @@ void GameLogic::handleActionInput(InputActionMessage* input)
 		return;
 	for (size_t j = 0; j < input->downedButtons.size(); j++)
 	{
-		if (input->downedButtons[j] == (int8_t)KEYBOARD_ACTIONS::LEFT)
+		if (input->downedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::LEFT)
 			player->buttonDown_Left = true;
-		else if (input->downedButtons[j] == (int8_t)KEYBOARD_ACTIONS::RIGHT)
+		else if (input->downedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::RIGHT)
 			player->buttonDown_Right = true;
-		else if (input->downedButtons[j] == (int8_t)KEYBOARD_ACTIONS::FORWARD)
+		else if (input->downedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::FORWARD)
 			player->buttonDown_Forward = true;
-		else if (input->downedButtons[j] == (int8_t)KEYBOARD_ACTIONS::BACKWARD)
+		else if (input->downedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::BACKWARD)
 			player->buttonDown_Backward = true;
 	}
 	for (size_t j = 0; j < input->uppedButtons.size(); j++)
 	{
-		if (input->uppedButtons[j] == (int8_t)KEYBOARD_ACTIONS::LEFT)
+		if (input->uppedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::LEFT)
 			player->buttonDown_Left = false;
-		else if (input->uppedButtons[j] == (int8_t)KEYBOARD_ACTIONS::RIGHT)
+		else if (input->uppedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::RIGHT)
 			player->buttonDown_Right = false;
-		else if (input->uppedButtons[j] == (int8_t)KEYBOARD_ACTIONS::FORWARD)
+		else if (input->uppedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::FORWARD)
 			player->buttonDown_Forward = false;
-		else if (input->uppedButtons[j] == (int8_t)KEYBOARD_ACTIONS::BACKWARD)
+		else if (input->uppedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::BACKWARD)
 			player->buttonDown_Backward = false;
 	}
 }

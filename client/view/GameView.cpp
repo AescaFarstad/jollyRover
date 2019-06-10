@@ -6,12 +6,8 @@
 #include <std2.h>
 
 
-GameView::GameView(GPU_Target* screen, Prototypes* prototypes)
+GameView::GameView()
 {
-	this->m_screen = screen;
-	this->m_prototypes = prototypes;
-
-	m_isInitialized = false;
 	m_loadCount = 0;
 }
 
@@ -21,11 +17,27 @@ GameView::~GameView()
 		GPU_FreeImage(m_image);
 }
 
+void GameView::init(GPU_Target* screen, Prototypes* prototypes)
+{
+	this->m_screen = screen;
+	this->m_prototypes = prototypes;
+	
+	m_window = SDL_GetWindowFromID(m_screen->context->windowID);
+	SDL_SetWindowSize(m_window, m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight);
+	GPU_SetWindowResolution(m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight);
+	SDL_SetWindowPosition(m_window, S::config.window_X, S::config.window_Y);
+	
+	m_image = GPU_LoadImage("out/assets/atlas.png");
+ 	if (!m_image)
+ 		THROW_FATAL_ERROR("IMG IS NULL")
+ 	GPU_SetSnapMode(m_image, GPU_SNAP_NONE);
+	GPU_SetBlending(m_image, 1);
+	 
+	m_renderer.init(m_screen, m_image);
+	
+}
 void GameView::render(GameState* state, RouteInput* routeInput)
 {
-	if (!m_isInitialized)
-		init();
-
 	this->m_state = state;
 	this->m_routeInput = routeInput;
 	
@@ -56,31 +68,13 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 
 void GameView::onMouseMove(SDL_MouseMotionEvent* event)
 {
-	if (!m_state || !m_isInitialized)
+	if (!m_state)
 		return;
 	auto nearestCreep = std2::minElement(m_state->creeps, [event](CreepState& creep){return Point(event->x, event->y).distanceTo(creep.unit.location);});
 	if (Point(event->x, event->y).distanceTo(nearestCreep->unit.location) < 50)	
 		VisualDebug::interestingId = nearestCreep->object.id;
 	else
 		VisualDebug::interestingId = -1;
-}
-
-void GameView::init()
-{
-	m_window = SDL_GetWindowFromID(m_screen->context->windowID);
-	SDL_SetWindowSize(m_window, m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight);
-	GPU_SetWindowResolution(m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight);
-	SDL_SetWindowPosition(m_window, S::config.window_X, S::config.window_Y);
-	
-	m_image = GPU_LoadImage("out/assets/atlas.png");
- 	if (!m_image)
- 		THROW_FATAL_ERROR("IMG IS NULL")
- 	GPU_SetSnapMode(m_image, GPU_SNAP_NONE);
-	GPU_SetBlending(m_image, 1);
-	 
-	m_renderer.init(m_screen, m_image);
-	m_isInitialized = true;
-	
 }
 
 void GameView::drawPlayers()
