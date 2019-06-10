@@ -52,7 +52,7 @@ GameKeyboardInput::GameKeyboardInput()
 		buttonByAction[(int)actionByButton[i]] = i;
 }
 
-void GameKeyboardInput::handleKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Network& network, GameUpdater& gameUpdater)
+void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Network& network, GameUpdater& gameUpdater)
 {
 	GAME_KEYBOARD_ACTIONS code = actionByButton[scancode];
 	switch (code)
@@ -267,7 +267,7 @@ void GameKeyboardInput::handleKeyDown(SDL_Scancode scancode, Keyboard& keyboard,
 	}
 }
 
-void GameKeyboardInput::handleKeyUp(SDL_Scancode scancode, Keyboard& keyboard, Network& network, GameUpdater& gameUpdater)
+void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, Keyboard& keyboard, Network& network, GameUpdater& gameUpdater)
 {
 	GAME_KEYBOARD_ACTIONS code = actionByButton[scancode];
 	switch (code)

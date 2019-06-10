@@ -22,20 +22,47 @@ Game::Game(GPU_Target* screen)
 	loadConfig();
 	loadPrototypes();
 	//S::persistentStorage.clean();
-	S::persistentStorage.init();	
-
-	m_taskManager = new TaskManager();
+	S::persistentStorage.init();
 	
 	if (S::config.loopBack)
 		m_network = new LoopBackNetwork(m_gameMode.getGameUpdater());
 	else
 		m_network = new Network();		
 	m_network->connect();
+	
+	initRenderer(screen);
 		
 	m_modes.push_back(&m_gameMode);
-	m_gameMode.init(screen, &m_prototypes, m_network);
-	m_activeMode = &m_gameMode;
+	m_gameMode.init(&m_renderer, &m_prototypes, m_network);
+	m_activeMode = 0;
 	
+	
+	m_modes.push_back(&m_textureMode);
+	m_textureMode.init(&m_renderer, &m_prototypes);
+	
+}
+
+Game::~Game()
+{
+	delete m_network;
+	if (m_image != nullptr)
+		GPU_FreeImage(m_image);
+}
+
+void Game::initRenderer(GPU_Target* screen)
+{
+	m_window = SDL_GetWindowFromID(screen->context->windowID);
+	SDL_SetWindowSize(m_window, m_prototypes.variables.fieldWidth, m_prototypes.variables.fieldHeight);
+	GPU_SetWindowResolution(m_prototypes.variables.fieldWidth, m_prototypes.variables.fieldHeight);
+	SDL_SetWindowPosition(m_window, S::config.window_X, S::config.window_Y);
+	
+	m_image = GPU_LoadImage("out/assets/atlas.png");
+ 	if (!m_image)
+ 		THROW_FATAL_ERROR("IMG IS NULL")
+ 	GPU_SetSnapMode(m_image, GPU_SNAP_NONE);
+	GPU_SetBlending(m_image, 1);
+	 
+	m_renderer.init(screen, m_image);
 }
 
 void Game::load()
@@ -138,35 +165,35 @@ void Game::load()
 	loadGameTask->exec();
 
 
-	m_taskManager->push(std::move(loadGameTask));
+	m_taskManager.push(std::move(loadGameTask));
 }
 
 void Game::update()
 {
-	m_taskManager->update();
+	m_taskManager.update();
 	m_network->update();
 	
 	for(auto& mode : m_modes)
-		mode->update(mode == m_activeMode);
+		mode->update(mode == m_modes[m_activeMode]);
 }
 
 void Game::handleEvent(SDL_Event* event)
 {
 	if (event->type == SDL_MOUSEBUTTONDOWN)
 	{
-		m_activeMode->onMouseDown(&event->button);
+		m_modes[m_activeMode]->onMouseDown(&event->button);
 		return;
 	}
 
 	if (event->type == SDL_MOUSEBUTTONUP)
 	{
-		m_activeMode->onMouseUp(&event->button);
+		m_modes[m_activeMode]->onMouseUp(&event->button);
 		return;
 	}
 
 	if (event->type == SDL_MOUSEMOTION)
 	{
-		m_activeMode->onMouseMove(&event->motion);
+		m_modes[m_activeMode]->onMouseMove(&event->motion);
 		return;
 	}
 	
@@ -183,7 +210,7 @@ void Game::handleEvent(SDL_Event* event)
 			{
 				//printf("Key press detected\n");
 				m_keyboard.isDown[event->key.keysym.scancode] = true;
-				m_activeMode->handleKeyDown(event->key.keysym.scancode, m_keyboard);
+				m_modes[m_activeMode]->onKeyDown(event->key.keysym.scancode, m_keyboard);
 			}
 			break;
 
@@ -192,7 +219,8 @@ void Game::handleEvent(SDL_Event* event)
 			{
 				//printf("Key release detected\n");
 				m_keyboard.isDown[event->key.keysym.scancode] = false;
-				m_activeMode->handleKeyUp(event->key.keysym.scancode, m_keyboard);
+				if (!handleGlobalKey(event->key.keysym.scancode))				
+					m_modes[m_activeMode]->onKeyUp(event->key.keysym.scancode, m_keyboard);
 			}
 			break;
 
@@ -200,6 +228,20 @@ void Game::handleEvent(SDL_Event* event)
 			break;
 	}
 		
+}
+
+bool Game::handleGlobalKey(SDL_Scancode scancode)
+{
+	switch (scancode) 
+	{
+		case SDL_SCANCODE_F1:
+		{
+			m_activeMode = (m_activeMode + 1) % m_modes.size();
+			return true;			
+		}
+		default: return false;
+	}
+	
 }
 
 void Game::loadPrototypes()

@@ -8,7 +8,7 @@ class LoopBackNetwork : public Network
 {
 public:
 	LoopBackNetwork(GameUpdater* gameUpdater);
-	~LoopBackNetwork();
+	virtual ~LoopBackNetwork();
 
 
 

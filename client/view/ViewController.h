@@ -1,3 +1,4 @@
+#pragma once
 #include <unordered_map>
 #include <GameState.h>
 #include <Prototypes.h>

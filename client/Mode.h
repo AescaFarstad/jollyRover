@@ -21,8 +21,8 @@ public:
 	virtual void onMouseMove(SDL_MouseMotionEvent* event) = 0;
 	
 	
-	virtual	void handleKeyDown(SDL_Scancode scancode, Keyboard& keyboard) = 0;
-	virtual	void handleKeyUp(SDL_Scancode scancode, Keyboard& keyboard) = 0;
+	virtual	void onKeyDown(SDL_Scancode scancode, Keyboard& keyboard) = 0;
+	virtual	void onKeyUp(SDL_Scancode scancode, Keyboard& keyboard) = 0;
 
 private:
 

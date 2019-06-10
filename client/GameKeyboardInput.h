@@ -14,6 +14,6 @@ public:
 	GAME_KEYBOARD_ACTIONS actionByButton[128];
 	uint16_t buttonByAction[128];
 		
-	void handleKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Network& network, GameUpdater& gameUpdater);
-	void handleKeyUp(SDL_Scancode scancode, Keyboard& keyboard, Network& network, GameUpdater& gameUpdater);
+	void onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Network& network, GameUpdater& gameUpdater);
+	void onKeyUp(SDL_Scancode scancode, Keyboard& keyboard, Network& network, GameUpdater& gameUpdater);
 };

@@ -24,7 +24,7 @@ class Network
 {
 public:
 	Network();
-	~Network();
+	virtual ~Network();
 
 	NetworkMessageFactory factory;
 	TimeSync timeSync;

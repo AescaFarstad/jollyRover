@@ -20,29 +20,25 @@ class GameView
 {
 public:
 	GameView();
-	~GameView();
 
-	void init(GPU_Target* screen, Prototypes* prototypes);
+	void init(Renderer* renderer, Prototypes* prototypes);
 	void render(GameState* state, RouteInput* routeInput);
 	
 	void onMouseMove(SDL_MouseMotionEvent* event);
 	
 private:
 
-	SDL_Window* m_window;
 	GPU_Target* m_screen; 
+	Renderer* m_renderer;
 	Prototypes* m_prototypes;
 	GameState* m_state;
 	RouteInput* m_routeInput;
-	GPU_Image* m_image;	
-	Renderer m_renderer;
 	ViewController<ProjectileExplosionView> m_projectileExplosions;	
 	ViewController<ProjectileExplosionView> m_unitDeaths;
 	int32_t lastTime;	
 	
 	uint32_t m_loadCount;
 
-	void setColor(uint32_t color);
 	void drawPlayers();
 	void drawObstacles();
 	void drawInput();

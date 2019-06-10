@@ -5,10 +5,10 @@ GameMode::GameMode()
 	m_isLoaded = false;
 }
 
-void GameMode::init(GPU_Target* screen, Prototypes* prototypes, Network* network)
+void GameMode::init(Renderer* renderer, Prototypes* prototypes, Network* network)
 {
 	m_prototypes = prototypes;
-	m_gameView.init(screen, prototypes);
+	m_gameView.init(renderer, prototypes);
 	m_network = network;
 }
 
@@ -58,26 +58,36 @@ void GameMode::addNewInput(std::unique_ptr<InputMessage> input)
 	
 void GameMode::onMouseDown(SDL_MouseButtonEvent* event)
 {
+	if (!m_isLoaded)
+		return;
 	m_routeInput.onMouseDown(event);
 }
 
 void GameMode::onMouseUp(SDL_MouseButtonEvent* event)
 {
+	if (!m_isLoaded)
+		return;
 	m_routeInput.onMouseUp(event);	
 }
 
 void GameMode::onMouseMove(SDL_MouseMotionEvent* event)
 {
+	if (!m_isLoaded)
+		return;
 	m_routeInput.onMouseMove(event);
 	m_gameView.onMouseMove(event);
 }
 	
-void GameMode::handleKeyDown(SDL_Scancode scancode, Keyboard& keyboard)
+void GameMode::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard)
 {
-	m_keyboardInput.handleKeyDown(scancode, keyboard, *m_network, m_gameUpdater);
+	if (!m_isLoaded)
+		return;
+	m_keyboardInput.onKeyDown(scancode, keyboard, *m_network, m_gameUpdater);
 }
 
-void GameMode::handleKeyUp(SDL_Scancode scancode, Keyboard& keyboard)
+void GameMode::onKeyUp(SDL_Scancode scancode, Keyboard& keyboard)
 {
-	m_keyboardInput.handleKeyUp(scancode, keyboard, *m_network, m_gameUpdater);	
+	if (!m_isLoaded)
+		return;
+	m_keyboardInput.onKeyUp(scancode, keyboard, *m_network, m_gameUpdater);	
 }

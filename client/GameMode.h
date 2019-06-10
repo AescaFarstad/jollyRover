@@ -12,10 +12,11 @@ public:
 	GameMode();
 	virtual ~GameMode() = default;
 	
-	void init(GPU_Target* screen, Prototypes* prototypes, Network* network);
+	void init(Renderer* renderer, Prototypes* prototypes, Network* network);
 	void loadGame(std::unique_ptr<GameState> state, int64_t clientToServerDelta);
 	
 	void addNewInput(std::unique_ptr<InputMessage> input);
+	GameUpdater* getGameUpdater();
 
 	virtual void update(bool isActive) override;
 	
@@ -23,10 +24,9 @@ public:
 	virtual void onMouseUp(SDL_MouseButtonEvent* event) override;
 	virtual void onMouseMove(SDL_MouseMotionEvent* event) override;
 	
-	virtual	void handleKeyDown(SDL_Scancode scancode, Keyboard& keyboard) override;
-	virtual	void handleKeyUp(SDL_Scancode scancode, Keyboard& keyboard) override;
+	virtual	void onKeyDown(SDL_Scancode scancode, Keyboard& keyboard) override;
+	virtual	void onKeyUp(SDL_Scancode scancode, Keyboard& keyboard) override;
 	
-	GameUpdater* getGameUpdater();
 
 private:
 
