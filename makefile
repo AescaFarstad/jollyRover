@@ -65,11 +65,13 @@ local: $(SUBOBJ_LOCAL)
 web: $(SUBOBJ_WEB)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets/
+	rsync -r web/ out/
 	$(WEB_COMPILER) \
-		-O2 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 \
-		-s WASM=0 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
+		-O2 -g1 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 \
+		-s WASM=0 -s TOTAL_MEMORY=134217728 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
 		--use-preload-plugins -v -o $(WEB_TARGET).html lib/SDL_gpu.bc $(SUBOBJ_WEB) \
-		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets
+		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets \
+		--memory-init-file 1
 	sed -i 's/antialias\:false/antialias\:true/g' $(WEB_TARGET).js
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
@@ -87,7 +89,7 @@ $(OBJDIR_CLIENT_LOCAL)/%.bc : %.cpp
 	
 $(OBJDIR_CLIENT_WEB)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
-	$(WEB_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -c -o $@ $<
+	$(WEB_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -g1 -c -o $@ $<
 	
 $(OBJDIR_CLIENT_SERVER)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
