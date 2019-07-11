@@ -194,7 +194,7 @@ int main()
 
 	messageBuffer = new std::unique_ptr<NetworkMessage>[SERVER_CONST::messageBufferSize + 1];
 	std::unique_ptr<GameState> state = std::make_unique<GameState>();
-	gameUpdater.load(std::move(state), &prototypes);
+	gameUpdater.load(std::move(state), &prototypes, false);
 
 	while (!isFinished)
 		mainLoop();
