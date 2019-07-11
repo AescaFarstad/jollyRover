@@ -31,7 +31,7 @@ void GameUpdater::load(std::unique_ptr<GameState> state, Prototypes* prototypes,
 {
 	this->state = std::move(state);
 	lastValidTimeStamp = this->state->timeStamp;
-	//saveState(this->state.get());
+	saveState(this->state.get());
 	this->state->isEventLoggerEnabled = enableEventLogger;
 	
 	this->state->propagatePrototypes(prototypes);
@@ -118,6 +118,8 @@ std::vector<InputMessage*>* GameUpdater::getThisFrameInputs(uint32_t fromInclusi
 void GameUpdater::rewindToPrecedingState(uint32_t stamp)
 {
 	SerializationStream* s = statesByStamps.lower_bound(stamp)->second.get();
+	if (s == nullptr)
+		THROW_FATAL_ERROR("Unable to rewind game state");
 	state->deserialize(*s);
 	state->propagatePrototypes(prototypes);
 	s->seekAbsolute(0);
