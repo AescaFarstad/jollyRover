@@ -343,11 +343,26 @@ void GameLogic::handleGameLoad(LoadGameMessage* input, Prototypes* prototypes)
 	state->time.forcedTimeScale = time.forcedTimeScale;	
 	state->time.timeScale = time.timeScale;
 	state->loadCount = loadCount + 1;
-	//state->players = players;
-	//TODO keep existing players in game
+	
+	for (size_t i = 0; i < players.size(); i++)
+	{
+		if (!playerByLogin(players[i].login))
+		{
+			PlayerTest restoredPlayer = players[i];
+			restoredPlayer.activeCars.clear();
+			
+			state->players.push_back(restoredPlayer);
+		}
+	}
+	state->players.erase(std::remove_if(state->players.begin(), state->players.end(), [&players](PlayerTest& sp){
+		return players.end() == std::find_if(players.begin(), players.end(), [login = sp.login](PlayerTest& p){ 
+			return p.login == login; 
+		});
+	}), state->players.end());	
 	
 	state->propagatePrototypes(prototypes);
 }
+
 
 PlayerTest* GameLogic::playerByLogin(int32_t login)
 {
