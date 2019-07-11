@@ -52,6 +52,8 @@ void NetworkClient::logSend(std::string messageName, NetworkPacket &packet)
 	S::log.add("< SEND " + messageName + " to " + std::to_string(login) + ":\n\t" +
 		Serializer::toHex(packet.payload, packet.payloadSize),
 		{ LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
+	S::log.add("< SEND " + messageName + "[" + std::to_string(packet.payloadSize) + "]" + " to " + std::to_string(login),
+		{LOG_TAGS::NET_BRIEF });
 }
 
 std::unique_ptr<NetworkPacket> NetworkClient::getPacket()

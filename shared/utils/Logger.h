@@ -25,6 +25,7 @@ enum class LOG_TAGS : int
 	FILE_SYSTEM,
 
 
+	NET_BRIEF,
 	NET_MESSAGE,
 	SUBTASK,
 

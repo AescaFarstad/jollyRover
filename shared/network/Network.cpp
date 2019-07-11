@@ -20,7 +20,7 @@ Network::Network()
 		if (!genericRequestBinder.process(std::move(message)))
 		{
 			GenericRequestMessage* t = dynamic_cast<GenericRequestMessage*>(message.get());
-			S::log.add("GenericRequestMessage is not handled: " + t->getName() + " " + std::to_string((int16_t)t->request), { LOG_TAGS::NET });
+			S::log.add("GenericRequestMessage is not handled: " + t->getName() + " " + std::to_string((int16_t)t->request), { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
 		}
 	});
 	
@@ -46,8 +46,8 @@ void Network::connect()
 	SDLNet_ResolveHost(&ip, S::config.host, S::config.port);
 	socket = SDLNet_TCP_Open(&ip);
 
-	S::log.add("connect status: " + std::string(socket == nullptr ? "false" : "true"), {LOG_TAGS::NET});
-	S::log.add("ip, port: " + std::string(S::config.host) + " " + std::to_string(S::config.port), {LOG_TAGS::NET});
+	S::log.add("connect status: " + std::string(socket == nullptr ? "false" : "true"), {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
+	S::log.add("ip, port: " + std::string(S::config.host) + " " + std::to_string(S::config.port), {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
 
 	SDLNet_TCP_AddSocket(socketSet, socket);
 	isConnected = socket != nullptr;
@@ -79,7 +79,7 @@ void Network::update()
 		std::string name = message->getName();
 		if (!binder.process(std::move(message)))
 		{
-			S::log.add("NetworkMessage is not handled: " + name, { LOG_TAGS::NET });
+			S::log.add("NetworkMessage is not handled: " + name, { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
 		}
 		message = poll();
 	}
@@ -89,7 +89,7 @@ void Network::send(NetworkPacket* packet)
 {
 	if (socket == nullptr)
 	{
-		S::log.add("Message will not be sent, not connected.", { LOG_TAGS::NET, LOG_TAGS::ERROR_ });
+		S::log.add("Message will not be sent, not connected.", { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF, LOG_TAGS::ERROR_ });
 	}
 	else
 	{
@@ -107,6 +107,8 @@ void Network::send(NetworkMessage* msg)
 	S::log.add("SEND " + msg->getName() + " " + std::to_string(packet->payloadSize) + ":\n\t" +
 		Serializer::toHex(packet->payload, packet->payloadSize),
 		{ LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
+	S::log.add("SEND " + msg->getName() + "[" + std::to_string(packet->payloadSize) + "]",
+		{ LOG_TAGS::NET_BRIEF });
 
 	requestTimeByInitiatorId[msg->initiator_id] = SDL_GetTicks();
 	send(packet.get());
@@ -126,7 +128,7 @@ std::unique_ptr<NetworkMessage> Network::poll()
 	else if (packet->isDisconnectNotice)
 	{
 		isConnected = false;
-		S::log.add("disconnected",	{ LOG_TAGS::NET });
+		S::log.add("disconnected",	{ LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
 		//TODO initiate reconnect
 		return nullptr;
 	}
@@ -155,7 +157,7 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 			S::log.add("TimeSync range: " + std::to_string(uncertaintyBefore) + " -> " + std::to_string(uncertaintyAfter), { LOG_TAGS::NET });
 	}
 
-	S::log.add("RCVD " + resultMessage->getName(), { LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
+	S::log.add("RCVD " + resultMessage->getName(), { LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE, LOG_TAGS::NET_BRIEF });
 
 	if (resultMessage->typeId == MessageTypes::TYPE_REQUEST_MSG)
 	{

@@ -30,7 +30,7 @@ void LoopBackNetwork::update()
 			std::string name = parsedMessage->getName();
 			if (!binder.process(std::move(parsedMessage)))
 			{
-				S::log.add("NetworkMessage is not handled: " + name, { LOG_TAGS::NET });
+				S::log.add("NetworkMessage is not handled: " + name, { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
 			}
 		}
 	}

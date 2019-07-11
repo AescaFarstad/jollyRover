@@ -136,7 +136,7 @@ void ServerNetwork::handleConnections()
 	TCPsocket clientSocket = SDLNet_TCP_Accept(serverSocketRaw);
 	if (clientSocket)
 	{
-		S::log.add("Client connected R", {LOG_TAGS::NET});
+		S::log.add("Client connected R", {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
 		UndeterminedClient* uclient = new UndeterminedClient(onClientDetermined, [this]() {
 			return SDLNet_CheckSockets(socketSet, 0);
 		});
@@ -149,7 +149,7 @@ void ServerNetwork::handleConnections()
 	clientSocket = SDLNet_TCP_Accept(serverSocketWeb);
 	if (clientSocket)
 	{
-		S::log.add("Client connected W", { LOG_TAGS::NET });
+		S::log.add("Client connected W", { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
 		WebClient* wclient = new WebClient(onHandshakeDone, [this]() {
 			return SDLNet_CheckSockets(socketSet, 0);
 		});
@@ -195,7 +195,7 @@ void ServerNetwork::handleData(std::unique_ptr<NetworkMessage> externalBuffer[])
 				addMessageToBuffer(std::move(disconnectedMessage), externalBuffer);
 			}
 
-			S::log.add("Client disconnected " + std::to_string(clients[i]->login), { LOG_TAGS::NET });
+			S::log.add("Client disconnected " + std::to_string(clients[i]->login), { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
 
 			delete clients[i];
 			clients[i] = nullptr;

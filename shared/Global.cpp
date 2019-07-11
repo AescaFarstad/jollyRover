@@ -61,6 +61,8 @@ void GameConfig::setTagByName(std::string name, bool value)
 		
 	else if (name == "NET_MESSAGE")
 		setTagByTag(LOG_TAGS::NET_MESSAGE, value);
+	else if (name == "NET_BRIEF")
+		setTagByTag(LOG_TAGS::NET_BRIEF, value);
 	else if (name == "SUBTASK")
 		setTagByTag(LOG_TAGS::SUBTASK, value);
 		
