@@ -132,7 +132,12 @@ std::unique_ptr<NetworkMessage> Network::poll()
 		//TODO initiate reconnect
 		return nullptr;
 	}
-	return processIncomingPacket(std::move(packet));
+	
+	auto result = processIncomingPacket(std::move(packet));
+	
+	if (result)
+		return std::move(result);
+	else return poll();
 }
 
 std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<NetworkPacket> packet)
