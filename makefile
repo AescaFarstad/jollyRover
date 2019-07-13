@@ -5,7 +5,12 @@ LOCAL_COMPILER := $(CXX)
 OUT := out
 WEB_TARGET := $(OUT)/web
 LOCAL_TARGET := $(OUT)/local
-SERVER_TARGET := $(OUT)/server
+SERVER_TARGET_NAME := JRserver
+SERVER_TARGET := $(OUT)/$(SERVER_TARGET_NAME)
+CONFIG := $(OUT)/config.json
+PROTOTYPES := $(OUT)/prototypes.json
+SSH_CONFIG := JollyRover
+REMOTE_DEPLOY_PATH := ~/JollyRover
 
 AUTODEPS = -MMD -MF $(subst .bc,.d,$@)
 COMPILE_FLAGS := -g -Wall -c -std=c++14 -D_REENTRANT $(CXXFLAGS) 
@@ -39,7 +44,7 @@ DIR_SHARED +=shared/model/ref
 
 
 INC_PARAMS_CLIENT=$(foreach d, $(DIR_CLIENT), -I$d) $(foreach d, $(DIR_SHARED), -I$d) -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu
-INC_PARAMS_SERVER=$(foreach d, $(DIR_SERVER), -I$d) $(foreach d, $(DIR_SHARED), -I$d)
+INC_PARAMS_SERVER=$(foreach d, $(DIR_SERVER), -I$d) $(foreach d, $(DIR_SHARED), -I$d) -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu
 
 SOURCES_CLIENT = $(foreach d, $(DIR_CLIENT), $(wildcard $d/*.cpp)) $(foreach d, $(DIR_SHARED), $(wildcard $d/*.cpp))
 SOURCES_SERVER = $(foreach d, $(DIR_SERVER), $(wildcard $d/*.cpp)) $(foreach d, $(DIR_SHARED), $(wildcard $d/*.cpp))
@@ -69,7 +74,7 @@ web: $(SUBOBJ_WEB)
 	$(WEB_COMPILER) \
 		-O2 -g1 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 \
 		-s WASM=0 -s TOTAL_MEMORY=134217728 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
-		--use-preload-plugins -v -o $(WEB_TARGET).html lib/SDL_gpu.bc $(SUBOBJ_WEB) \
+		--use-preload-plugins -v -o $(WEB_TARGET).js lib/SDL_gpu.bc $(SUBOBJ_WEB) \
 		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets \
 		--memory-init-file 1
 	sed -i 's/antialias\:false/antialias\:true/g' $(WEB_TARGET).js
@@ -82,6 +87,11 @@ server: $(SUBOBJ_SERVER)
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
 all: local server web
+
+deploy:
+	rsync -Pav $(SERVER_TARGET) $(CONFIG) $(PROTOTYPES) '$(SSH_CONFIG):$(REMOTE_DEPLOY_PATH)/$(OUT)'
+	ssh $(SSH_CONFIG) pkill -x $(SERVER_TARGET_NAME) || true
+	ssh $(SSH_CONFIG) 'cd $(REMOTE_DEPLOY_PATH); $(SERVER_TARGET)' & exit
 
 $(OBJDIR_CLIENT_LOCAL)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
