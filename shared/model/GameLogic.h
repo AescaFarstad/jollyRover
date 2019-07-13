@@ -8,15 +8,13 @@
 #include <InputRouteMessage.h>
 #include <InputTimeMessage.h>
 #include <LoadGameMessage.h>
-#include <CarLogic.h>
+#include <Cars.h>
 
 class GameLogic
 {
 public:
 	GameLogic() = default;
 	~GameLogic() = default;
-
-	CarLogic carLogic;
 
 	void update(GameState* state, int32_t timePassed, std::vector<InputMessage*>& inputs, Prototypes* prototypes);
 	void makeLogicStep(GameState* state, int32_t timePassed, Prototypes* prototypes);

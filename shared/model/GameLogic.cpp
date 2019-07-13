@@ -86,24 +86,14 @@ void GameLogic::makeLogicStep(GameState* state, int32_t timePassed, Prototypes* 
 
 		if (player.x < -200 && player.speedX < 0)
 			player.speedX *= -1;
-
-		for (CarRide &ride : player.activeCars)
-		{
-			carLogic.update(ride, player, state, prototypes, timePassed);
-		}
-
-		auto finishedCars = std::remove_if(player.activeCars.begin(), player.activeCars.end(), [](CarRide &ride) {
-			//bool isf = ride.isFinished || ride.car.health <= 0;
-			//printf("has finish %d, %d\n", isf, ride.ui);
-			return ride.isFinished || ride.car.health <= 0; 
-		});
-		if (finishedCars != player.activeCars.end())
-		{
-			player.activeCars.erase(finishedCars);
-		}
-
 	}
-	Creeps::handleCreeps(state, prototypes, timePassed);
+	Creeps::handleCreepSpawn(state, prototypes, timePassed);
+	
+	Creeps::handleCreepUpdate(state, prototypes, timePassed);
+	Cars::handleCarUpdate(state, prototypes, timePassed);
+	
+	Creeps::handleCreepDeath(state, prototypes, timePassed);
+	Cars::handleCarDeath(state, prototypes, timePassed);
 }
 
 bool GameLogic::testRouteIsValid(std::vector<Point>& route, Prototypes* prototypes)

@@ -8,13 +8,16 @@ namespace Creeps
 {
 	using namespace CreepsInternal;
 	
-	void handleCreeps(GameState* state, Prototypes* prototypes, int32_t timePassed)
+	void handleCreepSpawn(GameState* state, Prototypes* prototypes, int32_t timePassed)
 	{
 		preprocessCreeps(state, prototypes);
 		runDebugAsserts(state, prototypes);
 		spawnFormations(state, prototypes);
-		updateCache(state, prototypes);
-			
+		updateCache(state, prototypes);		
+	}
+	
+	void handleCreepUpdate(GameState* state, Prototypes* prototypes, int32_t timePassed)
+	{
 		processFormations(state, prototypes, timePassed);
 		
 		processProjectiles(state, prototypes, timePassed);		
@@ -24,7 +27,10 @@ namespace Creeps
 		preventCreepObstacleCollision(state, prototypes);
 		
 		applyCreepMovement(state);		
-		
+	}
+	
+	void handleCreepDeath(GameState* state, Prototypes* prototypes, int32_t timePassed)
+	{
 		removeDeadProjectiles(state);
 		removeDeadCreeps(state);
 		removeDeadFormations(state);

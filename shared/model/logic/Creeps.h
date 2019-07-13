@@ -2,7 +2,10 @@
 
 namespace Creeps
 {
-	void handleCreeps(GameState* state, Prototypes* prototypes, int32_t timePassed);
+	void handleCreepSpawn(GameState* state, Prototypes* prototypes, int32_t timePassed);
+	void handleCreepUpdate(GameState* state, Prototypes* prototypes, int32_t timePassed);
+	void handleCreepDeath(GameState* state, Prototypes* prototypes, int32_t timePassed);
+	
 	Point getCurrentSlotLocation(FormationState& formation, int32_t slot);
 	Point getTargetSlotLocation(FormationState& formation, int32_t slot);
 		
