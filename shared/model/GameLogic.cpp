@@ -265,7 +265,7 @@ void GameLogic::handleRouteInput(InputRouteMessage* input, Prototypes* prototype
 {
 	if (testRouteIsValid(input->route, prototypes))
 	{
-		playerByLogin(input->login)->activeCars.emplace_back(input->route, prototypes->cars[0]);
+		Cars::launchCar(state, playerByLogin(input->login), input->route, prototypes);
 	}
 	else
 	{

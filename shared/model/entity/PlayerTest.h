@@ -1,6 +1,6 @@
 #pragma once
 #include <ISerializable.h>
-#include <CarRide.h>
+#include <CarState.h>
 class PlayerTest
 {
 public:
@@ -18,7 +18,7 @@ public:
 
 	int32_t login;
 
-	std::vector<CarRide> activeCars;
+	std::vector<CarState> activeCars;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;

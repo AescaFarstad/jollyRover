@@ -12,9 +12,9 @@ namespace Cars
 	{
 		for (PlayerTest& player : state->players)
 		{
-			for (CarRide& ride : player.activeCars)
+			for (CarState& car : player.activeCars)
 			{
-				updateCar(ride, player, state, prototypes, timePassed);
+				updateCar(car, player, state, prototypes, timePassed);
 			}
 		}
 	}
@@ -23,42 +23,75 @@ namespace Cars
 	{
 		for (PlayerTest& player : state->players)
 		{
-			player.activeCars.erase(std::remove_if(player.activeCars.begin(), player.activeCars.end(), [](CarRide &ride) {
-				return ride.isFinished || ride.car.health <= 0; 
+			player.activeCars.erase(std::remove_if(player.activeCars.begin(), player.activeCars.end(), [](CarState &car) {
+				return car.isFinished || car.unit.health <= 0; 
 			}), player.activeCars.end());
 		}
 	}
 	
+	void launchCar(GameState* state, PlayerTest* player, std::vector<Point>& route, Prototypes* prototypes)
+	{
+		player->activeCars.emplace_back();
+		CarState& car = player->activeCars.back();
+		
+		car.route = route;
+		car.progress = 0;
+		car.routeIndex = 0;
+		car.isFinished = false;
+		
+		CarProto& proto = prototypes->cars[0];
+		
+		car.object.id = state->idCounter++;
+		car.object.prototypeId = 0;
+		car.unit.force = 2; //TODO create player forces
+		car.unit.health = proto.maxHealth;
+		car.unit.location = locationFromRouteProgress(car);
+		car.unit.voluntaryMovement = Point(0, 0);
+	}
+	
 	namespace CarsInternal
 	{
-		void updateCar(CarRide& ride, PlayerTest& player, GameState* state, Prototypes* prototypes, int32_t timePassed)
+		void updateCar(CarState& car, PlayerTest& player, GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{
-			float passedThisStep = prototypes->cars[ride.car.prototypeId].speed * timePassed;
+			Point& startingLocation = car.unit.location;
+			float passedThisStep = prototypes->cars[car.object.prototypeId].speed * timePassed;
 
-			while (passedThisStep > 0 && (size_t)ride.routeIndex < ride.route.size() - 1)
+			while (passedThisStep > 0 && (size_t)car.routeIndex < car.route.size() - 1)
 			{
-				passedThisStep = moveCar(passedThisStep, ride);
+				passedThisStep = moveCar(passedThisStep, car);
 			}
-			if ((uint16_t)ride.routeIndex == ride.route.size() - 1)
+			
+			car.unit.location = locationFromRouteProgress(car);
+			car.unit.voluntaryMovement = car.unit.location - startingLocation;
+			
+			if ((uint16_t)car.routeIndex == car.route.size() - 1)
 			{
-				ride.isFinished = true;
+				car.isFinished = true;
 			}
 		}
 		
-		float moveCar(float maxDistance, CarRide& ride)
+		float moveCar(float maxDistance, CarState& car)
 		{
-			float thisDistance = ride.route[ride.routeIndex + 1].distanceTo(ride.route[ride.routeIndex]);
-			if (thisDistance * (1 - ride.progress) < maxDistance)
+			float thisDistance = car.route[car.routeIndex + 1].distanceTo(car.route[car.routeIndex]);
+			if (thisDistance * (1 - car.progress) < maxDistance)
 			{
-				ride.progress += maxDistance / thisDistance;
+				car.progress += maxDistance / thisDistance;
 			}
 			else
 			{
-				maxDistance -= thisDistance * (1 - ride.progress);
-				ride.routeIndex++;
-				ride.progress = 0;
+				maxDistance -= thisDistance * (1 - car.progress);
+				car.routeIndex++;
+				car.progress = 0;
 			}
 			return maxDistance;
+		}
+		
+		Point locationFromRouteProgress(CarState& car)
+		{
+			Point result = car.route[car.routeIndex + 1] - car.route[car.routeIndex];
+			result.scaleBy(car.progress);
+			result += car.route[car.routeIndex];
+			return result;
 		}
 	}
 }

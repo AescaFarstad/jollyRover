@@ -154,7 +154,7 @@ void GameView::drawCars()
 
 	for (PlayerTest &player : m_state->players)
 	{
-		for (CarRide &ride : player.activeCars)
+		for (CarState &ride : player.activeCars)
 		{
 			for (size_t i = ride.routeIndex + 1; i < ride.route.size(); i++)
 			{

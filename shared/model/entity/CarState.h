@@ -2,23 +2,21 @@
 #include <ISerializable.h>
 #include <vector>
 #include <Point.h>
-#include <Car.h>
+#include <BaseEntities.h>
 #include <CarProto.h>
 
-class CarRide
+class CarState
 {
 public:
-	CarRide();
-	CarRide(std::vector<Point> route, CarProto &car);
-	~CarRide();
+	CarState() = default;
+	~CarState() = default;
 
-	Car car;
+	Object object;
+	Unit unit;
 	std::vector<Point> route;
 	int16_t routeIndex;
 	float progress;
 	bool isFinished;
-
-	int ui;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
