@@ -36,8 +36,11 @@ public:
 	float targetOrientation;
 	int32_t spawnedAt;
 	SUB_OBJECTIVE subObjective;
+	float agroAt;
 	
 	bool isDisposed_;
+	Point actualLocation_;
+	float agro_;
 	FormationProto* formationPrototype_;
 	ObjectiveProto* objectivePrototype_;
 	

@@ -50,6 +50,7 @@ private:
 	void drawProjectileExplosion();
 	void drawUnitExplosion();
 	void drawDebugGraphics();
+	void drawThreatMap();
 	
 	
 };

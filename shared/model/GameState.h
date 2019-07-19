@@ -9,6 +9,7 @@
 #include <Prototypes.h>
 #include <SpatialMap.h>
 #include <EventLogger.h>
+#include <ThreatMap.h>
 #include <vector>
 /*
 class ForceState
@@ -45,6 +46,7 @@ public:
 	
 	std::vector<int> forceStrength_;
 	SpatialMap<CreepState> creepMap_;
+	ThreatMap threatMap_[2];
 	std::unordered_map<int32_t, CreepState*> creepById_;
 
 	void deserialize(SerializationStream& stream);

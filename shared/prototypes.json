@@ -9,9 +9,10 @@
 		"stepAngleWindow": 3.14,
 		"maxEventAnimationTime": 1000,
 		"war":{
-			"intensity": 400,
+			"intensity": 5000,
 			"creepRestitution": 0.6,
-			"additionalSpacing": 5
+			"additionalSpacing": 5,
+			"baseAgroLevel": 15
 		}
 	},
 	"forces":[
@@ -215,7 +216,7 @@
 			"name":"tank",
 			"maxHealth":200,
 			"speed": 180,
-			"strength":1000,
+			"strength":2000,
 			"loot": 100,
 			"weapon": 0,
 			"size": 21,
@@ -234,7 +235,7 @@
 			"name":"soldier",
 			"maxHealth":40,
 			"speed": 25,
-			"strength":10,
+			"strength":100,
 			"loot": 0,		
 			"weapon": 1,
 			"size": 5,
@@ -248,7 +249,7 @@
 			"name":"katzuka",
 			"maxHealth":40,
 			"speed": 120,
-			"strength":100,
+			"strength":1000,
 			"loot": 0,		
 			"weapon": 1,
 			"size": 32,
@@ -267,7 +268,7 @@
 			"name":"hotzwiner",
 			"maxHealth":50,
 			"speed": 12,
-			"strength":2000,
+			"strength":20000,
 			"loot": 0,		
 			"weapon": 2,
 			"size": 7,
@@ -407,7 +408,8 @@
 			"type":"assault",
 			"connections":0,
 			"leader":-1,
-			"enabled":false,
+			"enabled":true,
+			"relativeAgroability":1.5,
 			"slots":[
 				{
 					"offset":{ "y":30, "x":50 },
@@ -437,6 +439,7 @@
 			"connections":4,
 			"leader":-1,
 			"enabled":true,
+			"relativeAgroability":1,
 			"slots":[
 				{
 					"offset":{ "y":10, "x":-10 },
@@ -628,7 +631,8 @@
 			"type":"assault",
 			"connections":2,
 			"leader":0,
-			"enabled":true,
+			"enabled":false,
+			"relativeAgroability":1,
 			"slots":[
 				{
 					"offset":{ "y":0, "x":-40 },

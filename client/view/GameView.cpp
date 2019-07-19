@@ -44,6 +44,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	//drawFormationConnections();	
 	drawProjectileExplosion();	
 	drawDebugGraphics();
+	drawThreatMap();
 	
 	lastTime = state->time.time;
 }
@@ -426,6 +427,10 @@ void GameView::drawFormations()
 				}/**/
 			}
 		}
+		
+		int32_t radius = FMath::lerpClipped(0, 2, form.agroAt, 10, form.agro_);
+		GPU_CircleFilled(m_screen, form.actualLocation_.x, form.actualLocation_.y, radius, color);
+		
 	}
 }
 
@@ -529,5 +534,36 @@ void GameView::drawDebugGraphics()
 			GPU_CircleFilled(m_screen, circle.origin.x, circle.origin.y, circle.radius, color);
 		else
 			GPU_Circle(m_screen, circle.origin.x, circle.origin.y, circle.radius, color);
+	}
+}
+
+void GameView::drawThreatMap()
+{
+	const std::vector<std::vector<int32_t>>* maps[2];
+	maps[0] = m_state->threatMap_[0].getRawData();
+	maps[1] = m_state->threatMap_[1].getRawData();
+	const Point AA = m_state->threatMap_[0].getAA();
+	int32_t cellSize = m_state->threatMap_[0].getCellSize();
+	
+	SDL_Color colors[2] = {colorFromHex(0xff0000), colorFromHex(0x0000ff)};
+	
+	for(size_t c = 0; c < 2; c++)
+	{
+		for(size_t i = 1; i < maps[c]->size() - 1; i++)
+		{
+			for(size_t j = 1; j < (*maps[c])[i].size() - 1; j++)
+			{
+				SDL_Color color = colors[c];
+				color.a = (int8_t)FMath::lerpClipped(0, 0, 1000, 150, (*maps[c])[i][j]);
+				GPU_RectangleFilled(
+					m_screen, 
+					AA.x + cellSize * (i - 1),
+					AA.y + cellSize * (j - 1),
+					AA.x + cellSize * (i),
+					AA.y + cellSize * (j),
+					color
+				);					
+			}
+		}
 	}
 }

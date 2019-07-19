@@ -116,6 +116,9 @@ namespace Creeps
 		
 		void updateCache(GameState* state, Prototypes* prototypes)
 		{
+			state->threatMap_[0].reset();
+			state->threatMap_[1].reset();
+			
 			for(auto& creep : state->creeps)
 				creep.movement_.scaleTo(0);
 			
@@ -125,6 +128,26 @@ namespace Creeps
 				state->creepMap_ = SpatialMap<CreepState>(50, true, Point(-100, -100), BB);
 			}
 			state->creepMap_.setUnique(state->creeps);
+			
+			if (!state->threatMap_[0].isValid())
+			{
+				Point BB(prototypes->variables.fieldWidth, prototypes->variables.fieldHeight);
+				state->threatMap_[0] = ThreatMap(80, Point(), BB);
+				state->threatMap_[1] = ThreatMap(80, Point(), BB);
+			}
+			
+			for(auto& creep : state->creeps)
+			{
+				state->threatMap_[creep.unit.force].addThreat(creep.unit.location, creep.creepProto_->strength);
+			}
+			state->threatMap_[0].blur(1);
+			state->threatMap_[1].blur(1);
+			state->threatMap_[0].blur(0.8);
+			state->threatMap_[1].blur(0.8);
+			state->threatMap_[0].blur(0.6);
+			state->threatMap_[1].blur(0.6);
+			state->threatMap_[0].blur(0.4);
+			state->threatMap_[1].blur(0.4);
 		}
 		
 		void spawnFormation(GameState* state, Prototypes* prototypes, ForceProto& forceProto, FormationProto& formationProto)
@@ -148,6 +171,7 @@ namespace Creeps
 			formation.speed = FMath::F_MAX;
 			formation.angularSpeed = 0;
 			formation.spawnedAt = state->time.time;
+			formation.agroAt = state->random.get(0.7f, 1.4f) * formationProto.relativeAgroability * prototypes->variables.baseAgroLevel;
 			formation.subObjective = SUB_OBJECTIVE::NONE;
 			
 			for(auto& slot : formationProto.slots)
@@ -275,6 +299,13 @@ namespace Creeps
 			float tractorMoveBalanceFactor = 0;
 			int32_t tractorCreepsCount = 0;
 			float avgOrientationImbalance = 0;
+			float totalStrength = 0;
+			float hostileThreat = 0;
+			int32_t totalCreeps = 0;
+			int32_t mapIndex = formation.force == 0 ? 1 : 0;
+			
+			formation.actualLocation_ = Point();
+			
 			
 			for(auto& id : formation.slots)
 			{
@@ -285,6 +316,11 @@ namespace Creeps
 				CreepState& creep = *creepP;
 				if (!creepP || creepP->unit.health <= 0)
 					continue;
+					
+				formation.actualLocation_ += creep.unit.location * creep.creepProto_->strength;
+				totalStrength += creep.creepProto_->strength;
+				totalCreeps++;
+				hostileThreat += state->threatMap_[mapIndex].getThreatAt(creep.unit.location);
 					
 				Point formationSlotLocation = getCurrentSlotLocation(formation, creep.formationsSlot);
 				Point targetSlotLocation = getTargetSlotLocation(formation, creep.formationsSlot);
@@ -354,6 +390,7 @@ namespace Creeps
 				tractorMoveBalanceFactor /= tractorCreepsCount;
 				avgOrientationImbalance /= tractorCreepsCount;
 			}
+			formation.actualLocation_ /= totalStrength;
 			
 			
 			Point formationDirection;
@@ -412,6 +449,11 @@ namespace Creeps
 			
 			if (formationMovementComplete && avgMoveBalance > -1 - tractorMoveBalanceFactor && avgOrientationImbalance < 0.1)
 				formation.subObjective = SUB_OBJECTIVE::NONE;
+			
+			hostileThreat /= totalCreeps;
+			if (hostileThreat > formation.agroAt)
+				formation.subObjective = SUB_OBJECTIVE::ASSAULT;
+			formation.agro_ = hostileThreat;
 		}
 		
 		void tryOptimiseFormation(FormationState& formation, GameState* state, int32_t timePassed)
@@ -445,6 +487,10 @@ namespace Creeps
 		
 		void performAssault(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{
+			float friendlyNearbyForces = 0;
+			float hostileNearbyForces = 0;
+			float totalCreeps = 0;
+			
 			for(auto& id : formation.slots)
 			{
 				if (id < 0)
@@ -455,6 +501,11 @@ namespace Creeps
 				
 				if (!creepP || creep.unit.health <= 0)
 					return;
+					
+				int32_t mapIndex = creep.unit.force == 0 ? 1 : 0;
+				hostileNearbyForces += state->threatMap_[mapIndex].getThreatAt(creep.unit.location);
+				friendlyNearbyForces += state->threatMap_[1 - mapIndex].getThreatAt(creep.unit.location);
+				totalCreeps++;
 				
 				CreepState* target = nullptr;
 				if (creep.weapon.target > 0)
@@ -484,6 +535,40 @@ namespace Creeps
 						moveCreepTowardsPoint(creep, target->unit.location, prototypes, timePassed);				
 					}
 				}	
+			}
+			
+			if (hostileNearbyForces / totalCreeps < formation.agroAt / 2)
+			{
+				Point center;
+				
+				for(auto& id : formation.slots)
+				{
+					if (id < 0)
+						continue;
+						
+					CreepState* creepP = state->creepById_[id];
+					CreepState& creep = *creepP;
+					
+					if (!creepP || creep.unit.health <= 0)
+						continue;
+					center += creep.unit.location;
+				}
+				center.scaleBy(1.f/totalCreeps);
+				auto nearbyCreeps = state->creepMap_.getInRadius(center, 300);
+				bool hasEnemies = false;
+				for(auto& creep : nearbyCreeps)
+				{
+					if 	(creep->unit.force != formation.force)
+					{
+						hasEnemies = true;
+						break;
+					}
+				}
+				if (!hasEnemies)
+				{
+					formation.objectiveID = -1;
+					formation.subObjective = SUB_OBJECTIVE::NONE;
+				}
 			}
 		}
 		
@@ -903,6 +988,10 @@ namespace Creeps
 					return f.object.id == creep.formationId;
 					});
 				formation->slots[creep.formationsSlot] = -1;
+				if (formation->subObjective == SUB_OBJECTIVE::MOVE)
+				{
+					formation->subObjective = SUB_OBJECTIVE::ASSAULT;
+				}
 				if (state->isEventLoggerEnabled)
 				{	
 					state->eventLogger.addUnitDeath(state->time.time, creep.object.id, creep.object.prototypeId, creep.unit.location, 													creep.unit.voluntaryMovement.asAngle(), creep.impact_);

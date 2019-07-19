@@ -52,6 +52,7 @@ public:
 	float maxAngularSpeed;
 	Point AA;
 	Point BB;
+	float relativeAgroability;
 };
 
 void from_json(const json &j, FormationSlotProto &slot);

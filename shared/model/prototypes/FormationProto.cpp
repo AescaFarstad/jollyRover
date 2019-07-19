@@ -33,4 +33,5 @@ void from_json(const json &j, FormationProto &formation)
 	
 	formation.leader = j.at("leader");
 	formation.connections = j.at("connections");
+	formation.relativeAgroability = j.at("relativeAgroability");
 }

@@ -13,6 +13,7 @@ void FormationState::deserialize(SerializationStream &stream)
 	Serializer::read(angularSpeed, stream);
 	Serializer::read(spawnedAt, stream);
 	Serializer::read(subObjective, stream);
+	Serializer::read(agroAt, stream);
 	Serializer::readVector(slots, stream);
 	
 	formationPrototype_ = nullptr;
@@ -33,6 +34,7 @@ void FormationState::serialize(SerializationStream &stream) const
 	Serializer::write(angularSpeed, stream);
 	Serializer::write(spawnedAt, stream);
 	Serializer::write(subObjective, stream);
+	Serializer::write(agroAt, stream);
 	Serializer::writeVector(slots, stream);
 }
 
