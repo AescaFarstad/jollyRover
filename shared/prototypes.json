@@ -38,7 +38,8 @@
 		{
 			"id": 0,
 			"name": "Mustang",
-			"speed": 0.0003,
+			"speed": 0.1,
+			"size": 23,
 			"fuelPerMeter": 2,
 			"maxHealth": 200,
 			"repairTime": 200,
@@ -47,7 +48,8 @@
 		{
 			"id": 1,
 			"name": "Coyote",
-			"speed": 0.0005,
+			"speed": 0.05,
+			"size": 10,
 			"fuelPerMeter": 3,
 			"maxHealth": 100,
 			"repairTime": 100,

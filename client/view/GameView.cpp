@@ -36,9 +36,9 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawPlayers();
 	drawObstacles();
 	drawInput();
-	drawCars();
 	drawUnitExplosion();	
 	drawCreeps();
+	drawCars();
 	drawProjectiles();
 	//drawFormations();	
 	//drawFormationConnections();	
@@ -154,38 +154,35 @@ void GameView::drawCars()
 
 	for (PlayerTest &player : m_state->players)
 	{
-		for (CarState &ride : player.activeCars)
+		for (CarState &car : player.activeCars)
 		{
-			for (size_t i = ride.routeIndex + 1; i < ride.route.size(); i++)
+			for (size_t i = car.routeIndex + 1; i < car.route.size(); i++)
 			{
 				GPU_Line(
 					m_screen,
-					ride.route[i - 1].x,
-					ride.route[i - 1].y,
-					ride.route[i].x,
-					ride.route[i].y,
+					car.route[i - 1].x,
+					car.route[i - 1].y,
+					car.route[i].x,
+					car.route[i].y,
 					color
 				);
 				GPU_Rectangle(
 					m_screen,
-					ride.route[i].x - rectSize / 2,
-					ride.route[i].y - rectSize / 2,
-					ride.route[i].x + rectSize / 2,
-					ride.route[i].y + rectSize / 2,
+					car.route[i].x - rectSize / 2,
+					car.route[i].y - rectSize / 2,
+					car.route[i].x + rectSize / 2,
+					car.route[i].y + rectSize / 2,
 					color
 				);
 			}
 
-			Point carLocation = ride.route[ride.routeIndex + 1] - ride.route[ride.routeIndex];
-			carLocation.scaleTo(ride.progress * carLocation.getLength());
-			carLocation += ride.route[ride.routeIndex];
-
+			m_renderer->blit(S::textures.tanks_2.tankBody_green_outline, car.unit.location, car.unit.voluntaryMovement.asAngle());
 			GPU_RectangleFilled(
 					m_screen,
-					carLocation.x - carSize / 2,
-					carLocation.y - carSize / 2,
-					carLocation.x + carSize / 2,
-					carLocation.y + carSize / 2,
+					car.unit.location.x - carSize / 2,
+					car.unit.location.y - carSize / 2,
+					car.unit.location.x + carSize / 2,
+					car.unit.location.y + carSize / 2,
 					color
 				);
 		}

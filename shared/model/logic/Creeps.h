@@ -46,7 +46,6 @@ namespace Creeps
 		
 		void removeDeadProjectiles(GameState* state);
 		void removeDeadCreeps(GameState* state);
-		void removeDeadCreep(CreepState& creep, GameState* state);
 		void removeDeadFormations(GameState* state);
 	}
 }

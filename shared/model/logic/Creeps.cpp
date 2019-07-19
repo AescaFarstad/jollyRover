@@ -896,66 +896,27 @@ namespace Creeps
 		{
 			if (state->creeps.size() > GameState::MAX_CREEPS)
 				THROW_FATAL_ERROR("Creeps exceed maximum, pointers are invalid.");
-			for(auto& creep : state->creeps)
-			{
-				if (creep.unit.health <= 0)
-				{
-					/*
-					if (creep.formationId)
-					{
-						auto formation = std::find_if(state->formations.begin(), state->formations.end(), [id = creep.formationId](FormationState& form){ 
-							return form.object.id == id;
-						});
-						if (formation != state->formations.end())
-						{
-							formation->isDisposed_ = true;
-						}
-					}
-					TODO clean formation
-					*/
-				}
-			}
 			
-			//Manuall std::remove_if with some additions to manage creepById pointers			
-			auto first = state->creeps.begin();
-			auto last = state->creeps.end();
-			auto predicate = [](CreepState& c){ return c.unit.health <= 0;};
-			first = std::find_if(first, last, predicate);
-			if (first != last)
-			{
-				auto removeFrom = first;
-				removeDeadCreep(*first, state);
-				state->creepById_.erase(first->object.id);
-				++first;
-				for (; first != last; ++first)
-				{
-					if (!predicate(*first))
-					{
-						*removeFrom = std::move(*first);
-						state->creepById_[removeFrom->object.id] = &*removeFrom;
-						++removeFrom;
-					}
-					else
-					{
-						state->creepById_.erase(first->object.id);
-						removeDeadCreep(*first, state);						
-					}					
+			auto removeDeadCreep = [&state](CreepState& creep){
+				state->creepById_.erase(creep.object.id);
+				auto formation = std::find_if(state->formations.begin(), state->formations.end(), [&creep](FormationState& f) {
+					return f.object.id == creep.formationId;
+					});
+				formation->slots[creep.formationsSlot] = -1;
+				if (state->isEventLoggerEnabled)
+				{	
+					state->eventLogger.addUnitDeath(state->time.time, creep.object.id, creep.object.prototypeId, creep.unit.location, 													creep.unit.voluntaryMovement.asAngle(), creep.impact_);
 				}
-				state->creeps.erase(removeFrom,  state->creeps.end());
-			}			
-		}
-		
-		void removeDeadCreep(CreepState& creep, GameState* state)
-		{
-			state->creepById_.erase(creep.object.id);
-			auto formation = std::find_if(state->formations.begin(), state->formations.end(), [&creep](FormationState& f) {
-				return f.object.id == creep.formationId;
-				});
-			formation->slots[creep.formationsSlot] = -1;
-			if (state->isEventLoggerEnabled)
-			{	
-				state->eventLogger.addUnitDeath(state->time.time, creep.object.id, creep.object.prototypeId, creep.unit.location, 													creep.unit.voluntaryMovement.asAngle(), creep.impact_);
-			}
+			};
+			
+			state->creeps.erase(std2::removeAndExecute(
+					state->creeps, 
+					[](CreepState& c){ return c.unit.health <= 0;},
+					removeDeadCreep,
+					[&state](CreepState& c){ state->creepById_[c.object.id] = &c;}
+				),
+				state->creeps.end()
+			);	
 		}
 		
 		void removeDeadFormations(GameState* state)

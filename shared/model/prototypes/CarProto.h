@@ -10,6 +10,7 @@ public:
 
 	int16_t id;
 	int32_t maxHealth;
+	int32_t size;
 	float speed;
 
 private:

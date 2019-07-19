@@ -4,7 +4,7 @@
 template<typename T>
 void ProjectileExplosionView::render(Renderer* renderer, T& event, GameState* state, Prototypes* prototypes)
 {	
-	int32_t seed = FMath::q_sdbm(event.id);
+	int32_t seed = FMath::q_sdbm(event.id * event.stamp);
 	if (m_seed != seed)
 		init(seed, event, state);
 		
@@ -123,7 +123,7 @@ void ProjectileExplosionView::init(int32_t seed, ProjectileExplosionEvent& event
 	if (event.prototypeId == 0)
 		numParticles = random.get(3, 5);
 	else
-		numParticles = 1;
+		numParticles = random.get() > 0.8 ? 1 : 0;
 	
 	
 	for(int32_t i = 0; i < numParticles; i++)
