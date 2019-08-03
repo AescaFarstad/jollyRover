@@ -62,29 +62,7 @@ void GameView::onMouseMove(SDL_MouseMotionEvent* event)
 
 void GameView::drawPlayers()
 {
-	SDL_Color colors[10] = {
-		colorFromHex(0x000000),
-		colorFromHex(0xff0000),
-		colorFromHex(0x00ff00),
-		colorFromHex(0x0000ff),
-		colorFromHex(0xffff00),
-		colorFromHex(0x00ffff),
-		colorFromHex(0xff00ff),
-		colorFromHex(0x777777),
-		colorFromHex(0x0077ff),
-		colorFromHex(0xff7700)
-	};
-
-	for (size_t i = 0; i < m_state->players.size(); i++)
-	{
-		GPU_RectangleFilled(
-			m_screen, 
-			m_state->players[i].x + 200,
-			m_state->players[i].y + 200,
-			m_state->players[i].x + 205,
-			m_state->players[i].y + 205, 
-			colors[i]);
-	}
+	//...
 }
 
 void GameView::drawObstacles()

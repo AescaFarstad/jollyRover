@@ -55,38 +55,7 @@ void GameLogic::update(GameState* state, int32_t timePassed, std::vector<InputMe
 void GameLogic::makeLogicStep(GameState* state, int32_t timePassed, Prototypes* prototypes)
 {
 	state->time.time += timePassed;
-
-	for (size_t i = 0; i < state->players.size(); i++)
-	{
-		PlayerTest &player = state->players[i];
-		if (player.buttonDown_Left)
-			player.speedX -= 0.15f;
-		if (player.buttonDown_Right)
-			player.speedX += 0.15f;
-		if (player.buttonDown_Forward)
-			player.speedY -= 0.15f;
-		if (player.buttonDown_Backward)
-			player.speedY += 0.15f;
-
-		player.speedX *= 0.95f;
-		player.speedY *= 0.95f;
-
-
-		player.x += player.speedX;
-		player.y += player.speedY;
-
-		if (player.x > 200 && player.speedX > 0)
-			player.speedX *= -1;
-
-		if (player.y > 200 && player.speedY > 0)
-			player.speedY *= -1;
-
-		if (player.y < -200 && player.speedY < 0)
-			player.speedY *= -1;
-
-		if (player.x < -200 && player.speedX < 0)
-			player.speedX *= -1;
-	}
+	
 	Creeps::handleCreepSpawn(state, prototypes, timePassed);
 	
 	Creeps::handleCreepUpdate(state, prototypes, timePassed);
@@ -208,28 +177,7 @@ void GameLogic::handleActionInput(InputActionMessage* input)
 	PlayerTest* player = playerByLogin(input->login);
 	if (player == nullptr)
 		return;
-	for (size_t j = 0; j < input->downedButtons.size(); j++)
-	{
-		if (input->downedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::LEFT)
-			player->buttonDown_Left = true;
-		else if (input->downedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::RIGHT)
-			player->buttonDown_Right = true;
-		else if (input->downedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::FORWARD)
-			player->buttonDown_Forward = true;
-		else if (input->downedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::BACKWARD)
-			player->buttonDown_Backward = true;
-	}
-	for (size_t j = 0; j < input->uppedButtons.size(); j++)
-	{
-		if (input->uppedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::LEFT)
-			player->buttonDown_Left = false;
-		else if (input->uppedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::RIGHT)
-			player->buttonDown_Right = false;
-		else if (input->uppedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::FORWARD)
-			player->buttonDown_Forward = false;
-		else if (input->uppedButtons[j] == (int8_t)GAME_KEYBOARD_ACTIONS::BACKWARD)
-			player->buttonDown_Backward = false;
-	}
+	//...
 }
 
 void GameLogic::handlePlayerJoinedInput(InputPlayerJoinedMessage* input)
@@ -237,17 +185,6 @@ void GameLogic::handlePlayerJoinedInput(InputPlayerJoinedMessage* input)
 	state->players.emplace_back();
 	PlayerTest& p = *(state->players.end() - 1);
 	p.login = input->login;
-	p.x = 0;//(float)state->random.get(-50, 50);
-	p.y = 0;//(float)state->random.get(-50, 50);
-
-	std::string logStr  = "spawn player " + std::to_string(p.login) + " at ";
-	logStr += "[";
-	logStr += std::to_string(p.x);
-	logStr += ":";
-	logStr += std::to_string(p.y);
-	logStr += "] ";
-
-	S::log.add(logStr, { LOG_TAGS::GAME });
 }
 
 void GameLogic::handlePlayerLeftInput(InputPlayerLeftMessage* input)

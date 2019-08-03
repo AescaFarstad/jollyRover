@@ -348,17 +348,7 @@ void Game::addNetworkBindings()
 		/*
 		Serializer::write(gameUpdater->state.get(), stream3);
 		S::log.add("CURRENT STATE (" + std::to_string(gameUpdater->state->timeStamp) + ")\n\t" +
-		Serializer::toHex(stream3.readAll(), stream3.getLength()), { LOG_TAGS::UNIQUE });*/
-		std::string logStr = "PLAYER LOCATIONS: \n\t";
-		for (size_t i = 0; i < gameUpdater->state->players.size(); i++)
-		{
-			logStr += "[";
-			logStr += std::to_string(gameUpdater->state->players[i].x);
-			logStr += ":";
-			logStr += std::to_string(gameUpdater->state->players[i].y);
-			logStr += "] ";
-		}
-		S::log.add(logStr + "\n\n", { LOG_TAGS::UNIQUE });
+		Serializer::toHex(stream3.readAll(), stream3.getLength()), { LOG_TAGS::UNIQUE });*/	
 	});
 
 	binding = std::make_unique<AnonymousBinding>("TYPE_GAME_STATE_MSG");
