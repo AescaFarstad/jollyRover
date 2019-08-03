@@ -237,8 +237,8 @@ void GameLogic::handlePlayerJoinedInput(InputPlayerJoinedMessage* input)
 	state->players.emplace_back();
 	PlayerTest& p = *(state->players.end() - 1);
 	p.login = input->login;
-	p.x = (float)state->random.get(-50, 50);
-	p.y = (float)state->random.get(-50, 50);
+	p.x = 0;//(float)state->random.get(-50, 50);
+	p.y = 0;//(float)state->random.get(-50, 50);
 
 	std::string logStr  = "spawn player " + std::to_string(p.login) + " at ";
 	logStr += "[";

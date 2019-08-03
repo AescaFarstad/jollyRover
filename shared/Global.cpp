@@ -27,6 +27,7 @@ void GameConfig::load(nlohmann::json& j)
 	S::config.loopBack = jconfig.at("loopBack");
 	S::config.window_X = jconfig.at("windowLocation").at("x");
 	S::config.window_Y = jconfig.at("windowLocation").at("y");
+	S::config.maxSaveStates = jconfig.at("maxSaveStates");
 	loadLogTags(j);
 }
 

@@ -8,6 +8,7 @@ GameUpdater::GameUpdater()
 {
 	lastValidTimeStamp = 0;
 	isLoaded = false;
+	lastSavedSteps = -1;
 }
 
 
@@ -21,7 +22,7 @@ void GameUpdater::update(uint32_t time)
 		std::vector<InputMessage*>* inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + prototypes->variables.fixedStepDuration);
 		logic.update(state.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
 		lastValidTimeStamp = state->timeStamp;
-		if (state->time.performedSteps % S::config.saveStateInterval == 0)
+		if (lastSavedSteps != state->time.performedSteps && state->time.performedSteps % S::config.saveStateInterval == 0)
 			saveState(state.get());
 		delete inputs;
 	}
@@ -68,7 +69,10 @@ std::unique_ptr<GameState> GameUpdater::getNewStateBySteps(int32_t steps)
 	auto result = std::make_unique<GameState>();
 	
 	uint32_t stamp = stampsBySteps.lower_bound(steps)->second;
-	SerializationStream* s = statesByStamps.at(stamp).get();
+	auto streamRef = statesByStamps.find(stamp);
+	if (streamRef == statesByStamps.end())
+		return std::unique_ptr<GameState>(nullptr);
+	SerializationStream* s = streamRef->second.get();
 	result->deserialize(*s);
 	s->seekAbsolute(0);
 	result->propagatePrototypes(prototypes);
@@ -132,4 +136,18 @@ void GameUpdater::saveState(GameState* state)
 	stream->seekAbsolute(0);
 	statesByStamps[state->timeStamp] = std::move(stream);
 	stampsBySteps[state->time.performedSteps] = state->timeStamp;
+	lastSavedSteps = state->time.performedSteps;
+	
+	if (statesByStamps.size() > S::config.maxSaveStates * 2)
+	{
+		auto min = std::min_element(statesByStamps.begin(), statesByStamps.end());
+		auto cutOffPoint = state->timeStamp - S::config.maxSaveStates * S::config.saveStateInterval * prototypes->variables.fixedStepDuration;
+		decltype(statesByStamps) newStatesByStamps;
+		for(auto i = statesByStamps.begin(); i != statesByStamps.end(); i++)
+		{
+			if (i->first > cutOffPoint || i == min)
+				newStatesByStamps[i->first] = std::move(i->second);
+		}
+		statesByStamps = std::move(newStatesByStamps);
+	}
 }

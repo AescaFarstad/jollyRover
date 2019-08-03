@@ -44,6 +44,14 @@ float SeededRandom::get()
 	return m_seed / 2147483647.0;
 }
 
+float SeededRandom::peekNext()
+{
+	auto saveSeed = m_seed;
+	auto result = get();
+	m_seed = saveSeed;
+	return result;
+}
+
 void SeededRandom::deserialize(SerializationStream & stream)
 {
 	Serializer::read(m_seed, stream);

@@ -21,7 +21,8 @@ public:
 	int32_t webPort;
 	char host[17];
 	int32_t maxMessageSize;
-	int32_t saveStateInterval;
+	uint32_t maxSaveStates;
+	uint32_t saveStateInterval;
 	int32_t networkUpdateInterval;
 	bool loopBack;
 	int32_t window_X;

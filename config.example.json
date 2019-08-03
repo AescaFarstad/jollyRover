@@ -5,6 +5,7 @@
 		"webPort":12880,
 		"desktopPort":12745,
 		"saveStateInterval":3,
+		"maxSaveStates":1000,
 		"maxMessageSize":3000,
 		"networkUpdateInterval":5,
 		"loopBack":true,

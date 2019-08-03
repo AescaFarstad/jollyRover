@@ -160,7 +160,9 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 		case GAME_KEYBOARD_ACTIONS::REVERT1 :
 		{
 			LoadGameMessage loadMsg;
-			auto state = gameUpdater.getNewStateBySteps(gameUpdater.state->time.performedSteps - 1);
+			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 1));
+			if (!state)
+				return;
 			auto stream = SerializationStream::createExp();
 			state->serialize(*stream);
 			loadMsg.stateLength = stream->getLength();
@@ -171,7 +173,9 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 		case GAME_KEYBOARD_ACTIONS::REVERT5 :
 		{
 			LoadGameMessage loadMsg;
-			auto state = gameUpdater.getNewStateBySteps(gameUpdater.state->time.performedSteps - 5);
+			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 5));
+			if (!state)
+				return;
 			auto stream = SerializationStream::createExp();
 			state->serialize(*stream);
 			loadMsg.stateLength = stream->getLength();
@@ -182,7 +186,9 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 		case GAME_KEYBOARD_ACTIONS::REVERT25 :
 		{
 			LoadGameMessage loadMsg;
-			auto state = gameUpdater.getNewStateBySteps(gameUpdater.state->time.performedSteps - 25);
+			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 25));
+			if (!state)
+				return;
 			auto stream = SerializationStream::createExp();
 			state->serialize(*stream);
 			loadMsg.stateLength = stream->getLength();
@@ -193,7 +199,9 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 		case GAME_KEYBOARD_ACTIONS::REVERT125 :
 		{
 			LoadGameMessage loadMsg;
-			auto state = gameUpdater.getNewStateBySteps(gameUpdater.state->time.performedSteps - 125);
+			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 125));
+			if (!state)
+				return;
 			auto stream = SerializationStream::createExp();
 			state->serialize(*stream);
 			loadMsg.stateLength = stream->getLength();

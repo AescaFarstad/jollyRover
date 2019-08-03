@@ -37,4 +37,5 @@ private:
 	void rewindToPrecedingState(uint32_t stamp);
 	void saveState(GameState* state);
 	Prototypes* prototypes;
+	int32_t lastSavedSteps;
 }; 
