@@ -26,6 +26,7 @@ namespace MainInternal
 	GameUpdater gameUpdater;
 	int32_t inputIdCounter = 0;
 	Prototypes prototypes;
+	bool hasClients = false;
 }
 
 using namespace MainInternal;
@@ -115,6 +116,7 @@ void loadConfig()
 	json j = json::parse(file);
 	file.close();
 	S::config.load(j);
+	S::config.saveStateInterval = -1; //Server never needs to save states
 }
 
 void mainLoop()
@@ -143,13 +145,19 @@ void mainLoop()
 		messageBuffer[i] = nullptr;
 		i++;
 	}
+	
+	bool newHasClients = network.hasClients();
+	if (hasClients && !newHasClients)
+		gameUpdater.load(std::make_unique<GameState>(), &prototypes, false);
+	hasClients = newHasClients;
 
 	int ticks = SDL_GetTicks();
 	int delta = ticks - lastTicks;
 	if (delta >= MIN_TIME_PER_FRAME)
 	{
 		lastTicks = ticks;
-		gameUpdater.update(ticks);
+		if (hasClients)
+			gameUpdater.update(ticks);
 	}
 }
 
@@ -193,8 +201,7 @@ int main()
 	network.init();
 
 	messageBuffer = new std::unique_ptr<NetworkMessage>[SERVER_CONST::messageBufferSize + 1];
-	std::unique_ptr<GameState> state = std::make_unique<GameState>();
-	gameUpdater.load(std::move(state), &prototypes, false);
+	gameUpdater.load(std::make_unique<GameState>(), &prototypes, false);
 
 	while (!isFinished)
 		mainLoop();
