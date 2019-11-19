@@ -12,11 +12,12 @@ void GameMode::init(Renderer* renderer, Prototypes* prototypes, Network* network
 	m_network = network;
 }
 
-void GameMode::loadGame(std::unique_ptr<GameState> state, int64_t clientToServerDelta)
+void GameMode::loadGame(std::unique_ptr<GameState> state, int64_t clientToServerDelta, int32_t login)
 {
 	m_gameUpdater.load(std::move(state), m_prototypes, true);
 	m_clientToServerDelta = clientToServerDelta;
 	m_routeInput.load(m_gameUpdater.state.get(), m_prototypes);
+	m_gameView.setLogin(login);
 	m_isLoaded = true;
 }
 

@@ -28,6 +28,8 @@ public:
 	
 	void onMouseMove(SDL_MouseMotionEvent* event);
 	
+	void setLogin(int32_t login);
+	
 private:
 
 	GPU_Target* m_screen; 
@@ -35,6 +37,7 @@ private:
 	Prototypes* m_prototypes;
 	GameState* m_state;
 	RouteInput* m_routeInput;
+	int32_t m_login;
 	ViewController<ProjectileExplosionView> m_projectileExplosions;	
 	ViewController<ProjectileExplosionView> m_unitDeaths;
 	int32_t lastTime;	

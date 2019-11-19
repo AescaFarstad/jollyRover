@@ -108,6 +108,7 @@ void LoopBackNetwork::send(NetworkMessage* message)
 		case MessageTypes::TYPE_GREETING_MSG:
 		{
 			GreetingMessage* gMsg = dynamic_cast<GreetingMessage*>(message);
+			gMsg->login = LOGIN;
 			gMsg->password = {1, 2, 3, 4, 5};
 			addToIncoming(message);
 			break;

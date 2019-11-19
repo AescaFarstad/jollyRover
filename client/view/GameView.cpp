@@ -89,6 +89,10 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	
 	lastTime = state->time.time;
 }
+void GameView::setLogin(int32_t login)
+{
+	m_login = login;
+}
 
 void GameView::onMouseMove(SDL_MouseMotionEvent* event)
 {
@@ -195,8 +199,19 @@ void GameView::drawCars()
 					color
 				);
 			}
+			
+			auto& carTexture = player.login == m_login ? 
+				S::textures.tanks_2.tankBody_green_outline : 
+				S::textures.tanks_2.tankBody_red_outline;
+			auto& carGunTexture = player.login == m_login ? 
+				S::textures.tanks_2.tankGreen_barrel2_outline : 
+				S::textures.tanks_2.tankRed_barrel2_outline;
 
-			m_renderer->blit(S::textures.tanks_2.tankBody_green_outline, car.unit.location, car.unit.voluntaryMovement.asAngle());
+			m_renderer->blit(carTexture, car.unit.location, car.unit.voluntaryMovement.asAngle(), 0.8);
+			auto gunLocation = car.unit.voluntaryMovement;
+			gunLocation.scaleTo(9);
+			gunLocation += car.unit.location;
+			m_renderer->blit(carGunTexture, gunLocation, car.unit.voluntaryMovement.asAngle(), 0.8);
 			GPU_RectangleFilled(
 					m_screen,
 					car.unit.location.x - carSize / 2,
@@ -589,6 +604,5 @@ void GameView::drawThreatMap()
 
 void GameView::drawHUD()
 {
-	auto text = "Score: " + std::to_string(m_state->timeStamp);
-	m_fontAmaticBold.draw(m_screen, 20.f, 20.f, text.c_str());
+	m_fontAmaticBold.draw(m_screen, 20.f, 20.f, "Score: %d", m_state->timeStamp);
 }
