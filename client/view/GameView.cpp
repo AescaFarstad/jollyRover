@@ -9,6 +9,39 @@
 GameView::GameView()
 {
 	m_loadCount = 0;
+	
+	m_layer1Image = loadImage("out/assets/map layer 1.png");
+	m_layer1Image->anchor_x = 0;
+	m_layer1Image->anchor_y = 0;
+	m_layer2Image = loadImage("out/assets/map layer 2.png");
+	m_layer2Image->anchor_x = 0;
+	m_layer2Image->anchor_y = 0;
+	m_layer3Image = loadImage("out/assets/map layer 3.png"); 
+	m_layer3Image->anchor_x = 0;
+	m_layer3Image->anchor_y = 0;
+	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 36);
+	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 36);
+}
+
+GameView::~GameView()
+{
+	if (m_layer1Image)
+		delete m_layer1Image;
+	if (m_layer2Image)
+		delete m_layer2Image;
+	if (m_layer3Image)
+		delete m_layer3Image;
+}
+
+
+GPU_Image* GameView::loadImage(std::string path)
+{
+	GPU_Image* result = GPU_LoadImage(path.c_str());
+	if (!result)
+ 		THROW_FATAL_ERROR("IMG IS NULL")
+ 	GPU_SetSnapMode(result, GPU_SNAP_NONE);
+	GPU_SetBlending(result, 1);
+	return result;
 }
 
 void GameView::init(Renderer* renderer, Prototypes* prototypes)
@@ -32,19 +65,27 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	
 	SDL_Color white = colorFromHex(0xffffff);
 	GPU_RectangleFilled(m_screen, 0, 0, m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight, white);
+	
+	GPU_Rect layerRect{0, 0, (float)m_layer1Image->w, (float)m_layer1Image->h};
+	Point location(0, 0);
 
+	m_renderer->blit(m_layer1Image, layerRect, location);
 	drawPlayers();
-	drawObstacles();
-	drawInput();
-	drawUnitExplosion();	
+	drawUnitExplosion();
+	m_renderer->blit(m_layer2Image, layerRect, location);	
 	drawCreeps();
 	drawCars();
 	drawProjectiles();
+	m_renderer->blit(m_layer3Image, layerRect, location);
 	//drawFormations();	
 	//drawFormationConnections();	
 	drawProjectileExplosion();	
 	drawDebugGraphics();
-	drawThreatMap();
+	//drawThreatMap();
+	//drawObstacles();
+	drawInput();
+	
+	drawHUD();
 	
 	lastTime = state->time.time;
 }
@@ -544,4 +585,10 @@ void GameView::drawThreatMap()
 			}
 		}
 	}
+}
+
+void GameView::drawHUD()
+{
+	auto text = "Score: " + std::to_string(m_state->timeStamp);
+	m_fontAmaticBold.draw(m_screen, 20.f, 20.f, text.c_str());
 }

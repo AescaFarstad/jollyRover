@@ -7,6 +7,7 @@
 #include <Renderer.h>
 #include <ProjectileExplosionView.h>
 #include <ViewController.h>
+#include <NFont.h>
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL_image.h>
@@ -20,6 +21,7 @@ class GameView
 {
 public:
 	GameView();
+	~GameView();
 
 	void init(Renderer* renderer, Prototypes* prototypes);
 	void render(GameState* state, RouteInput* routeInput);
@@ -37,6 +39,12 @@ private:
 	ViewController<ProjectileExplosionView> m_unitDeaths;
 	int32_t lastTime;	
 	
+	GPU_Image* m_layer1Image;
+	GPU_Image* m_layer2Image;
+	GPU_Image* m_layer3Image;
+	NFont m_fontAmaticBold;
+	NFont m_fontAmaticRegular;
+	
 	uint32_t m_loadCount;
 
 	void drawPlayers();
@@ -51,6 +59,8 @@ private:
 	void drawUnitExplosion();
 	void drawDebugGraphics();
 	void drawThreatMap();
+	void drawHUD();
+	GPU_Image* loadImage(std::string path);
 	
 	
 };

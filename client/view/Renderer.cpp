@@ -22,6 +22,12 @@ void Renderer::blit(TextureDef& texture, TweenParams& params)
 {
 	blit(texture, params.location, params.rotation, params.scale, params.tint);
 }
+
+void Renderer::blit(GPU_Image* customTexture, GPU_Rect& rect, Point& location, float rotation, float scale, uint8_t alpha)
+{
+	GPU_SetRGBA(m_atlas, 255, 255, 255, alpha);
+	GPU_BlitTransform(customTexture, &rect, m_screen, location.x, location.y, rotation / M_PI * 180, scale, scale); 
+}
 	
 
 GPU_Target* Renderer::getScreen()
