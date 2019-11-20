@@ -5,7 +5,7 @@
 #include <memory>
 #include <SDL_gpu.h>
 #include <Renderer.h>
-#include <ProjectileExplosionView.h>
+#include <SerialAnimationView.h>
 #include <ViewController.h>
 #include <NFont.h>
 
@@ -38,8 +38,8 @@ private:
 	GameState* m_state;
 	RouteInput* m_routeInput;
 	int32_t m_login;
-	ViewController<ProjectileExplosionView> m_projectileExplosions;	
-	ViewController<ProjectileExplosionView> m_unitDeaths;
+	ViewController<SerialAnimationView> m_projectileExplosions;	
+	ViewController<SerialAnimationView> m_unitDeaths;
 	int32_t lastTime;	
 	
 	GPU_Image* m_layer1Image;

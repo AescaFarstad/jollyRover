@@ -4,10 +4,10 @@
 #include <EventLogger.h>
 #include <Particle.h>
 
-class ProjectileExplosionView
+class SerialAnimationView
 {
 public:
-	ProjectileExplosionView() = default;
+	SerialAnimationView() = default;
 	
 	uint32_t lastUpdate;
 	
@@ -25,5 +25,5 @@ private:
 	
 };
 
-extern template void ProjectileExplosionView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes);
-extern template void ProjectileExplosionView::render<UnitDeathEvent>(Renderer* renderer, UnitDeathEvent& event, GameState* state, Prototypes* prototypes);
+extern template void SerialAnimationView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes);
+extern template void SerialAnimationView::render<UnitDeathEvent>(Renderer* renderer, UnitDeathEvent& event, GameState* state, Prototypes* prototypes);

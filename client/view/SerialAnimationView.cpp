@@ -1,8 +1,8 @@
-#include <ProjectileExplosionView.h>
+#include <SerialAnimationView.h>
 #include <FMath.h>
 
 template<typename T>
-void ProjectileExplosionView::render(Renderer* renderer, T& event, GameState* state, Prototypes* prototypes)
+void SerialAnimationView::render(Renderer* renderer, T& event, GameState* state, Prototypes* prototypes)
 {	
 	int32_t seed = FMath::q_sdbm(event.id * event.stamp);
 	if (m_seed != seed)
@@ -16,7 +16,7 @@ void ProjectileExplosionView::render(Renderer* renderer, T& event, GameState* st
 	}	
 }
 
-void ProjectileExplosionView::init(int32_t seed, UnitDeathEvent& event, GameState* state)
+void SerialAnimationView::init(int32_t seed, UnitDeathEvent& event, GameState* state)
 {	
 	m_startTime = event.stamp;
 	m_seed = seed;
@@ -112,7 +112,7 @@ void ProjectileExplosionView::init(int32_t seed, UnitDeathEvent& event, GameStat
 }
 
 
-void ProjectileExplosionView::init(int32_t seed, ProjectileExplosionEvent& event, GameState* state)
+void SerialAnimationView::init(int32_t seed, ProjectileExplosionEvent& event, GameState* state)
 {
 	m_startTime = event.stamp;
 	m_endTime = 0;
@@ -179,6 +179,6 @@ void ProjectileExplosionView::init(int32_t seed, ProjectileExplosionEvent& event
 }
 
 
-template void ProjectileExplosionView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes);
-template void ProjectileExplosionView::render<UnitDeathEvent>(Renderer* renderer, UnitDeathEvent& event, GameState* state, Prototypes* prototypes);
+template void SerialAnimationView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes);
+template void SerialAnimationView::render<UnitDeathEvent>(Renderer* renderer, UnitDeathEvent& event, GameState* state, Prototypes* prototypes);
 	
