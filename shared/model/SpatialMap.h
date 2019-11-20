@@ -445,7 +445,7 @@ std::vector<T*> SpatialMap<T>::getInCell(Point& origin)
 	
 }
 
-
+///Returns a pair: [cell center, cell content]. Does not return the put-of-bounds cell since it has no center.
 template <typename T>
 std::vector<std::pair<Point, std::vector<T*>*>> SpatialMap<T>::getCellsInRadius(Point& origin, int32_t radius, float in_out_ratio)
 {
@@ -456,10 +456,21 @@ std::vector<std::pair<Point, std::vector<T*>*>> SpatialMap<T>::getCellsInRadius(
 	
 	Point* offset = m_offsetByMap[&map];
 	
-	int32_t fromX = std::max(0.0f, (origin.x - radius - m_AA.x - offset->x) / m_cellSize);
-	int32_t fromY = std::max(0.0f, (origin.y - radius - m_AA.y - offset->y) / m_cellSize);
-	int32_t toX = std::min((float)map.size() - 1,    std::ceil((origin.x + radius - m_AA.x - offset->x) / m_cellSize));
-	int32_t toY = std::min((float)map[0].size() - 1, std::ceil((origin.y + radius - m_AA.y - offset->y) / m_cellSize));
+	int32_t fromX = (origin.x - radius - m_AA.x - offset->x) / m_cellSize;
+	int32_t fromY = (origin.y - radius - m_AA.y - offset->y) / m_cellSize;
+	int32_t toX = std::ceil((origin.x + radius - m_AA.x - offset->x) / m_cellSize);
+	int32_t toY = std::ceil((origin.y + radius - m_AA.y - offset->y) / m_cellSize);
+	
+	int32_t maxX = map.size() - 1;
+	int32_t maxY = map[0].size() - 1;
+	bool goesOffBounds = fromX < 0 || fromY < 0 || toX > maxX || toY > maxY;
+	if (goesOffBounds)
+	{
+		fromX = std::min(std::max(0, fromX), maxX);
+		fromY = std::min(std::max(0, fromY), maxY);
+		toX = std::min(std::max(0, toX), maxX);
+		toY = std::min(std::max(0, toY), maxY);
+	}
 	
 	std::vector<std::pair<Point, std::vector<T*>*>> result;
 	result.reserve((toX - fromX) * (toY - fromY));
