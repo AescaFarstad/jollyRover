@@ -14,6 +14,8 @@ public:
 	int16_t force;
 	int32_t splash;
 	int32_t speed;
+	int32_t weapon;
+	int32_t spawnedAt;
 	Point target;
 	Point location;
 	

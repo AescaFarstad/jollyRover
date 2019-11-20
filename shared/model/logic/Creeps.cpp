@@ -918,6 +918,8 @@ namespace Creeps
 			projectile.target = to;
 			projectile.location = from;
 			projectile.force = force;
+			projectile.weapon = prototype->id;
+			projectile.spawnedAt = state->time.time;
 			
 			projectile.target.x += state->random.get(-1.0f, 1.0f) * distance * 0.1;
 			projectile.target.y += state->random.get(-1.0f, 1.0f) * distance * 0.1;

@@ -272,8 +272,11 @@ void GameView::drawCreeps()
 			else
 				barrelAngle = bodyAngle;
 			
-			m_renderer->blit(S::textures.tanks_2.tankBody_sand, creep.unit.location, bodyAngle, 1);
-			m_renderer->blit(S::textures.tanks_2.tankSand_barrel1, creep.unit.location, barrelAngle, 1);
+			TextureDef& tankTexture = creep.unit.force == 1? S::textures.tanks_2.tankBody_sand : S::textures.tanks_2.tankBody_blue;
+			TextureDef& gunTexture = creep.unit.force == 1? S::textures.tanks_2.tankSand_barrel1 : S::textures.tanks_2.tankBlue_barrel1;
+			
+			m_renderer->blit(tankTexture, creep.unit.location, bodyAngle, 1);
+			m_renderer->blit(gunTexture, creep.unit.location, barrelAngle, 1);
 			/*
 			auto scaledMovement = creep.unit.voluntaryMovement;
 			if (scaledMovement.getLength() > 0)
@@ -302,14 +305,26 @@ void GameView::drawProjectiles()
 	
 	for (Projectile &projectile : m_state->projectiles)
 	{
-		GPU_Rectangle(
-			m_screen,
-			projectile.location.x - rectSize/2,
-			projectile.location.y - rectSize/2,
-			projectile.location.x + rectSize/2,
-			projectile.location.y + rectSize/2,
-			color
+		
+		if (projectile.weapon == 0)
+		{
+			if (m_state->time.time - projectile.spawnedAt < 20 / projectile.speed * 1000)
+				continue; //Shell is inside the barrel
+			TextureDef& texture = projectile.force == 1? S::textures.tanks_2.bulletSand1_outline : S::textures.tanks_2.bulletBlue1_outline;
+			m_renderer->blit(texture, projectile.location, (projectile.target - projectile.location).asAngle(), 0.7);
+		}
+		else
+		{
+			GPU_Rectangle(
+				m_screen,
+				projectile.location.x - rectSize/2,
+				projectile.location.y - rectSize/2,
+				projectile.location.x + rectSize/2,
+				projectile.location.y + rectSize/2,
+				color
 		);	
+			
+		}
 	}
 }
 
