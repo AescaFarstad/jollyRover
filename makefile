@@ -78,7 +78,7 @@ web: $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT)
 	rsync -r assets/ out/assets/
 	rsync -r web/ out/
 	$(WEB_COMPILER) \
-		-O2 -g1 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 \
+		-O2 -g1 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
 		-s WASM=0 -s TOTAL_MEMORY=134217728 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
 		--use-preload-plugins -v -o $(WEB_TARGET).js lib/SDL_gpu.bc $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT) \
 		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets \
@@ -100,7 +100,7 @@ $(SDL_FontCache_LOCAL_OBJECT):
 	
 $(SDL_FontCache_WEB_OBJECT):
 	@mkdir -p $(dir $@)
-	$(EMSCRIPTEN)/emcc -g -c $(SDL_FontCachePATH).c -o $(SDL_FontCache_LOCAL_OBJECT) -DFC_USE_SDL_GPU -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu $(LOCAL_LIBS)
+	$(EMSCRIPTEN)/emcc -g -c $(SDL_FontCachePATH).c -o $(SDL_FontCache_WEB_OBJECT) -DFC_USE_SDL_GPU -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu $(LOCAL_LIBS)
 
 deploy:
 	rsync -Pav $(SERVER_TARGET) $(CONFIG) $(PROTOTYPES) '$(SSH_CONFIG):$(REMOTE_DEPLOY_PATH)/$(OUT)'
