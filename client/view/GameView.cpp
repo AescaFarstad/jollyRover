@@ -50,7 +50,45 @@ void GameView::init(Renderer* renderer, Prototypes* prototypes)
 	m_prototypes = prototypes;
 	m_renderer = renderer;
 	
+	resolveTextures(prototypes);
 }
+
+void GameView::resolveTextures(Prototypes* prototypes)
+{
+	for(auto& car: prototypes->cars)
+	{
+		car.opponentCarGunTexture = S::textures.getTextureByName(car.opponentCarGunTextureName);
+		car.opponentCarHullTexture = S::textures.getTextureByName(car.opponentCarHullTextureName);
+		car.playerCarGunTexture = S::textures.getTextureByName(car.playerCarGunTextureName);
+		car.playerCarHullTexture = S::textures.getTextureByName(car.playerCarHullTextureName);
+		
+		assert(car.opponentCarGunTexture != nullptr || car.opponentCarGunTextureName == "");
+		assert(car.opponentCarHullTexture != nullptr || car.opponentCarHullTextureName == "");
+		assert(car.playerCarGunTexture != nullptr || car.playerCarGunTextureName == "");
+		assert(car.playerCarHullTexture != nullptr || car.playerCarHullTextureName == "");
+	}
+	
+	for(auto& creep: prototypes->creeps)
+	{
+		for(size_t i = 0; i < creep.gunTextureName.size(); i++)
+		{
+			creep.hullTexture.push_back(S::textures.getTextureByName(creep.hullTextureName[i]));
+			creep.gunTexture.push_back(S::textures.getTextureByName(creep.gunTextureName[i]));
+			
+			assert(creep.hullTexture[i] != nullptr || creep.hullTextureName[i] == "");
+			assert(creep.gunTexture[i] != nullptr || creep.gunTextureName[i] == "");
+		}			
+	}
+	for(auto& weapon: prototypes->weapons)
+	{
+		for(size_t i = 0; i < weapon.projectileTextureName.size(); i++)
+		{
+			weapon.projectileTexture.push_back(S::textures.getTextureByName(weapon.projectileTextureName[i]));
+			assert(weapon.projectileTexture[i] != nullptr || weapon.projectileTextureName[i] == "");	
+		}
+	}
+}
+
 void GameView::render(GameState* state, RouteInput* routeInput)
 {
 	m_state = state;
@@ -63,7 +101,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 		m_unitDeaths.clear();
 	}
 	
-	SDL_Color white = colorFromHex(0xffffff);
+	SDL_Color white = ViewUtil::colorFromHex(0xffffff);
 	GPU_RectangleFilled(m_screen, 0, 0, m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight, white);
 	
 	GPU_Rect layerRect{0, 0, (float)m_layer1Image->w, (float)m_layer1Image->h};
@@ -112,7 +150,7 @@ void GameView::drawPlayers()
 
 void GameView::drawObstacles()
 {
-	SDL_Color obstacleColor = colorFromHex(0x004477);
+	SDL_Color obstacleColor = ViewUtil::colorFromHex(0x004477);
 
 	for (auto &obstacle : m_prototypes->obstacles)
 	{
@@ -139,8 +177,8 @@ void GameView::drawObstacles()
 
 void GameView::drawInput()
 {
-	SDL_Color validColor = colorFromHex(0x00ff00);
-	SDL_Color invalidColor = colorFromHex(0xff0000);
+	SDL_Color validColor = ViewUtil::colorFromHex(0x00ff00);
+	SDL_Color invalidColor = ViewUtil::colorFromHex(0xff0000);
 	int rectSize = 6;
 
 	for (size_t i = 1; i < m_routeInput->route.size(); i++)
@@ -172,7 +210,7 @@ void GameView::drawInput()
 
 void GameView::drawCars()
 {
-	SDL_Color color = colorFromHex(0x0000ff);
+	SDL_Color color = ViewUtil::colorFromHex(0x0000ff);
 	int rectSize = 4;
 	int carSize = 8;
 
@@ -199,19 +237,19 @@ void GameView::drawCars()
 					color
 				);
 			}
-			
+			auto& proto = m_prototypes->cars[car.object.prototypeId];			
 			auto& carTexture = player.login == m_login ? 
-				S::textures.tanks_2.tankBody_green_outline : 
-				S::textures.tanks_2.tankBody_red_outline;
+				proto.playerCarHullTexture : 
+				proto.opponentCarHullTexture;
 			auto& carGunTexture = player.login == m_login ? 
-				S::textures.tanks_2.tankGreen_barrel2_outline : 
-				S::textures.tanks_2.tankRed_barrel2_outline;
+				proto.playerCarGunTexture : 
+				proto.opponentCarGunTexture;
 
-			m_renderer->blit(carTexture, car.unit.location, car.unit.voluntaryMovement.asAngle(), 0.8);
+			m_renderer->blit(*carTexture, car.unit.location, car.unit.voluntaryMovement.asAngle(), 0.8);
 			auto gunLocation = car.unit.voluntaryMovement;
 			gunLocation.scaleTo(9);
 			gunLocation += car.unit.location;
-			m_renderer->blit(carGunTexture, gunLocation, car.unit.voluntaryMovement.asAngle(), 0.8);
+			m_renderer->blit(*carGunTexture, gunLocation, car.unit.voluntaryMovement.asAngle(), 0.8);
 			GPU_RectangleFilled(
 					m_screen,
 					car.unit.location.x - carSize / 2,
@@ -230,8 +268,8 @@ void GameView::drawCreeps()
 {
 	for(auto& creep : m_state->creeps)
 	{
-		//SDL_Color color = colorFromHex(0xff0000, 0x99);
-		//SDL_Color color2 = colorFromHex(0x0000ff);
+		//SDL_Color color = ViewUtil::colorFromHex(0xff0000, 0x99);
+		//SDL_Color color2 = ViewUtil::colorFromHex(0x0000ff);
 		if (creep.object.prototypeId == 1)
 		{/*
 			if (creep.unit.force == 0)
@@ -251,9 +289,7 @@ void GameView::drawCreeps()
 					bodyAngle = lastAngle - M_PI / (48.f + ((creep.object.id * 7) % 24));
 			}
 			last[creep.object.id] = bodyAngle;
-			
-			TextureDef& texture = creep.unit.force == 0? S::textures.td.soldier2 : S::textures.td.soldier1;
-			m_renderer->blit(texture, creep.unit.location, bodyAngle + M_PI_2, 0.5);
+			m_renderer->blit(*creep.creepProto_->hullTexture[creep.unit.force], creep.unit.location, bodyAngle + M_PI_2, 0.5);
 			
 			//VisualDebug::drawArrow(creep.unit.location, creep.unit.location + Point::fromAngle(bodyAngle, 30), 0x0000ff);
 			//VisualDebug::drawArrow(creep.unit.location, creep.unit.location + Point::fromAngle(creep.unit.voluntaryMovement.asAngle(), 30), 0xff0000);
@@ -271,12 +307,9 @@ void GameView::drawCreeps()
 				barrelAngle = (creep.targetLoc_ - creep.unit.location).asAngle();
 			else
 				barrelAngle = bodyAngle;
-			
-			TextureDef& tankTexture = creep.unit.force == 1? S::textures.tanks_2.tankBody_sand : S::textures.tanks_2.tankBody_blue;
-			TextureDef& gunTexture = creep.unit.force == 1? S::textures.tanks_2.tankSand_barrel1 : S::textures.tanks_2.tankBlue_barrel1;
-			
-			m_renderer->blit(tankTexture, creep.unit.location, bodyAngle, 1);
-			m_renderer->blit(gunTexture, creep.unit.location, barrelAngle, 1);
+						
+			m_renderer->blit(*creep.creepProto_->hullTexture[creep.unit.force], creep.unit.location, bodyAngle, 1);
+			m_renderer->blit(*creep.creepProto_->gunTexture[creep.unit.force], creep.unit.location, barrelAngle, 1);
 			/*
 			auto scaledMovement = creep.unit.voluntaryMovement;
 			if (scaledMovement.getLength() > 0)
@@ -288,10 +321,6 @@ void GameView::drawCreeps()
 			}
 			if (creep.targetLoc_.getLength() > 0)
 				GPU_Line(m_renderer->getScreen(), creep.unit.location.x, creep.unit.location.y, creep.targetLoc_.x, creep.targetLoc_.y, color2);*/
-		}		
-		else if (creep.object.prototypeId == 2)
-		{
-			m_renderer->blit(S::textures.tanks_2.tankBody_huge, creep.unit.location, creep.orientation, 1);
 		}
 		//GPU_CircleFilled(m_screen, creep.unit.location.x, creep.unit.location.y, creep.creepProto_->size, color);
 	}
@@ -300,7 +329,7 @@ void GameView::drawCreeps()
 
 void GameView::drawProjectiles()
 {
-	SDL_Color color = colorFromHex(0xff00ff);
+	SDL_Color color = ViewUtil::colorFromHex(0xff00ff);
 	int rectSize = 2;
 	
 	for (Projectile &projectile : m_state->projectiles)
@@ -310,8 +339,8 @@ void GameView::drawProjectiles()
 		{
 			if (m_state->time.time - projectile.spawnedAt < 20 / projectile.speed * 1000)
 				continue; //Shell is inside the barrel
-			TextureDef& texture = projectile.force == 1? S::textures.tanks_2.bulletSand1_outline : S::textures.tanks_2.bulletBlue1_outline;
-			m_renderer->blit(texture, projectile.location, (projectile.target - projectile.location).asAngle(), 0.7);
+			TextureDef* texture = m_prototypes->weapons[projectile.weapon].projectileTexture[projectile.force];
+			m_renderer->blit(*texture, projectile.location, (projectile.target - projectile.location).asAngle(), 0.7);
 		}
 		else
 		{
@@ -330,7 +359,7 @@ void GameView::drawProjectiles()
 
 void GameView::drawFormationConnections()
 {
-	SDL_Color color = colorFromHex(0xff00ff);
+	SDL_Color color = ViewUtil::colorFromHex(0xff00ff);
 	
 	for (auto& form : m_state->formations)
 	{
@@ -354,7 +383,7 @@ void GameView::drawFormationConnections()
 
 void GameView::drawFormations()
 {
-	SDL_Color color = colorFromHex(0xdddd00);
+	SDL_Color color = ViewUtil::colorFromHex(0xdddd00);
 	
 	for (auto& form : m_state->formations)
 	{
@@ -538,13 +567,13 @@ void GameView::drawDebugGraphics()
 {
 	for(auto& line : S::visualDebug.lines)
 	{
-		SDL_Color color = colorFromHex(line.color, 0xff);
+		SDL_Color color = ViewUtil::colorFromHex(line.color, 0xff);
 		GPU_Line(m_screen, line.from.x, line.from.y, line.to.x, line.to.y, color);
 	}
 	
 	for(auto& arrow : S::visualDebug.arrows)
 	{
-		SDL_Color color = colorFromHex(arrow.color, 0xff);
+		SDL_Color color = ViewUtil::colorFromHex(arrow.color, 0xff);
 		GPU_Line(m_screen, arrow.from.x, arrow.from.y, arrow.to.x, arrow.to.y, color);
 		
 		Point vec = arrow.to - arrow.from;
@@ -569,7 +598,7 @@ void GameView::drawDebugGraphics()
 	
 	for(auto& rect : S::visualDebug.rects)
 	{
-		SDL_Color color = colorFromHex(rect.color, rect.alpha);
+		SDL_Color color = ViewUtil::colorFromHex(rect.color, rect.alpha);
 		if (rect.fill)
 			GPU_RectangleFilled2(m_screen, rect.rect, color);
 		else
@@ -578,7 +607,7 @@ void GameView::drawDebugGraphics()
 	
 	for(auto& circle : S::visualDebug.circles)
 	{
-		SDL_Color color = colorFromHex(circle.color, circle.alpha);
+		SDL_Color color = ViewUtil::colorFromHex(circle.color, circle.alpha);
 		if (circle.fill)
 			GPU_CircleFilled(m_screen, circle.origin.x, circle.origin.y, circle.radius, color);
 		else
@@ -594,7 +623,7 @@ void GameView::drawThreatMap()
 	const Point AA = m_state->threatMap_[0].getAA();
 	int32_t cellSize = m_state->threatMap_[0].getCellSize();
 	
-	SDL_Color colors[2] = {colorFromHex(0xff0000), colorFromHex(0x0000ff)};
+	SDL_Color colors[2] = {ViewUtil::colorFromHex(0xff0000), ViewUtil::colorFromHex(0x0000ff)};
 	
 	for(size_t c = 0; c < 2; c++)
 	{

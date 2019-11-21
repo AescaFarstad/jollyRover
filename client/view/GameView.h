@@ -63,7 +63,9 @@ private:
 	void drawDebugGraphics();
 	void drawThreatMap();
 	void drawHUD();
+	
 	GPU_Image* loadImage(std::string path);
+	void resolveTextures(Prototypes* prototypes);
 	
 	
 };

@@ -14,7 +14,7 @@ void from_json(const json &j, CreepProto &creep)
 	creep.maxWhiskerLength = j.at("maxWhiskerLength");
 	
 	if (creep.whiskers > CreepState::MAX_WHISKER_COUNT - 1)
-		THROW_FATAL_ERROR("Too manu whiskers!");
+		THROW_FATAL_ERROR("Too many whiskers!");
 	
 	creep.loot = j.at("loot");
 	creep.strength = j.at("strength");
@@ -41,6 +41,9 @@ void from_json(const json &j, CreepProto &creep)
 	{
 		creep.normalFriction = 0;
 	}
+	
+	creep.hullTextureName = j.at("hullTexture").get<std::vector<std::string>>();
+	creep.gunTextureName = j.at("gunTexture").get<std::vector<std::string>>();
 }
 
 void from_json(const json &j, WeaponProto &weapon)
@@ -51,4 +54,5 @@ void from_json(const json &j, WeaponProto &weapon)
 	weapon.splash = j.at("splash");
 	weapon.range = j.at("range");
 	weapon.bulletSpeed = j.at("bulletSpeed");
+	weapon.projectileTextureName = j.at("projectileTexture").get<std::vector<std::string>>();
 }

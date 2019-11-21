@@ -9,6 +9,7 @@ enum class MOVE_TYPE : uint8_t
 	TRACTOR
 };
 
+class TextureDef;
 class WeaponProto
 {
 public:
@@ -21,6 +22,8 @@ public:
 	int32_t splash;
 	int32_t range;
 	int32_t bulletSpeed;
+	std::vector<std::string> projectileTextureName;
+	std::vector<TextureDef*> projectileTexture;
 
 private:
 
@@ -49,6 +52,11 @@ public:
 	float breaksStrength;
 	float omniDirectionalSpeed;
 	float normalFriction;
+	std::vector<std::string> hullTextureName;
+	std::vector<std::string> gunTextureName;
+	
+	std::vector<TextureDef*> hullTexture;
+	std::vector<TextureDef*> gunTexture;
 
 private:
 

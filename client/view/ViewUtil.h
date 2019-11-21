@@ -20,13 +20,16 @@ public:
 namespace S
 {	
 	extern TextureNames textures;
-	extern SequenceNames sequences;
+	extern SequenceNames sequences;	
 }
 
-extern const SDL_Color FAIL_COLOR;
+namespace ViewUtil
+{
+	extern const SDL_Color FAIL_COLOR;
 
-///0xrrggbb 0xaa
-SDL_Color colorFromHex(uint32_t color, uint8_t alpha = 0xff);
+	///0xrrggbb 0xaa
+	SDL_Color colorFromHex(uint32_t color, uint8_t alpha = 0xff);
+}
 
 bool operator==(SDL_Color& x, SDL_Color& y);
 

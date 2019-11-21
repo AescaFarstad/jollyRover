@@ -10,7 +10,7 @@ void TextureView::init(Renderer* renderer, Prototypes* prototypes)
 
 void TextureView::render(std::vector<TextureDisplay>& displays)
 {
-	SDL_Color white = colorFromHex(0xffffff);
+	SDL_Color white = ViewUtil::colorFromHex(0xffffff);
 	GPU_RectangleFilled(m_screen, 0, 0, m_prototypes->variables.fieldWidth, m_prototypes->variables.fieldHeight, white);
 	
 	for(auto& display : displays)
@@ -24,7 +24,7 @@ void TextureView::render(std::vector<TextureDisplay>& displays)
 			m_mouseLocation.y < display.location.y + display.texture->rect.h / 2
 		)
 		{
-			SDL_Color color = colorFromHex(0x0000ff, 0x77);
+			SDL_Color color = ViewUtil::colorFromHex(0x0000ff, 0x77);
 			GPU_Rectangle(
 					m_screen,
 					display.location.x - display.texture->rect.w / 2,

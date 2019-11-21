@@ -34,7 +34,7 @@ void SerialAnimationView::init(int32_t seed, UnitDeathEvent& event, GameState* s
 		p.from.location.y += random.get(-10.f, 10.f);
 		p.from.rotation = random.get(0.f, 2*M_PI);
 		p.from.scale = 1;
-		p.from.tint = colorFromHex(0xffffff, 0xff);
+		p.from.tint = ViewUtil::colorFromHex(0xffffff, 0xff);
 		p.to = p.from;
 		particles.push_back(p);
 		
@@ -71,7 +71,7 @@ void SerialAnimationView::init(int32_t seed, UnitDeathEvent& event, GameState* s
 				p.from.location = event.location + c2c;
 				
 				p.from.scale = 1;
-				p.from.tint = colorFromHex(0xdddddd, 0xff);
+				p.from.tint = ViewUtil::colorFromHex(0xdddddd, 0xff);
 				
 				if (event.impact.getLength() > 0)
 				{
@@ -84,7 +84,7 @@ void SerialAnimationView::init(int32_t seed, UnitDeathEvent& event, GameState* s
 				
 				p.to = p.from;
 				p.to.location = event.location + c2c;
-				p.to.tint = colorFromHex(0x666666, 0x11);
+				p.to.tint = ViewUtil::colorFromHex(0x666666, 0x11);
 				if (random.get() > 0.7)
 					p.to.rotation += random.get((float)-M_PI * 10, (float)M_PI * 10); 
 				
@@ -103,7 +103,7 @@ void SerialAnimationView::init(int32_t seed, UnitDeathEvent& event, GameState* s
 		p.from.location = event.location;
 		p.from.rotation = random.get(0.f, 2*M_PI);
 		p.from.scale = 0.1;
-		p.from.tint = colorFromHex(0xffffff, 0xff);		
+		p.from.tint = ViewUtil::colorFromHex(0xffffff, 0xff);		
 		p.to = p.from;
 		p.to.tint.a = 0x10;
 		p.to.scale = 0.2;

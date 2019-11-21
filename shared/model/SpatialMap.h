@@ -431,7 +431,7 @@ std::vector<T*> SpatialMap<T>::getInCell(Point& origin)
 	if (!m_isValid)
 		THROW_FATAL_ERROR("Spatial map is not valid.");
 		
-	if (origin.x < m_AA.x || origin.y < m_AA.y || origin.x > m_BB.x || origin.y > m_BB.y)
+	if (origin.x < m_AA.x || origin.y < m_AA.y || origin.x >= m_BB.x || origin.y >= m_BB.y)
 		return m_rest;
 		
 	auto& map = m_map[0][0];
