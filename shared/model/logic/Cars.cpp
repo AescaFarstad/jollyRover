@@ -29,12 +29,10 @@ namespace Cars
 				{
 					if (car.unit.health <= 0)
 					{
-						state->eventLogger.addUnitDeath(
+						state->eventLogger.addCarDeath(
 							state->time.time, 
-							car.object.id, 
-							car.object.prototypeId, 
-							car.unit.location, 	
-							car.unit.voluntaryMovement.asAngle(), 
+							car, 
+							player.login,
 							Point()
 						);
 					}

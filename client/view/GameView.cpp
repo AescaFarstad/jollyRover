@@ -98,7 +98,8 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	{
 		m_loadCount = state->loadCount;
 		m_projectileExplosions.clear();
-		m_unitDeaths.clear();
+		m_creepDeaths.clear();
+		m_carDeaths.clear();
 	}
 	
 	SDL_Color white = ViewUtil::colorFromHex(0xffffff);
@@ -521,7 +522,8 @@ void GameView::drawProjectileExplosion()
 			m_state->eventLogger.projectileExplosions.begin(), 
 			m_state->eventLogger.projectileExplosions.end(),
 			m_state, 
-			m_prototypes
+			m_prototypes,
+			m_login
 		);
 	/*
 	size_t projectilesTotal = std::min(m_state->eventLogger.projectileExplosions.size, m_state->eventLogger.projectileExplosions.total);
@@ -544,12 +546,21 @@ void GameView::drawUnitExplosion()
 {
 	if (!m_state->isEventLoggerEnabled)
 		return;
-	m_unitDeaths.render(
+	m_creepDeaths.render(
 			m_renderer, 
-			m_state->eventLogger.unitDeaths.begin(), 
-			m_state->eventLogger.unitDeaths.end(),
+			m_state->eventLogger.creepDeaths.begin(), 
+			m_state->eventLogger.creepDeaths.end(),
 			m_state, 
-			m_prototypes
+			m_prototypes,
+			m_login
+		);	
+	m_carDeaths.render(
+			m_renderer, 
+			m_state->eventLogger.carDeaths.begin(), 
+			m_state->eventLogger.carDeaths.end(),
+			m_state, 
+			m_prototypes,
+			m_login
 		);	
 		/*
 	size_t unitsTotal = std::min(m_state->eventLogger.unitDeaths.size, m_state->eventLogger.unitDeaths.total);

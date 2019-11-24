@@ -2,11 +2,11 @@
 #include <FMath.h>
 
 template<typename T>
-void SerialAnimationView::render(Renderer* renderer, T& event, GameState* state, Prototypes* prototypes)
+void SerialAnimationView::render(Renderer* renderer, T& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer)
 {	
 	int32_t seed = FMath::q_sdbm(event.id * event.stamp);
 	if (m_seed != seed)
-		init(seed, event, state);
+		init(seed, event, state, prototypes, thisPlayer);
 		
 	if (state->time.time > m_endTime)
 		return;
@@ -16,44 +16,36 @@ void SerialAnimationView::render(Renderer* renderer, T& event, GameState* state,
 	}	
 }
 
-void SerialAnimationView::init(int32_t seed, UnitDeathEvent& event, GameState* state)
-{	
-	m_startTime = event.stamp;
-	m_seed = seed;
-	SeededRandom random(seed);
+void SerialAnimationView::initFragAnimation(UnitDeathEvent& event, SeededRandom& random, GPU_Rect& origin, int32_t startTime)
+{
+	Particle p;
+	p.sequence = &S::sequences.explosion;
+	p.delay = 0;
+	p.duration = 300;
+	m_endTime = startTime + p.duration;
+	p.from.location = event.location;
+	p.from.location.x += random.get(-10.f, 10.f);
+	p.from.location.y += random.get(-10.f, 10.f);
+	p.from.rotation = random.get(0.f, 2*M_PI);
+	p.from.scale = 1;
+	p.from.tint = ViewUtil::colorFromHex(0xffffff, 0xff);
+	p.to = p.from;
+	particles.push_back(p);
 	
-	if (event.prototypeId == 0)
-	{
-		Particle p;
-		p.sequence = &S::sequences.explosion;
-		p.delay = 0;
-		p.duration = 300;
-		m_endTime = m_startTime + p.duration;
-		p.from.location = event.location;
-		p.from.location.x += random.get(-10.f, 10.f);
-		p.from.location.y += random.get(-10.f, 10.f);
-		p.from.rotation = random.get(0.f, 2*M_PI);
-		p.from.scale = 1;
-		p.from.tint = ViewUtil::colorFromHex(0xffffff, 0xff);
-		p.to = p.from;
-		particles.push_back(p);
+	int32_t wShreds = random.get(5, 8);
+	int32_t hShreds = random.get(5, 8);
+	
+	p.sequence = nullptr;
+	shreds.reserve(wShreds * hShreds);
+	
+	int32_t baseDuration = random.get(400, 900);
 		
-		int32_t wShreds = random.get(5, 8);
-		int32_t hShreds = random.get(5, 8);
-		
-		p.sequence = nullptr;
-		shreds.reserve(wShreds * hShreds);
-		
-		int32_t baseDuration = random.get(400, 900);
-		
-		
-		for(int32_t i = 0; i < wShreds; i++)
+	for(int32_t i = 0; i < wShreds; i++)
 		{
 			for(int32_t j = 0; j < hShreds; j++)
 			{
 				shreds.emplace_back();
 				TextureDef& td = shreds.back();
-				GPU_Rect& origin = S::textures.tanks_2.tankBody_sand.rect;
 				
 				td.rect.x = origin.x + origin.w * i / wShreds;
 				td.rect.y = origin.y + origin.h * j / hShreds;
@@ -88,10 +80,22 @@ void SerialAnimationView::init(int32_t seed, UnitDeathEvent& event, GameState* s
 				if (random.get() > 0.7)
 					p.to.rotation += random.get((float)-M_PI * 10, (float)M_PI * 10); 
 				
-				m_endTime = std::max(m_endTime, m_startTime + p.delay + p.duration);
+				m_endTime = std::max(m_endTime, startTime + p.delay + p.duration);
 				particles.push_back(p);
 			}
 		}
+}
+
+void SerialAnimationView::init(int32_t seed, CreepDeathEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer)
+{	
+	m_startTime = event.stamp;
+	m_seed = seed;
+	SeededRandom random(seed);
+	
+	if (event.unitDeath.prototypeId == 0)
+	{		
+		GPU_Rect& origin = prototypes->creeps[event.unitDeath.prototypeId].hullTexture[event.force]->rect;
+		initFragAnimation(event.unitDeath, random, origin, m_startTime);
 	}
 	else
 	{
@@ -100,7 +104,7 @@ void SerialAnimationView::init(int32_t seed, UnitDeathEvent& event, GameState* s
 		p.delay = 0;
 		p.duration = random.get(4500, 14500);
 		m_endTime = m_startTime + p.duration;
-		p.from.location = event.location;
+		p.from.location = event.unitDeath.location;
 		p.from.rotation = random.get(0.f, 2*M_PI);
 		p.from.scale = 0.1;
 		p.from.tint = ViewUtil::colorFromHex(0xffffff, 0xff);		
@@ -111,8 +115,22 @@ void SerialAnimationView::init(int32_t seed, UnitDeathEvent& event, GameState* s
 	}
 }
 
+void SerialAnimationView::init(int32_t seed, CarDeathEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer)
+{	
+	m_startTime = event.stamp;
+	m_seed = seed;
+	SeededRandom random(seed);
+	
+	GPU_Rect& origin = event.player == thisPlayer ?
+			prototypes->cars[event.unitDeath.prototypeId].playerCarHullTexture->rect :
+			prototypes->cars[event.unitDeath.prototypeId].opponentCarHullTexture->rect;
+			
+	initFragAnimation(event.unitDeath, random, origin, m_startTime);
+}
 
-void SerialAnimationView::init(int32_t seed, ProjectileExplosionEvent& event, GameState* state)
+
+
+void SerialAnimationView::init(int32_t seed, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer)
 {
 	m_startTime = event.stamp;
 	m_endTime = 0;
@@ -179,6 +197,7 @@ void SerialAnimationView::init(int32_t seed, ProjectileExplosionEvent& event, Ga
 }
 
 
-template void SerialAnimationView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes);
-template void SerialAnimationView::render<UnitDeathEvent>(Renderer* renderer, UnitDeathEvent& event, GameState* state, Prototypes* prototypes);
+template void SerialAnimationView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer);
+template void SerialAnimationView::render<CreepDeathEvent>(Renderer* renderer, CreepDeathEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer);
+template void SerialAnimationView::render<CarDeathEvent>(Renderer* renderer, CarDeathEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer);
 	

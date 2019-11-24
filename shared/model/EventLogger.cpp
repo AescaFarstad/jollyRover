@@ -33,21 +33,8 @@ void ProjectileExplosionEvent::serialize(SerializationStream& stream) const
 	Serializer::write(location, stream);
 }
 
-UnitDeathEvent::UnitDeathEvent(int32_t id, int32_t stamp, int32_t unitId, int16_t prototypeId, Point location, float rotation, Point impact)
-{
-	this->stamp = stamp;
-	this->id = id;
-	this->unitId = unitId;
-	this->prototypeId = prototypeId;
-	this->location = location;
-	this->rotation = rotation;
-	this->impact = impact;	
-}
-	
 void UnitDeathEvent::deserialize(SerializationStream& stream)
 {
-	Serializer::read(stamp, stream);
-	Serializer::read(id, stream);
 	Serializer::read(unitId, stream);
 	Serializer::read(prototypeId, stream);
 	Serializer::read(location, stream);
@@ -57,8 +44,6 @@ void UnitDeathEvent::deserialize(SerializationStream& stream)
 
 void UnitDeathEvent::serialize(SerializationStream& stream) const 
 {
-	Serializer::write(stamp, stream);
-	Serializer::write(id, stream);
 	Serializer::write(unitId, stream);
 	Serializer::write(prototypeId, stream);
 	Serializer::write(location, stream);
@@ -66,7 +51,68 @@ void UnitDeathEvent::serialize(SerializationStream& stream) const
 	Serializer::write(impact, stream);
 }
 
-int32_t UnitDeathEvent::getId()
+CreepDeathEvent::CreepDeathEvent(int32_t id, int32_t stamp, const CreepState& creep, Point impact)
+{
+	this->stamp = stamp;
+	this->id = id;
+	this->unitDeath.unitId = creep.object.id;
+	this->force = creep.unit.force;
+	this->unitDeath.prototypeId = creep.object.prototypeId;
+	this->unitDeath.location = creep.unit.location;
+	this->unitDeath.rotation = creep.unit.voluntaryMovement.asAngle();
+	this->unitDeath.impact = impact;	
+}
+	
+void CreepDeathEvent::deserialize(SerializationStream& stream)
+{
+	Serializer::read(stamp, stream);
+	Serializer::read(id, stream);
+	Serializer::read(force, stream);
+	Serializer::read(unitDeath, stream);
+}
+
+void CreepDeathEvent::serialize(SerializationStream& stream) const 
+{
+	Serializer::write(stamp, stream);
+	Serializer::write(id, stream);
+	Serializer::write(force, stream);
+	Serializer::write(unitDeath, stream);
+}
+
+int32_t CreepDeathEvent::getId()
+{
+	return id;
+}
+
+CarDeathEvent::CarDeathEvent(int32_t id, int32_t stamp, const CarState& car, int32_t player, Point impact)
+{
+	this->stamp = stamp;
+	this->id = id;
+	this->unitDeath.unitId = car.object.id;
+	this->player = player;
+	this->unitDeath.prototypeId = car.object.prototypeId;
+	this->unitDeath.location = car.unit.location;
+	this->unitDeath.rotation = car.unit.voluntaryMovement.asAngle();
+	this->unitDeath.impact = impact;	
+}
+	
+void CarDeathEvent::deserialize(SerializationStream& stream)
+{
+	Serializer::read(stamp, stream);
+	Serializer::read(id, stream);
+	Serializer::read(player, stream);
+	Serializer::read(unitDeath, stream);
+}
+
+void CarDeathEvent::serialize(SerializationStream& stream) const 
+{
+	Serializer::write(stamp, stream);
+	Serializer::write(id, stream);
+	Serializer::write(player, stream);
+	Serializer::write(unitDeath, stream);
+}
+
+int32_t CarDeathEvent::getId()
 {
 	return id;
 }

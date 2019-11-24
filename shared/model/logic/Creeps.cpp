@@ -996,7 +996,7 @@ namespace Creeps
 				}
 				if (state->isEventLoggerEnabled)
 				{	
-					state->eventLogger.addUnitDeath(state->time.time, creep.object.id, creep.object.prototypeId, creep.unit.location, 													creep.unit.voluntaryMovement.asAngle(), creep.impact_);
+					state->eventLogger.addCreepDeath(state->time.time, creep, creep.impact_);
 				}
 			};
 			

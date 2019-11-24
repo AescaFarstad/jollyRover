@@ -14,13 +14,13 @@ public:
 	
 	
 	template<typename T>
-	void render(Renderer* renderer, T begin, T end, GameState* state, Prototypes* prototypes)
+	void render(Renderer* renderer, T begin, T end, GameState* state, Prototypes* prototypes, int32_t thisPlayer)
 	{
 		size_t updateCount = 0;
 		while(begin != end)
 		{
 			auto& view = m_views[begin->getId()];
-			view.render(renderer, *begin, state, prototypes);
+			view.render(renderer, *begin, state, prototypes, thisPlayer);
 			view.lastUpdate = state->timeStamp;
 			++updateCount;
 			++begin;

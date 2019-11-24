@@ -39,7 +39,8 @@ private:
 	RouteInput* m_routeInput;
 	int32_t m_login;
 	ViewController<SerialAnimationView> m_projectileExplosions;	
-	ViewController<SerialAnimationView> m_unitDeaths;
+	ViewController<SerialAnimationView> m_creepDeaths;
+	ViewController<SerialAnimationView> m_carDeaths;
 	int32_t lastTime;	
 	
 	GPU_Image* m_layer1Image;
