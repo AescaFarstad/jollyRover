@@ -245,10 +245,32 @@ void GameView::drawCars()
 			auto& carGunTexture = player.login == m_login ? 
 				proto.playerCarGunTexture : 
 				proto.opponentCarGunTexture;
-
-			m_renderer->blit(*carTexture, car.unit.location, car.unit.voluntaryMovement.asAngle(), 0.8);
-			auto gunLocation = car.unit.voluntaryMovement;
-			gunLocation.scaleTo(9);
+				
+			size_t fromIndex;
+			size_t toIndex;
+			float ratio;
+			if (car.progress > 0.5)
+			{
+				fromIndex = car.routeIndex;
+				toIndex = car.routeIndex + 1;
+				if (toIndex == car.route.size())
+					toIndex = fromIndex;
+				ratio = car.progress - 0.5;
+			}
+			else
+			{
+				fromIndex = car.routeIndex - 1;
+				toIndex = car.routeIndex;
+				if (fromIndex < 0)
+					fromIndex = 0;
+				ratio = car.progress + 0.5;
+			}
+			auto vec1 = car.route[fromIndex + 1] - car.route[fromIndex];
+			auto vec2 = car.route[toIndex + 1] - car.route[toIndex];
+			float angle =  (vec1 * (1 - ratio) + vec2 * ratio).asAngle();
+			
+			m_renderer->blit(*carTexture, car.unit.location, angle, 0.8);
+			auto gunLocation = Point::fromAngle(angle, 9);
 			gunLocation += car.unit.location;
 			m_renderer->blit(*carGunTexture, gunLocation, car.unit.voluntaryMovement.asAngle(), 0.8);
 			GPU_RectangleFilled(
