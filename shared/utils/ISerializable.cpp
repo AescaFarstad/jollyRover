@@ -41,7 +41,7 @@ void Serializer::read(ISerializable* value, SerializationStream &stream)
 }
 
 
-void Serializer::write(MessageTypes& value, SerializationStream &stream)
+void Serializer::write(const MessageTypes& value, SerializationStream &stream)
 {
 	Serializer::write((std::underlying_type<MessageTypes>::type)value, stream);
 }
@@ -52,7 +52,7 @@ void Serializer::read(MessageTypes& value, SerializationStream &stream)
 	Serializer::read(tmp, stream);
 	value = (MessageTypes)tmp;
 }
-void Serializer::write(RequestTypes& value, SerializationStream &stream)
+void Serializer::write(const RequestTypes& value, SerializationStream &stream)
 {
 	Serializer::write((std::underlying_type<RequestTypes>::type)value, stream);
 }

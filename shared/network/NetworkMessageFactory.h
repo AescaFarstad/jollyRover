@@ -25,7 +25,7 @@ public:
 
 	std::unique_ptr<NetworkMessage> pointerByType(MessageTypes type);
 	
-
+/*
 	template <typename T, typename A>
 	T pointerByType2(MessageTypes type, A &source)
 	{
@@ -47,5 +47,5 @@ public:
 			return std::make_unique<LoadGameMessage>(source);
 		return nullptr;
 	}
-
+*/
 };

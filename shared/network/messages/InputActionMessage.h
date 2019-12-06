@@ -11,8 +11,8 @@ public:
 	std::vector<int8_t> downedButtons;
 	std::vector<int8_t> uppedButtons;
 
-	virtual void deserialize(SerializationStream& stream);
-	virtual void serialize(SerializationStream& stream);
-	virtual std::string getName();
+	void deserialize(SerializationStream& stream) override;
+	void serialize(SerializationStream& stream) const override;
+	std::string getName() override;
 };
 

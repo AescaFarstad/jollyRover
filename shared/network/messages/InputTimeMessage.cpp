@@ -26,7 +26,7 @@ void InputTimeMessage::deserialize(SerializationStream& stream)
 	Serializer::read(modifyForcedStepsAtOnce, stream);
 }
 
-void InputTimeMessage::serialize(SerializationStream& stream)
+void InputTimeMessage::serialize(SerializationStream& stream) const
 {
 	InputMessage::serialize(stream);
 	Serializer::write(allowSteps, stream);

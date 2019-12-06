@@ -52,6 +52,7 @@ void LoopBackNetwork::send(NetworkMessage* message)
 		case MessageTypes::TYPE_INPUT_LEFT_MSG:
 		case MessageTypes::TYPE_INPUT_ROUTE_MSG:
 		case MessageTypes::TYPE_INPUT_TIME_MSG:
+		case MessageTypes::TYPE_INPUT_IMPULSE_MSG:
 		case MessageTypes::TYPE_LOAD_GAME_MSG:
 		{
 			InputMessage* iMsg = dynamic_cast<InputMessage*>(message);

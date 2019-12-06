@@ -20,7 +20,7 @@ void GameUpdater::update(uint32_t time)
 	while (state->timeStamp < time - prototypes->variables.fixedStepDuration)
 	{		
 		std::vector<InputMessage*>* inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + prototypes->variables.fixedStepDuration);
-		logic.update(state.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
+		GameLogic::update(state.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
 		lastValidTimeStamp = state->timeStamp;
 		if (lastSavedSteps != state->time.performedSteps && state->time.performedSteps % S::config.saveStateInterval == 0)
 			saveState(state.get());
@@ -57,7 +57,7 @@ std::unique_ptr<GameState> GameUpdater::getNewStateByStamp(uint32_t stamp)
 	while (result->timeStamp < stamp - prototypes->variables.fixedStepDuration)
 	{
 		std::vector<InputMessage*>* inputs = getThisFrameInputs(result->timeStamp, result->timeStamp + prototypes->variables.fixedStepDuration);
-		logic.update(result.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
+		GameLogic::update(result.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
 		delete inputs;
 	}
 
@@ -80,7 +80,7 @@ std::unique_ptr<GameState> GameUpdater::getNewStateBySteps(int32_t steps)
 	while (result->time.performedSteps < steps && result->timeStamp < state->timeStamp)
 	{
 		std::vector<InputMessage*>* inputs = getThisFrameInputs(result->timeStamp, result->timeStamp + prototypes->variables.fixedStepDuration);
-		logic.update(result.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
+		GameLogic::update(result.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
 		delete inputs;
 	}
 

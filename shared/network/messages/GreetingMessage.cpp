@@ -22,7 +22,7 @@ void GreetingMessage::deserialize(SerializationStream& stream)
 	Serializer::readVector(password, stream);
 }
 
-void GreetingMessage::serialize(SerializationStream& stream)
+void GreetingMessage::serialize(SerializationStream& stream) const
 {
 	NetworkMessage::serialize(stream);
 	Serializer::write(login, stream);

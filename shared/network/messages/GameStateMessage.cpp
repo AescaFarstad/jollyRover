@@ -24,7 +24,7 @@ void GameStateMessage::deserialize(SerializationStream& stream)
 	ownsState = true;
 }
 
-void GameStateMessage::serialize(SerializationStream& stream)
+void GameStateMessage::serialize(SerializationStream& stream) const
 {
 	NetworkMessage::serialize(stream);
 	state->serialize(stream);

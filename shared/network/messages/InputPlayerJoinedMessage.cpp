@@ -19,7 +19,7 @@ void InputPlayerJoinedMessage::deserialize(SerializationStream& stream)
 	Serializer::read(login, stream);
 }
 
-void InputPlayerJoinedMessage::serialize(SerializationStream& stream)
+void InputPlayerJoinedMessage::serialize(SerializationStream& stream) const
 {
 	InputMessage::serialize(stream);
 	Serializer::write(login, stream);

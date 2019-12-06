@@ -18,7 +18,7 @@ void InputPlayerLeftMessage::deserialize(SerializationStream& stream)
 	Serializer::read(login, stream);
 }
 
-void InputPlayerLeftMessage::serialize(SerializationStream& stream)
+void InputPlayerLeftMessage::serialize(SerializationStream& stream) const
 {
 	InputMessage::serialize(stream);
 	Serializer::write(login, stream);

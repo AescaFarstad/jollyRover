@@ -19,6 +19,6 @@ public:
 	bool modifyForcedStepsAtOnce;
 
 	void deserialize(SerializationStream& stream) override;
-	void serialize(SerializationStream& stream) override;
+	void serialize(SerializationStream& stream) const override;
 	std::string getName() override;
 };

@@ -15,8 +15,8 @@ public:
 	uint32_t stamp;
 	int32_t inResponseTo;
 
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream);
+	virtual void deserialize(SerializationStream& stream);
+	virtual void serialize(SerializationStream& stream) const;
 	virtual std::string getName();
 
 	static int32_t getMessageId();

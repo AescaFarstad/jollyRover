@@ -10,8 +10,8 @@ public:
 
 	RequestTypes request;
 
-	virtual void deserialize(SerializationStream& stream);
-	virtual void serialize(SerializationStream& stream);
-	virtual std::string getName();
+	void deserialize(SerializationStream& stream) override;
+	void serialize(SerializationStream& stream) const override;
+	std::string getName() override;
 };
 

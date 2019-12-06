@@ -20,7 +20,7 @@ void InputActionMessage::deserialize(SerializationStream& stream)
 	Serializer::readVector(uppedButtons, stream);
 }
 
-void InputActionMessage::serialize(SerializationStream& stream)
+void InputActionMessage::serialize(SerializationStream& stream) const
 {
 	InputMessage::serialize(stream);
 	Serializer::write(angle, stream);

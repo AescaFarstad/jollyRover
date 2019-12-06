@@ -32,11 +32,12 @@ public:
 	
 	void setUnique(std::vector<T>& data);
 	void setNonUnique(std::vector<T>& data);
-	std::vector<T*> getInRadius(Point& origin, int32_t radius);
-	std::vector<T*> getInCell(Point& origin);
-	std::vector<std::pair<Point, std::vector<T*>*>> getCellsInRadius(Point& origin, int32_t radius, float in_out_ratio = 0.5);
+	std::vector<T*> getInRadius(const Point& origin, int32_t radius);
+	std::vector<T*> getInCell(const Point& origin);
+	std::vector<T*> getInCellsIntersectingRect(const Point& AA, const Point& BB);
+	std::vector<std::pair<Point, std::vector<T*>*>> getCellsInRadius(const Point& origin, int32_t radius, float in_out_ratio = 0.5);
 	template <typename F>
-	std::vector<T*> getNearest(Point& origin, F predicate);
+	std::vector<T*> getNearest(const Point& origin, F predicate);
 	int32_t getCellSize();
 	bool isValid();
 	
@@ -54,7 +55,7 @@ private:
 	bool m_useLayeredMap;
 	bool m_isValid;
 	
-	std::vector<std::vector<std::vector<T*>>>& findBestMap(Point& origin, int32_t radius);
+	std::vector<std::vector<std::vector<T*>>>& findBestMap(const Point& origin, int32_t radius);
 	void clearMap(std::vector<std::vector<std::vector<T*>>>& map, int32_t expectedCount);
 	
 };
@@ -332,7 +333,7 @@ void SpatialMap<T>::setNonUnique(std::vector<T>& data)
 }
 
 template <typename T>
-std::vector<std::vector<std::vector<T*>>>& SpatialMap<T>::findBestMap(Point& origin, int32_t radius)
+std::vector<std::vector<std::vector<T*>>>& SpatialMap<T>::findBestMap(const Point& origin, int32_t radius)
 {
 	int32_t dx = (int)(origin.x - m_AA.x) % m_cellSize;
 	int32_t dy = (int)(origin.y - m_AA.y) % m_cellSize;
@@ -360,7 +361,7 @@ std::vector<std::vector<std::vector<T*>>>& SpatialMap<T>::findBestMap(Point& ori
 
 
 template <typename T>
-std::vector<T*> SpatialMap<T>::getInRadius(Point& origin, int32_t radius)
+std::vector<T*> SpatialMap<T>::getInRadius(const Point& origin, int32_t radius)
 {
 	if (!m_isValid)
 		THROW_FATAL_ERROR("Spatial map is not valid.");
@@ -378,7 +379,7 @@ std::vector<T*> SpatialMap<T>::getInRadius(Point& origin, int32_t radius)
 		(origin.x - radius < m_AA.x ||
 		origin.x + radius >= m_BB.x ||
 		origin.y - radius < m_AA.y ||
-		origin.y + radius >= m_AA.y);
+		origin.y + radius >= m_BB.y);
 		
 	std::vector<T*> result;
 	int32_t expectedSize = (goesOutOfBounds ? 1.5 : 2) * radius * radius * M_PI * m_totalSize / (m_dimensions.x * m_dimensions.y);
@@ -426,7 +427,7 @@ std::vector<T*> SpatialMap<T>::getInRadius(Point& origin, int32_t radius)
 }
 
 template <typename T>
-std::vector<T*> SpatialMap<T>::getInCell(Point& origin)
+std::vector<T*> SpatialMap<T>::getInCell(const Point& origin)
 {
 	if (!m_isValid)
 		THROW_FATAL_ERROR("Spatial map is not valid.");
@@ -445,9 +446,55 @@ std::vector<T*> SpatialMap<T>::getInCell(Point& origin)
 	
 }
 
+template <typename T>
+std::vector<T*> SpatialMap<T>::getInCellsIntersectingRect(const Point& AA, const Point& BB)
+{
+	if (!m_isValid)
+		THROW_FATAL_ERROR("Spatial map is not valid.");
+	if (AA.x > BB.x || AA.y > BB.y)
+		THROW_FATAL_ERROR("getInRect received bad rect");
+	
+	auto delta = BB - AA;
+	auto& map = m_useLayeredMap ? findBestMap((AA + BB) * 0.5, std::max(delta.x, delta.y)) : m_map[0][0];
+	
+	Point* offset = m_offsetByMap[&map];
+	
+	int32_t fromX = std::max(0.0f, (AA.x - m_AA.x - offset->x) / m_cellSize);
+	int32_t fromY = std::max(0.0f, (AA.y - m_AA.y - offset->y) / m_cellSize);
+	int32_t toX = std::min((float)map.size() - 1,    std::ceil((BB.x - m_AA.x - offset->x) / m_cellSize));
+	int32_t toY = std::min((float)map[0].size() - 1, std::ceil((BB.y - m_AA.y - offset->y) / m_cellSize));
+	
+	bool goesOutOfBounds = 
+		(AA.x < m_AA.x ||
+		BB.x >= m_BB.x ||
+		AA.y < m_AA.y ||
+		BB.y >= m_BB.y);
+		
+	std::vector<T*> result;
+	int32_t expectedSize = (goesOutOfBounds ? 1.5 : 2) * std::fabs(AA.crossProduct(BB)) * m_totalSize / (m_dimensions.x * m_dimensions.y);
+	expectedSize = std::min(m_totalSize / 2, expectedSize);
+	result.reserve(expectedSize);	
+	
+	for(int32_t x = fromX; x <= toX; x++)
+	{
+		for(int32_t y = fromY; y <= toY; y++)
+		{
+			result.insert(result.end(), map[x][y].begin(), map[x][y].end());
+		}
+	}
+	
+	if (goesOutOfBounds)
+	{
+		result.insert(result.end(), m_rest.begin(), m_rest.end());
+	}
+	
+	return result;
+	
+}
+
 ///Returns a pair: [cell center, cell content]. Does not return the put-of-bounds cell since it has no center.
 template <typename T>
-std::vector<std::pair<Point, std::vector<T*>*>> SpatialMap<T>::getCellsInRadius(Point& origin, int32_t radius, float in_out_ratio)
+std::vector<std::pair<Point, std::vector<T*>*>> SpatialMap<T>::getCellsInRadius(const Point& origin, int32_t radius, float in_out_ratio)
 {
 	if (!m_isValid)
 		THROW_FATAL_ERROR("Spatial map is not valid.");

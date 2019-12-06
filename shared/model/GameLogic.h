@@ -8,31 +8,29 @@
 #include <InputRouteMessage.h>
 #include <InputTimeMessage.h>
 #include <LoadGameMessage.h>
+#include <InputImpulseMessage.h>
 #include <Cars.h>
 
-class GameLogic
+namespace GameLogic
 {
-public:
-	GameLogic() = default;
-	~GameLogic() = default;
-
 	void update(GameState* state, int32_t timePassed, std::vector<InputMessage*>& inputs, Prototypes* prototypes);
-	void makeLogicStep(GameState* state, int32_t timePassed, Prototypes* prototypes);
 
-	static bool testEdgeIsValid(Point& from, Point& to, std::vector<Obstacle>& obstacles);
-	static bool testRouteIsValid(std::vector<Point>& route, Prototypes* prototypes);
-	static void buildRouteToTarget(Point& target, std::vector<RoutePoint>& route, Prototypes* prototypes);
-	static bool isRouteAnglePositive(std::vector<RoutePoint>& route, Point& target, Prototypes* prototypes);
+	bool testEdgeIsValid(Point& from, Point& to, Prototypes* prototypes);
+	bool testRouteIsValid(std::vector<Point>& route, Prototypes* prototypes);
+	void buildRouteToTarget(Point& target, std::vector<RoutePoint>& route, Prototypes* prototypes);
+	bool isRouteAnglePositive(std::vector<RoutePoint>& route, Point& target, Prototypes* prototypes);
 
-private:
-	GameState* state;
+	namespace GameLogicInternal
+	{
+		void makeLogicStep(GameState* state, int32_t timePassed, Prototypes* prototypes);
+		void handleActionInput(GameState* state, InputActionMessage* input);
+		void handlePlayerJoinedInput(GameState* state, InputPlayerJoinedMessage* input);
+		void handlePlayerLeftInput(GameState* state, InputPlayerLeftMessage* input);
+		void handleRouteInput(GameState* state, InputRouteMessage* input, Prototypes* prototypes);
+		void handleTimeInput(GameState* state, InputTimeMessage* input, Prototypes* prototypes);
+		void handleGameLoad(GameState* state, LoadGameMessage* input, Prototypes* prototypes);
+		void handleInputImpulse(GameState* state, InputImpulseMessage* input, Prototypes* prototypes);
 
-	void handleActionInput(InputActionMessage* input);
-	void handlePlayerJoinedInput(InputPlayerJoinedMessage* input);
-	void handlePlayerLeftInput(InputPlayerLeftMessage* input);
-	void handleRouteInput(InputRouteMessage* input, Prototypes* prototypes);
-	void handleTimeInput(InputTimeMessage* input, Prototypes* prototypes);
-	void handleGameLoad(LoadGameMessage* input, Prototypes* prototypes);
-
-	PlayerTest* playerByLogin(int32_t login);
+		PlayerTest* playerByLogin(GameState* state, int32_t login);
+	}
 };

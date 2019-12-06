@@ -11,7 +11,8 @@ enum class MessageTypes : int16_t
 	TYPE_GAME_STATE_MSG = 6,
 	TYPE_INPUT_ROUTE_MSG = 7,
 	TYPE_INPUT_TIME_MSG = 8,
-	TYPE_LOAD_GAME_MSG = 9
+	TYPE_LOAD_GAME_MSG = 9,
+	TYPE_INPUT_IMPULSE_MSG = 10
 };
 
 enum class RequestTypes : int16_t

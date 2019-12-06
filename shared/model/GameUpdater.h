@@ -17,7 +17,6 @@ public:
 
 	std::unique_ptr<GameState> state;
 
-	GameLogic logic;
 	bool isLoaded;
 
 	void update(uint32_t time);

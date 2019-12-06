@@ -22,7 +22,7 @@ void LoadGameMessage::deserialize(SerializationStream& stream)
 	memcpy(state, content, stateLength);
 }
 
-void LoadGameMessage::serialize(SerializationStream& stream)
+void LoadGameMessage::serialize(SerializationStream& stream) const
 {
 	InputMessage::serialize(stream);
 	Serializer::write(stateLength, stream);

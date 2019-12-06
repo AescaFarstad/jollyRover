@@ -26,7 +26,7 @@ void NetworkMessage::deserialize(SerializationStream& stream)
 	Serializer::read(inResponseTo, stream);
 }
 
-void NetworkMessage::serialize(SerializationStream& stream)
+void NetworkMessage::serialize(SerializationStream& stream) const
 {
 	Serializer::write(typeId, stream);
 	Serializer::write(initiator_id, stream);

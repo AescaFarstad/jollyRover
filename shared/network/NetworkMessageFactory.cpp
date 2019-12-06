@@ -1,4 +1,5 @@
 #include <NetworkMessageFactory.h>
+#include <InputImpulseMessage.h>
 
 NetworkMessageFactory::NetworkMessageFactory()
 {
@@ -37,6 +38,8 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::pointerByType(MessageType
 		return std::make_unique<InputRouteMessage>();
 	else if (type == MessageTypes::TYPE_INPUT_TIME_MSG)
 		return std::make_unique<InputTimeMessage>();
+	else if (type == MessageTypes::TYPE_INPUT_IMPULSE_MSG)
+		return std::make_unique<InputImpulseMessage>();
 	else if (type == MessageTypes::TYPE_LOAD_GAME_MSG)
 		return std::make_unique<LoadGameMessage>();
 	else

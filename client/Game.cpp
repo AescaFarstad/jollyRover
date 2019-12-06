@@ -308,6 +308,13 @@ void Game::addNetworkBindings()
 	setCallOnce(false)->
 	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
 	m_network->binder.bind(std::move(binding));
+	
+	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_IMPULSE_MSG");
+	binding->
+	bindByMsgType(MessageTypes::TYPE_INPUT_IMPULSE_MSG)->
+	setCallOnce(false)->
+	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
+	m_network->binder.bind(std::move(binding));
 
 	binding = std::make_unique<AnonymousBinding>("TYPE_LOAD_GAME_MSG");
 	binding->

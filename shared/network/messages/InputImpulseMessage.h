@@ -1,14 +1,15 @@
 #pragma once
 #include <InputMessage.h>
-class LoadGameMessage :
+#include <InputImpulse.h>
+
+class InputImpulseMessage :
 	public InputMessage
 {
 public:
-	LoadGameMessage();
-	~LoadGameMessage();
+	InputImpulseMessage();
+	~InputImpulseMessage();
 
-	char* state;
-	uint32_t stateLength;
+	INPUT_IMPULSE impulse;
 
 	void deserialize(SerializationStream& stream) override;
 	void serialize(SerializationStream& stream) const override;

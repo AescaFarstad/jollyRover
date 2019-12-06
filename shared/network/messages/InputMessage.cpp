@@ -10,7 +10,7 @@ void InputMessage::deserialize(SerializationStream& stream)
 
 }
 
-void InputMessage::serialize(SerializationStream& stream)
+void InputMessage::serialize(SerializationStream& stream) const
 {
 	NetworkMessage::serialize(stream);
 	Serializer::write(localId, stream);

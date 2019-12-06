@@ -121,7 +121,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawProjectileExplosion();	
 	drawDebugGraphics();
 	//drawThreatMap();
-	//drawObstacles();
+	drawObstacles();
 	drawInput();
 	
 	drawHUD();
@@ -272,7 +272,7 @@ void GameView::drawCars()
 			m_renderer->blit(*carTexture, car.unit.location, angle, 0.8);
 			auto gunLocation = Point::fromAngle(angle, 9);
 			gunLocation += car.unit.location;
-			m_renderer->blit(*carGunTexture, gunLocation, car.unit.voluntaryMovement.asAngle(), 0.8);
+			m_renderer->blit(*carGunTexture, gunLocation, angle, 0.8);
 			GPU_RectangleFilled(
 					m_screen,
 					car.unit.location.x - carSize / 2,

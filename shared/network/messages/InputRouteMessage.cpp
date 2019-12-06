@@ -21,7 +21,7 @@ inline void InputRouteMessage::deserialize(SerializationStream &stream)
 	Serializer::readVector(route, stream);
 }
 
-inline void InputRouteMessage::serialize(SerializationStream &stream)
+inline void InputRouteMessage::serialize(SerializationStream &stream) const
 {
 	//SerializationStream::AGA = true;
 	InputMessage::serialize(stream);

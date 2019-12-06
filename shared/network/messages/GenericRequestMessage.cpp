@@ -20,7 +20,7 @@ void GenericRequestMessage::deserialize(SerializationStream& stream)
 	Serializer::read(request, stream);
 }
 
-void GenericRequestMessage::serialize(SerializationStream& stream)
+void GenericRequestMessage::serialize(SerializationStream& stream) const
 {
 	NetworkMessage::serialize(stream);
 	Serializer::write(request, stream);

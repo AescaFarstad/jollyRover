@@ -2,6 +2,7 @@
 #include <InputTimeMessage.h>
 #include <LoadGameMessage.h>
 #include <InputActionMessage.h>
+#include <InputImpulseMessage.h>
 #include <PersistentStorage.h>
 #include <GameKeyboardActions.h>
 
@@ -47,6 +48,10 @@ GameKeyboardInput::GameKeyboardInput()
 	
 	actionByButton[SDL_SCANCODE_PAGEUP] = GAME_KEYBOARD_ACTIONS::SAVE_GAME;
 	actionByButton[SDL_SCANCODE_PAGEDOWN] = GAME_KEYBOARD_ACTIONS::LOAD_GAME;
+	
+	actionByButton[SDL_SCANCODE_SEMICOLON] = GAME_KEYBOARD_ACTIONS::ADD_AI;
+	actionByButton[SDL_SCANCODE_APOSTROPHE] = GAME_KEYBOARD_ACTIONS::CLEAR_AI;
+	actionByButton[SDL_SCANCODE_BACKSLASH] = GAME_KEYBOARD_ACTIONS::ACT_AI;
 	
 	for(uint16_t i = 0; i < 128; i++)
 		buttonByAction[(int)actionByButton[i]] = i;
@@ -267,6 +272,21 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 			network.send(&loadMsg);
 			break;
 		}
+		case GAME_KEYBOARD_ACTIONS::ADD_AI :
+		{			
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::CLEAR_AI :
+		{			
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::ACT_AI :
+		{			
+			InputImpulseMessage msg;
+			msg.impulse = INPUT_IMPULSE::ACT_AI;
+			network.send(&msg);			
+			break;
+		}
 		default:
 		{
 			S::log.add("action not handled: " + std::to_string((int)code), {LOG_TAGS::ERROR_});
@@ -312,6 +332,9 @@ void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, Keyboard& keyboard, Netwo
 		case GAME_KEYBOARD_ACTIONS::REVERT125 :
 		case GAME_KEYBOARD_ACTIONS::LOAD_GAME :
 		case GAME_KEYBOARD_ACTIONS::SAVE_GAME :
+		case GAME_KEYBOARD_ACTIONS::ADD_AI :
+		case GAME_KEYBOARD_ACTIONS::CLEAR_AI :
+		case GAME_KEYBOARD_ACTIONS::ACT_AI :
 		break;
 		
 		case GAME_KEYBOARD_ACTIONS::RIGHT :

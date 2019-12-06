@@ -8,7 +8,7 @@ public:
 	virtual ~ISerializable();
 
 	virtual void deserialize(SerializationStream& stream) = 0;
-	virtual void serialize(SerializationStream& stream) = 0;
+	virtual void serialize(SerializationStream& stream) const = 0;
 };
 
 namespace Serializer {
@@ -18,9 +18,9 @@ namespace Serializer {
 	void write(ISerializable* value, SerializationStream& stream);
 	void read(ISerializable* value, SerializationStream& stream);
 	
-	void write(MessageTypes& value, SerializationStream& stream);
+	void write(const MessageTypes& value, SerializationStream& stream);
 	void read(MessageTypes& value, SerializationStream& stream);
-	void write(RequestTypes& value, SerializationStream& stream);
+	void write(const RequestTypes& value, SerializationStream& stream);
 	void read(RequestTypes& value, SerializationStream& stream);
 	
 	
