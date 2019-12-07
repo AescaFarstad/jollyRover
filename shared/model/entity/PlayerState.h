@@ -2,7 +2,7 @@
 #include <ISerializable.h>
 #include <CarState.h>
 
-class PlayerTest
+class PlayerState
 {
 public:
 

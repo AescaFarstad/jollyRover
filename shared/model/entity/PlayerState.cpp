@@ -1,7 +1,7 @@
 #include <PlayerState.h>
 
 
-void PlayerTest::deserialize(SerializationStream & stream)
+void PlayerState::deserialize(SerializationStream & stream)
 {
 	Serializer::read(login, stream);
 	Serializer::read(isHeadless, stream);
@@ -9,7 +9,7 @@ void PlayerTest::deserialize(SerializationStream & stream)
 	Serializer::readVector(activeCars, stream);
 }
 
-void PlayerTest::serialize(SerializationStream & stream) const
+void PlayerState::serialize(SerializationStream & stream) const
 {
 				
 	Serializer::write(login, stream);

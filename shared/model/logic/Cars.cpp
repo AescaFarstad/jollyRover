@@ -10,7 +10,7 @@ namespace Cars
 	
 	void handleCarUpdate(GameState* state, Prototypes* prototypes, int32_t timePassed)
 	{
-		for (PlayerTest& player : state->players)
+		for (PlayerState& player : state->players)
 		{
 			for (CarState& car : player.activeCars)
 			{
@@ -23,7 +23,7 @@ namespace Cars
 	{
 		if (state->isEventLoggerEnabled)
 		{
-			for (PlayerTest& player : state->players)
+			for (PlayerState& player : state->players)
 			{
 				for(auto& car : player.activeCars)
 				{
@@ -41,7 +41,7 @@ namespace Cars
 		}
 		
 		
-		for (PlayerTest& player : state->players)
+		for (PlayerState& player : state->players)
 		{
 			player.activeCars.erase(std::remove_if(player.activeCars.begin(), player.activeCars.end(), [](CarState &car) {
 				return car.isFinished || car.unit.health <= 0; 
@@ -49,7 +49,7 @@ namespace Cars
 		}
 	}
 	
-	void launchCar(GameState* state, PlayerTest* player, std::vector<Point>& route, Prototypes* prototypes)
+	void launchCar(GameState* state, PlayerState* player, std::vector<Point>& route, Prototypes* prototypes)
 	{
 		player->activeCars.emplace_back();
 		CarState& car = player->activeCars.back();
@@ -71,7 +71,7 @@ namespace Cars
 	
 	namespace CarsInternal
 	{
-		void updateCar(CarState& car, PlayerTest& player, GameState* state, Prototypes* prototypes, int32_t timePassed)
+		void updateCar(CarState& car, PlayerState& player, GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{
 			Point startingLocation = car.unit.location;
 			float passedThisStep = prototypes->cars[car.object.prototypeId].speed * timePassed;

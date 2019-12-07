@@ -31,6 +31,6 @@ namespace GameLogic
 		void handleGameLoad(GameState* state, LoadGameMessage* input, Prototypes* prototypes);
 		void handleInputImpulse(GameState* state, InputImpulseMessage* input, Prototypes* prototypes);
 
-		PlayerTest* playerByLogin(GameState* state, int32_t login);
+		PlayerState* playerByLogin(GameState* state, int32_t login);
 	}
 };

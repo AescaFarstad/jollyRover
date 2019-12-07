@@ -34,7 +34,7 @@ public:
 	std::vector<Projectile> projectiles;
 	//std::vector<ForceState> forces;
 	
-	std::vector<PlayerTest> players;
+	std::vector<PlayerState> players;
 	std::vector<FormationState> formations;
 	SeededRandom random;
 	TimeState time;

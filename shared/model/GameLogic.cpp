@@ -184,7 +184,7 @@ namespace GameLogic
 
 		void handleActionInput(GameState* state, InputActionMessage* input)
 		{
-			PlayerTest* player = playerByLogin(state, input->login);
+			PlayerState* player = playerByLogin(state, input->login);
 			if (player == nullptr)
 				return;
 			//...
@@ -193,7 +193,7 @@ namespace GameLogic
 		void handlePlayerJoinedInput(GameState* state, InputPlayerJoinedMessage* input)
 		{
 			state->players.emplace_back();
-			PlayerTest& p = *(state->players.end() - 1);
+			PlayerState& p = *(state->players.end() - 1);
 			p.login = input->login;
 		}
 
@@ -285,14 +285,14 @@ namespace GameLogic
 			{
 				if (!playerByLogin(state, players[i].login))
 				{
-					PlayerTest restoredPlayer = players[i];
+					PlayerState restoredPlayer = players[i];
 					restoredPlayer.activeCars.clear();
 					
 					state->players.push_back(restoredPlayer);
 				}
 			}
-			state->players.erase(std::remove_if(state->players.begin(), state->players.end(), [&players](PlayerTest& sp){
-				return players.end() == std::find_if(players.begin(), players.end(), [login = sp.login](PlayerTest& p){ 
+			state->players.erase(std::remove_if(state->players.begin(), state->players.end(), [&players](PlayerState& sp){
+				return players.end() == std::find_if(players.begin(), players.end(), [login = sp.login](PlayerState& p){ 
 					return p.login == login; 
 				});
 			}), state->players.end());	
@@ -301,12 +301,12 @@ namespace GameLogic
 		}
 
 
-		PlayerTest* playerByLogin(GameState* state, int32_t login)
+		PlayerState* playerByLogin(GameState* state, int32_t login)
 		{
 			auto result = std::find_if(
 						state->players.begin(), 
 						state->players.end(), 
-						[login](PlayerTest& player){return player.login == login;}
+						[login](PlayerState& player){return player.login == login;}
 						);
 			return result == state->players.end() ? nullptr : &(*result);
 		}
@@ -323,7 +323,7 @@ namespace GameLogic
 				}
 				case INPUT_IMPULSE::ADD_AI :
 				{
-					int32_t login = std2::minElement(state->players, [](PlayerTest& player){return player.login;})->login - 1;
+					int32_t login = std2::minElement(state->players, [](PlayerState& player){return player.login;})->login - 1;
 					state->players.push_back({ 
 						.login = login, 
 						.isHeadless = true, 
@@ -336,7 +336,7 @@ namespace GameLogic
 					state->players.erase(std::remove_if(
 						state->players.begin(), 
 						state->players.end(), 
-						[](PlayerTest& player){return player.isHeadless;}
+						[](PlayerState& player){return player.isHeadless;}
 						));
 					for(auto& p : state->players)
 						p.isAI = false;

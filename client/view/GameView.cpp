@@ -215,7 +215,7 @@ void GameView::drawCars()
 	int rectSize = 4;
 	int carSize = 8;
 
-	for (PlayerTest &player : m_state->players)
+	for (PlayerState &player : m_state->players)
 	{
 		for (CarState &car : player.activeCars)
 		{
