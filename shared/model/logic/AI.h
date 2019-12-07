@@ -3,6 +3,7 @@
 
 namespace AI
 {
+	void handleAITurn(GameState* state, Prototypes* prototypes, int32_t timePassed);
 	std::vector<Point> getRandomWalk(GameState* state, Prototypes* prototypes);
 	
 	namespace AIInternal

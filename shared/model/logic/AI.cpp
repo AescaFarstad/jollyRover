@@ -7,6 +7,18 @@ namespace AI
 	float boundaryPower = 3;
 	float desireBase = 10;
 	
+	void handleAITurn(GameState* state, Prototypes* prototypes, int32_t timePassed)
+	{
+		for(auto& p : state->players)
+		{
+			if (p.isAI && p.activeCars.size() == 0)
+			{
+				Cars::launchCar(state, &p, getRandomWalk(state, prototypes), prototypes);
+			}
+		}
+	}
+	
+	
 	std::vector<Point> getRandomWalk(GameState* state, Prototypes* prototypes)
 	{
 		std::vector<Point> result;
@@ -21,8 +33,6 @@ namespace AI
 		
 		return result;
 	}
-	
-	
 	
 	namespace AIInternal
 	{
@@ -47,7 +57,7 @@ namespace AI
 			/*if (last.x > prototypes->variables.fieldHeight - boundary)
 				attraction += Point(- FMath::nlerp(0, 0, boundary, 100, boundary - (prototypes->variables.fieldHeight - last.y), boundaryPower), 0);*/
 			
-			if (index > (size_t)prototypes->variables.maxRouteSteps / 20)
+			if (index > (size_t)prototypes->variables.maxRouteSteps / 30)
 			{
 				attraction += Point(0, 1);
 			}
@@ -73,7 +83,12 @@ namespace AI
 			
 			for(int32_t i = 0; i < attractionStrength; i++)
 			{
-				float newStepAngle = random.get(angle - prototypes->variables.stepAngleWindow / 4, angle + prototypes->variables.stepAngleWindow / 4);
+				float allowedAngleVariation = FMath::lerpClipped(
+						0, prototypes->variables.stepAngleWindow / 5, 
+						5, prototypes->variables.stepAngleWindow / 2, 
+						failureStreak
+					);
+				float newStepAngle = random.get(angle - allowedAngleVariation, angle + allowedAngleVariation);
 				if (i == 0 || 
 						std::fabs(FMath::angleDelta(newStepAngle, attractionAngle)) < 
 						std::fabs(FMath::angleDelta(stepAngle, attractionAngle))

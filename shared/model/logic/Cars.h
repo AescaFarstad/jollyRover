@@ -5,7 +5,7 @@ namespace Cars
 	void handleCarUpdate(GameState* state, Prototypes* prototypes, int32_t timePassed);
 	void handleCarDeath(GameState* state, Prototypes* prototypes, int32_t timePassed);	
 			
-	void launchCar(GameState* state, PlayerState* player, std::vector<Point>& route, Prototypes* prototypes);		
+	void launchCar(GameState* state, PlayerState* player, const std::vector<Point>& route, Prototypes* prototypes);		
 	
 	namespace CarsInternal
 	{

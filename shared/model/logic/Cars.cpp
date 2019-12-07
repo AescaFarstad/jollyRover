@@ -54,7 +54,7 @@ namespace Cars
 		}
 	}
 	
-	void launchCar(GameState* state, PlayerState* player, std::vector<Point>& route, Prototypes* prototypes)
+	void launchCar(GameState* state, PlayerState* player, const std::vector<Point>& route, Prototypes* prototypes)
 	{
 		player->activeCars.emplace_back();
 		CarState& car = player->activeCars.back();

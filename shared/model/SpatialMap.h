@@ -33,7 +33,7 @@ public:
 	void setUnique(std::vector<T>& data);
 	void setNonUnique(std::vector<T>& data);
 	std::vector<T*> getInRadius(const Point& origin, int32_t radius);
-	std::vector<T*> getInCell(const Point& origin);
+	std::vector<T*>& getInCell(const Point& origin);
 	std::vector<T*> getInCellsIntersectingRect(const Point& AA, const Point& BB);
 	std::vector<std::pair<Point, std::vector<T*>*>> getCellsInRadius(const Point& origin, int32_t radius, float in_out_ratio = 0.5);
 	template <typename F>
@@ -427,7 +427,7 @@ std::vector<T*> SpatialMap<T>::getInRadius(const Point& origin, int32_t radius)
 }
 
 template <typename T>
-std::vector<T*> SpatialMap<T>::getInCell(const Point& origin)
+std::vector<T*>& SpatialMap<T>::getInCell(const Point& origin)
 {
 	if (!m_isValid)
 		THROW_FATAL_ERROR("Spatial map is not valid.");

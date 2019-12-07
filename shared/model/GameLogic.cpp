@@ -173,6 +173,8 @@ namespace GameLogic
 		{
 			state->time.time += timePassed;
 			
+			AI::handleAITurn(state, prototypes, timePassed);
+			
 			Creeps::handleCreepSpawn(state, prototypes, timePassed);
 			
 			Creeps::handleCreepUpdate(state, prototypes, timePassed);
@@ -325,6 +327,8 @@ namespace GameLogic
 				case INPUT_IMPULSE::ADD_AI :
 				{
 					int32_t login = std2::minElement(state->players, [](PlayerState& player){return player.login;})->login - 1;
+					if (login > 0)
+						login = -1;
 					state->players.push_back({ 
 						.login = login, 
 						.score = 0,

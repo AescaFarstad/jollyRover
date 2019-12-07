@@ -19,8 +19,8 @@ GameView::GameView()
 	m_layer3Image = loadImage("out/assets/map layer 3.png"); 
 	m_layer3Image->anchor_x = 0;
 	m_layer3Image->anchor_y = 0;
-	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 28);
-	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 28);
+	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 24);
+	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 24);
 }
 
 GameView::~GameView()
@@ -211,9 +211,9 @@ void GameView::drawInput()
 
 void GameView::drawCars()
 {
-	SDL_Color color = ViewUtil::colorFromHex(0x0000ff);
+	SDL_Color myColor = ViewUtil::colorFromHex(0x0000ff);
+	SDL_Color theirColor = ViewUtil::colorFromHex(0x555555);
 	int rectSize = 4;
-	int carSize = 8;
 
 	for (PlayerState &player : m_state->players)
 	{
@@ -227,7 +227,7 @@ void GameView::drawCars()
 					car.route[i - 1].y,
 					car.route[i].x,
 					car.route[i].y,
-					color
+					player.login == m_login ? myColor : theirColor
 				);
 				GPU_Rectangle(
 					m_screen,
@@ -235,7 +235,7 @@ void GameView::drawCars()
 					car.route[i].y - rectSize / 2,
 					car.route[i].x + rectSize / 2,
 					car.route[i].y + rectSize / 2,
-					color
+					player.login == m_login ? myColor : theirColor
 				);
 			}
 			auto& proto = m_prototypes->cars[car.object.prototypeId];			
@@ -273,14 +273,15 @@ void GameView::drawCars()
 			auto gunLocation = Point::fromAngle(angle, 9);
 			gunLocation += car.unit.location;
 			m_renderer->blit(*carGunTexture, gunLocation, angle, 0.8);
+			/*
 			GPU_RectangleFilled(
 					m_screen,
 					car.unit.location.x - carSize / 2,
 					car.unit.location.y - carSize / 2,
 					car.unit.location.x + carSize / 2,
 					car.unit.location.y + carSize / 2,
-					color
-				);
+					player.login == m_login ? myColor : theirColor
+				);*/
 		}
 	}
 }
@@ -699,14 +700,14 @@ void GameView::drawHUD()
 		{
 			text += "AI " + std::to_string(-p.login);
 		}
-		text += ": " +  std::to_string(p.score);
+		text += ":  " +  std::to_string(p.score);
 		
 		for(auto& car : p.activeCars)
 		{
-			text += " + " +  std::to_string(car.score);
+			text += "  +  " +  std::to_string(car.score);
 		}
 		
-		m_fontAmaticBold.draw(m_screen, 20.f, 20.f + 30 * i, text.c_str());
+		m_fontAmaticBold.draw(m_screen, 5.f, 20.f + 30 * i, "%s", text.c_str());
 		
 		i++;
 	}
