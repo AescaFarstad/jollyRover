@@ -8,7 +8,15 @@ namespace AI
 	
 	namespace AIInternal
 	{
+		struct RouteStruct
+		{
+			std::vector<Point> route;
+			int32_t index;
+			int32_t failureStreak;
+			int32_t stepCount;
+			bool isFinished;
+		};
 		
-		void makeStep(std::vector<Point>& route, size_t index, int32_t failureStreak, SeededRandom& random,  Prototypes* prototypes);
+		void makeStep(RouteStruct& data, SeededRandom& random,  Prototypes* prototypes);
 	}
 }

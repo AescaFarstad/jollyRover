@@ -16,6 +16,7 @@ public:
 	~GameUpdater() = default;
 
 	std::unique_ptr<GameState> state;
+	Prototypes* prototypes;
 
 	bool isLoaded;
 
@@ -35,6 +36,5 @@ private:
 	std::map<uint32_t, uint32_t, std::greater<uint32_t>> stampsBySteps;
 	void rewindToPrecedingState(uint32_t stamp);
 	void saveState(GameState* state);
-	Prototypes* prototypes;
 	int32_t lastSavedSteps;
 }; 

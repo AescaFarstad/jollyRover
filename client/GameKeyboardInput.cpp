@@ -5,6 +5,7 @@
 #include <InputImpulseMessage.h>
 #include <PersistentStorage.h>
 #include <GameKeyboardActions.h>
+#include <AI.h>
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL_scancode.h>
@@ -295,10 +296,10 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::ACT_AI :
-		{			
-			InputImpulseMessage msg;
-			msg.impulse = INPUT_IMPULSE::ACT_AI;
-			network.send(&msg);			
+		{
+			auto route = AI::getRandomWalk(gameUpdater.state.get(), gameUpdater.prototypes);
+			InputRouteMessage msg(route);
+			network.send(&msg);
 			break;
 		}
 		default:

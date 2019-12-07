@@ -19,8 +19,8 @@ GameView::GameView()
 	m_layer3Image = loadImage("out/assets/map layer 3.png"); 
 	m_layer3Image->anchor_x = 0;
 	m_layer3Image->anchor_y = 0;
-	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 24);
-	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 24);
+	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 32);
+	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 32);
 }
 
 GameView::~GameView()
@@ -219,6 +219,8 @@ void GameView::drawCars()
 	{
 		for (CarState &car : player.activeCars)
 		{
+			if ((size_t)car.routeIndex >= car.route.size() - 1)
+				continue;
 			for (size_t i = car.routeIndex + 1; i < car.route.size(); i++)
 			{
 				GPU_Line(
@@ -692,7 +694,10 @@ void GameView::drawHUD()
 		std::string text = "";
 		if (!p.isHeadless)
 		{
-			text += "player " + std::to_string(p.login);
+			if (p.login == m_login)
+				text += "YOU";
+			else
+				text += "player " + std::to_string(p.login);
 			if (p.isAI)
 				text += " (AI)";
 		}
@@ -704,7 +709,8 @@ void GameView::drawHUD()
 		
 		for(auto& car : p.activeCars)
 		{
-			text += "  +  " +  std::to_string(car.score);
+			if (car.score > 0)
+				text += "  +  " +  std::to_string(car.score);
 		}
 		
 		m_fontAmaticBold.draw(m_screen, 5.f, 20.f + 30 * i, "%s", text.c_str());

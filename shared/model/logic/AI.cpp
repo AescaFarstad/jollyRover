@@ -21,30 +21,45 @@ namespace AI
 	
 	std::vector<Point> getRandomWalk(GameState* state, Prototypes* prototypes)
 	{
-		std::vector<Point> result;
+		AIInternal::RouteStruct data;
 		
-		while(!GameLogic::testRouteIsValid(result, prototypes))
+		while(!GameLogic::testRouteIsValid(data.route, prototypes))
 		{
-			result.clear();
-			result.push_back(Point(state->random.get(0, prototypes->variables.fieldWidth), prototypes->variables.fieldHeight));
-			result.push_back(Point(result[0].x, result[0].y - prototypes->variables.routeStepSize));
-			AIInternal::makeStep(result, 1, 0, state->random, prototypes);
-		}		
+			Point start = { (float)state->random.get(0, prototypes->variables.fieldWidth), (float)prototypes->variables.fieldHeight };
+			Point firstStep = { start.x, start.y - prototypes->variables.routeStepSize };
+			data = {
+				.route = { start, firstStep },
+				.index = 0,
+				.failureStreak = 0,
+				.stepCount = 0,
+				.isFinished = false
+			};
+			while (!data.isFinished && data.stepCount < 5000)
+				AIInternal::makeStep(data, state->random, prototypes);
+		}
+		data.route.erase(data.route.begin() + data.index + 1, data.route.end());
 		
-		return result;
+		S::log.add(
+				"[Route] len: " + std::to_string(data.stepCount) + 
+				" f: " + std::to_string(data.stepCount - data.index) + 
+				" r: " + std::to_string((float)data.index / data.stepCount),
+			{LOG_TAGS::GAME});			
+		return data.route;
 	}
 	
 	namespace AIInternal
 	{
-		
 	
-		void makeStep(std::vector<Point>& route, size_t index, int32_t failureStreak, SeededRandom& random,  Prototypes* prototypes)
-		{			
+		void makeStep(RouteStruct& data, SeededRandom& random,  Prototypes* prototypes)
+		{
+			data.stepCount++;
+			
 			Point attraction = Point(0, 0);
-			auto& last = route[index];
+			auto& last = data.route[data.index];
 			if (last.y > prototypes->variables.fieldHeight)
 			{
 				last.y = prototypes->variables.fieldHeight;
+				data.isFinished = true;
 				return;
 			}
 			
@@ -54,18 +69,16 @@ namespace AI
 				attraction += Point(- FMath::nlerp(0, 0, boundary, 100, boundary - (prototypes->variables.fieldWidth - last.x), boundaryPower), 0);
 			if (last.y < boundary)
 				attraction += Point(0, FMath::nlerp(0, 0, boundary, 100, boundary - last.y, boundaryPower));
-			/*if (last.x > prototypes->variables.fieldHeight - boundary)
-				attraction += Point(- FMath::nlerp(0, 0, boundary, 100, boundary - (prototypes->variables.fieldHeight - last.y), boundaryPower), 0);*/
 			
-			if (index > (size_t)prototypes->variables.maxRouteSteps / 30)
+			if (data.index > prototypes->variables.maxRouteSteps / 30)
 			{
 				attraction += Point(0, 1);
 			}
-			if (index < (size_t)prototypes->variables.minRouteSteps)
+			if (data.index < prototypes->variables.minRouteSteps)
 			{
 				attraction += Point(0, -10);
 			}
-			if (index < 50)
+			if (data.index < 50)
 			{
 				attraction += Point(0, -1);
 			}
@@ -73,7 +86,7 @@ namespace AI
 			float stepAngle;
 			float attractionAngle;
 			int32_t attractionStrength = 1;
-			float angle = (route[index] - route[index - 1]).asAngle();
+			float angle = (data.route[data.index] - data.route[data.index - 1]).asAngle();
 			if (attraction.getLength() != 0)
 			{
 				attractionStrength = 2 + std::sqrt(attraction.getLength());
@@ -86,7 +99,7 @@ namespace AI
 				float allowedAngleVariation = FMath::lerpClipped(
 						0, prototypes->variables.stepAngleWindow / 5, 
 						5, prototypes->variables.stepAngleWindow / 2, 
-						failureStreak
+						data.failureStreak
 					);
 				float newStepAngle = random.get(angle - allowedAngleVariation, angle + allowedAngleVariation);
 				if (i == 0 || 
@@ -97,33 +110,23 @@ namespace AI
 					stepAngle = newStepAngle;
 				}
 			}
-			Point step = Point::fromAngle(stepAngle, prototypes->variables.routeStepSize) + route[index];
+			Point step = Point::fromAngle(stepAngle, prototypes->variables.routeStepSize) + data.route[data.index];
 				
 			
 			if (prototypes->obstacleMap.getInCell(step).size() > 0)
 			{
-				index--;
-				failureStreak++;
-				makeStep(route, index, failureStreak, random, prototypes);
+				data.index--;
+				data.failureStreak++;
 			}
 			else
 			{
-				index++;
-				if (route.size() > index)
-					route[index] = step;
+				data.index++;
+				if (data.route.size() > (size_t)data.index)
+					data.route[data.index] = step;
 				else
-					route.push_back(step);
-				/*if (failureStreak > 0)
-					S::log.add("fail streak: " + std::to_string(failureStreak));*/
-				failureStreak = 0;
-				makeStep(route, index, failureStreak, random, prototypes);
+					data.route.push_back(step);
+				data.failureStreak = 0;
 			}
-			
-			
-			//сделать шаг
-			//проверить препятствие
-			//если всё плохо, то инкремент и откат
-			//и переделать рекурсию в итерации
 		}
 	}
 }
