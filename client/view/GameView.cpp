@@ -19,8 +19,8 @@ GameView::GameView()
 	m_layer3Image = loadImage("out/assets/map layer 3.png"); 
 	m_layer3Image->anchor_x = 0;
 	m_layer3Image->anchor_y = 0;
-	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 36);
-	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 36);
+	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 28);
+	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 28);
 }
 
 GameView::~GameView()
@@ -681,5 +681,33 @@ void GameView::drawThreatMap()
 
 void GameView::drawHUD()
 {
-	m_fontAmaticBold.draw(m_screen, 20.f, 20.f, "Score: %d", m_state->timeStamp);
+	//m_fontAmaticBold.draw(m_screen, 20.f, 20.f, "Score: %d", m_state->timeStamp);
+	
+	std::vector<PlayerState> players = m_state->players;
+	std::sort(players.begin(), players.end(), [](PlayerState& a, PlayerState& b){ return a.score > b.score;});
+	int32_t i = 0;
+	for(auto& p : players)
+	{
+		std::string text = "";
+		if (!p.isHeadless)
+		{
+			text += "player " + std::to_string(p.login);
+			if (p.isAI)
+				text += " (AI)";
+		}
+		else
+		{
+			text += "AI " + std::to_string(-p.login);
+		}
+		text += ": " +  std::to_string(p.score);
+		
+		for(auto& car : p.activeCars)
+		{
+			text += " + " +  std::to_string(car.score);
+		}
+		
+		m_fontAmaticBold.draw(m_screen, 20.f, 20.f + 30 * i, text.c_str());
+		
+		i++;
+	}
 }

@@ -192,20 +192,21 @@ namespace GameLogic
 
 		void handlePlayerJoinedInput(GameState* state, InputPlayerJoinedMessage* input)
 		{
-			state->players.emplace_back();
-			PlayerState& p = *(state->players.end() - 1);
-			p.login = input->login;
+			state->players.push_back({
+				.login = input->login, 
+				.score = 0,
+				.isHeadless = false, 
+				.isAI = false 
+				});
 		}
 
 		void handlePlayerLeftInput(GameState* state, InputPlayerLeftMessage* input)
 		{
-			for (auto it = state->players.begin(); it != state->players.end(); it++) {
-				if (it->login == input->login)
-				{
-					state->players.erase(it);
-					break;
-				}
-			}
+			state->players.erase(std::remove_if(
+					state->players.begin(),
+					state->players.end(),
+					[login = input->login](PlayerState& player){ return player.login == login;}
+			));
 		}
 
 		void handleRouteInput(GameState* state, InputRouteMessage* input, Prototypes* prototypes)
@@ -326,6 +327,7 @@ namespace GameLogic
 					int32_t login = std2::minElement(state->players, [](PlayerState& player){return player.login;})->login - 1;
 					state->players.push_back({ 
 						.login = login, 
+						.score = 0,
 						.isHeadless = true, 
 						.isAI = true 
 						});

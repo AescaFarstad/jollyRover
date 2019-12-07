@@ -98,8 +98,8 @@ namespace AI
 					route[index] = step;
 				else
 					route.push_back(step);
-				if (failureStreak > 0)
-					S::log.add("fail streak: " + std::to_string(failureStreak));
+				/*if (failureStreak > 0)
+					S::log.add("fail streak: " + std::to_string(failureStreak));*/
 				failureStreak = 0;
 				makeStep(route, index, failureStreak, random, prototypes);
 			}

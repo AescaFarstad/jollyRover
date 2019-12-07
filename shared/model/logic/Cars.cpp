@@ -23,7 +23,7 @@ namespace Cars
 	{
 		if (state->isEventLoggerEnabled)
 		{
-			for (PlayerState& player : state->players)
+			for (auto& player : state->players)
 			{
 				for(auto& car : player.activeCars)
 				{
@@ -41,8 +41,13 @@ namespace Cars
 		}
 		
 		
-		for (PlayerState& player : state->players)
+		for (auto& player : state->players)
 		{
+			for (auto& car : player.activeCars)
+			{
+				if (car.isFinished)
+					player.score += car.score;
+			}
 			player.activeCars.erase(std::remove_if(player.activeCars.begin(), player.activeCars.end(), [](CarState &car) {
 				return car.isFinished || car.unit.health <= 0; 
 			}), player.activeCars.end());
@@ -58,6 +63,7 @@ namespace Cars
 		car.progress = 0;
 		car.routeIndex = 0;
 		car.isFinished = false;
+		car.score = 0;
 		
 		CarProto& proto = prototypes->cars[0];
 		
@@ -94,7 +100,10 @@ namespace Cars
 					if (creep->creepProto_->weight > 100)
 						car.unit.health = 0;
 					else
-						creep->unit.health = 0;					
+					{
+						creep->unit.health = 0;
+						car.score++;
+					}				
 				}
 			}
 			

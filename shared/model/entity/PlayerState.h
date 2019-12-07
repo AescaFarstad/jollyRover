@@ -7,6 +7,7 @@ class PlayerState
 public:
 
 	int32_t login;
+	int32_t score;
 	bool isHeadless;
 	bool isAI;
 

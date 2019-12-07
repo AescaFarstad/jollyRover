@@ -17,6 +17,7 @@ public:
 	int16_t routeIndex;
 	float progress;
 	bool isFinished;
+	int32_t score;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
