@@ -81,4 +81,13 @@ namespace std2
 		}
 		return last;
 	}
+	
+	template<typename T, typename L>
+	auto contains(T& iterable, L&& expression)
+	{
+		return iterable.end() != std::find_if(
+			iterable.begin(),
+			iterable.end(),
+			std::forward(expression));
+	}
 }

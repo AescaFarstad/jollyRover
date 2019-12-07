@@ -7,6 +7,8 @@ class PlayerTest
 public:
 
 	int32_t login;
+	bool isHeadless;
+	bool isAI;
 
 	std::vector<CarState> activeCars;
 

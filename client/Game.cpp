@@ -16,7 +16,7 @@
 #include <memory>
 #include <GameState.h>
 #include <PersistentStorage.h>
-
+#include <InputImpulseMessage.h>
 Game::Game(GPU_Target* screen)
 {
 	loadConfig();
@@ -39,7 +39,7 @@ Game::Game(GPU_Target* screen)
 	
 	m_modes.push_back(&m_textureMode);
 	m_textureMode.init(&m_renderer, &m_prototypes);
-	
+		
 }
 
 Game::~Game()
@@ -134,7 +134,7 @@ void Game::load()
 			int64_t clientToServerDelta = m_network->timeSync.localToServerUpperBound(0);
 			S::log.add("server time delta: " + std::to_string(clientToServerDelta) + 
 					" uncertainty: " + std::to_string(m_network->timeSync.getUncertainty()), { LOG_TAGS::NET });
-			m_gameMode.loadGame(std::unique_ptr<GameState>(gameStateMsg->state), clientToServerDelta, m_login);
+			m_gameMode.loadGame(std::unique_ptr<GameState>(gameStateMsg->state), clientToServerDelta + 30000, m_login);
 			gameStateMsg->ownsState = false;
 			
 			addNetworkBindings();

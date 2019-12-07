@@ -50,8 +50,9 @@ GameKeyboardInput::GameKeyboardInput()
 	actionByButton[SDL_SCANCODE_PAGEDOWN] = GAME_KEYBOARD_ACTIONS::LOAD_GAME;
 	
 	actionByButton[SDL_SCANCODE_SEMICOLON] = GAME_KEYBOARD_ACTIONS::ADD_AI;
-	actionByButton[SDL_SCANCODE_APOSTROPHE] = GAME_KEYBOARD_ACTIONS::CLEAR_AI;
+	actionByButton[SDL_SCANCODE_L] = GAME_KEYBOARD_ACTIONS::CLEAR_AI;
 	actionByButton[SDL_SCANCODE_BACKSLASH] = GAME_KEYBOARD_ACTIONS::ACT_AI;
+	actionByButton[SDL_SCANCODE_APOSTROPHE] = GAME_KEYBOARD_ACTIONS::TOGGLE_AI;
 	
 	for(uint16_t i = 0; i < 128; i++)
 		buttonByAction[(int)actionByButton[i]] = i;
@@ -274,10 +275,23 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 		}
 		case GAME_KEYBOARD_ACTIONS::ADD_AI :
 		{			
+			InputImpulseMessage msg;
+			msg.impulse = INPUT_IMPULSE::ADD_AI;
+			network.send(&msg);			
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::CLEAR_AI :
 		{			
+			InputImpulseMessage msg;
+			msg.impulse = INPUT_IMPULSE::CLEAR_AI;
+			network.send(&msg);			
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::TOGGLE_AI :
+		{			
+			InputImpulseMessage msg;
+			msg.impulse = INPUT_IMPULSE::TOGGLE_AI;
+			network.send(&msg);			
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::ACT_AI :
@@ -335,6 +349,7 @@ void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, Keyboard& keyboard, Netwo
 		case GAME_KEYBOARD_ACTIONS::ADD_AI :
 		case GAME_KEYBOARD_ACTIONS::CLEAR_AI :
 		case GAME_KEYBOARD_ACTIONS::ACT_AI :
+		case GAME_KEYBOARD_ACTIONS::TOGGLE_AI :
 		break;
 		
 		case GAME_KEYBOARD_ACTIONS::RIGHT :

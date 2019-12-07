@@ -33,7 +33,7 @@
       "name": "Server",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/out/server",
+      "program": "${workspaceFolder}/out/JRserver",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",

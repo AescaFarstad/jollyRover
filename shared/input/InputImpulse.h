@@ -6,7 +6,8 @@ enum class INPUT_IMPULSE : int8_t {
 	NONE,
 	ADD_AI,
 	CLEAR_AI,
-	ACT_AI
+	ACT_AI,
+	TOGGLE_AI
 	
 };
 

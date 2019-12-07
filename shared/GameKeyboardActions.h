@@ -26,7 +26,8 @@ enum class GAME_KEYBOARD_ACTIONS : int8_t {
 	LOAD_GAME,
 	ADD_AI,
 	CLEAR_AI,
-	ACT_AI
+	ACT_AI,
+	TOGGLE_AI
 	
 	
 };

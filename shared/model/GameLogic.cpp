@@ -5,6 +5,7 @@
 #include <VisualDebug.h>
 #include <GameKeyboardActions.h>
 #include <AI.h>
+#include <std2.h>
 
 
 namespace GameLogic
@@ -302,12 +303,12 @@ namespace GameLogic
 
 		PlayerTest* playerByLogin(GameState* state, int32_t login)
 		{
-			for (size_t i = 0; i < state->players.size(); i++)
-			{
-				if (state->players[i].login == login)
-					return &state->players[i];
-			}
-			return nullptr;
+			auto result = std::find_if(
+						state->players.begin(), 
+						state->players.end(), 
+						[login](PlayerTest& player){return player.login == login;}
+						);
+			return result == state->players.end() ? nullptr : &(*result);
 		}
 
 		void handleInputImpulse(GameState* state, InputImpulseMessage* input, Prototypes* prototypes)
@@ -318,6 +319,33 @@ namespace GameLogic
 				{
 					auto route = AI::getRandomWalk(state, prototypes);
 					Cars::launchCar(state, playerByLogin(state, input->login), route, prototypes);
+					break;
+				}
+				case INPUT_IMPULSE::ADD_AI :
+				{
+					int32_t login = std2::minElement(state->players, [](PlayerTest& player){return player.login;})->login - 1;
+					state->players.push_back({ 
+						.login = login, 
+						.isHeadless = true, 
+						.isAI = true 
+						});
+					break;
+				}
+				case INPUT_IMPULSE::CLEAR_AI :
+				{
+					state->players.erase(std::remove_if(
+						state->players.begin(), 
+						state->players.end(), 
+						[](PlayerTest& player){return player.isHeadless;}
+						));
+					for(auto& p : state->players)
+						p.isAI = false;
+					break;
+				}
+				case INPUT_IMPULSE::TOGGLE_AI :
+				{
+					auto thisPlayer = playerByLogin(state, input->login);
+					thisPlayer->isAI = !thisPlayer->isAI;
 					break;
 				}
 				default:
