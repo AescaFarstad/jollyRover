@@ -39,7 +39,8 @@
 		{
 			"id": 0,
 			"name": "Mustang",
-			"speed": 0.1,
+			"speed": 0.04,
+			"accel": 0.00005,
 			"size": 18,
 			"fuelPerMeter": 2,
 			"maxHealth": 200,
@@ -58,6 +59,7 @@
 			"id": 1,
 			"name": "Coyote",
 			"speed": 0.05,
+			"accel": 0.05,
 			"size": 10,
 			"fuelPerMeter": 3,
 			"maxHealth": 100,
@@ -431,12 +433,13 @@
 		}
 	],
 	"formations":[
+		
 		{
 			"id":0,
 			"type":"assault",
 			"connections":0,
 			"leader":-1,
-			"enabled":true,
+			"enabled":false,
 			"relativeAgroability":1.5,
 			"slots":[
 				{
@@ -466,7 +469,7 @@
 			"type":"assault",
 			"connections":4,
 			"leader":-1,
-			"enabled":true,
+			"enabled":false,
 			"relativeAgroability":1,
 			"slots":[
 				{
@@ -664,7 +667,7 @@
 			"slots":[
 				{
 					"offset":{ "y":0, "x":-40 },
-					"creepType":2,
+					"creepType":0,
 					"optional":false
 				},
 				
@@ -761,6 +764,113 @@
 					"optional":false
 				}
 				
+			]
+		},
+		{
+			"id":3,
+			"type":"assault",
+			"connections":2,
+			"leader":-1,
+			"enabled":true,
+			"relativeAgroability":1.5,
+			"slots":[
+				{
+					"offset":{ "y":-10, "x":0 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":10, "x":0 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":0, "x":-20 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":-20, "x":-20 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":20, "x":-20 },
+					"creepType":1,
+					"optional":false
+				}
+			]
+		},
+		{
+			"id":4,
+			"type":"assault",
+			"connections":2,
+			"leader":-1,
+			"enabled":true,
+			"relativeAgroability":1.5,
+			"slots":[
+				{
+					"offset":{ "y":-20, "x":20 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":0, "x":20 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":20, "x":20 },
+					"creepType":1,
+					"optional":false
+				},
+				
+				{
+					"offset":{ "y":-40, "x":0 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":-20, "x":0 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":0, "x":0 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":20, "x":0 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":40, "x":0 },
+					"creepType":1,
+					"optional":false
+				},
+				
+				{
+					"offset":{ "y":-40, "x":-20 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":-20, "x":-20 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":20, "x":-20 },
+					"creepType":1,
+					"optional":false
+				},
+				{
+					"offset":{ "y":40, "x":-20 },
+					"creepType":1,
+					"optional":false
+				}
 			]
 		}
 		

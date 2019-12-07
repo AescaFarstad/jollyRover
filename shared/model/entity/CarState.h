@@ -18,6 +18,8 @@ public:
 	float progress;
 	bool isFinished;
 	int32_t score;
+	float speed;
+	float accel;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;

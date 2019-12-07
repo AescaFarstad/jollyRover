@@ -21,6 +21,7 @@ public:
 	TextureDef* opponentCarHullTexture;
 	TextureDef* opponentCarGunTexture;
 	float speed;
+	float accel;
 
 private:
 

@@ -121,7 +121,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	drawProjectileExplosion();	
 	drawDebugGraphics();
 	//drawThreatMap();
-	drawObstacles();
+	//drawObstacles();
 	drawInput();
 	
 	drawHUD();

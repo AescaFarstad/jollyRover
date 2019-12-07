@@ -67,6 +67,9 @@ namespace Cars
 		
 		CarProto& proto = prototypes->cars[0];
 		
+		car.speed = proto.speed;
+		car.accel = proto.accel;
+		
 		car.object.id = state->idCounter++;
 		car.object.prototypeId = 0;
 		car.unit.force = 2; //TODO create player forces
@@ -79,8 +82,10 @@ namespace Cars
 	{
 		void updateCar(CarState& car, PlayerState& player, GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{
+			car.speed += car.accel * timePassed;
+			
 			Point startingLocation = car.unit.location;
-			float passedThisStep = prototypes->cars[car.object.prototypeId].speed * timePassed;
+			float passedThisStep = car.speed * timePassed;
 
 			while (passedThisStep > 0 && (size_t)car.routeIndex < car.route.size() - 1)
 			{
@@ -103,9 +108,34 @@ namespace Cars
 					{
 						creep->unit.health = 0;
 						car.score++;
+						car.speed *= 0.8;
 					}				
 				}
 			}
+			
+			for (auto& player : state->players)
+			{
+				for (auto& anotherCar : player.activeCars)
+				{
+					if (&anotherCar != &car)
+					{
+						CarProto& anotherProto = prototypes->cars[anotherCar.object.prototypeId];
+						if (anotherCar.unit.location.distanceTo(car.unit.location) < proto.size + anotherProto.size)
+						{
+							if (anotherCar.speed > car.speed)
+							{
+								car.unit.health = 0;
+							}
+							else
+							{
+								anotherCar.unit.health = 0;
+							}
+							
+						}
+					}
+				}
+			}
+				
 			
 			if ((uint16_t)car.routeIndex == car.route.size() - 1)
 			{
