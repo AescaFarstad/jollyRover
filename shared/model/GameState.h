@@ -46,6 +46,7 @@ public:
 	
 	std::vector<int> forceStrength_;
 	SpatialMap<CreepState> creepMap_;
+	SpatialMap<CarState> carMap_;
 	ThreatMap threatMap_[2];
 	std::unordered_map<int32_t, CreepState*> creepById_;
 

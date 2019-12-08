@@ -72,12 +72,20 @@ void Prototypes::postProcess()
 			variables.maxCreepSize = creep.size;
 	}
 	
+	variables.maxCarSize = 0;
+	for(auto& car : cars)
+	{
+		if (variables.maxCarSize < car.size)
+			variables.maxCarSize = car.size;
+	}
+	
 	int32_t padding = 100;
 	Point from(-padding, -padding);
 	Point to(variables.fieldWidth + padding, variables.fieldHeight + padding);
 	
 	obstacleMap = SpatialMap<Obstacle>(10, false, from, to);
-	obstacleMap.setNonUnique(obstacles);
+	obstacleMap.reset(obstacles.size() * 4);
+	obstacleMap.addNonUnique(obstacles);
 	
 	
 	

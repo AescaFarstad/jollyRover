@@ -43,6 +43,8 @@ public:
 	int32_t strength;
 	int16_t weapon;
 	int32_t weight;
+	float slowOnRollOver;
+	bool rolloverable;
 	int16_t size;
 	int8_t whiskers;
 	int16_t maxWhiskerLength;

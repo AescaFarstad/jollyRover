@@ -127,7 +127,8 @@ namespace Creeps
 				Point BB(prototypes->variables.fieldWidth + 100, prototypes->variables.fieldHeight + 100);
 				state->creepMap_ = SpatialMap<CreepState>(50, true, Point(-100, -100), BB);
 			}
-			state->creepMap_.setUnique(state->creeps);
+			state->creepMap_.reset(state->creeps.size() * 2);
+			state->creepMap_.addUnique(state->creeps);
 			
 			if (!state->threatMap_[0].isValid())
 			{
@@ -317,6 +318,8 @@ namespace Creeps
 				if (!creepP || creepP->unit.health <= 0)
 					continue;
 					
+				creep.weapon.attackCooldown -= timePassed;	
+					
 				formation.actualLocation_ += creep.unit.location * creep.creepProto_->strength;
 				totalStrength += creep.creepProto_->strength;
 				totalCreeps++;
@@ -380,7 +383,43 @@ namespace Creeps
 				}
 				target->scaleBy(1.f/(targetPriority + partnerCount));
 				creep.formationAttraction_ = *target;
-				moveCreepTowardsPoint(creep, *target, prototypes, timePassed);				
+				moveCreepTowardsPoint(creep, *target, prototypes, timePassed);
+				
+				if (creep.weapon.attackCooldown <= 0)
+				{
+					auto cars = state->carMap_.getInRadius(creep.unit.location, creep.weaponProto_->range * 1.5);
+					if (cars.size() > 0)
+					{
+						auto interceptLoc = FMath::intercept(
+								creep.unit.location, 
+								cars[0]->unit.location, 
+								cars[0]->unit.voluntaryMovement / timePassed, 
+								creep.weaponProto_->bulletSpeed / 1000.f
+							);
+						Point nearestInterception;
+						if (!interceptLoc[0].isNaN())
+						{
+							if (interceptLoc[1].isNaN())
+								nearestInterception = interceptLoc[0];
+							else if ((creep.unit.location - interceptLoc[0]).getLength() < (creep.unit.location - interceptLoc[2]).getLength())
+								nearestInterception = interceptLoc[0];
+							else
+								nearestInterception = interceptLoc[1];
+						}
+						else
+						{
+							nearestInterception = interceptLoc[1];
+						}
+						
+						if (!interceptLoc[0].isNaN())
+							VisualDebug::drawArrow(creep.unit.location, interceptLoc[0], 0x000000);
+						if (!interceptLoc[1].isNaN())
+							VisualDebug::drawArrow(creep.unit.location, interceptLoc[1], 0x000000);
+						
+						if (!nearestInterception.isNaN() && (nearestInterception - creep.unit.location).getLength() < creep.weaponProto_->range)		
+							performCreepAttack(creep, cars[0]->unit, state, nearestInterception - cars[0]->unit.location);
+					}
+				}
 			}
 			
 			if (creepMoveBalanceCount > 0)
@@ -502,6 +541,8 @@ namespace Creeps
 				if (!creepP || creep.unit.health <= 0)
 					return;
 					
+				creep.weapon.attackCooldown -= timePassed;	
+					
 				int32_t mapIndex = creep.unit.force == 0 ? 1 : 0;
 				hostileNearbyForces += state->threatMap_[mapIndex].getThreatAt(creep.unit.location);
 				friendlyNearbyForces += state->threatMap_[1 - mapIndex].getThreatAt(creep.unit.location);
@@ -528,7 +569,7 @@ namespace Creeps
 					creep.targetLoc_ = target->unit.location;
 					if (target->unit.location.distanceTo(creep.unit.location) < creep.weaponProto_->range + target->creepProto_->size)
 					{
-						performCreepAttack(creep, target->unit, state, timePassed);
+						performCreepAttack(creep, target->unit, state, Point());
 					}
 					else
 					{
@@ -572,16 +613,12 @@ namespace Creeps
 			}
 		}
 		
-		void performCreepAttack(CreepState& creep, Unit& target, GameState* state, int32_t timePassed)
+		void performCreepAttack(CreepState& creep, Unit& target, GameState* state, const Point& leading)
 		{
-			if (creep.weapon.attackCooldown > 0)
-			{
-				creep.weapon.attackCooldown -= timePassed;
-			}
-			else
+			if (creep.weapon.attackCooldown <= 0)
 			{
 				creep.weapon.attackCooldown = 1000000 / creep.weaponProto_->attackSpeed;
-				spawnProjectile(creep.unit.location, target.location, creep.weaponProto_, creep.unit.force, state);
+				spawnProjectile(creep.unit.location, target.location + leading, creep.weaponProto_, creep.unit.force, state);
 			}
 		}
 		
@@ -903,7 +940,7 @@ namespace Creeps
 		}
 		
 		
-		void spawnProjectile(Point& from, Point& to, const WeaponProto* prototype, int16_t force, GameState* state)
+		void spawnProjectile(const Point& from, const Point& to, const WeaponProto* prototype, int16_t force, GameState* state)
 		{
 			state->projectiles.emplace_back();
 			Projectile& projectile = state->projectiles.back();
@@ -956,6 +993,18 @@ namespace Creeps
 							}
 						}
 					}
+					
+					auto cars = state->carMap_.getInRadius(proj.target, proj.splash + prototypes->variables.maxCreepSize);
+					for(auto& car : cars)
+					{
+						auto carProto = prototypes->cars[car->object.prototypeId];
+						int32_t r = proj.splash + carProto.size;
+						if (car->unit.location.sqDistanceTo(proj.target) < r*r)
+						{
+							car->unit.health -= proj.damage;
+						}
+					}
+					
 					proj.damage = -1;
 				}			
 			}

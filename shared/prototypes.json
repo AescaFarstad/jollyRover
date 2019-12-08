@@ -40,7 +40,7 @@
 			"id": 0,
 			"name": "Mustang",
 			"speed": 0.04,
-			"accel": 0.00005,
+			"accel": 0.00002,
 			"size": 18,
 			"fuelPerMeter": 2,
 			"maxHealth": 200,
@@ -276,6 +276,8 @@
 			"maxHealth":200,
 			"speed": 180,
 			"strength":2000,
+			"slowOnRollOver":0.8,
+			"rolloverable":false,
 			"loot": 100,
 			"weapon": 0,
 			"size": 21,
@@ -297,6 +299,8 @@
 			"maxHealth":40,
 			"speed": 25,
 			"strength":100,
+			"slowOnRollOver":0.8,
+			"rolloverable":true,
 			"loot": 0,		
 			"weapon": 1,
 			"size": 5,
@@ -325,8 +329,8 @@
 				"attackSpeed": 2500,
 				"splash": 1,	
 				"ranged":true,
-				"range": 30,
-				"bulletSpeed": 120,
+				"range": 40,
+				"bulletSpeed": 130,
 				"projectileTexture":["", "", ""]
 			},
 			{
@@ -467,9 +471,9 @@
 		{
 			"id":1,
 			"type":"assault",
-			"connections":4,
+			"connections":3,
 			"leader":-1,
-			"enabled":false,
+			"enabled":true,
 			"relativeAgroability":1,
 			"slots":[
 				{
@@ -662,7 +666,7 @@
 			"type":"assault",
 			"connections":2,
 			"leader":0,
-			"enabled":false,
+			"enabled":true,
 			"relativeAgroability":1,
 			"slots":[
 				{

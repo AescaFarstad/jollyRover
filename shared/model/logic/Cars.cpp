@@ -8,6 +8,20 @@ namespace Cars
 {
 	using namespace CarsInternal;
 	
+	void updateCarCache(GameState* state, Prototypes* prototypes, int32_t timePassed)
+	{
+		if (!state->carMap_.isValid())
+		{
+			Point BB(prototypes->variables.fieldWidth + 100, prototypes->variables.fieldHeight + 100);
+			state->carMap_ = SpatialMap<CarState>(120, true, Point(-100, -100), BB);
+		}
+		state->carMap_.reset(0);
+		for (PlayerState& player : state->players)
+		{
+			state->carMap_.addUnique(player.activeCars);
+		}
+	}
+	
 	void handleCarUpdate(GameState* state, Prototypes* prototypes, int32_t timePassed)
 	{
 		for (PlayerState& player : state->players)
@@ -102,13 +116,15 @@ namespace Cars
 			{
 				if (creep->creepProto_->size + proto.size > car.unit.location.distanceTo(creep->unit.location))
 				{
-					if (creep->creepProto_->weight > 100)
+					if (!creep->creepProto_->rolloverable)
+					{
 						car.unit.health = 0;
+					}
 					else
 					{
 						creep->unit.health = 0;
 						car.score++;
-						car.speed *= 0.8;
+						car.speed *= creep->creepProto_->slowOnRollOver;
 					}				
 				}
 			}

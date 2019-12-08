@@ -26,3 +26,8 @@ void CarState::serialize(SerializationStream &stream) const
 	Serializer::write(accel, stream);
 	Serializer::writeVector(route, stream);
 }
+
+const Point& CarState::getLocation()
+{
+	return unit.location;
+}

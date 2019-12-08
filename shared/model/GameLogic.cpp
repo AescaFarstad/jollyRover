@@ -77,9 +77,9 @@ namespace GameLogic
 
 		for (size_t i = 1; i < route.size(); i++)
 		{
-			if (fabsf(route[i - 1].distanceTo(route[i]) - prototypes->variables.routeStepSize) > 10 *FMath::EPSILON)
+			if (fabsf(route[i - 1].distanceTo(route[i]) - prototypes->variables.routeStepSize) > 100 *FMath::EPSILON)
 			{
-				if (i != route.size() - 1 || route[i - 1].distanceTo(route[i]) > prototypes->variables.routeStepSize + 10 *FMath::EPSILON)
+				if (i != route.size() - 1 || route[i - 1].distanceTo(route[i]) > prototypes->variables.routeStepSize + 100 *FMath::EPSILON)
 				{
 					//float ds = route[i - 1].distanceTo(route[i]);
 					//float max = prototypes->variables.routeStepSize + FMath::EPSILON;
@@ -177,6 +177,7 @@ namespace GameLogic
 			
 			Creeps::handleCreepSpawn(state, prototypes, timePassed);
 			
+			Cars::updateCarCache(state, prototypes, timePassed);
 			Creeps::handleCreepUpdate(state, prototypes, timePassed);
 			Cars::handleCarUpdate(state, prototypes, timePassed);
 			

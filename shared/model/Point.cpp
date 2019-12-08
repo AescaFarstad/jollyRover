@@ -241,3 +241,7 @@ Point operator*(const float& x, const Point& y)
 {
 	return Point(y.x * x, y.y * x);
 }
+Point operator/(const Point& x, const float& y)
+{
+	return Point(x.x / y, x.y / y);
+}

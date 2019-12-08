@@ -27,6 +27,7 @@ public:
 	int32_t intensity;
 	
 	int32_t maxCreepSize;
+	int32_t maxCarSize;
 	int32_t maxEventAnimationTime;
 	int32_t baseAgroLevel;
 	

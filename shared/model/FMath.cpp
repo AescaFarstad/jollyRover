@@ -108,6 +108,37 @@ float FMath::distanceToLine(const Point &from, const Point &l1, const Point &l2)
 	return (a * from.x + b * from.y + c) / std::sqrt(a * a + b * b);
 }
 
+
+std::array<Point, 2> FMath::intercept(const Point& origin, const Point& target, const Point& velocity, float speed)
+{
+	Point delta = target - origin;
+	float a = velocity.x * velocity.x + velocity.y * velocity.y - speed * speed;
+	float b = 2 * (velocity.x * delta.x + velocity.y * delta.y);
+	float c = delta.x * delta.x + delta.y * delta.y;
+	
+	if (std::fabs(b) < FMath::EPSILON)
+		return {Point::getNullPoint(), Point::getNullPoint()};
+	
+	std::array<float, 2> t = {-c/b, -c/b};
+	if (std::fabs(a) > FMath::EPSILON)
+	{
+		float d = b * b - 4 * a * c;
+		if (d < 0) 
+			return {Point::getNullPoint(), Point::getNullPoint()};
+		d = std::sqrt(d);
+		a *= 2;
+		t[0] = (-b - d) / a;
+		t[1] = (-b + d) / a;
+	}
+	
+	std::array<Point, 2> result;
+	
+	result[0] = t[0] > 0 ? target + t[0] * velocity : Point::getNullPoint();
+	result[1] = t[1] > 0 ? target + t[1] * velocity : Point::getNullPoint();
+	
+	return result;
+}
+
 //https://www.dsprelated.com/showarticle/1052.php
 // Polynomial approximating arctangenet on the range -1,1.
 // Max error < 0.005 (or 0.29 degrees)

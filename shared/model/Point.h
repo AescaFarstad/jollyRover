@@ -68,3 +68,4 @@ bool operator!=(const Point& x, const Point& y);
 float operator*(const Point& x, const Point& y);
 Point operator*(const Point& x, const float& y);
 Point operator*(const float& x, const Point& y);
+Point operator/(const Point& x, const float& y);

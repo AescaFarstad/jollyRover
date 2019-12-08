@@ -8,7 +8,7 @@ class Point;
 class Edge;
 namespace FMath
 {
-	const float EPSILON = 0.001f;
+	const float EPSILON = 0.0001f;
 	const float F_MAX = std::numeric_limits<float>::max();
 	const float F_MIN = std::numeric_limits<float>::min();
 
@@ -22,6 +22,7 @@ namespace FMath
 	Point lerp(float x1, Point& p1, float x2, Point& p2, float argument);
 	///Does not overflow
 	uint8_t lerp(float x1, uint8_t y1, float x2, uint8_t y2, float argument);
+	std::array<Point, 2> intercept(const Point& origin, const Point& target, const Point& velocity, float speed);
 	float atan2(float y, float x);
 	float angleDelta(float from, float to);
 	float normalizeAngle(float angle);

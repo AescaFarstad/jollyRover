@@ -9,6 +9,8 @@ void from_json(const json &j, CreepProto &creep)
 	creep.speed = j.at("speed");
 	creep.speed /= 1000;
 	creep.weight = j.at("weight");
+	creep.slowOnRollOver = j.at("slowOnRollOver");
+	creep.rolloverable = j.at("rolloverable");
 	creep.size = j.at("size");
 	creep.whiskers = j.at("whiskers");
 	creep.maxWhiskerLength = j.at("maxWhiskerLength");

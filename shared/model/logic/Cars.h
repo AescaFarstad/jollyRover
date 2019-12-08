@@ -2,6 +2,7 @@
 
 namespace Cars
 {
+	void updateCarCache(GameState* state, Prototypes* prototypes, int32_t timePassed);
 	void handleCarUpdate(GameState* state, Prototypes* prototypes, int32_t timePassed);
 	void handleCarDeath(GameState* state, Prototypes* prototypes, int32_t timePassed);	
 			

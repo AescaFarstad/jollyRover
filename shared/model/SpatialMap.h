@@ -29,9 +29,9 @@ public:
 	SpatialMap<T>(SpatialMap<T>&& that) = delete;
 	SpatialMap<T>(SpatialMap<T>& that) = delete;
 	
-	
-	void setUnique(std::vector<T>& data);
-	void setNonUnique(std::vector<T>& data);
+	void reset(int32_t expectedCount);
+	void addUnique(std::vector<T>& data);
+	void addNonUnique(std::vector<T>& data);
 	std::vector<T*> getInRadius(const Point& origin, int32_t radius);
 	std::vector<T*>& getInCell(const Point& origin);
 	std::vector<T*> getInCellsIntersectingRect(const Point& AA, const Point& BB);
@@ -189,6 +189,7 @@ SpatialMap<T>::SpatialMap(int32_t cellSize, bool useLayeredMap, Point AA, Point 
 	m_safetyBuffer = std::sqrt(2) * m_cellSize / 2;
 	m_totalSize = 0;
 }
+
 template <typename T>
 void SpatialMap<T>::clearMap(std::vector<std::vector<std::vector<T*>>>& map, int32_t expectedCount)
 {
@@ -203,12 +204,12 @@ void SpatialMap<T>::clearMap(std::vector<std::vector<std::vector<T*>>>& map, int
 }
 
 template <typename T>
-void SpatialMap<T>::setUnique(std::vector<T>& data)
-{
+void SpatialMap<T>::reset(int32_t expectedCount)
+{	
 	if (!m_isValid)
 		THROW_FATAL_ERROR("Spatial map is not valid.");
 		
-	float density = data.size() / (m_map[0][0].size() * m_map[0][0][0].size());
+	float density = expectedCount / (m_map[0][0].size() * m_map[0][0][0].size());
 	density *= 2;
 	clearMap(m_map[0][0], density);
 	
@@ -217,7 +218,16 @@ void SpatialMap<T>::setUnique(std::vector<T>& data)
 		
 	clearMap(m_map[1][0], density);
 	clearMap(m_map[0][1], density);
-	clearMap(m_map[1][1], density);	
+	clearMap(m_map[1][1], density);
+	
+	m_totalSize = 0;
+}
+
+template <typename T>
+void SpatialMap<T>::addUnique(std::vector<T>& data)
+{
+	if (!m_isValid)
+		THROW_FATAL_ERROR("Spatial map is not valid.");
 	
 	for(auto& iter : data)
 	{		
@@ -238,25 +248,14 @@ void SpatialMap<T>::setUnique(std::vector<T>& data)
 		}
 		
 	}
-	m_totalSize = data.size();
+	m_totalSize += data.size();
 }
 
 template <typename T>
-void SpatialMap<T>::setNonUnique(std::vector<T>& data)
+void SpatialMap<T>::addNonUnique(std::vector<T>& data)
 {
 	if (!m_isValid)
 		THROW_FATAL_ERROR("Spatial map is not valid.");
-		
-	float density = data.size() / (m_map[0][0].size() * m_map[0][0][0].size());
-	density *= 4;
-	clearMap(m_map[0][0], density);
-	
-	if (!m_useLayeredMap)
-		density = 0;
-		
-	clearMap(m_map[1][0], density);
-	clearMap(m_map[0][1], density);
-	clearMap(m_map[1][1], density);	
 	
 	Point vert[4] = {Point(0, 0), Point(0, m_cellSize), Point(m_cellSize, 0), Point(m_cellSize, m_cellSize)};
 	Edge protoEdges[4] = {
@@ -324,7 +323,6 @@ void SpatialMap<T>::setNonUnique(std::vector<T>& data)
 				map[x][y].push_back(&iter);
 		}	
 	}
-	m_totalSize = 0;
 	for(auto&gx : m_map)
 	for(auto&gy : gx)
 	for(auto&x : gy)
