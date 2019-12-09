@@ -13,8 +13,8 @@ SSH_CONFIG := JollyRover
 REMOTE_DEPLOY_PATH := ~/JollyRover
 
 AUTODEPS = -MMD -MF $(subst .bc,.d,$@)
-COMPILE_FLAGS := -g -Wall -c -std=c++14 -D_REENTRANT -DFC_USE_SDL_GPU $(CXXFLAGS)
-LINK_FLAGS := -std=c++14  $(LDFLAGS)
+COMPILE_FLAGS := -g -O0 -Wall -c -std=c++17 -D_REENTRANT -DFC_USE_SDL_GPU $(CXXFLAGS)
+LINK_FLAGS := -g -O0 -std=c++17  $(LDFLAGS)
 
 LOCAL_LIBS := -lSDL2_gpu -lSDL2 -lSDL2_net -lSDL2_image -lSDL2_ttf -lutil
 SERVER_LIBS := -lSDL2 -lSDL2_net -lutil
@@ -78,9 +78,9 @@ web: $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT)
 	rsync -r assets/ out/assets/
 	rsync -r web/ out/
 	$(WEB_COMPILER) \
-		-O2 -g1 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
-		-s WASM=0 -s TOTAL_MEMORY=134217728 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
-		--use-preload-plugins -v -o $(WEB_TARGET).js lib/SDL_gpu.bc $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT) \
+		-O2 -g0 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
+		-s WASM=1 -s TOTAL_MEMORY=134217728 -s DEMANGLE_SUPPORT=0 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=0 -s SAFE_HEAP=1 \
+		--use-preload-plugins -v -o $(WEB_TARGET).html lib/SDL_gpu.bc $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT) \
 		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets \
 		--memory-init-file 1
 	sed -i 's/antialias\:false/antialias\:true/g' $(WEB_TARGET).js
@@ -113,7 +113,7 @@ $(OBJDIR_CLIENT_LOCAL)/%.bc : %.cpp
 	
 $(OBJDIR_CLIENT_WEB)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
-	$(WEB_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -g1 -c -o $@ $<
+	$(WEB_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3  -c -o $@ $<
 	
 $(OBJDIR_CLIENT_SERVER)/%.bc : %.cpp
 	@mkdir -p $(dir $@)

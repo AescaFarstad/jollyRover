@@ -52,3 +52,5 @@ PC
 
 
 RequestTypes vs NETWORK_CLIENT_STATE почему капс/не капс?
+Requset types b MessageTypes сериализуются отдельно, всех надо в одно место
+зачем serializationstream возвращает уникптр?
