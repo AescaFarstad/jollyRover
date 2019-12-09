@@ -37,7 +37,7 @@ GameKeyboardInput::GameKeyboardInput()
 	actionByButton[SDL_SCANCODE_KP_4] = GAME_KEYBOARD_ACTIONS::TIME_SCALE1;
 	actionByButton[SDL_SCANCODE_KP_7] = GAME_KEYBOARD_ACTIONS::TIME_SCALE5;
 	
-	actionByButton[SDL_SCANCODE_KP_0] = GAME_KEYBOARD_ACTIONS::TIME_TOGGLE_PAUSE;
+	actionByButton[SDL_SCANCODE_KP_0] = GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_10;
 	actionByButton[SDL_SCANCODE_SPACE] = GAME_KEYBOARD_ACTIONS::TIME_TOGGLE_PAUSE;
 	
 	actionByButton[SDL_SCANCODE_KP_DIVIDE] = GAME_KEYBOARD_ACTIONS::REVERT1;
@@ -114,6 +114,16 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 			InputTimeMessage timeMsg;
 			timeMsg.forcedTimeScale = 3;
 			timeMsg.forcedStepsAtOnce = 3;
+			timeMsg.modifyForcedTimeScale = true;
+			timeMsg.modifyForcedStepsAtOnce = true;
+			network.send(&timeMsg);
+			break;
+		};
+		case GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_10 :
+		{
+			InputTimeMessage timeMsg;
+			timeMsg.forcedTimeScale = 1;
+			timeMsg.forcedStepsAtOnce = 10;
 			timeMsg.modifyForcedTimeScale = true;
 			timeMsg.modifyForcedStepsAtOnce = true;
 			network.send(&timeMsg);
@@ -318,10 +328,12 @@ void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, Keyboard& keyboard, Netwo
 		case GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_03 :
 		case GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_1 :
 		case GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_5 :
+		case GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_10 :
 		{
 			if (!keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_03]] &&
 				!keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_1]] &&
-				!keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_5]]
+				!keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_5]] &&
+				!keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_10]]
 			)
 			{
 			InputTimeMessage timeMsg;

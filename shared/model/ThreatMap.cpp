@@ -32,7 +32,7 @@ void ThreatMap::addThreat(Point& origin, int32_t value)
 
 void ThreatMap::blur(float amount)
 {
-	auto before = m_map;	
+	auto before = m_map;
 	for(size_t i = 1; i < m_map.size() - 1; i++)
 	{
 		for(size_t j = 1; j < m_map[i].size() - 1; j++)

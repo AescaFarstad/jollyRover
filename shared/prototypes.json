@@ -1,6 +1,6 @@
 {
 	"variables":{
-		"fixedStepDuration": 10,
+		"fixedStepDuration": 16,
 		"fieldWidth": 1280,
 		"fieldHeight": 720,
 		"routeStepSize": 20,
@@ -9,7 +9,7 @@
 		"stepAngleWindow": 3.14,
 		"maxEventAnimationTime": 1000,
 		"war":{
-			"intensity": 500,
+			"intensity": 12000,
 			"creepRestitution": 0.6,
 			"additionalSpacing": 5,
 			"baseAgroLevel": 15

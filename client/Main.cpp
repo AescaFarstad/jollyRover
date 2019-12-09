@@ -61,7 +61,7 @@ void mainLoop(void*)
 	
 	if (!isFinished && delta >= MIN_TIME_PER_FRAME)
 	{
-		GPU_Clear(screen);
+		GPU_Clear(screen);/*
 		lineCount++;
 		line += ", " + std::to_string(delta);
 		
@@ -70,7 +70,7 @@ void mainLoop(void*)
 			lineCount = 0;
 			printf("%s\n", line.c_str());
 			line="";
-		}
+		}*/
 
 		lastTicks = ticks;
 		game->update();

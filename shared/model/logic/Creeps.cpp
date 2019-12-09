@@ -133,8 +133,8 @@ namespace Creeps
 			if (!state->threatMap_[0].isValid())
 			{
 				Point BB(prototypes->variables.fieldWidth, prototypes->variables.fieldHeight);
-				state->threatMap_[0] = ThreatMap(80, Point(), BB);
-				state->threatMap_[1] = ThreatMap(80, Point(), BB);
+				state->threatMap_[0] = ThreatMap(160, Point(), BB);
+				state->threatMap_[1] = ThreatMap(160, Point(), BB);
 			}
 			
 			for(auto& creep : state->creeps)
@@ -142,13 +142,9 @@ namespace Creeps
 				state->threatMap_[creep.unit.force].addThreat(creep.unit.location, creep.creepProto_->strength);
 			}
 			state->threatMap_[0].blur(1);
-			state->threatMap_[1].blur(1);
+			state->threatMap_[0].blur(0.9);
 			state->threatMap_[0].blur(0.8);
-			state->threatMap_[1].blur(0.8);
-			state->threatMap_[0].blur(0.6);
-			state->threatMap_[1].blur(0.6);
-			state->threatMap_[0].blur(0.4);
-			state->threatMap_[1].blur(0.4);
+			state->threatMap_[0].blur(0.7);
 		}
 		
 		void spawnFormation(GameState* state, Prototypes* prototypes, ForceProto& forceProto, FormationProto& formationProto)
