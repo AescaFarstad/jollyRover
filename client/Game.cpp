@@ -134,7 +134,7 @@ void Game::load()
 			int64_t clientToServerDelta = m_network->timeSync.localToServerUpperBound(0);
 			S::log.add("server time delta: " + std::to_string(clientToServerDelta) + 
 					" uncertainty: " + std::to_string(m_network->timeSync.getUncertainty()), { LOG_TAGS::NET });
-			m_gameMode.loadGame(std::unique_ptr<GameState>(gameStateMsg->state), clientToServerDelta + 50000, m_login);
+			m_gameMode.loadGame(std::unique_ptr<GameState>(gameStateMsg->state), clientToServerDelta, m_login);
 			gameStateMsg->ownsState = false;
 			
 			addNetworkBindings();

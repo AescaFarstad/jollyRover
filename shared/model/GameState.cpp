@@ -4,6 +4,8 @@ GameState::GameState()
 {
 	timeStamp = 0;
 	idCounter = 1;
+	loadCount = 0;
+	isEventLoggerEnabled = false;
 	creeps.reserve(MAX_CREEPS);
 }
 

@@ -3,6 +3,7 @@
 #include <Logger.h>
 #include <cassert>
 #include <json.hpp>
+#include <FPSMeter.h>
 
 #define THROW_FATAL_ERROR(ERROR_MSG) {printf( "FATAL ERROR: \n%s @ %d \n%s \n", __FILE__, __LINE__, #ERROR_MSG); abort();}
 
@@ -42,4 +43,5 @@ namespace S
 	int32_t getId();
 	extern int32_t idCounter;
 	extern GameConfig config;
+	extern FPSMeter fpsMeter;
 }

@@ -24,7 +24,7 @@ namespace MainInternal
 	const int SCREEN_WIDTH = 640;
 	const int SCREEN_HEIGHT = 480;
 	const int MAX_TIME_PER_FRAME = 100;
-	const int MIN_TIME_PER_FRAME = 10;
+	const int MIN_TIME_PER_FRAME = 5;
 
 	GPU_Target* screen;
 	
@@ -32,7 +32,9 @@ namespace MainInternal
 
 	bool isFinished = false;
 	int lastTicks = 0;
-	FPSMeter fpsMeter;
+	
+	std::string line = "";
+	int32_t lineCount = 0;
 }
 
 using namespace MainInternal;
@@ -56,16 +58,26 @@ void mainLoop(void*)
 	
 	int ticks = SDL_GetTicks();
 	int delta = ticks - lastTicks > MAX_TIME_PER_FRAME ? MAX_TIME_PER_FRAME : ticks - lastTicks;
+	
 	if (!isFinished && delta >= MIN_TIME_PER_FRAME)
 	{
 		GPU_Clear(screen);
+		lineCount++;
+		line += ", " + std::to_string(delta);
+		
+		if (lineCount == 30)
+		{
+			lineCount = 0;
+			printf("%s\n", line.c_str());
+			line="";
+		}
 
 		lastTicks = ticks;
 		game->update();
 		
-		/*
-		fpsMeter.registerFrame(ticks);
-		if (fpsMeter.getMeasurementDuration() > 5000)
+		
+		S::fpsMeter.registerFrame(ticks);
+		/*if (fpsMeter.getMeasurementDuration() > 5000)
 			printf(fpsMeter.report().c_str());*/
 
 		GPU_Flip(screen);
@@ -132,6 +144,7 @@ typedef struct EmscriptenWebGLContextAttributes {
 
 	printf("endiness: %s\n", (SystemInfo::instance->isBigEndian ? "big" : "little"));
 	
+	GPU_SetPreInitFlags(GPU_INIT_DISABLE_VSYNC);
 	screen = GPU_InitRenderer(GPU_RENDERER_GLES_2, SCREEN_WIDTH, SCREEN_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
 	if (screen == NULL)
 	{

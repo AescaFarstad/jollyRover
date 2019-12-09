@@ -4,6 +4,7 @@
 #include <VisualDebug.h>
 #include <FMath.h>
 #include <std2.h>
+#include <FPSMeter.h>
 
 
 GameView::GameView()
@@ -119,7 +120,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	//drawFormations();	
 	//drawFormationConnections();	
 	drawProjectileExplosion();	
-	drawDebugGraphics();
+	//drawDebugGraphics();
 	//drawThreatMap();
 	//drawObstacles();
 	drawInput();
@@ -717,4 +718,6 @@ void GameView::drawHUD()
 		
 		i++;
 	}
+	
+	m_fontAmaticBold.draw(m_screen, 5.f, m_prototypes->variables.fieldHeight - 50, "fps: %.1f", S::fpsMeter.getfps(500));
 }

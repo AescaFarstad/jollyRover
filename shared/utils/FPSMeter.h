@@ -1,7 +1,9 @@
+#pragma once
 #include <string>
 #include <math.h>
 #include <sstream>
 #include <iomanip>
+#include <CircularContainer.h>
 
 class FPSMeter
 {
@@ -13,6 +15,7 @@ public:
 	
 	void registerFrame(size_t ticks);
 	std::string report();
+	float getfps(size_t duration);
 	size_t getMeasurementDuration();
 	
 private:
@@ -20,6 +23,8 @@ private:
 	size_t m_lastMeasurement;
 	size_t m_lastCount;
 	size_t m_time;
+	
+	CircularContainer<size_t, 180>  m_ticks;
 };
 
 

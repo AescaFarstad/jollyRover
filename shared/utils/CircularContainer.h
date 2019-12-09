@@ -1,6 +1,6 @@
 #pragma once
 #include <stdint.h>
-#include <Serializer.h>
+#include <iterator>
 
 template<typename T, uint32_t arraySize>
 class FixedCircularIterator : public std::iterator<std::random_access_iterator_tag, T>
@@ -29,7 +29,7 @@ public:
 	
     FixedCircularIterator<T, arraySize>& operator-=(const ptrdiff_t& movement)	
 	{
-		m_ptr = (m_ptr - m_start + movement) % arraySize + m_start;
+		m_ptr = (m_ptr - m_start - movement + arraySize) % arraySize + m_start;
 		return (*this);
 	}	
 	
@@ -105,7 +105,7 @@ public:
 
     T& operator*(){return *m_ptr;}
     const T& operator*()const{return *m_ptr;}
-    T* operator->(){return m_ptr;}
+    T* operator->()const{return m_ptr;}
 
     T* getPtr()const{return m_ptr;}
     const T* getConstPtr()const{return m_ptr;}
@@ -129,7 +129,7 @@ public:
 	uint32_t size;
 	
 	typedef FixedCircularIterator<T, arraySize> iterator;
-    typedef FixedCircularIterator<const T, arraySize> const_iterator;	
+    typedef FixedCircularIterator<const T, arraySize> const_iterator;
 	
     iterator leftEdge(){return iterator(&array[0]);}
     iterator begin()
@@ -145,32 +145,11 @@ public:
 		return leftEdge() + cursor;
 	}
 	
+	static uint32_t diff(const iterator& a, const iterator& b);
+	
 	template <class... Args>
 	void add(Args&&... args);
-	
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
 };
-
-template <typename T, uint32_t arraySize>
-void CircularContainer<T, arraySize>::deserialize(SerializationStream& stream)
-{
-	Serializer::read(cursor, stream);
-	Serializer::read(total, stream);
-	Serializer::read(size, stream);
-	int32_t readLength = std::min(sizeof(array), (long unsigned int)total);
-	memcpy(&array, stream.read(array, readLength), readLength);
-	
-}
-
-template <typename T, uint32_t arraySize>
-void CircularContainer<T, arraySize>::serialize(SerializationStream& stream) const
-{	
-	Serializer::write(cursor, stream);
-	Serializer::write(total, stream);
-	Serializer::write(size, stream);
-	stream.write(array, std::min((int)sizeof(array), (int)total));
-}
 
 template <typename T, uint32_t arraySize>
 CircularContainer<T, arraySize>::CircularContainer()
@@ -187,4 +166,13 @@ void CircularContainer<T, arraySize>::add(Args&&... args)
 	array[cursor] = T(std::forward<Args>(args)...);
 	cursor = (cursor + 1) % arraySize;
 	total++;
+}
+
+template <typename T, uint32_t arraySize>
+uint32_t CircularContainer<T, arraySize>::diff(const iterator& a, const iterator& b)
+{
+	if (a.getConstPtr() >= b.getConstPtr())
+		return (a.getConstPtr() - b.getConstPtr());
+	else
+		return (a.getConstPtr() - b.getConstPtr()) + arraySize;
 }

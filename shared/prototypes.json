@@ -9,7 +9,7 @@
 		"stepAngleWindow": 3.14,
 		"maxEventAnimationTime": 1000,
 		"war":{
-			"intensity": 5000,
+			"intensity": 500,
 			"creepRestitution": 0.6,
 			"additionalSpacing": 5,
 			"baseAgroLevel": 15
@@ -18,13 +18,13 @@
 	"forces":[
 		{
 			"id": 0,
-			"spawn": { "x1":1400, "y1":100, "x2":1500, "y2":620  },
+			"spawn": { "x1":1100, "y1":100, "x2":1200, "y2":620  },
 			"freq":[20, 100],
 			"alwaysOn":true
 		},
 		{
 			"id": 1,
-			"spawn": { "x1":-250, "y1":100, "x2":-150, "y2":620  },
+			"spawn": { "x1":-50, "y1":100, "x2":150, "y2":620  },
 			"freq":[10, 200],
 			"alwaysOn":true
 		},
@@ -666,7 +666,7 @@
 			"type":"assault",
 			"connections":2,
 			"leader":0,
-			"enabled":true,
+			"enabled":false,
 			"relativeAgroability":1,
 			"slots":[
 				{
