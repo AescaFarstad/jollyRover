@@ -2,3 +2,4 @@
 *.bc
 out/*
 .vscode/ipch/*
+callgrind.*
