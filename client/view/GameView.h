@@ -60,7 +60,7 @@ private:
 	void drawFormations();
 	void drawFormationConnections();
 	void drawProjectileExplosion();
-	void drawUnitExplosion();
+	void drawRemnants();
 	void drawDebugGraphics();
 	void drawThreatMap();
 	void drawHUD();

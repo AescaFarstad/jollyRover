@@ -12,7 +12,7 @@
 	#include <SDL2/SDL.h>
 #endif
 
-enum class LOG_TAGS : int
+enum class LOG_TAGS : int8_t
 {
 	UNIQUE,
 	ERROR_,
@@ -49,6 +49,8 @@ public:
 	void add(std::string message);
 	void enableTags(std::initializer_list<LOG_TAGS> m_enabledTags);
 	void disableTags(std::initializer_list<LOG_TAGS> disabledtags);
+	void toggleTag(LOG_TAGS tag);
+	bool isEnabled(LOG_TAGS tag);
 
 private:
 	std::vector<LogMessage> m_messages;

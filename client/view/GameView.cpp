@@ -5,6 +5,7 @@
 #include <FMath.h>
 #include <std2.h>
 #include <FPSMeter.h>
+#include <DrawSettings.h>
 
 
 GameView::GameView()
@@ -109,23 +110,36 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	GPU_Rect layerRect{0, 0, (float)m_layer1Image->w, (float)m_layer1Image->h};
 	Point location(0, 0);
 
-	m_renderer->blit(m_layer1Image, layerRect, location);
-	drawPlayers();
-	drawUnitExplosion();
-	m_renderer->blit(m_layer2Image, layerRect, location);	
-	drawCreeps();
-	drawCars();
-	drawProjectiles();
-	m_renderer->blit(m_layer3Image, layerRect, location);
-	//drawFormations();	
-	//drawFormationConnections();	
-	drawProjectileExplosion();	
-	//drawDebugGraphics();
-	//drawThreatMap();
-	//drawObstacles();
-	drawInput();
-	
-	drawHUD();
+	if (S::drawSettings.layer1)
+		m_renderer->blit(m_layer1Image, layerRect, location);
+	if (S::drawSettings.remnants)
+		drawRemnants();
+	if (S::drawSettings.layer2)
+		m_renderer->blit(m_layer2Image, layerRect, location);	
+	if (S::drawSettings.creeps)
+		drawCreeps();
+	if (S::drawSettings.cars)
+		drawCars();
+	if (S::drawSettings.projectiles)
+		drawProjectiles();
+	if (S::drawSettings.layer3)
+		m_renderer->blit(m_layer3Image, layerRect, location);
+	if (S::drawSettings.formations_D)
+		drawFormations();	
+	if (S::drawSettings.connections_D)
+		drawFormationConnections();	
+	if (S::drawSettings.explosions)
+		drawProjectileExplosion();	
+	if (S::drawSettings.debug_D)
+		drawDebugGraphics();
+	if (S::drawSettings.threat_D)
+		drawThreatMap();
+	if (S::drawSettings.obstacles_D)
+		drawObstacles();
+	if (S::drawSettings.input)
+		drawInput();	
+	if (S::drawSettings.hud)
+		drawHUD();
 	
 	lastTime = state->time.time;
 }
@@ -143,11 +157,6 @@ void GameView::onMouseMove(SDL_MouseMotionEvent* event)
 		VisualDebug::interestingId = nearestCreep->object.id;
 	else
 		VisualDebug::interestingId = -1;
-}
-
-void GameView::drawPlayers()
-{
-	//...
 }
 
 void GameView::drawObstacles()
@@ -568,7 +577,7 @@ void GameView::drawProjectileExplosion()
 	}*/
 }
 
-void GameView::drawUnitExplosion()
+void GameView::drawRemnants()
 {
 	if (!m_state->isEventLoggerEnabled)
 		return;
@@ -687,37 +696,41 @@ void GameView::drawHUD()
 {
 	//m_fontAmaticBold.draw(m_screen, 20.f, 20.f, "Score: %d", m_state->timeStamp);
 	
-	std::vector<PlayerState> players = m_state->players;
-	std::sort(players.begin(), players.end(), [](PlayerState& a, PlayerState& b){ return a.score > b.score;});
-	int32_t i = 0;
-	for(auto& p : players)
-	{
-		std::string text = "";
-		if (!p.isHeadless)
+	if (S::drawSettings.scores)
+	{	
+		std::vector<PlayerState> players = m_state->players;
+		std::sort(players.begin(), players.end(), [](PlayerState& a, PlayerState& b){ return a.score > b.score;});
+		int32_t i = 0;
+		for(auto& p : players)
 		{
-			if (p.login == m_login)
-				text += "YOU";
+			std::string text = "";
+			if (!p.isHeadless)
+			{
+				if (p.login == m_login)
+					text += "YOU";
+				else
+					text += "player " + std::to_string(p.login);
+				if (p.isAI)
+					text += " (AI)";
+			}
 			else
-				text += "player " + std::to_string(p.login);
-			if (p.isAI)
-				text += " (AI)";
+			{
+				text += "AI " + std::to_string(-p.login);
+			}
+			text += ":  " +  std::to_string(p.score);
+			
+			for(auto& car : p.activeCars)
+			{
+				if (car.score > 0)
+					text += "  +  " +  std::to_string(car.score);
+			}
+			
+			m_fontAmaticBold.draw(m_screen, 5.f, 20.f + 30 * i, "%s", text.c_str());
+			
+			i++;
 		}
-		else
-		{
-			text += "AI " + std::to_string(-p.login);
-		}
-		text += ":  " +  std::to_string(p.score);
-		
-		for(auto& car : p.activeCars)
-		{
-			if (car.score > 0)
-				text += "  +  " +  std::to_string(car.score);
-		}
-		
-		m_fontAmaticBold.draw(m_screen, 5.f, 20.f + 30 * i, "%s", text.c_str());
-		
-		i++;
 	}
 	
-	m_fontAmaticBold.draw(m_screen, 5.f, m_prototypes->variables.fieldHeight - 50, "fps: %.1f", S::fpsMeter.getfps(500));
+	if (S::drawSettings.fps_D)
+		m_fontAmaticBold.draw(m_screen, 5.f, m_prototypes->variables.fieldHeight - 50, "fps: %.1f", S::fpsMeter.getfps(500));
 }

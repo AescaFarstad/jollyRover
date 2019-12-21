@@ -78,11 +78,11 @@ web: $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT)
 	rsync -r assets/ out/assets/
 	rsync -r web/ out/
 	$(WEB_COMPILER) \
-		-g4 -O3 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
+		-g4 -O0 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
 		-s WASM=1 -s TOTAL_MEMORY=268435456 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
 		--use-preload-plugins -v -o $(WEB_TARGET).html lib/SDL_gpu.bc $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT) \
 		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets \
-		--memory-init-file 1
+		--memory-init-file 1 --shell-file out/index.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']" 
 	sed -i 's/antialias\:false/antialias\:true/g' $(WEB_TARGET).js
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	

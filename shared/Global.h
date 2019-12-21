@@ -44,4 +44,4 @@ namespace S
 	extern int32_t idCounter;
 	extern GameConfig config;
 	extern FPSMeter fpsMeter;
-}
+};

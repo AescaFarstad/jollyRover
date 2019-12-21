@@ -71,3 +71,17 @@ void Logger::report(LogMessage* msg)
 {
 	std::cout << std::setfill(' ') << std::setw(6) << msg->stamp << " " << msg->message << std::endl;
 }
+
+void Logger::toggleTag(LOG_TAGS tag)
+{
+	if (isEnabled(tag))
+		disableTags({tag});
+	else
+		enableTags({tag});		
+}
+
+bool Logger::isEnabled(LOG_TAGS tag)
+{
+	return isReportable({tag});
+}
+
