@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+#include <ISerializable.h>
 
 enum class MESSAGE_TYPE : int16_t
 {
@@ -24,3 +25,11 @@ enum class REQUEST_TYPE : int16_t
 	REQUEST_PING = 4,
 	REQUEST_PONG = 5
 };
+
+namespace Serializer {
+	
+	void write(const MESSAGE_TYPE& value, SerializationStream& stream);
+	void read(MESSAGE_TYPE& value, SerializationStream& stream);
+	void write(const REQUEST_TYPE& value, SerializationStream& stream);
+	void read(REQUEST_TYPE& value, SerializationStream& stream);
+}

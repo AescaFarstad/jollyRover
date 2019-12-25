@@ -4,7 +4,6 @@
 #include <sstream>
 #include <base64_2.h>
 #include <SerializationStream.h>
-#include <CircularContainer.h>
 #include <iomanip>
 #include <SerializeSimpleTypes.h>
 
@@ -40,7 +39,7 @@ namespace Serializer {
 		}
 	}
 	template <typename T>
-		void writeVector(const T& value, SerializationStream& stream)
+	void writeVector(const T& value, SerializationStream& stream)
 	{
 		int16_t size = (int16_t)value.size();
 		write(size, stream);
@@ -105,26 +104,5 @@ namespace Serializer {
 		unsigned char* ttmp = (unsigned char*)target;
 		for(size_t i = 0; i < sizeof(T); i++)
 			ttmp[i] = ptmp[sizeof(T) - 1 - i];
-	}
-	
-	
-	template <typename T, uint32_t arraySize>
-	void read(CircularContainer<T, arraySize>& out, SerializationStream& stream)
-	{
-		read(out.cursor, stream);
-		read(out.total, stream);
-		read(out.size, stream);
-		int32_t readLength = std::min(sizeof(out.array), (long unsigned int)out.total);
-		memcpy(&out.array, stream.read(out.array, readLength), readLength);
-		
-	}
-	
-	template <typename T, uint32_t arraySize>
-	void write(const CircularContainer<T, arraySize> value, SerializationStream& stream)
-	{	
-		write(value.cursor, stream);
-		write(value.total, stream);
-		write(value.size, stream);
-		stream.write(value.array, std::min((int)sizeof(value.array), (int)value.total));
 	}
 }

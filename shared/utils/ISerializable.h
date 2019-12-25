@@ -1,6 +1,5 @@
 #pragma once
 #include <Serializer.h>
-#include <MessageTypes.h>
 
 class ISerializable
 {
@@ -16,13 +15,7 @@ namespace Serializer {
 	void write(ISerializable& value, SerializationStream& stream);
 	void read(ISerializable& value, SerializationStream& stream);
 	void write(ISerializable* value, SerializationStream& stream);
-	void read(ISerializable* value, SerializationStream& stream);
-	
-	void write(const MESSAGE_TYPE& value, SerializationStream& stream);
-	void read(MESSAGE_TYPE& value, SerializationStream& stream);
-	void write(const REQUEST_TYPE& value, SerializationStream& stream);
-	void read(REQUEST_TYPE& value, SerializationStream& stream);
-	
+	void read(ISerializable* value, SerializationStream& stream);	
 	
 	template <typename T>
 	void write(const T& value, SerializationStream& stream)
@@ -79,7 +72,7 @@ namespace Serializer {
 		Serializer::write(that, s);
 		s.seekAbsolute(0);
 		
-		Serializer::read(*result.get(), s);
+		Serializer::read(*result, s);
 		
 		return std::move(result);
 	}

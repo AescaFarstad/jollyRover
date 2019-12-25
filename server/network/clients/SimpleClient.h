@@ -14,8 +14,7 @@ class SimpleClient :
 	public NetworkClient
 {
 public:
-	SimpleClient(std::function< int() > globalSocketNudgeFunction);
-	virtual ~SimpleClient();
+	SimpleClient(std::function< int() > globalSocketNudgeFunction) : NetworkClient(globalSocketNudgeFunction);
 
 	virtual void sendMessage(NetworkMessage* msg);
 	virtual void sendMessage(const char * payload, size_t size);

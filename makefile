@@ -1,3 +1,6 @@
+NPROCS = $(shell grep -c 'processor' /proc/cpuinfo)
+MAKEFLAGS += -j$(NPROCS)
+
 EMSCRIPTEN ?= ../../emsdk/emscripten/1.38.24
 WEB_COMPILER := $(EMSCRIPTEN)/em++
 LOCAL_COMPILER := $(CXX)
