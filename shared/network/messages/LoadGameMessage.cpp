@@ -2,7 +2,7 @@
 
 LoadGameMessage::LoadGameMessage()
 {
-	typeId = MessageTypes::TYPE_LOAD_GAME_MSG;
+	typeId = MESSAGE_TYPE::TYPE_LOAD_GAME_MSG;
 	state = nullptr;
 }
 

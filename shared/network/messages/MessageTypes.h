@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 
-enum class MessageTypes : int16_t
+enum class MESSAGE_TYPE : int16_t
 {
 	TYPE_UNINITIALIZED = -1,
 	TYPE_REQUEST_MSG = 1,
@@ -16,7 +16,7 @@ enum class MessageTypes : int16_t
 	TYPE_INPUT_IMPULSE_MSG = 10
 };
 
-enum class RequestTypes : int16_t
+enum class REQUEST_TYPE : int16_t
 {
 	REQUEST_GREETING = 1,
 	REQUEST_JOIN_GAME = 2,

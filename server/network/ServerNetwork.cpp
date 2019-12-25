@@ -24,7 +24,7 @@ ServerNetwork::ServerNetwork()
 			//onHandshakeDone(newClient);
 			newClient->state = NETWORK_CLIENT_STATE::GREETING;
 			GenericRequestMessage grm;
-			grm.request = RequestTypes::REQUEST_GREETING;
+			grm.request = REQUEST_TYPE::REQUEST_GREETING;
 			newClient->sendMessage(&grm);
 		}
 	};
@@ -32,7 +32,7 @@ ServerNetwork::ServerNetwork()
 	onHandshakeDone = [](NetworkClient* client) {
 		client->state = NETWORK_CLIENT_STATE::GREETING;
 		GenericRequestMessage grm;
-		grm.request = RequestTypes::REQUEST_GREETING;
+		grm.request = REQUEST_TYPE::REQUEST_GREETING;
 		client->sendMessage(&grm);
 	};
 }
@@ -212,19 +212,19 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 	msg->login = client->login;
 	switch (msg->typeId)
 	{
-		case MessageTypes::TYPE_INPUT_ACTION_MSG:
-		case MessageTypes::TYPE_INPUT_LEFT_MSG:
-		case MessageTypes::TYPE_INPUT_JOINED_MSG:
-		case MessageTypes::TYPE_INPUT_ROUTE_MSG:
-		case MessageTypes::TYPE_INPUT_TIME_MSG:
-		case MessageTypes::TYPE_INPUT_IMPULSE_MSG:
-		case MessageTypes::TYPE_LOAD_GAME_MSG:
-		case MessageTypes::TYPE_REQUEST_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_LEFT_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_TIME_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG:
+		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
+		case MESSAGE_TYPE::TYPE_REQUEST_MSG:
 		{
 			addMessageToBuffer(std::move(msg), externalBuffer);
 			break;
 		}
-		case MessageTypes::TYPE_GREETING_MSG:
+		case MESSAGE_TYPE::TYPE_GREETING_MSG:
 		{
 			GreetingMessage* gMsg = dynamic_cast<GreetingMessage*>(msg.get());
 			//TODO check login, password

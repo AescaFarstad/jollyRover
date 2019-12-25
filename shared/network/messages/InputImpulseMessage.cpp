@@ -3,7 +3,7 @@
 
 InputImpulseMessage::InputImpulseMessage()
 {
-	typeId = MessageTypes::TYPE_INPUT_IMPULSE_MSG;
+	typeId = MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG;
 	impulse = INPUT_IMPULSE::NONE;
 }
 

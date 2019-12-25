@@ -4,7 +4,7 @@
 
 InputActionMessage::InputActionMessage()
 {
-	typeId = MessageTypes::TYPE_INPUT_ACTION_MSG;
+	typeId = MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG;
 }
 
 

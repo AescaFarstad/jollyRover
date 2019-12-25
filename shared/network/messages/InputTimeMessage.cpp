@@ -2,7 +2,7 @@
 
 InputTimeMessage::InputTimeMessage()
 {
-	typeId = MessageTypes::TYPE_INPUT_TIME_MSG;
+	typeId = MESSAGE_TYPE::TYPE_INPUT_TIME_MSG;
 	
 	modifyAllowSteps = false;
 	modifyForcedTimeScale = false;

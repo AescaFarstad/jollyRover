@@ -4,7 +4,7 @@
 
 GreetingMessage::GreetingMessage()
 {
-	typeId = MessageTypes::TYPE_GREETING_MSG;
+	typeId = MESSAGE_TYPE::TYPE_GREETING_MSG;
 	login = 0;
 }
 

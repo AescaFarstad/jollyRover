@@ -18,10 +18,10 @@ namespace Serializer {
 	void write(ISerializable* value, SerializationStream& stream);
 	void read(ISerializable* value, SerializationStream& stream);
 	
-	void write(const MessageTypes& value, SerializationStream& stream);
-	void read(MessageTypes& value, SerializationStream& stream);
-	void write(const RequestTypes& value, SerializationStream& stream);
-	void read(RequestTypes& value, SerializationStream& stream);
+	void write(const MESSAGE_TYPE& value, SerializationStream& stream);
+	void read(MESSAGE_TYPE& value, SerializationStream& stream);
+	void write(const REQUEST_TYPE& value, SerializationStream& stream);
+	void read(REQUEST_TYPE& value, SerializationStream& stream);
 	
 	
 	template <typename T>

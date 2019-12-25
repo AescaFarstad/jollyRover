@@ -4,7 +4,7 @@
 
 InputPlayerJoinedMessage::InputPlayerJoinedMessage()
 {
-	typeId = MessageTypes::TYPE_INPUT_JOINED_MSG;
+	typeId = MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG;
 }
 
 

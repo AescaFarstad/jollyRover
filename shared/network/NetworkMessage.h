@@ -9,7 +9,7 @@ class NetworkMessage :
 public:
 	NetworkMessage();
 	virtual ~NetworkMessage();
-	MessageTypes typeId;
+	MESSAGE_TYPE typeId;
 	int32_t initiator_id;
 	int32_t login;
 	uint32_t stamp;

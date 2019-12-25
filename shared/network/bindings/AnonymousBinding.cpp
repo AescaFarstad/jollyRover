@@ -18,14 +18,14 @@ AnonymousBinding::AnonymousBinding(AnonymousBinding&& that) : ResponseBinding::R
 }
 
 
-AnonymousBinding* AnonymousBinding::bindByMsgType(MessageTypes typeId)
+AnonymousBinding* AnonymousBinding::bindByMsgType(MESSAGE_TYPE typeId)
 {
 	bindsMsgType = true;
 	this->msgTypeId = typeId;
 	return this;
 }
 
-AnonymousBinding* AnonymousBinding::bindByGenericType(RequestTypes typeId)
+AnonymousBinding* AnonymousBinding::bindByGenericType(REQUEST_TYPE typeId)
 {
 	bindsGenericType = true;
 	this->genericTypeId = typeId;

@@ -22,19 +22,19 @@ namespace GameLogic
 		
 		for (size_t i = 0; i < inputs.size(); i++)
 		{
-			if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_ACTION_MSG)
+			if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG)
 				GameLogicInternal::handleActionInput(state, static_cast<InputActionMessage*>(inputs[i]));
-			else if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_JOINED_MSG)
+			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG)
 				GameLogicInternal::handlePlayerJoinedInput(state, static_cast<InputPlayerJoinedMessage*>(inputs[i]));
-			else if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_LEFT_MSG)
+			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_LEFT_MSG)
 				GameLogicInternal::handlePlayerLeftInput(state, static_cast<InputPlayerLeftMessage*>(inputs[i]));
-			else if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_ROUTE_MSG)
+			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG)
 				GameLogicInternal::handleRouteInput(state, static_cast<InputRouteMessage*>(inputs[i]), prototypes);
-			else if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_TIME_MSG)
+			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_TIME_MSG)
 				GameLogicInternal::handleTimeInput(state, static_cast<InputTimeMessage*>(inputs[i]), prototypes);
-			else if (inputs[i]->typeId == MessageTypes::TYPE_LOAD_GAME_MSG)
+			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_LOAD_GAME_MSG)
 				GameLogicInternal::handleGameLoad(state, static_cast<LoadGameMessage*>(inputs[i]), prototypes);
-			else if (inputs[i]->typeId == MessageTypes::TYPE_INPUT_IMPULSE_MSG)
+			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG)
 				GameLogicInternal::handleInputImpulse(state, static_cast<InputImpulseMessage*>(inputs[i]), prototypes);
 			//S::log.add(std::to_string(prototypes->variables.fieldWidth), { LOG_TAGS::UNIQUE });
 		}

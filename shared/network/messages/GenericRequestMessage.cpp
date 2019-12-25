@@ -4,7 +4,7 @@
 
 GenericRequestMessage::GenericRequestMessage()
 {
-	typeId = MessageTypes::TYPE_REQUEST_MSG;
+	typeId = MESSAGE_TYPE::TYPE_REQUEST_MSG;
 }
 
 

@@ -4,7 +4,7 @@
 
 InputPlayerLeftMessage::InputPlayerLeftMessage()
 {
-	typeId = MessageTypes::TYPE_INPUT_LEFT_MSG;
+	typeId = MESSAGE_TYPE::TYPE_INPUT_LEFT_MSG;
 }
 
 

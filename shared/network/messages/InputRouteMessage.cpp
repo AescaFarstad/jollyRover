@@ -2,12 +2,12 @@
 
 InputRouteMessage::InputRouteMessage()
 {
-	typeId = MessageTypes::TYPE_INPUT_ROUTE_MSG;
+	typeId = MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG;
 }
 
 InputRouteMessage::InputRouteMessage(std::vector<Point> &route)
 {
-	typeId = MessageTypes::TYPE_INPUT_ROUTE_MSG;
+	typeId = MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG;
 	this->route = route;
 }
 

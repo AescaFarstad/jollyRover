@@ -26,7 +26,7 @@ Network::Network()
 	
 	std::unique_ptr<AnonymousBinding> binding = std::make_unique<AnonymousBinding>("Network generic binding");
 	binding->
-	bindByMsgType(MessageTypes::TYPE_REQUEST_MSG)->
+	bindByMsgType(MESSAGE_TYPE::TYPE_REQUEST_MSG)->
 	setCallOnce(false)->
 	setHandler(std::move(handleGenericRequest));
 	binder.bind(std::move(binding));
@@ -164,7 +164,7 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 
 	S::log.add("RCVD " + resultMessage->getName(), { LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE, LOG_TAGS::NET_BRIEF });
 
-	if (resultMessage->typeId == MessageTypes::TYPE_REQUEST_MSG)
+	if (resultMessage->typeId == MESSAGE_TYPE::TYPE_REQUEST_MSG)
 	{
 		GenericRequestMessage* grM = static_cast<GenericRequestMessage*>(resultMessage.get());
 		auto handlerIter = interceptorsGeneric_once.find(grM->request);
@@ -199,16 +199,16 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 	return nullptr;	
 }
 
-void Network::interceptOnce(MessageTypes messageType, MessageHandler handler)
+void Network::interceptOnce(MESSAGE_TYPE messageType, MessageHandler handler)
 {
 	if (interceptors_once.count(messageType) > 0)
 		THROW_FATAL_ERROR("message type already intercepted");
-	if (messageType == MessageTypes::TYPE_REQUEST_MSG)
+	if (messageType == MESSAGE_TYPE::TYPE_REQUEST_MSG)
 		THROW_FATAL_ERROR("can't intercept generic requests");
 	interceptors_once[messageType] = handler;
 }
 
-void Network::interceptGenericRequestOnce(RequestTypes requestType, GenericRequestHandler handler)
+void Network::interceptGenericRequestOnce(REQUEST_TYPE requestType, GenericRequestHandler handler)
 {
 	if (interceptorsGeneric_once.count(requestType) > 0)
 		THROW_FATAL_ERROR("request type already intercepted");

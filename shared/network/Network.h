@@ -36,8 +36,8 @@ public:
 	virtual void send(NetworkPacket* packet);
 	virtual void send(NetworkMessage* msg);
 	
-	void interceptOnce(MessageTypes messageType, MessageHandler handler);
-	void interceptGenericRequestOnce(RequestTypes requestType, GenericRequestHandler handler);
+	void interceptOnce(MESSAGE_TYPE messageType, MessageHandler handler);
+	void interceptGenericRequestOnce(REQUEST_TYPE requestType, GenericRequestHandler handler);
 
 protected:
 
@@ -51,8 +51,8 @@ private:
 	int activeSockets = 0;
 	bool isConnected = false;
 	std::unordered_map<int32_t, uint32_t> requestTimeByInitiatorId;
-	std::unordered_map<MessageTypes, MessageHandler> interceptors_once;
-	std::unordered_map<RequestTypes, GenericRequestHandler> interceptorsGeneric_once;
+	std::unordered_map<MESSAGE_TYPE, MessageHandler> interceptors_once;
+	std::unordered_map<REQUEST_TYPE, GenericRequestHandler> interceptorsGeneric_once;
 	
 	static std::unique_ptr<NetworkPacket> getNewPacket();
 	

@@ -14,7 +14,7 @@ void LoopBackNetwork::connect()
 {
 	timeSync.addMeasurement(0, 0, 0);
 	GenericRequestMessage grm;
-	grm.request = RequestTypes::REQUEST_GREETING;
+	grm.request = REQUEST_TYPE::REQUEST_GREETING;
 	addToIncoming(&grm);
 }
 
@@ -47,13 +47,13 @@ void LoopBackNetwork::send(NetworkMessage* message)
 	message->login = LOGIN;
 	switch (message->typeId)
 	{
-		case MessageTypes::TYPE_INPUT_ACTION_MSG:
-		case MessageTypes::TYPE_INPUT_JOINED_MSG:
-		case MessageTypes::TYPE_INPUT_LEFT_MSG:
-		case MessageTypes::TYPE_INPUT_ROUTE_MSG:
-		case MessageTypes::TYPE_INPUT_TIME_MSG:
-		case MessageTypes::TYPE_INPUT_IMPULSE_MSG:
-		case MessageTypes::TYPE_LOAD_GAME_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_LEFT_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_TIME_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG:
+		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
 		{
 			InputMessage* iMsg = dynamic_cast<InputMessage*>(message);
 			iMsg->serverStamp = gameUpdater->state->timeStamp;
@@ -61,13 +61,13 @@ void LoopBackNetwork::send(NetworkMessage* message)
 			addToIncoming(message);
 			break;
 		}
-		case MessageTypes::TYPE_REQUEST_MSG:
+		case MESSAGE_TYPE::TYPE_REQUEST_MSG:
 		{
 			GenericRequestMessage* t = dynamic_cast<GenericRequestMessage*>(message);
 			std::unique_ptr<GenericRequestMessage> genericRequestMsg = std::make_unique<GenericRequestMessage>(*t);
 			switch (genericRequestMsg->request)
 			{
-				case RequestTypes::REQUEST_JOIN_GAME:
+				case REQUEST_TYPE::REQUEST_JOIN_GAME:
 				{
 					GameStateMessage gsMsg;
 					GameState tempState(1934);
@@ -82,7 +82,7 @@ void LoopBackNetwork::send(NetworkMessage* message)
 					addToIncoming(&pjMsg);
 					break;
 				}
-				case RequestTypes::REQUEST_GAME_STATE:
+				case REQUEST_TYPE::REQUEST_GAME_STATE:
 				{
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
@@ -90,10 +90,10 @@ void LoopBackNetwork::send(NetworkMessage* message)
 					addToIncoming(&gsMsg);
 					break;
 				}
-				case RequestTypes::REQUEST_PING:
+				case REQUEST_TYPE::REQUEST_PING:
 				{
 					GenericRequestMessage grMsg;
-					grMsg.request = RequestTypes::REQUEST_PONG;
+					grMsg.request = REQUEST_TYPE::REQUEST_PONG;
 					grMsg.inResponseTo = genericRequestMsg->initiator_id;
 					addToIncoming(&grMsg);
 					break;
@@ -106,7 +106,7 @@ void LoopBackNetwork::send(NetworkMessage* message)
 			}
 			break;
 		}
-		case MessageTypes::TYPE_GREETING_MSG:
+		case MESSAGE_TYPE::TYPE_GREETING_MSG:
 		{
 			GreetingMessage* gMsg = dynamic_cast<GreetingMessage*>(message);
 			gMsg->login = LOGIN;

@@ -8,7 +8,7 @@ public:
 	GenericRequestMessage();
 	~GenericRequestMessage();
 
-	RequestTypes request;
+	REQUEST_TYPE request;
 
 	void deserialize(SerializationStream& stream) override;
 	void serialize(SerializationStream& stream) const override;

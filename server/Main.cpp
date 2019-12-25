@@ -35,12 +35,12 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 {
 	switch (message->typeId)
 	{
-		case MessageTypes::TYPE_INPUT_ACTION_MSG:
-		case MessageTypes::TYPE_INPUT_LEFT_MSG:
-		case MessageTypes::TYPE_INPUT_ROUTE_MSG:
-		case MessageTypes::TYPE_INPUT_JOINED_MSG:
-		case MessageTypes::TYPE_INPUT_TIME_MSG:
-		case MessageTypes::TYPE_LOAD_GAME_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_LEFT_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_TIME_MSG:
+		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
 		{
 			InputMessage* t = dynamic_cast<InputMessage*>(message.release());
 			//std::unique_ptr<InputMessage> iMsg = network.factory.pointerByType2<std::unique_ptr<NetworkMessage>>(message->typeId, *t);
@@ -51,13 +51,13 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 			gameUpdater.addNewInput(std::move(iMsg));
 			break;
 		}
-		case MessageTypes::TYPE_REQUEST_MSG:
+		case MESSAGE_TYPE::TYPE_REQUEST_MSG:
 		{
 			GenericRequestMessage* t = dynamic_cast<GenericRequestMessage*>(message.get());
 			std::unique_ptr<GenericRequestMessage> genericRequestMsg = std::make_unique<GenericRequestMessage>(*t);
 			switch (genericRequestMsg->request)
 			{
-				case RequestTypes::REQUEST_JOIN_GAME:
+				case REQUEST_TYPE::REQUEST_JOIN_GAME:
 				{
 					network.addPlayer(genericRequestMsg->login);
 
@@ -75,7 +75,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					gameUpdater.addNewInput(std::move(pjMsg));
 					break;
 				}
-				case RequestTypes::REQUEST_GAME_STATE:
+				case REQUEST_TYPE::REQUEST_GAME_STATE:
 				{
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
@@ -83,10 +83,10 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					network.send(&gsMsg, genericRequestMsg->login);
 					break;
 				}
-				case RequestTypes::REQUEST_PING:
+				case REQUEST_TYPE::REQUEST_PING:
 				{
 					GenericRequestMessage grMsg;
-					grMsg.request = RequestTypes::REQUEST_PONG;
+					grMsg.request = REQUEST_TYPE::REQUEST_PONG;
 					grMsg.inResponseTo = genericRequestMsg->initiator_id;
 					network.send(&grMsg, genericRequestMsg->login);
 					break;

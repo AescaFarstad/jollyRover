@@ -4,7 +4,7 @@
 
 GameStateMessage::GameStateMessage()
 {
-	typeId = MessageTypes::TYPE_GAME_STATE_MSG;
+	typeId = MESSAGE_TYPE::TYPE_GAME_STATE_MSG;
 	ownsState = false;
 }
 
