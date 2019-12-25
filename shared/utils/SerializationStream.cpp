@@ -42,8 +42,13 @@ SerializationStream& SerializationStream::operator=(SerializationStream&& that)
 		m_grower = that.m_grower;
 		m_cursor = that.m_cursor;
 		
-		auto index = std::distance(that.m_blocks.begin(), std::find(that.m_blocks.begin(), that.m_blocks.end(), that.m_cursor.block));
-		m_cursor.block = m_blocks[index];	
+		auto iter = std::find(that.m_blocks.begin(), that.m_blocks.end(), that.m_cursor.block);
+		if (iter != that.m_blocks.end())
+		{
+			auto index = std::distance(that.m_blocks.begin(), iter);
+			m_cursor.block = m_blocks[index];
+		}
+		
 		
 		that.m_grower = nullptr;
 		that.m_blocks.clear();
@@ -288,6 +293,7 @@ void SerializationStream::deserialize(SerializationStream& stream)
 	m_grower->grow(this, m_totalLength);
 	
 	write(stream.read(m_totalLength), m_totalLength);
+	seekAbsolute(0);
 }
 
 void SerializationStream::serialize(SerializationStream& stream) const

@@ -28,27 +28,6 @@ namespace Serializer {
 	void write(const std::string& value, SerializationStream& stream);
 
 
-	template <typename T>
-	void writeVector(const T& value, std::ostream& stream)
-	{
-		int16_t size = (int16_t)value.size();
-		write(size, stream);
-		for (int16_t i = 0; i < size; i++)
-		{
-			write(value[i], stream);
-		}
-	}
-	template <typename T>
-	void writeVector(const T& value, SerializationStream& stream)
-	{
-		int16_t size = (int16_t)value.size();
-		write(size, stream);
-		for (int16_t i = 0; i < size; i++)
-		{
-			write(value[i], stream);
-		}
-	}
-
 	void read(int32_t& out, std::istream& stream);
 	void read(uint32_t& out, std::istream& stream);
 	void read(int16_t& out, std::istream& stream);
@@ -67,30 +46,6 @@ namespace Serializer {
 	void read(float& out, SerializationStream& stream);
 	void read(std::string& out, SerializationStream& stream);
 
-	template <typename T>
-	void readVector(T& out, std::istream& stream)
-	{
-		int16_t size;
-		read(size, stream);
-		out.clear();
-		for (int16_t i = 0; i < size; i++)
-		{
-			out.emplace_back();
-			read(out[i], stream);
-		}
-	}
-	template <typename T>
-		void readVector(T& out, SerializationStream& stream)
-	{
-		int16_t size;
-		read(size, stream);
-		out.clear();
-		for (int16_t i = 0; i < size; i++)
-		{
-			out.emplace_back();
-			read(out[i], stream);
-		}
-	}
 	
 	//Debug Utils
 	std::string toHex(const char* source, size_t size);

@@ -126,9 +126,11 @@ EventLogger::EventLogger()
 void EventLogger::deserialize(SerializationStream& stream)
 {
 	Serializer::read(idCounter, stream);
+	//TODO serialize events as well
 }
 
 void EventLogger::serialize(SerializationStream& stream) const 
 {
 	Serializer::write(idCounter, stream);
+	//TODO serialize events as well
 }

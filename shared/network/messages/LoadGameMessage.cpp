@@ -3,7 +3,7 @@
 LoadGameMessage::LoadGameMessage()
 {
 	typeId = MESSAGE_TYPE::TYPE_LOAD_GAME_MSG;
-	state = nullptr;
+	state = SerializationStream::createExp();
 }
 
 void LoadGameMessage::deserialize(SerializationStream& stream)

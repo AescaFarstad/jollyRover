@@ -272,7 +272,7 @@ namespace GameLogic
 			int32_t loadCount = state->loadCount;
 			auto players = state->players;
 			
-			state->deserialize(input->state);			
+			state->deserialize(input->state);
 			
 			state->timeStamp = stamp;
 			if (time.allowedSteps > 0)
