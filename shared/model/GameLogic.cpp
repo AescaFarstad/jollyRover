@@ -273,9 +273,9 @@ namespace GameLogic
 			int32_t loadCount = state->loadCount;
 			auto players = state->players;
 			
-			stream->write(input->state, input->stateLength); 
-			stream->seekAbsolute(0);
-			state->deserialize(*stream);
+			stream.write(input->state, input->stateLength); 
+			stream.seekAbsolute(0);
+			state->deserialize(stream);
 			
 			
 			state->timeStamp = stamp;

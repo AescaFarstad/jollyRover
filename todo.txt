@@ -1,16 +1,3 @@
-
-
-При муве, которые инициирует вектор, поинтеры на старые элементы прокисают
-подсветка синтаксиса
-нельзя ли в Network кидать референс, а не поинтер NetworkMessage* ? Дабы было понятно что с памятью стало
-[this, cb = callback.release()] - можно вместо релиза мувать
-stepanglewindow - window??
-
-byte
-vector<T> vs T in serializer
-overwatch create objects during frame, GDC (sync)
-
-
 Рутинг портов https://serverfault.com/questions/112795/how-to-run-a-server-on-port-80-as-a-normal-user-on-linux
 sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 
@@ -18,39 +5,63 @@ sudo iptables -A INPUT -p tcp --dport 80 -j ACCEPT
 
 cmake -G "Unix Makefiles" -DSDL_gpu_DEFAULT_DISABLE_OPENGL=ON -DSDL_gpu_DISABLE_GLES=OFF -DSDL_gpu_DISABLE_GLES_1=ON -DSDL_gpu_DISABLE_GLES_3=ON -DSDL_gpu_DEFAULT_BUILD_DEMOS=OFF -DSDL_gpu_BUILD_DEMOS=OFF
 
-выставлять направление в финальной формации
-солдаты виляют
-сброс цели, если цель близка, но недостижима долгое время
+valgrind --tool=callgrind --dump-instr=yes -v --instr-atstart=no ./out/local > callgrind.log.txt
 
-следование за лидером
+нельзя ли в Network кидать референс, а не поинтер NetworkMessage* ? Дабы было понятно что с памятью стало
+[this, cb = callback.release()] - можно вместо релиза мувать
+stepanglewindow - window??
 
-разбить оптимизацию формации на кадры
-нормальные крип вью, без инклюда посреди GameView.cpp
+byte
+vector<T> vs T in serializer
 
-почистить Creeps.cpp
+Рефакторинг
+	зачем serializationstream возвращает уникптр?
+	RequestTypes vs NETWORK_CLIENT_STATE почему капс/не капс?
+	сериалайз enum к общему знаменателю
+	нормальные крип вью, без инклюда посреди GameView.cpp
+	убрать new
 
-отрисовка дебага в течении нескольких фреймов
-рендеринг текста
+Маст
+	бага с неисчезающим неправильным инпутом
+	танк вертится на последнем метре
+	всплывающая надпись
+	Перезарядка. Чем коцаней машинка - тем дольше перезарядка.
+	макс машинок одновременно
+	прокручивать текстэрию с логом вниз
+	графика пуль
+	графика пути
+	туториал
+	рисовать завершение пути вниз в качестве подсказки
 
-------------------------------
-дрожание солдат в конце 
-пофиксить краш при перемотке
-сейв игры
-в финальном состоянии формации все должны доезжать не привязываясь к соседям
+Было бы здорово геймплей
+	разные типы крипов у фракций с разными пушками
+	пострелять и отойти, пострелять и отойти
+	окружение противника
+	реджойн с другими формациями
+	более компактная формировка формаций с потерями
+	стороны периодически доминируют друг друга
+	левелап
+	лежачие паверапы
+	дерево апгрейдов
+	взрывы отталкивают юнитов
+	крипы в ассалте убегают из под выстрелов (с некоторой вероятностью)
+	
+Было бы здорово миск
+	не позволять нажимать на кнопочки до загрузки игры
+	стиль выделения у кнопок не должен быть таким выделяющимся
+	дым от повреждённых танков
+	
+final touches
+	спаун за пределами карты
+	больше формаций
+	оптимизация
 
-оил спаунится и отображается
-крипы собирают оил
-потеряв крипов формация отступает, может отъесть часть другой формации
-
-крипы стреляют даже пока идут
-крипы останавливаются, чтобы стрелять очередью
-
-PC
-
-визио карты
-веб-страничка
 
 
-RequestTypes vs NETWORK_CLIENT_STATE почему капс/не капс?
-Requset types b MessageTypes сериализуются отдельно, всех надо в одно место
-зачем serializationstream возвращает уникптр?
+
+
+Draw a path starting and ending at the bottom edge. Your tank will follow it.
+
+Run over soldiers -> earn trophies when you come back safely.
+
+Crash into other players at higher speed than their's -> steal their trophies.

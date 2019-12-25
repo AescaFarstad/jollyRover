@@ -83,8 +83,8 @@ namespace AI
 				attraction += Point(0, -1);
 			}
 			
-			float stepAngle;
-			float attractionAngle;
+			float stepAngle = 0;
+			float attractionAngle = 0;
 			int32_t attractionStrength = 1;
 			float angle = (data.route[data.index] - data.route[data.index - 1]).asAngle();
 			if (attraction.getLength() != 0)

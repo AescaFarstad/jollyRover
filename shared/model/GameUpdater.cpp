@@ -131,8 +131,9 @@ void GameUpdater::rewindToPrecedingState(uint32_t stamp)
 
 void GameUpdater::saveState(GameState* state)
 {
-	auto stream = SerializationStream::createExp();
-	state->serialize(*stream.get());
+	auto stream = std::make_unique<SerializationStream>();
+	*stream = SerializationStream::createExp();
+	state->serialize(*stream);
 	stream->seekAbsolute(0);
 	statesByStamps[state->timeStamp] = std::move(stream);
 	stampsBySteps[state->time.performedSteps] = state->timeStamp;

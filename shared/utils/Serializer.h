@@ -1,13 +1,12 @@
 #pragma once
 #include <iostream>
-#include <cstdint>
 #include <vector>
-#include <string>
 #include <sstream>
 #include <base64_2.h>
 #include <SerializationStream.h>
 #include <CircularContainer.h>
 #include <iomanip>
+#include <SerializeSimpleTypes.h>
 
 namespace Serializer {
 
@@ -29,14 +28,6 @@ namespace Serializer {
 	void write(const float& value, SerializationStream& stream);
 	void write(const std::string& value, SerializationStream& stream);
 
-	void write(const int32_t& value, char buffer[]);
-	void write(const uint32_t& value, char buffer[]);
-	void write(const int16_t& value, char buffer[]);
-	void write(const uint16_t& value, char buffer[]);
-	void write(const int8_t& value, char buffer[]);
-	void write(const bool& value, char buffer[]);
-	void write(const float& value, char buffer[]);
-	void write(const std::string& value, char buffer[]);
 
 	template <typename T>
 	void writeVector(const T& value, std::ostream& stream)
@@ -77,14 +68,6 @@ namespace Serializer {
 	void read(float& out, SerializationStream& stream);
 	void read(std::string& out, SerializationStream& stream);
 
-	void read(int32_t& out, const char* value);
-	void read(uint32_t& out, const char* value);
-	void read(int16_t& out, const char* value);
-	void read(uint16_t& out, const char* value);
-	void read(int8_t& out, const char* value);
-	void read(bool& out, const char* value);
-	void read(float& out, const char* value);
-	void read(std::string& out, const char* value);
 	template <typename T>
 	void readVector(T& out, std::istream& stream)
 	{
@@ -124,7 +107,6 @@ namespace Serializer {
 			ttmp[i] = ptmp[sizeof(T) - 1 - i];
 	}
 	
-	void swapBytes(char* target, size_t size);
 	
 	template <typename T, uint32_t arraySize>
 	void read(CircularContainer<T, arraySize>& out, SerializationStream& stream)

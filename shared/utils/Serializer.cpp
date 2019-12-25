@@ -7,14 +7,6 @@ void Serializer::write(const int32_t& value, std::ostream& stream)
 	stream.write(out, 4);
 }
 
-void Serializer::write(const int32_t& value, char buffer[])
-{
-	buffer[0] = value & 0xff;
-	buffer[1] = (value >> 8) & 0xff;
-	buffer[2] = (value >> 16) & 0xff;
-	buffer[3] = (value >> 24) & 0xff;
-}
-
 void Serializer::read(int32_t& out, std::istream& stream)
 {
 	char value[4];
@@ -27,14 +19,6 @@ void Serializer::write(const uint32_t& value, std::ostream& stream)
 	char out[4];
 	write(value, out);
 	stream.write(out, 4);
-}
-
-void Serializer::write(const uint32_t& value, char buffer[])
-{
-	buffer[0] = value & 0xff;
-	buffer[1] = (value >> 8) & 0xff;
-	buffer[2] = (value >> 16) & 0xff;
-	buffer[3] = (value >> 24) & 0xff;
 }
 
 void Serializer::read(uint32_t& out, std::istream& stream)
@@ -51,13 +35,6 @@ void Serializer::write(const int16_t& value, std::ostream& stream)
 	stream.write(out, 2);
 }
 
-void Serializer::write(const int16_t& value, char buffer[])
-{
-	buffer[0] = value & 0xff;
-	buffer[1] = (value >> 8) & 0xff;
-}
-
-
 void Serializer::read(int16_t& out, std::istream& stream)
 {
 	char value[2];
@@ -70,12 +47,6 @@ void Serializer::write(const uint16_t& value, std::ostream& stream)
 	char out[2];
 	write(value, out);
 	stream.write(out, 2);
-}
-
-void Serializer::write(const uint16_t& value, char buffer[])
-{
-	buffer[0] = value & 0xff;
-	buffer[1] = (value >> 8) & 0xff;
 }
 
 
@@ -94,11 +65,6 @@ void Serializer::write(const int8_t& value, std::ostream& stream)
 	stream.write(out, 1);
 }
 
-void Serializer::write(const int8_t& value, char buffer[])
-{
-	buffer[0] = value & 0xff;
-}
-
 void Serializer::read(int8_t& out, std::istream& stream)
 {
 	char value[1];
@@ -111,11 +77,6 @@ void Serializer::write(const bool& value, std::ostream& stream)
 	char out[1];
 	write(value, out);
 	stream.write(out, 1);
-}
-
-void Serializer::write(const bool& value, char buffer[])
-{
-	buffer[0] = value ? 1 : 0;
 }
 
 void Serializer::read(bool& out, std::istream& stream)
@@ -132,13 +93,6 @@ void Serializer::write(const float& value, std::ostream& stream)
 	stream.write(converted, sizeof(value));
 }
 
-void Serializer::write(const float& value, char buffer[])
-{
-	//TODO endianess
-	char* converted = (char*)& value;
-	memcpy(buffer, converted, 4);
-}
-
 void Serializer::read(float& out, std::istream& stream)
 {
 	//TODO endianess
@@ -152,15 +106,11 @@ void Serializer::write(const std::string& value, std::ostream& stream)
 	write((int16_t)value.size(), stream);
 	stream.write(value.c_str(), value.size());
 }
+
 void Serializer::write(const std::string& value, SerializationStream& stream)
 {
 	write((int16_t)value.size(), stream);
 	stream.write(value.c_str(), value.size());
-}
-void Serializer::write(const std::string& value, char buffer[])
-{
-	write((int16_t)value.size(), buffer);
-	memcpy(buffer+sizeof(int16_t), value.c_str(), value.size());
 }
 
 void Serializer::read(std::string& out, std::istream& stream)
@@ -178,12 +128,6 @@ void Serializer::read(std::string& out, SerializationStream& stream)
 	read(length, stream);
 	const char* value = stream.read(length);
 	out.assign(value, length);
-}
-void Serializer::read(std::string& out, const char* value)
-{
-	int16_t length;
-	read(length, value);
-	out.assign(value + sizeof(int16_t), length);
 }
 
 std::string Serializer::toHex(const char* source, size_t size)
@@ -359,61 +303,3 @@ void Serializer::read(float& out, SerializationStream& stream)
 //---------------------------------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------------------------------
-
-void Serializer::read(int32_t& out, const char* value)
-{
-	out = (unsigned char)value[0];
-	out += (unsigned char)value[1] << 8;
-	out += (unsigned char)value[2] << 16;
-	out += (unsigned char)value[3] << 24;
-}
-
-void Serializer::read(uint32_t& out, const char* value)
-{
-	out = (unsigned char)value[0];
-	out += (unsigned char)value[1] << 8;
-	out += (unsigned char)value[2] << 16;
-	out += (unsigned char)value[3] << 24;
-}
-
-void Serializer::read(int16_t& out, const char* value)
-{
-	out = (unsigned char)value[0];
-	out += (unsigned char)value[1] << 8;
-}
-
-void Serializer::read(uint16_t& out, const char* value)
-{
-	out = (unsigned char)value[0];
-	out += (unsigned char)value[1] << 8;
-}
-
-void Serializer::read(int8_t& out, const char* value)
-{
-	out = value[0];
-}
-
-void Serializer::read(bool& out, const char* value)
-{
-	out = value[0] != 0;
-}
-
-void Serializer::read(float& out, const char* value)
-{
-	//TODO endianess
-
-	char *outFloat = (char*)& out;
-
-	outFloat[0] = value[0];
-	outFloat[1] = value[1];
-	outFloat[2] = value[2];
-	outFloat[3] = value[3];
-}
-
-void Serializer::swapBytes(char* target, size_t size)
-{
-	unsigned char* tmp = new unsigned char[size];
-	for(size_t i = 0; i < size; i++)
-		tmp[i] = target[size - i - 1];
-	memcpy(target, tmp, size);
-}

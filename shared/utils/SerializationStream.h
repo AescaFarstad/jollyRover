@@ -18,9 +18,16 @@ class SerializationStream
 {
 	friend class StreamGrower;
 public:
-	SerializationStream(StreamGrower* m_grower);
-	SerializationStream();
+	SerializationStream(StreamGrower* m_grower = nullptr);
 	virtual ~SerializationStream();
+	
+	//TODO copy constructors
+	
+	SerializationStream(const SerializationStream& that) = delete;
+	SerializationStream& operator=(const SerializationStream& that) = delete;
+
+	SerializationStream(SerializationStream&& that);
+	SerializationStream& operator=(SerializationStream&& that);
 
 	const char* read(size_t length);
 	char* readAll();
@@ -36,7 +43,7 @@ public:
 
 	void write(const char* data, size_t length);
 
-	static std::unique_ptr<SerializationStream> createExp(size_t base  = 128, size_t exponent = 2);
+	static SerializationStream createExp(size_t base  = 128, size_t exponent = 2);
 
 protected:
 	std::vector<CharBlock*> m_blocks;

@@ -26,16 +26,16 @@ void PersistentStorage::p_init()
 	file.read(buffer, length);
 	
 	auto s = SerializationStream::createExp();
-	s->write(buffer, length);
-	s->seekAbsolute(0);
+	s.write(buffer, length);
+	s.seekAbsolute(0);
 	
 	bool hasSavedState;
-	Serializer::read(hasSavedState, *s);
+	Serializer::read(hasSavedState, s);
 	
 	if (hasSavedState)
 	{
 		savedState = std::make_unique<GameState>();
-		savedState->deserialize(*s);			
+		savedState->deserialize(s);			
 	}
 	
 	file.close();
@@ -45,16 +45,16 @@ void PersistentStorage::p_init()
 void PersistentStorage::p_commit()
 {
 	auto s = SerializationStream::createExp();
-	Serializer::write(savedState != nullptr, *s);
+	Serializer::write(savedState != nullptr, s);
 	if (savedState != nullptr)
-		savedState->serialize(*s);
+		savedState->serialize(s);
 		
 	std::ofstream file("out/save/save.data");
 
     if(file.is_open())
     {
-		auto data = s->readAll();
-		auto length = s->getLength();
+		auto data = s.readAll();
+		auto length = s.getLength();
 		file.write(data, length);
 		file.close();
     }

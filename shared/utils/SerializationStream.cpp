@@ -5,22 +5,51 @@
 SerializationStream::SerializationStream(StreamGrower* grower)
 {
 	this->m_grower = grower;
-	m_grower->grow(this, 0);
-}
-
-SerializationStream::SerializationStream()
-{
+	if (grower)
+		m_grower->grow(this, 0);
 }
 
 SerializationStream::~SerializationStream()
 {
-	//printf("~SerializationStream()\n");
-	delete m_grower;
-	//printf("delete grower\n");
+	if (m_grower)
+		delete m_grower;
+		
 	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
 		delete m_blocks[i];
 	}
+}
+	
+SerializationStream::SerializationStream(SerializationStream&& that)
+{
+	*this = std::move(that);
+}
+
+SerializationStream& SerializationStream::operator=(SerializationStream&& that)
+{
+	if (this != &that)
+	{
+		if (m_grower)
+			delete m_grower;
+		
+		for (size_t i = 0; i < m_blocks.size(); i++)
+		{
+			delete m_blocks[i];
+		}		
+		
+		m_blocks = std::move(that.m_blocks);
+		m_totalLength = that.m_totalLength;
+		m_grower = that.m_grower;
+		m_cursor = that.m_cursor;
+		
+		auto index = std::distance(that.m_blocks.begin(), std::find(that.m_blocks.begin(), that.m_blocks.end(), that.m_cursor.block));
+		m_cursor.block = m_blocks[index];	
+		
+		that.m_grower = nullptr;
+		that.m_blocks.clear();
+		
+	}
+	return *this;
 }
 
 const char* SerializationStream::read(size_t length)
@@ -246,9 +275,9 @@ void SerializationStream::write(const char* data, size_t length)
 
 }
 
-std::unique_ptr<SerializationStream> SerializationStream::createExp(size_t base, size_t exponent)
+SerializationStream SerializationStream::createExp(size_t base, size_t exponent)
 {
-	return std::unique_ptr<SerializationStream>(new SerializationStream(new StreamGrowerExp(base, exponent)));
+	return SerializationStream(new StreamGrowerExp(base, exponent));
 }
 
 void SerializationStream::grow(size_t blockSize)
