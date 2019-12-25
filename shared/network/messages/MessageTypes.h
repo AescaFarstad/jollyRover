@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdint>
+
 enum class MessageTypes : int16_t
 {
 	TYPE_UNINITIALIZED = -1,

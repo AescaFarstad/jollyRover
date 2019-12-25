@@ -14,8 +14,10 @@ stepanglewindow - window??
 byte
 vector<T> vs T in serializer
 
-Рефакторинг
+-----
 	зачем serializationstream возвращает уникптр?
+
+Рефакторинг
 	RequestTypes vs NETWORK_CLIENT_STATE почему капс/не капс?
 	сериалайз enum к общему знаменателю
 	нормальные крип вью, без инклюда посреди GameView.cpp

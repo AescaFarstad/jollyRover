@@ -5,10 +5,8 @@ class LoadGameMessage :
 {
 public:
 	LoadGameMessage();
-	~LoadGameMessage();
 
-	char* state;
-	uint32_t stateLength;
+	SerializationStream state;
 
 	void deserialize(SerializationStream& stream) override;
 	void serialize(SerializationStream& stream) const override;

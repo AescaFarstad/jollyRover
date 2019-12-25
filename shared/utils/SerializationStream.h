@@ -42,6 +42,9 @@ public:
 	size_t getLength();
 
 	void write(const char* data, size_t length);
+	
+	void deserialize(SerializationStream& stream);
+	void serialize(SerializationStream& stream) const;
 
 	static SerializationStream createExp(size_t base  = 128, size_t exponent = 2);
 

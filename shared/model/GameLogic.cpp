@@ -267,16 +267,12 @@ namespace GameLogic
 
 		void handleGameLoad(GameState* state, LoadGameMessage* input, Prototypes* prototypes)
 		{
-			auto stream = SerializationStream::createExp();
 			auto stamp = state->timeStamp;
 			TimeState time = state->time;
 			int32_t loadCount = state->loadCount;
 			auto players = state->players;
 			
-			stream.write(input->state, input->stateLength); 
-			stream.seekAbsolute(0);
-			state->deserialize(stream);
-			
+			state->deserialize(input->state);			
 			
 			state->timeStamp = stamp;
 			if (time.allowedSteps > 0)

@@ -1,5 +1,5 @@
 #include <SerializationStream.h>
-#include <assert.h>
+#include <SerializeSimpleTypes.h>
 #include <cmath>
 
 SerializationStream::SerializationStream(StreamGrower* grower)
@@ -272,7 +272,34 @@ void SerializationStream::write(const char* data, size_t length)
 			}
 		}
 	}
+}
 
+void SerializationStream::deserialize(SerializationStream& stream)
+{
+	for (size_t i = 0; i < m_blocks.size(); i++)
+	{
+		if (m_blocks[i])
+			delete m_blocks[i];
+	}
+	m_blocks.clear();
+	
+	auto lengthBuffer = stream.read(sizeof(m_totalLength));
+	Serializer::read(m_totalLength, lengthBuffer);	
+	m_grower->grow(this, m_totalLength);
+	
+	write(stream.read(m_totalLength), m_totalLength);
+}
+
+void SerializationStream::serialize(SerializationStream& stream) const
+{
+	char out[sizeof(m_totalLength)];
+	Serializer::write(m_totalLength, out);
+	stream.write(out, sizeof(m_totalLength));
+	
+	for(auto& block : m_blocks)
+	{
+		stream.write(block->block, block->occupied); 
+	}
 }
 
 SerializationStream SerializationStream::createExp(size_t base, size_t exponent)

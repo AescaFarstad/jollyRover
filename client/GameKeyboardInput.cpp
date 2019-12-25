@@ -180,10 +180,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 1));
 			if (!state)
 				return;
-			auto stream = SerializationStream::createExp();
-			state->serialize(stream);
-			loadMsg.stateLength = stream.getLength();
-			loadMsg.state = stream.readAll();
+			state->serialize(loadMsg.state);
 			network.send(&loadMsg);
 			break;
 		};
@@ -193,10 +190,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 5));
 			if (!state)
 				return;
-			auto stream = SerializationStream::createExp();
-			state->serialize(stream);
-			loadMsg.stateLength = stream.getLength();
-			loadMsg.state = stream.readAll();
+			state->serialize(loadMsg.state);
 			network.send(&loadMsg);
 			break;
 		};
@@ -206,10 +200,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 25));
 			if (!state)
 				return;
-			auto stream = SerializationStream::createExp();
-			state->serialize(stream);
-			loadMsg.stateLength = stream.getLength();
-			loadMsg.state = stream.readAll();
+			state->serialize(loadMsg.state);
 			network.send(&loadMsg);
 			break;
 		};
@@ -219,10 +210,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 125));
 			if (!state)
 				return;
-			auto stream = SerializationStream::createExp();
-			state->serialize(stream);
-			loadMsg.stateLength = stream.getLength();
-			loadMsg.state = stream.readAll();
+			state->serialize(loadMsg.state);
 			network.send(&loadMsg);
 			break;
 		};
@@ -230,10 +218,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 		{
 			LoadGameMessage loadMsg;
 			auto state = gameUpdater.getFirstState();
-			auto stream = SerializationStream::createExp();
-			state->serialize(stream);
-			loadMsg.stateLength = stream.getLength();
-			loadMsg.state = stream.readAll();
+			state->serialize(loadMsg.state);
 			network.send(&loadMsg);
 			break;
 		};
@@ -277,10 +262,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 			
 			LoadGameMessage loadMsg;
 			auto state = gameUpdater.getFirstState();
-			auto stream = SerializationStream::createExp();
-			S::persistentStorage.savedState->serialize(stream);
-			loadMsg.stateLength = stream.getLength();
-			loadMsg.state = stream.readAll();
+			S::persistentStorage.savedState->serialize(loadMsg.state);
 			network.send(&loadMsg);
 			break;
 		}

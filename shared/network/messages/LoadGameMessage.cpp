@@ -6,27 +6,16 @@ LoadGameMessage::LoadGameMessage()
 	state = nullptr;
 }
 
-LoadGameMessage::~LoadGameMessage()
-{
-	if (state != nullptr)
-		delete[] state;
-}
-
 void LoadGameMessage::deserialize(SerializationStream& stream)
 {
 	InputMessage::deserialize(stream);
-	Serializer::read(stateLength, stream);
-	
-	state = new char[stateLength];
-	auto content = stream.read(stateLength);
-	memcpy(state, content, stateLength);
+	Serializer::read(state, stream);
 }
 
 void LoadGameMessage::serialize(SerializationStream& stream) const
 {
 	InputMessage::serialize(stream);
-	Serializer::write(stateLength, stream);
-	stream.write(state, stateLength);
+	Serializer::write(state, stream);
 }
 
 std::string LoadGameMessage::getName()
