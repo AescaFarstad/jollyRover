@@ -140,9 +140,17 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 		drawInput();	
 	if (S::drawSettings.hud)
 		drawHUD();
+	if (S::drawSettings.flyingMessage)		
+		drawFlyingMessages();
 	
-	lastTime = state->time.time;
+	m_lastTime = state->time.time;
 }
+
+void GameView::addMessage(std::string message, Point location)
+{
+	m_flyingMessages.add(message, location, m_state->time.time);
+}
+
 void GameView::setLogin(int32_t login)
 {
 	m_login = login;
@@ -732,4 +740,10 @@ void GameView::drawHUD()
 	
 	if (S::drawSettings.fps_D)
 		m_fontAmaticBold.draw(m_screen, 5.f, m_prototypes->variables.fieldHeight - 50, "fps: %.1f", S::fpsMeter.getfps(500));
+}
+
+void GameView::drawFlyingMessages()
+{
+	for(auto& msg : m_flyingMessages)
+		msg.render(m_state->time.time, m_fontAmaticBold, m_screen);
 }

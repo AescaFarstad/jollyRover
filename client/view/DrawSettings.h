@@ -15,6 +15,7 @@ struct DrawSettings
 	bool obstacles_D;
 	bool input = true;
 	bool hud = true;
+	bool flyingMessage = true;
 	bool fps_D = false;
 	bool timing_D = false;
 	bool scores = true;

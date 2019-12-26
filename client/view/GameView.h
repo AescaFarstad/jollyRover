@@ -7,6 +7,7 @@
 #include <Renderer.h>
 #include <SerialAnimationView.h>
 #include <ViewController.h>
+#include <FlyingMessage.h>
 #include <NFont.h>
 
 #ifdef __EMSCRIPTEN__
@@ -25,6 +26,7 @@ public:
 
 	void init(Renderer* renderer, Prototypes* prototypes);
 	void render(GameState* state, RouteInput* routeInput);
+	void addMessage(std::string message, Point location);
 	
 	void onMouseMove(SDL_MouseMotionEvent* event);
 	
@@ -41,7 +43,8 @@ private:
 	ViewController<SerialAnimationView> m_projectileExplosions;	
 	ViewController<SerialAnimationView> m_creepDeaths;
 	ViewController<SerialAnimationView> m_carDeaths;
-	int32_t lastTime;	
+	int32_t m_lastTime;	
+	CircularContainer<FlyingMessage, 5> m_flyingMessages;
 	
 	GPU_Image* m_layer1Image;
 	GPU_Image* m_layer2Image;
@@ -64,6 +67,7 @@ private:
 	void drawDebugGraphics();
 	void drawThreatMap();
 	void drawHUD();
+	void drawFlyingMessages();
 	
 	GPU_Image* loadImage(std::string path);
 	void resolveTextures(Prototypes* prototypes);

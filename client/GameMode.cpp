@@ -62,6 +62,7 @@ void GameMode::onMouseDown(SDL_MouseButtonEvent* event)
 	if (!m_isLoaded)
 		return;
 	m_routeInput.onMouseDown(event);
+	//m_gameView.addMessage("test message. please ignore.", Point(event->x, event->y));
 	/*if (event->button == 0x1)
 		std::cout<<("\t\t{ \"x\":" + std::to_string(event->x) + ", \"y\":" + std::to_string(event->y) + " },")<<"\n";
 	if (event->button == 0x3)
