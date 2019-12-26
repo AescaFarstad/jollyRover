@@ -265,16 +265,15 @@ void GameView::drawCars()
 			{
 				fromIndex = car.routeIndex;
 				toIndex = car.routeIndex + 1;
-				if (toIndex == car.route.size())
+				if (toIndex == car.route.size() - 1)
 					toIndex = fromIndex;
 				ratio = car.progress - 0.5;
 			}
 			else
 			{
-				fromIndex = car.routeIndex - 1;
+				
+				fromIndex = car.routeIndex > 0 ? car.routeIndex - 1 : 0;
 				toIndex = car.routeIndex;
-				if (fromIndex < 0)
-					fromIndex = 0;
 				ratio = car.progress + 0.5;
 			}
 			auto vec1 = car.route[fromIndex + 1] - car.route[fromIndex];

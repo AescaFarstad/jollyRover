@@ -85,6 +85,7 @@ void RouteInput::onMouseUp(SDL_MouseButtonEvent* event)
 		if (!p.isValid_)
 		{
 			m_isCompletelyValid = false;
+			reset();
 			break;
 		}
 	}
