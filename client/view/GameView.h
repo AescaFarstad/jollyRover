@@ -26,7 +26,7 @@ public:
 
 	void init(Renderer* renderer, Prototypes* prototypes);
 	void render(GameState* state, RouteInput* routeInput);
-	void addMessage(std::string message, Point location);
+	void addMessage(std::string message, Point location, NFont::AlignEnum aligment = NFont::AlignEnum::LEFT);
 	
 	void onMouseMove(SDL_MouseMotionEvent* event);
 	

@@ -41,5 +41,8 @@ private:
 	GameView m_gameView;
 	RouteInput m_routeInput;
 	GameKeyboardInput m_keyboardInput;
+	
+	void handleRouteInput();
+	Point normalizeMessageLocation(Point location);
 
 };

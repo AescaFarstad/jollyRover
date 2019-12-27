@@ -23,7 +23,7 @@ GameView::GameView()
 	m_layer3Image->anchor_x = 0;
 	m_layer3Image->anchor_y = 0;
 	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 32);
-	m_fontAmaticBoldBig.load("out/assets/Amatic-Bold.ttf", 48);
+	m_fontAmaticBoldBig.load("out/assets/Amatic-Bold.ttf", 44);
 	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 32);
 }
 
@@ -148,9 +148,9 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	m_lastTime = state->time.time;
 }
 
-void GameView::addMessage(std::string message, Point location)
+void GameView::addMessage(std::string message, Point location, NFont::AlignEnum aligment)
 {
-	m_flyingMessages.add(message, location, m_state->time.time);
+	m_flyingMessages.add(message, location, m_state->time.time, aligment);
 }
 
 void GameView::setLogin(int32_t login)
@@ -201,29 +201,31 @@ void GameView::drawInput()
 	SDL_Color validColor = ViewUtil::colorFromHex(0x00ff00);
 	SDL_Color invalidColor = ViewUtil::colorFromHex(0xff0000);
 	int rectSize = 6;
+	
+	auto& route = m_routeInput->getRoutePoints();
 
-	for (size_t i = 1; i < m_routeInput->route.size(); i++)
+	for (size_t i = 1; i < route.size(); i++)
 	{
-		bool isValidEdge = m_routeInput->route[i].isValid_;
+		bool isValidEdge = route[i].isValid_;
 		SDL_Color& newColor = isValidEdge ? validColor : invalidColor;
 		GPU_Line(m_screen,
-			m_routeInput->route[i - 1].location.x,
-			m_routeInput->route[i - 1].location.y,
-			m_routeInput->route[i].location.x,
-			m_routeInput->route[i].location.y,
+			route[i - 1].location.x,
+			route[i - 1].location.y,
+			route[i].location.x,
+			route[i].location.y,
 			newColor
 		);
 
 		//S::log.add(std::to_string(i) + " draw " + routeInput->route[i - 1].toString() + " -> " + routeInput->route[i].toString());
 
-		SDL_Color& newColor2 = m_routeInput->route[i].isValid_ ? validColor : invalidColor;
+		SDL_Color& newColor2 = route[i].isValid_ ? validColor : invalidColor;
 
 		GPU_Rectangle(
 			m_screen, 
-			m_routeInput->route[i].location.x - rectSize / 2,
-			m_routeInput->route[i].location.y - rectSize / 2,
-			m_routeInput->route[i].location.x + rectSize / 2,
-			m_routeInput->route[i].location.y + rectSize / 2,
+			route[i].location.x - rectSize / 2,
+			route[i].location.y - rectSize / 2,
+			route[i].location.x + rectSize / 2,
+			route[i].location.y + rectSize / 2,
 			newColor2
 			);
 	}

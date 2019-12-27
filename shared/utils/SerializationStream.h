@@ -46,7 +46,7 @@ public:
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
 
-	static SerializationStream createExp(size_t base  = 128, size_t exponent = 2);
+	static SerializationStream createExp(size_t base  = 1024, size_t exponent = 2);
 
 protected:
 	std::vector<CharBlock*> m_blocks;

@@ -6,53 +6,50 @@
 
 RouteInput::RouteInput()
 {
-	m_isInputActive = false;
+	m_state = ROUTE_STATE::EMPTY;
 	m_isLoaded = false;
 }
 
-void RouteInput::load(GameState* state, Prototypes* prototypes)
+void RouteInput::load(Prototypes* prototypes)
 {
-	this->m_state = state;
 	this->m_prototypes = prototypes;
 	m_isLoaded = true;
 }
 
-bool RouteInput::isCompletelyValid()
+ROUTE_STATE RouteInput::getState()
 {
-	return m_isCompletelyValid;
+	return m_state;
 }
 
-bool RouteInput::isLoaded()
+std::vector<Point> RouteInput::getPoints()
 {
-	return m_isLoaded;
+	std::vector<Point> result;
+	result.resize(m_route.size());
+	std::transform(m_route.begin(), m_route.end(), result.begin(), [](RoutePoint& rp){ return rp.location; });
+	return result;
 }
 
-std::vector<Point> RouteInput::claimRoute()
+std::vector<RoutePoint>& RouteInput::getRoutePoints()
 {
-	std::vector<Point> routeAsPoints;
-	for (RoutePoint& rp : route)
-	{
-		routeAsPoints.push_back(rp.location);
-	}
-	reset();
-	return routeAsPoints;
+	return m_route;
 }
-
 
 void RouteInput::onMouseDown(SDL_MouseButtonEvent* event)
 {
 	if (!m_isLoaded)
 		return;
+		
+	if (m_state != ROUTE_STATE::EMPTY)
+		reset();
+		
 	if (event->x < m_prototypes->variables.fieldWidth && event->x > 0 &&
 		event->y < m_prototypes->variables.fieldHeight && event->y > 0)
 	{
 		Point touch(event->x, event->y);
-		//S::log.add(touch.toString());
-		route.push_back(RoutePoint{Point(event->x, m_prototypes->variables.fieldHeight), true});
-		GameLogic::buildRouteToTarget(touch, route, m_prototypes);
-		//GameLogic::isRouteAnglePositive(route, touch, prototypes);
+		m_route.push_back(RoutePoint{Point(event->x, m_prototypes->variables.fieldHeight), true});
+		GameLogic::buildRouteToTarget(touch, m_route, m_prototypes);
 
-		m_isInputActive = true;
+		m_state = ROUTE_STATE::ACTIVE;
 	}
 }
 
@@ -60,45 +57,47 @@ void RouteInput::onMouseUp(SDL_MouseButtonEvent* event)
 {
 	if (!m_isLoaded)
 		return;
-
-	m_isInputActive = false;
-	if (route.size() < (size_t)m_prototypes->variables.minRouteSteps)
+	
+	if (m_state == ROUTE_STATE::ACTIVE)
 	{
-		reset();
-		return;
-	}
-
-	RoutePoint finish{Point(event->x, m_prototypes->variables.fieldHeight), true}; //Assumed no obstacles next to the field edge
-	if (!GameLogic::isRouteAnglePositive(route, finish.location, m_prototypes))
-	{
-		reset();
-		return;
-	}
-
-	GameLogic::buildRouteToTarget(finish.location, route, m_prototypes);
-	route.push_back(finish);
-
-	m_isCompletelyValid = true;
-
-	for (RoutePoint& p : route)
-	{
-		if (!p.isValid_)
+		if (m_route.size() < (size_t)m_prototypes->variables.minRouteSteps)
 		{
-			m_isCompletelyValid = false;
-			reset();
-			break;
+			m_state = ROUTE_STATE::E_TOO_SHORT;
+			return;
 		}
-	}
-
-	if (m_isCompletelyValid)
-	{
-		S::log.add("Route input is valid!", { LOG_TAGS::INPUT_ });
+		
+		RoutePoint finish{Point(event->x, m_prototypes->variables.fieldHeight), true}; //Assumed no obstacles next to the field edge
+		if (!GameLogic::isRouteAnglePositive(m_route, finish.location, m_prototypes))
+		{
+			m_state = ROUTE_STATE::E_GOES_UP;
+			return;
+		}
+		
+		GameLogic::buildRouteToTarget(finish.location, m_route, m_prototypes);
+		m_route.push_back(finish);
+		
+		if (m_route.size() > (size_t)m_prototypes->variables.maxRouteSteps)
+		{
+			m_state = ROUTE_STATE::E_TOO_LONG;
+			return;
+		}
+		
+		for (RoutePoint& p : m_route)
+		{
+			if (!p.isValid_)
+			{
+				m_state = ROUTE_STATE::E_COLLIDES;
+				return;
+			}
+		}
+		
+		m_state = ROUTE_STATE::VALID;
 	}
 }
 
 void RouteInput::onMouseMove(SDL_MouseMotionEvent* event)
 {
-	if (!m_isInputActive || !m_isLoaded)
+	if (m_state != ROUTE_STATE::ACTIVE || !m_isLoaded)
 		return;
 
 	if (event->x < m_prototypes->variables.fieldWidth && event->x > 0 &&
@@ -106,20 +105,19 @@ void RouteInput::onMouseMove(SDL_MouseMotionEvent* event)
 	{
 		Point touch(event->x, event->y);
 
-		while (route.size() > 1 && !GameLogic::isRouteAnglePositive(route, touch, m_prototypes))
+		while (m_route.size() > 1 && !GameLogic::isRouteAnglePositive(m_route, touch, m_prototypes))
 		{
-			//S::log.add("-point:" + route.back().toString(), { LOG_TAGS::INPUT_ });
-			route.pop_back();
+			//S::log.add("-point:" + m_route.back().toString(), { LOG_TAGS::INPUT_ });
+			m_route.pop_back();
 		}
 
-		GameLogic::buildRouteToTarget(touch, route, m_prototypes);
+		GameLogic::buildRouteToTarget(touch, m_route, m_prototypes);
 	}
 }
 
 
 void RouteInput::reset()
 {
-	route.clear();
-	m_isInputActive = false;
-	m_isCompletelyValid = false;
+	m_route.clear();
+	m_state = ROUTE_STATE::EMPTY;
 }

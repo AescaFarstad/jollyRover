@@ -1,3 +1,7 @@
+#pragma once
+#include <string>
+#include <algorithm>
+
 namespace std2
 {
 	template<typename T, typename L>
@@ -90,4 +94,6 @@ namespace std2
 			iterable.end(),
 			std::forward(expression));
 	}
+	
+	void replaceAll(std::string& str, const std::string& from, const std::string& to);
 }

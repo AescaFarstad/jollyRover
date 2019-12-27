@@ -16,7 +16,7 @@ void GameMode::loadGame(std::unique_ptr<GameState> state, int64_t clientToServer
 {
 	m_gameUpdater.load(std::move(state), m_prototypes, true);
 	m_clientToServerDelta = clientToServerDelta;
-	m_routeInput.load(m_gameUpdater.state.get(), m_prototypes);
+	m_routeInput.load(m_prototypes);
 	m_gameView.setLogin(login);
 	m_login = login;
 	m_isLoaded = true;
@@ -30,24 +30,7 @@ void GameMode::update(bool isActive)
 	if (isActive)
 	{
 		m_gameUpdater.update(SDL_GetTicks() + m_clientToServerDelta);
-		if (m_routeInput.isCompletelyValid())
-		{
-			auto route = m_routeInput.claimRoute();
-			
-			auto thisPlayer = GameLogic::playerByLogin(m_gameUpdater.state.get(), m_login);
-			if (thisPlayer->refuelLeft >0 || thisPlayer->repairsLeft > 0 || thisPlayer->activeCars.size() > 0)
-			{
-				auto loc = route.back();
-				loc.y -= 60;
-				m_gameView.addMessage("Not ready yet!", loc);
-			}
-			else
-			{
-				InputRouteMessage nim(route);
-				m_network->send(&nim);				
-			}
-			
-		}
+		handleRouteInput();
 		m_gameView.render(m_gameUpdater.state.get(), &m_routeInput);
 	}
 	else
@@ -57,6 +40,77 @@ void GameMode::update(bool isActive)
 		m_gameUpdater.update(laggingTime);
 	}
 	
+}
+
+Point GameMode::normalizeMessageLocation(Point location)
+{
+	return Point(
+		std::max(200, std::min((int32_t)location.x, m_prototypes->variables.fieldWidth - 200)),
+		std::max((int32_t)location.y, 150)
+	);
+}
+
+void GameMode::handleRouteInput()
+{
+	switch (m_routeInput.getState())
+	{
+		case ROUTE_STATE::E_COLLIDES:
+		{
+			
+			for(auto& p : m_routeInput.getRoutePoints())
+			{
+				if (!p.isValid_)
+				{
+					m_gameView.addMessage("The route collides with an obstacle!", normalizeMessageLocation(p.location), NFont::AlignEnum::CENTER);
+					break;
+				}
+			}
+			m_routeInput.reset();
+			break;
+		}
+		case ROUTE_STATE::E_GOES_UP:
+		{
+			Point loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
+			m_gameView.addMessage("The route must end at the bottom edge!", loc, NFont::AlignEnum::CENTER);
+			m_routeInput.reset();
+			break;
+		}		
+		case ROUTE_STATE::E_TOO_SHORT:
+		{
+			Point loc(m_prototypes->variables.fieldWidth / 2, m_prototypes->variables.fieldHeight / 2);
+			m_gameView.addMessage("The route is too short!", loc, NFont::AlignEnum::CENTER);
+			m_routeInput.reset();
+			break;
+		}				
+		case ROUTE_STATE::E_TOO_LONG:
+		{
+			Point loc(m_prototypes->variables.fieldWidth / 2, m_prototypes->variables.fieldHeight / 2);
+			m_gameView.addMessage("The route is too long!", loc, NFont::AlignEnum::CENTER);
+			m_routeInput.reset();
+			break;
+		}
+		case ROUTE_STATE::VALID:
+		{
+			auto thisPlayer = GameLogic::playerByLogin(m_gameUpdater.state.get(), m_login);
+			if (thisPlayer->refuelLeft >0 || thisPlayer->repairsLeft > 0 || thisPlayer->activeCars.size() > 0)
+			{
+				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
+				loc.y -= 60;
+				m_gameView.addMessage("Not ready yet!", loc, NFont::AlignEnum::CENTER);
+				m_routeInput.reset();
+			}
+			else
+			{
+				InputRouteMessage nim(m_routeInput.getPoints());
+				m_network->send(&nim);
+				m_routeInput.reset();
+			}
+			break;
+		}
+		
+		default:
+			break;
+	}
 }
 		
 

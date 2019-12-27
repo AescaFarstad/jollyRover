@@ -43,6 +43,14 @@ namespace Cars
 				{
 					if (car.unit.health <= 0)
 					{
+						auto base = prototypes->variables.repairRefuelBase;
+						
+						player.score += car.score;
+						player.refuelTotal = base;
+						player.refuelLeft = player.refuelTotal;
+						player.repairsTotal = base;
+						player.repairsLeft = player.repairsTotal;
+					
 						state->eventLogger.addCarDeath(
 							state->time.time, 
 							car, 
@@ -66,7 +74,7 @@ namespace Cars
 					
 					player.score += car.score;
 					player.refuelTotal = base;
-					player.refuelLeft = base;
+					player.refuelLeft = player.refuelTotal;
 					player.repairsTotal = FMath::lerp(fullHealth, 0.f, 0, base, car.unit.health);
 					player.repairsLeft = player.repairsTotal;
 				}

@@ -9,6 +9,16 @@
 #else 
 	#include <SDL2/SDL.h>
 #endif
+enum class ROUTE_STATE
+{
+	EMPTY,
+	ACTIVE,
+	VALID,
+	E_TOO_SHORT,
+	E_TOO_LONG,
+	E_COLLIDES,
+	E_GOES_UP
+};
 
 class RouteInput
 {
@@ -16,13 +26,14 @@ public:
 	RouteInput();
 	~RouteInput() = default;
 
-	std::vector<RoutePoint> route;
 
-	void load(GameState* m_state, Prototypes* m_prototypes);
-	std::vector<Point> claimRoute();
+	void load(Prototypes* m_prototypes);
 	
-	bool isCompletelyValid();
-	bool isLoaded();
+	ROUTE_STATE getState();
+	std::vector<Point> getPoints();
+	std::vector<RoutePoint>& getRoutePoints();
+	
+	void reset();	
 
 	void onMouseDown(SDL_MouseButtonEvent* event);
 	void onMouseUp(SDL_MouseButtonEvent* event);
@@ -30,28 +41,11 @@ public:
 
 private:
 
-	bool m_isInputActive;
-	bool m_isCompletelyValid;
-	bool m_isLoaded;
-
-	GameState* m_state;
-	Prototypes* m_prototypes;
+	bool m_isLoaded;	
+	ROUTE_STATE m_state;
 	
-	void reset();
+	Prototypes* m_prototypes;
+	std::vector<RoutePoint> m_route;
+	
 
 };
-
-
-
-/*
- down-> route goes to the bottom in a straight line, input mode activated
-
- wrong terrain - highlight in red
-
- move - depends on the angle - advance or retract
-
- up-> if valid - send to server
-
- if invalid - reset
-
-*/
