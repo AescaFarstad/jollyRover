@@ -6,6 +6,7 @@
 #include <std2.h>
 #include <FPSMeter.h>
 #include <DrawSettings.h>
+#include <GameLogic.h>
 
 
 GameView::GameView()
@@ -22,6 +23,7 @@ GameView::GameView()
 	m_layer3Image->anchor_x = 0;
 	m_layer3Image->anchor_y = 0;
 	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 32);
+	m_fontAmaticBoldBig.load("out/assets/Amatic-Bold.ttf", 48);
 	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 32);
 }
 
@@ -738,12 +740,26 @@ void GameView::drawHUD()
 		}
 	}
 	
+	auto& vars = m_prototypes->variables;
+	
 	if (S::drawSettings.fps_D)
-		m_fontAmaticBold.draw(m_screen, 5.f, m_prototypes->variables.fieldHeight - 50, "fps: %.1f", S::fpsMeter.getfps(500));
+		m_fontAmaticBold.draw(m_screen, 5.f, vars.fieldHeight - 50, "fps: %.1f", S::fpsMeter.getfps(500));
+		
+	auto player = GameLogic::playerByLogin(m_state, m_login);
+	if (player->repairsLeft > 0)
+	{
+		int32_t repairs = (player->repairsTotal - player->repairsLeft) * 100 / player->repairsTotal;
+		m_fontAmaticBoldBig.draw(m_screen, vars.fieldWidth / 2, 30, NFont::AlignEnum::CENTER, "Hull repairs: %d%%", repairs);
+	}
+	else if (player->refuelLeft > 0)
+	{
+		int32_t refuels = (player->refuelTotal - player->refuelLeft) * 100 / player->refuelTotal;
+		m_fontAmaticBoldBig.draw(m_screen, vars.fieldWidth / 2, 30, NFont::AlignEnum::CENTER, "Refueling: %d%%", refuels);
+	}
 }
 
 void GameView::drawFlyingMessages()
 {
 	for(auto& msg : m_flyingMessages)
-		msg.render(m_state->time.time, m_fontAmaticBold, m_screen);
+		msg.render(m_state->time.time, m_fontAmaticBoldBig, m_screen);
 }

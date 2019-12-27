@@ -31,6 +31,10 @@ public:
 	int32_t maxEventAnimationTime;
 	int32_t baseAgroLevel;
 	
+	int32_t repairSpeed;
+	int32_t refuelSpeed;
+	int32_t repairRefuelBase;
+	
 
 	void load(json &source);
 

@@ -166,7 +166,18 @@ namespace GameLogic
 
 		float angleDelta = FMath::angleDelta(ongoingVector.asAngle(), finishingVector.asAngle());
 		return fabsf(angleDelta) < prototypes->variables.stepAngleWindow / 2;
+	}	
+	
+	PlayerState* playerByLogin(GameState* state, int32_t login)
+	{
+		auto result = std::find_if(
+					state->players.begin(), 
+					state->players.end(), 
+					[login](PlayerState& player){return player.login == login;}
+					);
+		return result == state->players.end() ? nullptr : &(*result);
 	}
+		
 	namespace GameLogicInternal 
 	{
 		void makeLogicStep(GameState* state, int32_t timePassed, Prototypes* prototypes)
@@ -174,6 +185,7 @@ namespace GameLogic
 			state->time.time += timePassed;
 			
 			AI::handleAITurn(state, prototypes, timePassed);
+			handlePlayerUpdate(state, prototypes, timePassed);
 			
 			Creeps::handleCreepSpawn(state, prototypes, timePassed);
 			
@@ -183,6 +195,19 @@ namespace GameLogic
 			
 			Creeps::handleCreepDeath(state, prototypes, timePassed);
 			Cars::handleCarDeath(state, prototypes, timePassed);
+		}
+		
+		void handlePlayerUpdate(GameState* state, Prototypes* prototypes, int32_t timePassed)
+		{
+			auto& var = prototypes->variables;
+			
+			for(auto& player : state->players)
+			{
+				if (player.repairsLeft > 0)
+					player.repairsLeft-= var.repairSpeed * timePassed;
+				else
+					player.refuelLeft -= var.refuelSpeed * timePassed;
+			}
 		}
 
 		void handleActionInput(GameState* state, InputActionMessage* input)
@@ -199,7 +224,11 @@ namespace GameLogic
 				.login = input->login, 
 				.score = 0,
 				.isHeadless = false, 
-				.isAI = false 
+				.isAI = false,									
+				.repairsTotal = 0,
+				.repairsLeft = 0,
+				.refuelTotal = 0,
+				.refuelLeft = 0				
 				});
 		}
 
@@ -214,9 +243,17 @@ namespace GameLogic
 
 		void handleRouteInput(GameState* state, InputRouteMessage* input, Prototypes* prototypes)
 		{
+			auto player = playerByLogin(state, input->login);
+			
+			if (player->refuelLeft > 0 || player->repairsLeft > 0  || player->activeCars.size() > 0)
+			{
+				S::log.add("Attempt to lauch a car before its ready", { LOG_TAGS::GAME });
+				return;
+			}	
+			
 			if (testRouteIsValid(input->route, prototypes))
 			{
-				Cars::launchCar(state, playerByLogin(state, input->login), input->route, prototypes);
+				Cars::launchCar(state, player, input->route, prototypes);
 			}
 			else
 			{
@@ -299,18 +336,7 @@ namespace GameLogic
 			
 			state->propagatePrototypes(prototypes);
 		}
-
-
-		PlayerState* playerByLogin(GameState* state, int32_t login)
-		{
-			auto result = std::find_if(
-						state->players.begin(), 
-						state->players.end(), 
-						[login](PlayerState& player){return player.login == login;}
-						);
-			return result == state->players.end() ? nullptr : &(*result);
-		}
-
+		
 		void handleInputImpulse(GameState* state, InputImpulseMessage* input, Prototypes* prototypes)
 		{
 			switch (input->impulse)
@@ -330,7 +356,11 @@ namespace GameLogic
 						.login = login, 
 						.score = 0,
 						.isHeadless = true, 
-						.isAI = true 
+						.isAI = true,						
+						.repairsTotal = 0,
+						.repairsLeft = 0,
+						.refuelTotal = 0,
+						.refuelLeft = 0
 						});
 					break;
 				}

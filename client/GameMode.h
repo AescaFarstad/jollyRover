@@ -32,6 +32,7 @@ private:
 
 	bool m_isLoaded;
 	int64_t m_clientToServerDelta;
+	int32_t m_login;
 	
 	Network* m_network;
 	Prototypes* m_prototypes;

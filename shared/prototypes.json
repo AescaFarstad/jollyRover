@@ -8,6 +8,9 @@
 		"maxRouteSteps": 4400,
 		"stepAngleWindow": 3.14,
 		"maxEventAnimationTime": 1000,
+		"repairSpeed":10,
+		"refuelSpeed":28,
+		"repairRefuelBase":100000,
 		"war":{
 			"intensity": 2000,
 			"creepRestitution": 0.6,

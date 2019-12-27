@@ -50,6 +50,7 @@ private:
 	GPU_Image* m_layer2Image;
 	GPU_Image* m_layer3Image;
 	NFont m_fontAmaticBold;
+	NFont m_fontAmaticBoldBig;
 	NFont m_fontAmaticRegular;
 	
 	uint32_t m_loadCount;

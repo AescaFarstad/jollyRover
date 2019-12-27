@@ -19,6 +19,7 @@ namespace GameLogic
 	bool testRouteIsValid(std::vector<Point>& route, Prototypes* prototypes);
 	void buildRouteToTarget(Point& target, std::vector<RoutePoint>& route, Prototypes* prototypes);
 	bool isRouteAnglePositive(std::vector<RoutePoint>& route, Point& target, Prototypes* prototypes);
+	PlayerState* playerByLogin(GameState* state, int32_t login);
 
 	namespace GameLogicInternal
 	{
@@ -30,7 +31,8 @@ namespace GameLogic
 		void handleTimeInput(GameState* state, InputTimeMessage* input, Prototypes* prototypes);
 		void handleGameLoad(GameState* state, LoadGameMessage* input, Prototypes* prototypes);
 		void handleInputImpulse(GameState* state, InputImpulseMessage* input, Prototypes* prototypes);
+		
+		void handlePlayerUpdate(GameState* state, Prototypes* prototypes, int32_t timePassed);
 
-		PlayerState* playerByLogin(GameState* state, int32_t login);
 	}
 };

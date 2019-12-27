@@ -60,7 +60,17 @@ namespace Cars
 			for (auto& car : player.activeCars)
 			{
 				if (car.isFinished)
+				{
+					auto base = prototypes->variables.repairRefuelBase;
+					auto fullHealth = prototypes->cars[car.object.prototypeId].maxHealth;
+					
 					player.score += car.score;
+					player.refuelTotal = base;
+					player.refuelLeft = base;
+					player.repairsTotal = FMath::lerp(fullHealth, 0.f, 0, base, car.unit.health);
+					player.repairsLeft = player.repairsTotal;
+				}
+					
 			}
 			player.activeCars.erase(std::remove_if(player.activeCars.begin(), player.activeCars.end(), [](CarState &car) {
 				return car.isFinished || car.unit.health <= 0; 

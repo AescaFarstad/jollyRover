@@ -18,6 +18,7 @@ void GameMode::loadGame(std::unique_ptr<GameState> state, int64_t clientToServer
 	m_clientToServerDelta = clientToServerDelta;
 	m_routeInput.load(m_gameUpdater.state.get(), m_prototypes);
 	m_gameView.setLogin(login);
+	m_login = login;
 	m_isLoaded = true;
 }
 
@@ -32,8 +33,20 @@ void GameMode::update(bool isActive)
 		if (m_routeInput.isCompletelyValid())
 		{
 			auto route = m_routeInput.claimRoute();
-			InputRouteMessage nim(route);
-			m_network->send(&nim);
+			
+			auto thisPlayer = GameLogic::playerByLogin(m_gameUpdater.state.get(), m_login);
+			if (thisPlayer->refuelLeft >0 || thisPlayer->repairsLeft > 0 || thisPlayer->activeCars.size() > 0)
+			{
+				auto loc = route.back();
+				loc.y -= 60;
+				m_gameView.addMessage("Not ready yet!", loc);
+			}
+			else
+			{
+				InputRouteMessage nim(route);
+				m_network->send(&nim);				
+			}
+			
 		}
 		m_gameView.render(m_gameUpdater.state.get(), &m_routeInput);
 	}
@@ -60,7 +73,7 @@ void GameMode::addNewInput(std::unique_ptr<InputMessage> input)
 void GameMode::onMouseDown(SDL_MouseButtonEvent* event)
 {
 	if (!m_isLoaded)
-		return;
+		return;		
 	m_routeInput.onMouseDown(event);
 	//m_gameView.addMessage("test message. please ignore.", Point(event->x, event->y));
 	/*if (event->button == 0x1)

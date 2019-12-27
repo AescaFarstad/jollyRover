@@ -10,6 +10,11 @@ public:
 	int32_t score;
 	bool isHeadless;
 	bool isAI;
+	
+	int32_t repairsTotal;
+	int32_t repairsLeft;
+	int32_t refuelTotal;
+	int32_t refuelLeft;
 
 	std::vector<CarState> activeCars;
 
