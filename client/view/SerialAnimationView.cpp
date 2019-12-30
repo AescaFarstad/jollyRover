@@ -135,14 +135,16 @@ void SerialAnimationView::init(int32_t seed, ProjectileExplosionEvent& event, Ga
 	m_startTime = event.stamp;
 	m_endTime = 0;
 	m_seed = seed;
+	auto& weapon = prototypes->weapons[event.prototypeId];
 	SeededRandom random(seed);
 	
 	int32_t numParticles;
-	if (event.prototypeId == 0)
-		numParticles = random.get(3, 5);
-	else
+	if (weapon.splash < 3)
 		numParticles = random.get() > 0.8 ? 1 : 0;
-	
+	else if (weapon.splash < 10)		
+		numParticles = random.get(2, 4);
+	else		
+		numParticles = random.get(3, 6);
 	
 	for(int32_t i = 0; i < numParticles; i++)
 	{
@@ -188,6 +190,13 @@ void SerialAnimationView::init(int32_t seed, ProjectileExplosionEvent& event, Ga
 		
 		p.to.scale += random.get(0.1f, 0.4f);
 		p.to.tint.a = 0;
+		
+		if (weapon.splash < 3)
+		{
+			p.from.scale *= 0.7;
+			p.from.tint.a *= 0.7;
+			p.to.scale *= 0.7;
+		}
 		
 		m_endTime = std::max(m_endTime, p.delay + p.duration);
 		particles.push_back(p);

@@ -6,6 +6,7 @@
 #include <SDL_gpu.h>
 #include <Renderer.h>
 #include <SerialAnimationView.h>
+#include <CreepView.h>
 #include <ViewController.h>
 #include <FlyingMessage.h>
 #include <NFont.h>
@@ -43,6 +44,7 @@ private:
 	ViewController<SerialAnimationView> m_projectileExplosions;	
 	ViewController<SerialAnimationView> m_creepDeaths;
 	ViewController<SerialAnimationView> m_carDeaths;
+	ViewController<CreepView> m_creeps;
 	int32_t m_lastTime;	
 	CircularContainer<FlyingMessage, 5> m_flyingMessages;
 	

@@ -51,3 +51,8 @@ const Point& CreepState::getLocation()
 {
 	return unit.location;
 }
+
+const int32_t& CreepState::getId()
+{
+	return unit.id;
+}

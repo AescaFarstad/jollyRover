@@ -318,6 +318,24 @@
 			"moveType":"walker",
 			"hullTexture":["td/soldier2", "td/soldier1", ""],
 			"gunTexture":["", "", ""]
+		},
+		{
+			"id": 2,
+			"name":"rocketSoldier",
+			"maxHealth":20,
+			"speed": 30,
+			"strength":300,
+			"slowOnRollOver":0.8,
+			"rolloverable":true,
+			"loot": 0,		
+			"weapon": 2,
+			"size": 5,
+			"weight":12,
+			"whiskers":3,
+			"maxWhiskerLength":100,
+			"moveType":"walker",
+			"hullTexture":["td/soldier3", "td/soldier3", ""],
+			"gunTexture":["", "", ""]
 		}
 	],
 	"weapons":[
@@ -329,6 +347,7 @@
 				"ranged":true,
 				"range": 160,
 				"bulletSpeed": 180,
+				"barrelSize":20,
 				"projectileTexture":["tanks_2/bulletBlue1_outline", "tanks_2/bulletSand1_outline", ""]				
 			},
 			{
@@ -339,17 +358,19 @@
 				"ranged":true,
 				"range": 40,
 				"bulletSpeed": 130,
+				"barrelSize":0,
 				"projectileTexture":["", "", ""]
 			},
 			{
 				"id": 2,
-				"damage": 20,
-				"attackSpeed": 500,
-				"splash": 25,	
+				"damage": 40,
+				"attackSpeed": 700,
+				"splash": 8,	
 				"ranged":true,
-				"range": 320,
-				"bulletSpeed": 80,
-				"projectileTexture":["", "", ""]
+				"range": 120,
+				"bulletSpeed": 240,
+				"barrelSize":0,
+				"projectileTexture":["tanks_2/bulletSand3", "tanks_2/bulletRed3", ""]
 			},
 			{
 				"id": 3,
@@ -359,6 +380,7 @@
 				"ranged":true,
 				"range": 8,
 				"bulletSpeed": 160,
+				"barrelSize":0,
 				"projectileTexture":["", "", ""]
 			},
 			{
@@ -369,6 +391,7 @@
 				"ranged":true,
 				"range": 8,
 				"bulletSpeed": 1600,
+				"barrelSize":0,
 				"projectileTexture":["", "", ""]
 			}
 	],
@@ -651,12 +674,12 @@
 				},
 				{
 					"offset":{ "y":-60, "x":-70 },
-					"creepType":1,
+					"creepType":2,
 					"optional":false
 				},
 				{
 					"offset":{ "y":60, "x":-70 },
-					"creepType":1,
+					"creepType":2,
 					"optional":false
 				},
 				{

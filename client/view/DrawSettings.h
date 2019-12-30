@@ -7,17 +7,18 @@ struct DrawSettings
 	bool cars = true;
 	bool projectiles = true;
 	bool layer3 = true;
-	bool formations_D = false;
-	bool connections_D = false;
+									bool formations_D = false;
+									bool connections_D = false;
+									bool formAgro_D = false;
 	bool explosions = true;
-	bool debug_D = false;
-	bool threat_D = false;
-	bool obstacles_D;
+									bool debug_D = false;
+									bool threat_D = false;
+									bool obstacles_D = false;
 	bool input = true;
 	bool hud = true;
 	bool flyingMessage = true;
-	bool fps_D = false;
-	bool timing_D = false;
+									bool fps_D = false;
+									bool timing_D = false;
 	bool scores = true;
 };
 

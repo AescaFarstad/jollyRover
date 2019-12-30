@@ -301,7 +301,7 @@ void GameView::drawCars()
 			gunLocation += car.unit.location;
 			m_renderer->blit(*carGunTexture, gunLocation, angle, 0.8);
 			
-			m_fontDebug.draw(m_screen, car.unit.location.x, car.unit.location.y, "agro:%d", car.agro);
+			//m_fontDebug.draw(m_screen, car.unit.location.x, car.unit.location.y, "agro:%d", car.agro);
 			
 			/*
 			GPU_RectangleFilled(
@@ -315,98 +315,45 @@ void GameView::drawCars()
 		}
 	}
 }
-#include <unordered_map>
-std::unordered_map<int32_t, float> last; //TODO convert to proper CreepView
 
 void GameView::drawCreeps()
 {
-	for(auto& creep : m_state->creeps)
-	{
-		//SDL_Color color = ViewUtil::colorFromHex(0xff0000, 0x99);
-		//SDL_Color color2 = ViewUtil::colorFromHex(0x0000ff);
-		if (creep.unit.prototypeId == 1)
-		{/*
-			if (creep.unit.force == 0)
-				GPU_Circle(m_renderer->getScreen(), creep.unit.location.x, creep.unit.location.y, creep.creepProto_->size, color);
-			else
-				GPU_CircleFilled(m_renderer->getScreen(), creep.unit.location.x, creep.unit.location.y, creep.creepProto_->size, color);
-				*/
-			
-			float bodyAngle = creep.unit.voluntaryMovement.asAngle();
-			float lastAngle = last[creep.unit.id];
-			float delta = FMath::angleDelta(bodyAngle, lastAngle);
-			if (std::fabs(delta) > M_PI / (48.f + ((creep.unit.id * 7)% 24)) )
-			{
-				if (delta > 0)
-					bodyAngle = lastAngle + M_PI / (48.f + ((creep.unit.id * 7) % 24));
-				else
-					bodyAngle = lastAngle - M_PI / (48.f + ((creep.unit.id * 7) % 24));
-			}
-			last[creep.unit.id] = bodyAngle;
-			m_renderer->blit(*creep.creepProto_->hullTexture[creep.unit.force], creep.unit.location, bodyAngle + M_PI_2, 0.5);
-			
-			//VisualDebug::drawArrow(creep.unit.location, creep.unit.location + Point::fromAngle(bodyAngle, 30), 0x0000ff);
-			//VisualDebug::drawArrow(creep.unit.location, creep.unit.location + Point::fromAngle(creep.unit.voluntaryMovement.asAngle(), 30), 0xff0000);
-		}
-		else if (creep.unit.prototypeId == 0)
-		{
-			float barrelAngle;
-			float bodyAngle;
-			if (creep.creepProto_->moveType == MOVE_TYPE::TRACTOR)
-				bodyAngle = creep.orientation;
-			else
-				bodyAngle = creep.unit.voluntaryMovement.asAngle();
-			
-			if (creep.targetLoc_.getLength() > 0)
-				barrelAngle = (creep.targetLoc_ - creep.unit.location).asAngle();
-			else
-				barrelAngle = bodyAngle;
-						
-			m_renderer->blit(*creep.creepProto_->hullTexture[creep.unit.force], creep.unit.location, bodyAngle, 1);
-			m_renderer->blit(*creep.creepProto_->gunTexture[creep.unit.force], creep.unit.location, barrelAngle, 1);
-			/*
-			auto scaledMovement = creep.unit.voluntaryMovement;
-			if (scaledMovement.getLength() > 0)
-			{
-				scaledMovement.scaleTo(100);
-				scaledMovement += creep.unit.location;
-				
-				GPU_Line(m_renderer->getScreen(), creep.unit.location.x, creep.unit.location.y, scaledMovement.x, scaledMovement.y, color);			
-			}
-			if (creep.targetLoc_.getLength() > 0)
-				GPU_Line(m_renderer->getScreen(), creep.unit.location.x, creep.unit.location.y, creep.targetLoc_.x, creep.targetLoc_.y, color2);*/
-		}
-		//GPU_CircleFilled(m_screen, creep.unit.location.x, creep.unit.location.y, creep.creepProto_->size, color);
-	}
+	m_creeps.render(
+			m_renderer, 
+			m_state->creeps.begin(), 
+			m_state->creeps.end(),
+			m_state, 
+			m_prototypes,
+			m_login
+		);
 }
 
 
 void GameView::drawProjectiles()
 {
-	SDL_Color color = ViewUtil::colorFromHex(0xff00ff);
+	SDL_Color color = ViewUtil::colorFromHex(0x333333);
 	int rectSize = 2;
 	
 	for (Projectile &projectile : m_state->projectiles)
 	{
-		
-		if (projectile.weapon == 0)
+		if (projectile.weapon == 1)
 		{
-			if (m_state->time.time - projectile.spawnedAt < 20 / projectile.speed * 1000)
-				continue; //Shell is inside the barrel
-			TextureDef* texture = m_prototypes->weapons[projectile.weapon].projectileTexture[projectile.force];
-			m_renderer->blit(*texture, projectile.location, (projectile.target - projectile.location).asAngle(), 0.7);
-		}
-		else
-		{
-			GPU_Rectangle(
+			GPU_RectangleFilled(
 				m_screen,
 				projectile.location.x - rectSize/2,
 				projectile.location.y - rectSize/2,
 				projectile.location.x + rectSize/2,
 				projectile.location.y + rectSize/2,
 				color
-		);	
-			
+			);
+		}
+		else
+		{
+			auto barrel = m_prototypes->weapons[projectile.prototypeId].barrelSize;
+			if (m_state->time.time - projectile.spawnedAt < barrel / projectile.speed * 1000)
+				continue; //Shell is inside the barrel
+			TextureDef* texture = m_prototypes->weapons[projectile.weapon].projectileTexture[projectile.force];
+			m_renderer->blit(*texture, projectile.location, (projectile.target - projectile.location).asAngle(), 0.7);
 		}
 	}
 }

@@ -22,6 +22,8 @@ public:
 	int32_t splash;
 	int32_t range;
 	int32_t bulletSpeed;
+	int32_t barrelSize;
+	
 	std::vector<std::string> projectileTextureName;
 	std::vector<TextureDef*> projectileTexture;
 

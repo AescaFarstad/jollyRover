@@ -45,5 +45,5 @@ public:
 	
 private:
 	static const size_t CLEAN_UP_SIZE = 100;
-	std::unordered_map<int16_t, V> m_views;
+	std::unordered_map<int32_t, V> m_views;
 };

@@ -36,6 +36,7 @@ public:
 	void propagatePrototypes(std::vector<CreepProto>& creepProtos, std::vector<WeaponProto>& weaponProtos);
 	
 	const Point& getLocation();
+	const int32_t& getId();
 
 private:
 

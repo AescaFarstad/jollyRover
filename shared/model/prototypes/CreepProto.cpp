@@ -56,5 +56,6 @@ void from_json(const json &j, WeaponProto &weapon)
 	weapon.splash = j.at("splash");
 	weapon.range = j.at("range");
 	weapon.bulletSpeed = j.at("bulletSpeed");
+	weapon.barrelSize = j.at("barrelSize");
 	weapon.projectileTextureName = j.at("projectileTexture").get<std::vector<std::string>>();
 }
