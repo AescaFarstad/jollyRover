@@ -3,6 +3,7 @@
 #include <VisualDebug.h>
 #include <std2.h>
 #include <Field.h>
+#include <GameUtil.h>
 
 namespace Cars
 {
@@ -70,7 +71,7 @@ namespace Cars
 				if (car.isFinished)
 				{
 					auto base = prototypes->variables.repairRefuelBase;
-					auto fullHealth = prototypes->cars[car.object.prototypeId].maxHealth;
+					auto fullHealth = prototypes->cars[car.unit.prototypeId].maxHealth;
 					
 					player.score += car.score;
 					player.refuelTotal = base;
@@ -101,9 +102,11 @@ namespace Cars
 		
 		car.speed = proto.speed;
 		car.accel = proto.accel;
+		car.timeSinceRollover = 0;
+		car.agro = 0;
 		
-		car.object.id = state->idCounter++;
-		car.object.prototypeId = 0;
+		car.unit.id = state->idCounter++;
+		car.unit.prototypeId = 0;
 		car.unit.force = 2; //TODO create player forces
 		car.unit.health = proto.maxHealth;
 		car.unit.location = locationFromRouteProgress(car);
@@ -115,6 +118,12 @@ namespace Cars
 		void updateCar(CarState& car, PlayerState& player, GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{
 			car.speed += car.accel * timePassed;
+			if (car.agro > 0)
+			{
+				car.timeSinceRollover += timePassed;
+				float scale = FMath::lerp(0, 0, 1000, prototypes->variables.carAgroFadeGainPerSecond, car.timeSinceRollover);
+				car.agro = std::max(0.f, car.agro - scale * timePassed);				
+			}
 			
 			Point startingLocation = car.unit.location;
 			float passedThisStep = car.speed * timePassed;
@@ -127,7 +136,7 @@ namespace Cars
 			car.unit.location = locationFromRouteProgress(car);
 			car.unit.voluntaryMovement = car.unit.location - startingLocation;
 			
-			CarProto& proto = prototypes->cars[car.object.prototypeId];
+			CarProto& proto = prototypes->cars[car.unit.prototypeId];
 			auto rolledOverCreeps = state->creepMap_.getInRadius(car.unit.location, proto.size + prototypes->variables.maxCreepSize);
 			
 			for(auto& creep : rolledOverCreeps)
@@ -141,8 +150,12 @@ namespace Cars
 					else
 					{
 						creep->unit.health = 0;
+						auto formation = GameUtil::formationByCreep(*creep, state);
+						formation->carAgro += prototypes->variables.carAgroPerUnit;
 						car.score++;
 						car.speed *= creep->creepProto_->slowOnRollOver;
+						car.timeSinceRollover = 0;
+						car.agro += prototypes->variables.carAgroGainPerUnit;
 					}				
 				}
 			}
@@ -153,7 +166,7 @@ namespace Cars
 				{
 					if (&anotherCar != &car)
 					{
-						CarProto& anotherProto = prototypes->cars[anotherCar.object.prototypeId];
+						CarProto& anotherProto = prototypes->cars[anotherCar.unit.prototypeId];
 						if (anotherCar.unit.location.distanceTo(car.unit.location) < proto.size + anotherProto.size)
 						{
 							if (anotherCar.speed > car.speed)

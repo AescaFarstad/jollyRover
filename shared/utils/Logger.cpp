@@ -14,7 +14,7 @@ Logger::~Logger()
 {
 }
 
-void Logger::add(std::string message, std::initializer_list<LOG_TAGS> tags)
+void Logger::add(const std::string& message, std::initializer_list<LOG_TAGS> tags)
 {
 	LogMessage* msg = new LogMessage();
 	msg->message = message;
@@ -25,7 +25,7 @@ void Logger::add(std::string message, std::initializer_list<LOG_TAGS> tags)
 		report(msg);
 }
 
-void Logger::add(std::string message)
+void Logger::add(const std::string& message)
 {
 	add(message, { LOG_TAGS::ANONYMOS });
 }

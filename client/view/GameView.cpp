@@ -25,6 +25,8 @@ GameView::GameView()
 	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 32);
 	m_fontAmaticBoldBig.load("out/assets/Amatic-Bold.ttf", 44);
 	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 32);
+	m_fontDebug.load("out/assets/Cousine-Regular.ttf", 18);
+	m_fontDebug_m.load("out/assets/Cousine-Regular.ttf", 12);
 }
 
 GameView::~GameView()
@@ -130,6 +132,8 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 		drawFormations();	
 	if (S::drawSettings.connections_D)
 		drawFormationConnections();	
+	if (S::drawSettings.formAgro_D)
+		drawFormationAgro();
 	if (S::drawSettings.explosions)
 		drawProjectileExplosion();	
 	if (S::drawSettings.debug_D)
@@ -164,7 +168,7 @@ void GameView::onMouseMove(SDL_MouseMotionEvent* event)
 		return;
 	auto nearestCreep = std2::minElement(m_state->creeps, [event](CreepState& creep){return Point(event->x, event->y).distanceTo(creep.unit.location);});
 	if (Point(event->x, event->y).distanceTo(nearestCreep->unit.location) < 50)	
-		VisualDebug::interestingId = nearestCreep->object.id;
+		VisualDebug::interestingId = nearestCreep->unit.id;
 	else
 		VisualDebug::interestingId = -1;
 }
@@ -262,7 +266,7 @@ void GameView::drawCars()
 					player.login == m_login ? myColor : theirColor
 				);
 			}
-			auto& proto = m_prototypes->cars[car.object.prototypeId];			
+			auto& proto = m_prototypes->cars[car.unit.prototypeId];			
 			auto& carTexture = player.login == m_login ? 
 				proto.playerCarHullTexture : 
 				proto.opponentCarHullTexture;
@@ -296,6 +300,9 @@ void GameView::drawCars()
 			auto gunLocation = Point::fromAngle(angle, 9);
 			gunLocation += car.unit.location;
 			m_renderer->blit(*carGunTexture, gunLocation, angle, 0.8);
+			
+			m_fontDebug.draw(m_screen, car.unit.location.x, car.unit.location.y, "agro:%d", car.agro);
+			
 			/*
 			GPU_RectangleFilled(
 					m_screen,
@@ -317,7 +324,7 @@ void GameView::drawCreeps()
 	{
 		//SDL_Color color = ViewUtil::colorFromHex(0xff0000, 0x99);
 		//SDL_Color color2 = ViewUtil::colorFromHex(0x0000ff);
-		if (creep.object.prototypeId == 1)
+		if (creep.unit.prototypeId == 1)
 		{/*
 			if (creep.unit.force == 0)
 				GPU_Circle(m_renderer->getScreen(), creep.unit.location.x, creep.unit.location.y, creep.creepProto_->size, color);
@@ -326,22 +333,22 @@ void GameView::drawCreeps()
 				*/
 			
 			float bodyAngle = creep.unit.voluntaryMovement.asAngle();
-			float lastAngle = last[creep.object.id];
+			float lastAngle = last[creep.unit.id];
 			float delta = FMath::angleDelta(bodyAngle, lastAngle);
-			if (std::fabs(delta) > M_PI / (48.f + ((creep.object.id * 7)% 24)) )
+			if (std::fabs(delta) > M_PI / (48.f + ((creep.unit.id * 7)% 24)) )
 			{
 				if (delta > 0)
-					bodyAngle = lastAngle + M_PI / (48.f + ((creep.object.id * 7) % 24));
+					bodyAngle = lastAngle + M_PI / (48.f + ((creep.unit.id * 7) % 24));
 				else
-					bodyAngle = lastAngle - M_PI / (48.f + ((creep.object.id * 7) % 24));
+					bodyAngle = lastAngle - M_PI / (48.f + ((creep.unit.id * 7) % 24));
 			}
-			last[creep.object.id] = bodyAngle;
+			last[creep.unit.id] = bodyAngle;
 			m_renderer->blit(*creep.creepProto_->hullTexture[creep.unit.force], creep.unit.location, bodyAngle + M_PI_2, 0.5);
 			
 			//VisualDebug::drawArrow(creep.unit.location, creep.unit.location + Point::fromAngle(bodyAngle, 30), 0x0000ff);
 			//VisualDebug::drawArrow(creep.unit.location, creep.unit.location + Point::fromAngle(creep.unit.voluntaryMovement.asAngle(), 30), 0xff0000);
 		}
-		else if (creep.object.prototypeId == 0)
+		else if (creep.unit.prototypeId == 0)
 		{
 			float barrelAngle;
 			float bodyAngle;
@@ -410,7 +417,7 @@ void GameView::drawFormationConnections()
 	
 	for (auto& form : m_state->formations)
 	{
-		FormationProto& proto = m_prototypes->formations[form.object.prototypeId];
+		FormationProto& proto = m_prototypes->formations[form.prototypeId];
 		
 		for (size_t i = 0; i < form.slots.size(); i++)
 		{
@@ -428,16 +435,63 @@ void GameView::drawFormationConnections()
 	}
 }
 
+
+void GameView::drawFormationAgro()
+{
+	for (auto& form : m_state->formations)
+	{
+		Point location;
+		int32_t totalCreeps = 0;
+		float hostileThreat = 0;
+		int32_t mapIndex = form.force == 0 ? 1 : 0;
+		
+		for (size_t i = 0; i < form.slots.size(); i++)
+		{
+			auto& slot = form.slots[i];
+			
+			if (slot > 0)
+			{
+				auto creep = std::find_if(m_state->creeps.begin(), m_state->creeps.end(), [slot](CreepState& creep){ return creep.unit.id == slot; });
+				if (creep != m_state->creeps.end())
+				{
+					location+=creep->unit.location;
+					hostileThreat += m_state->threatMap_[mapIndex].getThreatAt(creep->unit.location);
+					totalCreeps++;
+				}
+			}
+		}
+		
+		location /= totalCreeps;
+		hostileThreat /= totalCreeps;
+		
+		int32_t percent = 100 * form.carAgro / m_prototypes->variables.carAgroThresholdPerSlot / totalCreeps;
+		std::string state = "";
+		switch (form.subObjective)
+		{
+			case SUB_OBJECTIVE::MOVE: {state = "M"; break;}
+			case SUB_OBJECTIVE::PURSUE: {state = "P"; break;}
+			case SUB_OBJECTIVE::NONE: {state = "N"; break;}
+			case SUB_OBJECTIVE::ASSAULT: {state = "A"; break;}
+			default: {state = "?"; break;}
+		}
+		m_fontDebug.draw(m_screen, location.x, location.y, "%s agro: %d, (%d%%)", state.c_str(), form.carAgro, (int32_t)percent);
+		
+		percent = 100 * hostileThreat / form.agroAt;
+		m_fontDebug_m.draw(m_screen, location.x, location.y + 16, "threat: %d, (%d%%)", (int32_t)hostileThreat, (int32_t)percent);
+		m_fontDebug_m.draw(m_screen, location.x, location.y + 28, "count: %d", totalCreeps); 
+	}
+}
+
 void GameView::drawFormations()
 {
 	SDL_Color color = ViewUtil::colorFromHex(0xdddd00);
 	
 	for (auto& form : m_state->formations)
 	{
-		if (form.subObjective == SUB_OBJECTIVE::ASSAULT)
+		if (form.subObjective != SUB_OBJECTIVE::MOVE)
 			continue;
 			
-		FormationProto& proto = m_prototypes->formations[form.object.prototypeId];
+		FormationProto& proto = m_prototypes->formations[form.prototypeId];
 		
 		Point AB(proto.AA.x, proto.BB.y);
 		Point BA(proto.BB.x, proto.AA.y);
@@ -507,6 +561,9 @@ void GameView::drawFormations()
 		
 		GPU_Polygon(m_screen, 5, points, color);
 		
+		Point location;
+		int32_t totalCreeps = 0;
+		
 		for (size_t i = 0; i < form.slots.size(); i++)
 		{
 			int slotSize = 4;
@@ -536,9 +593,11 @@ void GameView::drawFormations()
 					color
 				);
 				
-				auto creep = std::find_if(m_state->creeps.begin(), m_state->creeps.end(), [slot](CreepState& creep){ return creep.object.id == slot; });
+				auto creep = std::find_if(m_state->creeps.begin(), m_state->creeps.end(), [slot](CreepState& creep){ return creep.unit.id == slot; });
 				if (creep != m_state->creeps.end())
 				{
+					location+=creep->unit.location;
+					totalCreeps++;
 					GPU_Circle(m_screen, creep->formationAttraction_.x, creep->formationAttraction_.y, 2, color);
 					GPU_Circle(m_screen, creep->formationAttraction_.x, creep->formationAttraction_.y, 5, color);
 					GPU_Line(
@@ -556,6 +615,9 @@ void GameView::drawFormations()
 		int32_t radius = FMath::lerpClipped(0, 2, form.agroAt, 10, form.agro_);
 		GPU_CircleFilled(m_screen, form.actualLocation_.x, form.actualLocation_.y, radius, color);
 		
+		location /= totalCreeps;
+		int32_t percent = 100 * form.carAgro / m_prototypes->variables.carAgroThresholdPerSlot / totalCreeps;
+		m_fontDebug.draw(m_screen, location.x, location.y, "agro: %d, (%d%%)", form.carAgro, percent);
 	}
 }
 
@@ -689,7 +751,9 @@ void GameView::drawThreatMap()
 			for(size_t j = 1; j < (*maps[c])[i].size() - 1; j++)
 			{
 				SDL_Color color = colors[c];
-				color.a = (int8_t)FMath::lerpClipped(0, 0, 1000, 150, (*maps[c])[i][j]);
+				color.a = (int8_t)FMath::lerpClipped(0, 0, 1000, 120, (*maps[c])[i][j]);
+				if (color.a > 0)
+					color.a += 10;
 				GPU_RectangleFilled(
 					m_screen, 
 					AA.x + cellSize * (i - 1),

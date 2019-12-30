@@ -4,11 +4,12 @@
 #include <ObjectiveProto.h>
 #include <Point.h>
 
-enum class SUB_OBJECTIVE
+enum class SUB_OBJECTIVE : int8_t
 {
 	NONE,
 	MOVE,
 	ASSAULT,
+	PURSUE,
 	APPROACH,
 	HARVEST,
 	RETREAT,
@@ -23,8 +24,9 @@ public:
 	~FormationState() = default;
 	
 	static const int8_t MAX_FORMATION_COUNT = 32;
-	
-	Object object;
+		
+	int32_t id;
+	int16_t prototypeId;
 	int16_t objectiveID;
 	int16_t force;
 	std::vector<int32_t> slots;
@@ -37,6 +39,7 @@ public:
 	int32_t spawnedAt;
 	SUB_OBJECTIVE subObjective;
 	float agroAt;
+	int32_t carAgro;
 	
 	bool isDisposed_;
 	Point actualLocation_;

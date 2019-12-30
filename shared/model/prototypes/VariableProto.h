@@ -35,6 +35,13 @@ public:
 	int32_t refuelSpeed;
 	int32_t repairRefuelBase;
 	
+	int32_t carAgroPerUnit;
+	int32_t carAgroThresholdPerSlot;
+	int32_t carChaseBreakoutDistance;
+	
+	int32_t carAgroGainPerUnit;
+	float carAgroFadeGainPerSecond;
+	
 
 	void load(json &source);
 

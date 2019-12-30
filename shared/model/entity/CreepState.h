@@ -13,7 +13,6 @@ public:
 	
 	static const int8_t MAX_WHISKER_COUNT = 32;
 	
-	Object object;
 	Unit unit;
 	Weapon weapon;
 	std::array<int16_t, MAX_WHISKER_COUNT> whiskers;

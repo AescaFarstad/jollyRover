@@ -3,6 +3,7 @@
 #include <VisualDebug.h>
 #include <std2.h>
 #include <Field.h>
+#include <GameUtil.h>
 
 namespace Creeps
 {
@@ -22,7 +23,7 @@ namespace Creeps
 		
 		processProjectiles(state, prototypes, timePassed);		
 		
-		pushOutCreeps(state, prototypes, timePassed);
+		processCreeps(state, prototypes, timePassed);
 		pushCreepsOutOfObstacles(state, prototypes, timePassed);
 		preventCreepObstacleCollision(state, prototypes);
 		
@@ -69,15 +70,15 @@ namespace Creeps
 		{
 			for(auto& creep : state->creeps)
 			{
-				auto& mapCreep = state->creepById_[creep.object.id];
+				auto& mapCreep = state->creepById_[creep.unit.id];
 				if (mapCreep != &creep)
 					THROW_FATAL_ERROR("creep pointer mismatch");
-				if (mapCreep->object.id != creep.object.id)
+				if (mapCreep->unit.id != creep.unit.id)
 					THROW_FATAL_ERROR("creep pointer mismatch");
 			}
 			
 			for(auto& creep : state->creeps)
-				if (creep.creepProto_ != &prototypes->creeps[creep.object.prototypeId])
+				if (creep.creepProto_ != &prototypes->creeps[creep.unit.prototypeId])
 					THROW_FATAL_ERROR("frefer");
 					
 			for(auto& form : state->formations)
@@ -133,18 +134,21 @@ namespace Creeps
 			if (!state->threatMap_[0].isValid())
 			{
 				Point BB(prototypes->variables.fieldWidth, prototypes->variables.fieldHeight);
-				state->threatMap_[0] = ThreatMap(160, Point(), BB);
-				state->threatMap_[1] = ThreatMap(160, Point(), BB);
+				state->threatMap_[0] = ThreatMap(120, Point(), BB);
+				state->threatMap_[1] = ThreatMap(120, Point(), BB);
 			}
 			
 			for(auto& creep : state->creeps)
 			{
 				state->threatMap_[creep.unit.force].addThreat(creep.unit.location, creep.creepProto_->strength);
 			}
-			state->threatMap_[0].blur(1);
-			state->threatMap_[0].blur(0.9);
 			state->threatMap_[0].blur(0.8);
 			state->threatMap_[0].blur(0.7);
+			state->threatMap_[0].blur(0.6);
+			
+			state->threatMap_[1].blur(0.8);
+			state->threatMap_[1].blur(0.7);
+			state->threatMap_[1].blur(0.6);
 		}
 		
 		void spawnFormation(GameState* state, Prototypes* prototypes, ForceProto& forceProto, FormationProto& formationProto)
@@ -158,8 +162,8 @@ namespace Creeps
 			state->formations.emplace_back();
 			FormationState& formation = state->formations.back();
 			formation.objectiveID = -1;
-			formation.object.id = state->idCounter++;
-			formation.object.prototypeId = formationProto.id;
+			formation.id = state->idCounter++;
+			formation.prototypeId = formationProto.id;
 			formation.force = forceProto.id;
 			formation.formationPrototype_ = &formationProto;
 			formation.isDisposed_ = false;
@@ -169,6 +173,7 @@ namespace Creeps
 			formation.angularSpeed = 0;
 			formation.spawnedAt = state->time.time;
 			formation.agroAt = state->random.get(0.7f, 1.4f) * formationProto.relativeAgroability * prototypes->variables.baseAgroLevel;
+			formation.carAgro = 0;
 			formation.subObjective = SUB_OBJECTIVE::NONE;
 			
 			for(auto& slot : formationProto.slots)
@@ -178,10 +183,10 @@ namespace Creeps
 					
 					CreepState& creep = spawnCreep(slot.creepType, getCurrentSlotLocation(formation, formation.slots.size()), state, prototypes);
 					creep.unit.force = forceProto.id;
-					creep.formationId = formation.object.id;
+					creep.formationId = formation.id;
 					creep.formationsSlot = formation.slots.size();
 					creep.orientation = formation.orientation;
-					formation.slots.push_back(creep.object.id);
+					formation.slots.push_back(creep.unit.id);
 					formation.speed = std::min(formation.speed, creep.creepProto_->speed);
 				}
 				else
@@ -210,16 +215,16 @@ namespace Creeps
 				creep.whiskers[i] = -1;
 			}
 			
-			creep.object.prototypeId = type;
-			creep.object.id = state->idCounter++;
-			state->creepById_[creep.object.id] = &creep;
+			creep.unit.prototypeId = type;
+			creep.unit.id = state->idCounter++;
+			state->creepById_[creep.unit.id] = &creep;
 			
 			creep.unit.health = creep.creepProto_->maxHealth;
 			creep.unit.location = location;
 			
 			creep.weapon.prototypeId = creep.creepProto_->weapon;
 			creep.weapon.attackCooldown = 0;
-			creep.weapon.target = -1;
+			creep.weapon.target.id = -1;
 			
 			creep.formationId = -1;
 			creep.formationsSlot = -1;
@@ -248,6 +253,11 @@ namespace Creeps
 					case SUB_OBJECTIVE::ASSAULT :
 					{
 						performAssault(formation, state, prototypes, timePassed);
+						break;
+					}					
+					case SUB_OBJECTIVE::PURSUE :
+					{
+						performPursue(formation, state, prototypes, timePassed);
 						break;
 					}
 					default:
@@ -313,8 +323,8 @@ namespace Creeps
 				CreepState& creep = *creepP;
 				if (!creepP || creepP->unit.health <= 0)
 					continue;
-					
-				creep.weapon.attackCooldown -= timePassed;	
+				
+				creep.weapon.target.id = -1;
 					
 				formation.actualLocation_ += creep.unit.location * creep.creepProto_->strength;
 				totalStrength += creep.creepProto_->strength;
@@ -489,6 +499,13 @@ namespace Creeps
 			if (hostileThreat > formation.agroAt)
 				formation.subObjective = SUB_OBJECTIVE::ASSAULT;
 			formation.agro_ = hostileThreat;
+			
+			if (formation.carAgro > 0)
+			{
+				formation.carAgro -= timePassed;
+				if (formation.carAgro > prototypes->variables.carAgroThresholdPerSlot * totalCreeps)
+					formation.subObjective = SUB_OBJECTIVE::PURSUE;
+			}
 		}
 		
 		void tryOptimiseFormation(FormationState& formation, GameState* state, int32_t timePassed)
@@ -505,7 +522,7 @@ namespace Creeps
 				if (i == j)
 					continue;
 				CreepState* creep2 = state->creepById_[formation.slots[j]];
-				if (!creep2 || creep2->unit.health <= 0 || creep1->object.prototypeId != creep2->object.prototypeId)
+				if (!creep2 || creep2->unit.health <= 0 || creep1->unit.prototypeId != creep2->unit.prototypeId)
 					continue;
 				if (creep1ToSlotDistance > creep1->unit.location.distanceTo(getCurrentSlotLocation(formation, j)) &&
 					creep1ToSlotDistance > creep2->unit.location.distanceTo(getCurrentSlotLocation(formation, i))
@@ -513,11 +530,109 @@ namespace Creeps
 				{
 					creep1->formationsSlot = j;
 					creep2->formationsSlot = i;
-					formation.slots[i] = creep2->object.id;
-					formation.slots[j] = creep1->object.id;
+					formation.slots[i] = creep2->unit.id;
+					formation.slots[j] = creep1->unit.id;
 					return;
 				}
 			}
+		}
+		
+		void performPursue(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed)
+		{
+			float avgDistance = 0;
+			float minDistance = std::numeric_limits<float>::max();
+			int32_t totalCreeps = 1;
+			
+			for(auto& id : formation.slots)
+			{
+				if (id < 0)
+					continue;
+					
+				CreepState* creepP = state->creepById_[id];
+				CreepState& creep = *creepP;
+				
+				if (!creepP || creep.unit.health <= 0)
+					return;
+				
+				totalCreeps++;
+				
+				auto target = chaseAndDestroy(creep, state, prototypes, timePassed, [](CreepState& creep, GameState* state, Prototypes* prototypes){
+					
+					CarState* bestCar;
+					float bestValue = std::numeric_limits<float>::max();
+					
+					for(auto& player : state->players)
+					{
+						for(auto& car : player.activeCars)
+						{
+							float distance = creep.unit.location.distanceTo(car.unit.location);
+							float value = distance / (1 + car.agro);
+							if (value < bestValue)
+							{
+								bestValue = value;
+								bestCar = &car;
+							}
+						}
+					}
+					
+					return bestCar ? &bestCar->unit : nullptr;
+				});
+				
+				if (target)
+				{
+					float distance = creep.unit.location.distanceTo(target->location);
+					avgDistance += distance;
+					minDistance = std::min(minDistance, distance);
+				}
+			}
+			avgDistance /= totalCreeps;
+			
+			if (avgDistance + minDistance > prototypes->variables.carChaseBreakoutDistance)
+			{
+				formation.carAgro /= 2;
+				formation.objectiveID = -1;
+				formation.subObjective = SUB_OBJECTIVE::NONE;				
+			}
+		}
+		
+		Unit* chaseAndDestroy(CreepState& creep, GameState* state, Prototypes* prototypes, int32_t timePassed, 
+				std::function<Unit*(CreepState&, GameState*, Prototypes*)> getTargetForCreep)
+		{
+			Unit* target = nullptr;
+			if (creep.weapon.target.id > 0)
+				target = GameUtil::resolveTarget(creep.weapon.target, state);
+			if (target == nullptr || target->health <= 0)
+				target = getTargetForCreep(creep, state, prototypes);
+			if (target == nullptr)
+			{
+				creep.weapon.target.id = -1;
+				return target;
+			}
+			else
+			{
+				creep.weapon.target.id = target->id;
+				creep.weapon.target.type = target->host_.type;
+			}			
+			
+			Obstacle* obstacle = Field::findObstacle(creep.unit.location, prototypes);
+			if (obstacle)
+			{
+				moveUnitOutOfObstacle(creep, obstacle, timePassed);				
+			}
+			else
+			{
+				creep.targetLoc_ = target->location;
+				//TODO take targets size into account (UnitPrototype?)
+				if (target->location.distanceTo(creep.unit.location) < creep.weaponProto_->range)
+				{
+					performCreepAttack(creep, *target, state, Point());
+				}
+				else
+				{
+					moveCreepTowardsPoint(creep, target->location, prototypes, timePassed);				
+				}
+			}
+			return target;
 		}
 		
 		void performAssault(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed)
@@ -536,42 +651,16 @@ namespace Creeps
 				
 				if (!creepP || creep.unit.health <= 0)
 					return;
-					
-				creep.weapon.attackCooldown -= timePassed;	
-					
+				//TODO optimise	threatMap_[mapIndex]
 				int32_t mapIndex = creep.unit.force == 0 ? 1 : 0;
 				hostileNearbyForces += state->threatMap_[mapIndex].getThreatAt(creep.unit.location);
 				friendlyNearbyForces += state->threatMap_[1 - mapIndex].getThreatAt(creep.unit.location);
 				totalCreeps++;
 				
-				CreepState* target = nullptr;
-				if (creep.weapon.target > 0)
-					target = state->creepById_[creep.weapon.target];
-				if (target == nullptr || target->unit.health <= 0)
-					target = getBestAssaultTargetForCreep(creep, state->creeps);
-				if (target == nullptr)
-				{
-					creep.weapon.target = -1;
-					return;
-				}
-				
-				Obstacle* obstacle = Field::findObstacle(creep.unit.location, prototypes);
-				if (obstacle)
-				{
-					moveUnitOutOfObstacle(creep, obstacle, timePassed);				
-				}
-				else
-				{
-					creep.targetLoc_ = target->unit.location;
-					if (target->unit.location.distanceTo(creep.unit.location) < creep.weaponProto_->range + target->creepProto_->size)
-					{
-						performCreepAttack(creep, target->unit, state, Point());
-					}
-					else
-					{
-						moveCreepTowardsPoint(creep, target->unit.location, prototypes, timePassed);				
-					}
-				}	
+				chaseAndDestroy(creep, state, prototypes, timePassed, [](CreepState& creep, GameState* state, Prototypes* prototypes){
+					auto result = getBestAssaultTargetForCreep(creep, state->creeps);
+					return result ? &result->unit : nullptr;
+					});
 			}
 			
 			if (hostileNearbyForces / totalCreeps < formation.agroAt / 2)
@@ -873,10 +962,15 @@ namespace Creeps
 			}
 		}	
 		
-		void pushOutCreeps(GameState* state, Prototypes* prototypes, int32_t timePassed)
+		void processCreeps(GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{
 			for(auto& creep : state->creeps)
 			{
+				creep.weapon.attackCooldown -= timePassed;			
+				
+				
+				
+				//Collisions
 				std::vector<CreepState*> possibleCollisions = state->creepMap_.getInRadius(
 						creep.unit.location, creep.creepProto_->size + prototypes->variables.maxCreepSize + prototypes->variables.additionalSpacing);
 				
@@ -896,7 +990,7 @@ namespace Creeps
 						int32_t totalWeight = creep.creepProto_->weight + creep2->creepProto_->weight;
 						float force = penetration * prototypes->variables.creepRestitution / totalWeight;
 						
-						if (creep.unit.force == creep2->unit.force && creep.object.prototypeId != creep2->object.prototypeId)
+						if (creep.unit.force == creep2->unit.force && creep.unit.prototypeId != creep2->unit.prototypeId)
 							force /= 10;
 						
 						creep2Creep.scaleTo(force * creep2->creepProto_->weight);
@@ -943,8 +1037,8 @@ namespace Creeps
 			
 			auto distance = from.distanceTo(to);
 					
-			projectile.object.id = state->idCounter++;
-			projectile.object.prototypeId = prototype->id;
+			projectile.id = state->idCounter++;
+			projectile.prototypeId = prototype->id;
 			projectile.speed = prototype->bulletSpeed;
 			projectile.splash = prototype->splash;
 			projectile.damage = prototype->damage;
@@ -993,7 +1087,7 @@ namespace Creeps
 					auto cars = state->carMap_.getInRadius(proj.target, proj.splash + prototypes->variables.maxCreepSize);
 					for(auto& car : cars)
 					{
-						auto carProto = prototypes->cars[car->object.prototypeId];
+						auto carProto = prototypes->cars[car->unit.prototypeId];
 						int32_t r = proj.splash + carProto.size;
 						if (car->unit.location.sqDistanceTo(proj.target) < r*r)
 						{
@@ -1013,7 +1107,7 @@ namespace Creeps
 				for(auto& p : state->projectiles)
 				{
 					if (p.damage == -1)
-						state->eventLogger.addProjectileExplosion(state->time.time, p.object.id, p.object.prototypeId, p.target);
+						state->eventLogger.addProjectileExplosion(state->time.time, p.id, p.prototypeId, p.target);
 				}
 			}
 			
@@ -1030,12 +1124,10 @@ namespace Creeps
 				THROW_FATAL_ERROR("Creeps exceed maximum, pointers are invalid.");
 			
 			auto removeDeadCreep = [&state](CreepState& creep){
-				state->creepById_.erase(creep.object.id);
-				auto formation = std::find_if(state->formations.begin(), state->formations.end(), [&creep](FormationState& f) {
-					return f.object.id == creep.formationId;
-					});
+				state->creepById_.erase(creep.unit.id);
+				auto formation = GameUtil::formationByCreep(creep, state);
 				formation->slots[creep.formationsSlot] = -1;
-				if (formation->subObjective == SUB_OBJECTIVE::MOVE)
+				if (formation->subObjective == SUB_OBJECTIVE::MOVE && formation->carAgro <= 0)
 				{
 					formation->subObjective = SUB_OBJECTIVE::ASSAULT;
 				}
@@ -1049,7 +1141,7 @@ namespace Creeps
 					state->creeps, 
 					[](CreepState& c){ return c.unit.health <= 0;},
 					removeDeadCreep,
-					[&state](CreepState& c){ state->creepById_[c.object.id] = &c;}
+					[&state](CreepState& c){ state->creepById_[c.unit.id] = &c;}
 				),
 				state->creeps.end()
 			);	

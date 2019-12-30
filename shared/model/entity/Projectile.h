@@ -8,8 +8,9 @@ class Projectile
 public:
 	Projectile() = default;
 	~Projectile() = default;
-	
-	Object object;
+		
+	int32_t id;
+	int16_t prototypeId;
 	int32_t damage;
 	int16_t force;
 	int32_t splash;

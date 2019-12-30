@@ -5,11 +5,12 @@ CreepState::CreepState()
 {
 	creepProto_ = nullptr;
 	weaponProto_ = nullptr;
+	unit.host_.type = ENTTITY_TYPE::CREEP;
+	unit.host_.pointer = this;
 }
 
 void CreepState::deserialize(SerializationStream &stream)
 {
-	Serializer::read(object, stream);
 	Serializer::read(unit, stream);
 	Serializer::read(weapon, stream);
 	Serializer::read(formationId, stream);
@@ -26,7 +27,6 @@ void CreepState::deserialize(SerializationStream &stream)
 
 void CreepState::serialize(SerializationStream &stream) const
 {
-	Serializer::write(object, stream);
 	Serializer::write(unit, stream);
 	Serializer::write(weapon, stream);
 	Serializer::write(formationId, stream);
@@ -42,7 +42,7 @@ void CreepState::serialize(SerializationStream &stream) const
 
 void CreepState::propagatePrototypes(std::vector<CreepProto>& creepProtos, std::vector<WeaponProto>& weaponProtos)
 {
-	creepProto_ = &(creepProtos[object.prototypeId]);
+	creepProto_ = &(creepProtos[unit.prototypeId]);
 	weaponProto_ = &(weaponProtos[creepProto_->weapon]);
 	
 }

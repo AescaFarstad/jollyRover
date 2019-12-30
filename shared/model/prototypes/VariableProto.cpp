@@ -34,6 +34,13 @@ void VariableProto::load(json &source)
 	repairSpeed = source.at("repairSpeed");
 	refuelSpeed = source.at("refuelSpeed");
 	repairRefuelBase = source.at("repairRefuelBase");
+	
+	carAgroPerUnit = source.at("war").at("carAgroPerUnit");
+	carAgroThresholdPerSlot = source.at("war").at("carAgroThresholdPerSlot");
+	carChaseBreakoutDistance = source.at("war").at("carChaseBreakoutDistance");
+	
+	carAgroGainPerUnit = source.at("carAgroGainPerUnit");
+	carAgroFadeGainPerSecond = source.at("carAgroFadeGainPerSecond");
 }
 
 

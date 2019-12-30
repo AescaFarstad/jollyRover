@@ -30,7 +30,7 @@ void GameState::deserialize(SerializationStream& stream)
 	Serializer::readVector(projectiles, stream);
 	Serializer::readVector(formations, stream);
 	for(auto&creep : creeps)
-		creepById_[creep.object.id] = &creep;
+		creepById_[creep.unit.id] = &creep;
 }
 
 void GameState::propagatePrototypes(Prototypes* prototypes)

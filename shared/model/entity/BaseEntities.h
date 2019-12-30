@@ -2,14 +2,31 @@
 #include <ISerializable.h>
 #include <Point.h>
 
-class Object
+enum class ENTTITY_TYPE : int8_t
+{
+	CREEP,
+	CAR
+};
+
+class Host
 {
 public:
-	Object() = default;
-	~Object() = default;
+	void* pointer;
+	ENTTITY_TYPE type;
+};
 
+class Unit
+{
+public:
 	int32_t id;
 	int16_t prototypeId;
+	int16_t force;
+	int32_t health;
+	Point location;
+	Point voluntaryMovement;
+	
+	Host host_;
+	
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
@@ -18,17 +35,17 @@ private:
 
 };
 
-class Unit
+namespace Serializer {
+
+	void write(const ENTTITY_TYPE& value, SerializationStream& stream);
+	void read(ENTTITY_TYPE& value, SerializationStream& stream);
+}
+
+class Target
 {
 public:
-	Unit() = default;
-	~Unit() = default;
-
-	int16_t force;
-	int32_t health;
-	Point location;
-	Point voluntaryMovement;
-	
+	int32_t id;
+	ENTTITY_TYPE type;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
@@ -41,12 +58,9 @@ private:
 class Weapon
 {
 public:
-	Weapon() = default;
-	~Weapon() = default;
-
 	int16_t prototypeId;
 	int32_t attackCooldown;
-	int32_t target;
+	Target target;
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;

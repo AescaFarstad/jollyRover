@@ -27,6 +27,9 @@ namespace Creeps
 		void findObjective(FormationState& formation, GameState* state, Prototypes* prototypes);
 		void moveFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);		
 		void performAssault(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
+		void performPursue(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
+		Unit* chaseAndDestroy(CreepState& creep, GameState* state, Prototypes* prototypes, int32_t timePassed, 
+				std::function<Unit*(CreepState&, GameState*, Prototypes*)> getTargetForCreep);
 		void accelerateTractor(CreepState& creep, float amount);
 		void changeTractorOrientation(CreepState& creep, float targetOrientation, int32_t timePassed);
 		CreepState* getBestAssaultTargetForCreep(CreepState& creep, std::vector<CreepState>& creeps);
@@ -40,7 +43,7 @@ namespace Creeps
 		void processProjectiles(GameState* state, Prototypes* prototypes, int32_t timePassed);		
 		
 		void applyCreepMovement(GameState* state);
-		void pushOutCreeps(GameState* state, Prototypes* prototypes, int32_t timePassed);
+		void processCreeps(GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void pushCreepsOutOfObstacles(GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void preventCreepObstacleCollision(GameState* state, Prototypes* prototypes);		
 		

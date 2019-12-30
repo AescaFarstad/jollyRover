@@ -8,10 +8,10 @@
 class CarState
 {
 public:
-	CarState() = default;
+	CarState();
 	~CarState() = default;
 
-	Object object;
+	
 	Unit unit;
 	std::vector<Point> route;
 	int16_t routeIndex;
@@ -20,6 +20,9 @@ public:
 	int32_t score;
 	float speed;
 	float accel;
+	int32_t timeSinceRollover;
+	int32_t agro;
+	
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;

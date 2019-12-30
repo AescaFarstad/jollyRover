@@ -2,7 +2,8 @@
 
 void FormationState::deserialize(SerializationStream &stream)
 {
-	Serializer::read(object, stream);
+	Serializer::read(id, stream);
+	Serializer::read(prototypeId, stream);
 	Serializer::read(objectiveID, stream);
 	Serializer::read(force, stream);
 	Serializer::read(orientation, stream);
@@ -14,6 +15,7 @@ void FormationState::deserialize(SerializationStream &stream)
 	Serializer::read(spawnedAt, stream);
 	Serializer::read(subObjective, stream);
 	Serializer::read(agroAt, stream);
+	Serializer::read(carAgro, stream);
 	Serializer::readVector(slots, stream);
 	
 	formationPrototype_ = nullptr;
@@ -23,7 +25,8 @@ void FormationState::deserialize(SerializationStream &stream)
 
 void FormationState::serialize(SerializationStream &stream) const
 {
-	Serializer::write(object, stream);
+	Serializer::write(id, stream);
+	Serializer::write(prototypeId, stream);
 	Serializer::write(objectiveID, stream);
 	Serializer::write(force, stream);
 	Serializer::write(orientation, stream);
@@ -35,13 +38,14 @@ void FormationState::serialize(SerializationStream &stream) const
 	Serializer::write(spawnedAt, stream);
 	Serializer::write(subObjective, stream);
 	Serializer::write(agroAt, stream);
+	Serializer::write(carAgro, stream);
 	Serializer::writeVector(slots, stream);
 }
 
 
 void FormationState::propagatePrototypes(std::vector<FormationProto>& formations, std::vector<std::vector<ObjectiveProto>>& objectives)
 {
-	formationPrototype_ = &(formations[object.prototypeId]);
+	formationPrototype_ = &(formations[prototypeId]);
 	if (force >= 0 && objectiveID >= 0)
 		objectivePrototype_ = &(objectives[force][objectiveID]);
 	else
@@ -51,12 +55,12 @@ void FormationState::propagatePrototypes(std::vector<FormationProto>& formations
 
 void Serializer::write(const SUB_OBJECTIVE& value, SerializationStream& stream)
 {
-	Serializer::write((int32_t)value, stream);
+	Serializer::write((int8_t)value, stream);
 }
 
 void Serializer::read(SUB_OBJECTIVE& value, SerializationStream& stream)
 {
-	int32_t t;
+	int8_t t;
 	Serializer::read(t, stream);
 	value = (SUB_OBJECTIVE)t;
 }

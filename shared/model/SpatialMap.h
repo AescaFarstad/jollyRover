@@ -108,7 +108,7 @@ void traceMap(std::vector<std::vector<std::vector<T*>>>& map, std::vector<T*>& m
 			std::string tmp = "";
 			for(auto& r : n)
 			{
-				tmp += std::to_string(r->object.prototypeId) + ",";
+				tmp += std::to_string(r->unit.prototypeId) + ",";
 			}
 			std::cout << "\t\t" << n.size() << " " << tmp << "\n";
 		}
@@ -117,7 +117,7 @@ void traceMap(std::vector<std::vector<std::vector<T*>>>& map, std::vector<T*>& m
 	std::string tmp = "rest:";
 	for(auto& m : m_rest)
 	{
-		tmp += std::to_string(m->object.prototypeId) + ",";
+		tmp += std::to_string(m->unit.prototypeId) + ",";
 	}
 	std::cout << "\t\t" << m_rest.size() << " " << tmp << "\n";
 };

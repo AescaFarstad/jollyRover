@@ -45,8 +45,8 @@ public:
 	Logger(std::initializer_list<LOG_TAGS> m_enabledTags, std::initializer_list<LOG_TAGS> m_disabledTags);
 	~Logger();
 
-	void add(std::string message, std::initializer_list<LOG_TAGS> tags);
-	void add(std::string message);
+	void add(const std::string& message, std::initializer_list<LOG_TAGS> tags);
+	void add(const std::string& message);
 	void enableTags(std::initializer_list<LOG_TAGS> m_enabledTags);
 	void disableTags(std::initializer_list<LOG_TAGS> disabledtags);
 	void toggleTag(LOG_TAGS tag);

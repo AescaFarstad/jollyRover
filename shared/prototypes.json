@@ -11,11 +11,16 @@
 		"repairSpeed":10,
 		"refuelSpeed":28,
 		"repairRefuelBase":100000,
+		"carAgroGainPerUnit":1000,
+		"carAgroFadeGainPerSecond":1,
 		"war":{
 			"intensity": 2000,
 			"creepRestitution": 0.6,
 			"additionalSpacing": 5,
-			"baseAgroLevel": 15
+			"baseAgroLevel": 15,
+			"carAgroPerUnit": 1000,
+			"carAgroThresholdPerSlot":150,
+			"carChaseBreakoutDistance":400
 		}
 	},
 	"forces":[
@@ -46,7 +51,7 @@
 			"accel": 0.00002,
 			"size": 18,
 			"fuelPerMeter": 2,
-			"maxHealth": 200,
+			"maxHealth": 1500,
 			"repairTime": 200,
 			"refuelTime": 50,
 			"hullTexture":{

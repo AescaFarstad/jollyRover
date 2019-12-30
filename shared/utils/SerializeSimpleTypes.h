@@ -26,5 +26,4 @@ namespace Serializer {
 	void read(float& out, const char* value);
 	void read(std::string& out, const char* value);
 	
-	void swapBytes(char* target, size_t size);
 }

@@ -52,6 +52,8 @@ private:
 	NFont m_fontAmaticBold;
 	NFont m_fontAmaticBoldBig;
 	NFont m_fontAmaticRegular;
+	NFont m_fontDebug;
+	NFont m_fontDebug_m;
 	
 	uint32_t m_loadCount;
 
@@ -62,6 +64,7 @@ private:
 	void drawCreeps();
 	void drawProjectiles();
 	void drawFormations();
+	void drawFormationAgro();
 	void drawFormationConnections();
 	void drawProjectileExplosion();
 	void drawRemnants();

@@ -55,9 +55,9 @@ CreepDeathEvent::CreepDeathEvent(int32_t id, int32_t stamp, const CreepState& cr
 {
 	this->stamp = stamp;
 	this->id = id;
-	this->unitDeath.unitId = creep.object.id;
+	this->unitDeath.unitId = creep.unit.id;
 	this->force = creep.unit.force;
-	this->unitDeath.prototypeId = creep.object.prototypeId;
+	this->unitDeath.prototypeId = creep.unit.prototypeId;
 	this->unitDeath.location = creep.unit.location;
 	this->unitDeath.rotation = creep.unit.voluntaryMovement.asAngle();
 	this->unitDeath.impact = impact;	
@@ -88,9 +88,9 @@ CarDeathEvent::CarDeathEvent(int32_t id, int32_t stamp, const CarState& car, int
 {
 	this->stamp = stamp;
 	this->id = id;
-	this->unitDeath.unitId = car.object.id;
+	this->unitDeath.unitId = car.unit.id;
 	this->player = player;
-	this->unitDeath.prototypeId = car.object.prototypeId;
+	this->unitDeath.prototypeId = car.unit.prototypeId;
 	this->unitDeath.location = car.unit.location;
 	this->unitDeath.rotation = car.unit.voluntaryMovement.asAngle();
 	this->unitDeath.impact = impact;	
