@@ -44,6 +44,7 @@ public:
 	int16_t id;
 	bool enabled;
 	FORMATION_TYPE type;
+	std::vector<int16_t> forces;
 	std::vector<FormationSlotProto> slots;
 	int32_t strength;
 	int32_t width;

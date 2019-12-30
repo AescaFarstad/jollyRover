@@ -105,7 +105,9 @@ namespace Creeps
 				if (state->forceStrength_[force.id] < prototypes->variables.intensity)
 				{
 					FormationProto formation;
-					do formation = state->random.getFromVector(prototypes->formations);	while(!formation.enabled);
+					do 
+						formation = state->random.getFromVector(prototypes->formations);	
+					while(!formation.enabled || std::find(formation.forces.begin(), formation.forces.end(), force.id) == formation.forces.end());
 					if (state->creeps.size() + formation.slots.size() < GameState::MAX_CREEPS)
 					{
 						spawnFormation(state, prototypes, force, prototypes->formations[formation.id]);
@@ -416,11 +418,6 @@ namespace Creeps
 						{
 							nearestInterception = interceptLoc[1];
 						}
-						
-						if (!interceptLoc[0].isNaN())
-							VisualDebug::drawArrow(creep.unit.location, interceptLoc[0], 0x000000);
-						if (!interceptLoc[1].isNaN())
-							VisualDebug::drawArrow(creep.unit.location, interceptLoc[1], 0x000000);
 						
 						if (!nearestInterception.isNaN() && (nearestInterception - creep.unit.location).getLength() < creep.weaponProto_->range)		
 							performCreepAttack(creep, cars[0]->unit, state, nearestInterception - cars[0]->unit.location);

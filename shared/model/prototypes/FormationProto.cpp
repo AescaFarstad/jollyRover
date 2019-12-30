@@ -24,6 +24,7 @@ void from_json(const json &j, FormationProto &formation)
 	else
 		THROW_FATAL_ERROR("josn parse error");
 		
+	formation.forces = j.at("forces").get<std::vector<int16_t>>();
 	formation.slots = j.at("slots").get<std::vector<FormationSlotProto>>();
 	
 	for(size_t i = 0; i < formation.slots.size(); i++)
