@@ -19,7 +19,10 @@ void Prototypes::load(json &source)
 	weapons = source.at("weapons").get<std::vector<WeaponProto>>();
 	forces = source.at("forces").get<std::vector<ForceProto>>();
 	
-	formations = source.at("formations").get<std::vector<FormationProto>>();
+	auto formationLayout = source.at("formationLayout").get<std::vector<FormationLayout>>();
+	auto formationDef = source.at("formationDef").get<std::vector<FormationDef>>();	
+	formations = FormationProto::createFormations(formationLayout, formationDef);
+	
 	auto allObjectives = source.at("objectives").get<std::vector<ObjectiveProto>>();
 	
 	objectives.resize(forces.size());

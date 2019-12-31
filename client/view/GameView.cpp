@@ -336,7 +336,8 @@ void GameView::drawProjectiles()
 	
 	for (Projectile &projectile : m_state->projectiles)
 	{
-		if (projectile.weapon == 1)
+		TextureDef* texture = m_prototypes->weapons[projectile.weapon].projectileTexture[projectile.force];
+		if (!texture)
 		{
 			GPU_RectangleFilled(
 				m_screen,
@@ -351,8 +352,7 @@ void GameView::drawProjectiles()
 		{
 			auto barrel = m_prototypes->weapons[projectile.prototypeId].barrelSize;
 			if (m_state->time.time - projectile.spawnedAt < barrel / projectile.speed * 1000)
-				continue; //Shell is inside the barrel
-			TextureDef* texture = m_prototypes->weapons[projectile.weapon].projectileTexture[projectile.force];
+				continue; //Shell is inside the barreltexture
 			m_renderer->blit(*texture, projectile.location, (projectile.target - projectile.location).asAngle(), 0.7);
 		}
 	}

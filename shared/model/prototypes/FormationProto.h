@@ -1,6 +1,7 @@
 #pragma once
 #include <json.hpp>
 #include <Point.h>
+
 using json = nlohmann::json;
 
 enum class FORMATION_TYPE : int32_t
@@ -34,12 +35,38 @@ public:
 	std::vector<FormationSlotConnectionProto> connections;
 	
 };
+void from_json(const json &j, FormationSlotProto &slot);
+
+class FormationLayout
+{
+public:
+	int16_t id;
+	std::vector<FormationSlotProto> slots;
+	int32_t leader;
+	int32_t connections;
+};
+
+void from_json(const json &j, FormationLayout &layout);
+
+class FormationDef
+{
+public:
+	int16_t id;
+	int16_t layout;
+	FORMATION_TYPE type;
+	float relativeAgroability;
+	bool enabled;
+	std::vector<int16_t> forces;
+	std::vector<int32_t> slots;
+};
+
+void from_json(const json &j, FormationDef &def);
 
 class FormationProto
 {
 public:
-	FormationProto() = default;
-	~FormationProto() = default;
+
+	static std::vector<FormationProto> createFormations(std::vector<FormationLayout>& layouts, std::vector<FormationDef>& definitions);
 	
 	int16_t id;
 	bool enabled;
@@ -55,6 +82,3 @@ public:
 	Point BB;
 	float relativeAgroability;
 };
-
-void from_json(const json &j, FormationSlotProto &slot);
-void from_json(const json &j, FormationProto &formation);

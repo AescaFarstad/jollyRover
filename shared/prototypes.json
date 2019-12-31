@@ -304,8 +304,8 @@
 		{
 			"id": 1,
 			"name":"soldier",
-			"maxHealth":40,
-			"speed": 25,
+			"maxHealth":50,
+			"speed": 24,
 			"strength":100,
 			"slowOnRollOver":0.8,
 			"rolloverable":true,
@@ -336,6 +336,24 @@
 			"moveType":"walker",
 			"hullTexture":["td/soldier3", "td/soldier3", ""],
 			"gunTexture":["", "", ""]
+		},
+		{
+			"id": 3,
+			"name":"soldier2",
+			"maxHealth":40,
+			"speed": 30,
+			"strength":100,
+			"slowOnRollOver":0.8,
+			"rolloverable":true,
+			"loot": 0,		
+			"weapon": 3,
+			"size": 4,
+			"weight":10,
+			"whiskers":3,
+			"maxWhiskerLength":100,
+			"moveType":"walker",
+			"hullTexture":["td/soldier2", "td/soldier1", ""],
+			"gunTexture":["", "", ""]
 		}
 	],
 	"weapons":[
@@ -356,7 +374,7 @@
 				"attackSpeed": 2500,
 				"splash": 1,	
 				"ranged":true,
-				"range": 40,
+				"range": 36,
 				"bulletSpeed": 130,
 				"barrelSize":0,
 				"projectileTexture":["", "", ""]
@@ -374,24 +392,13 @@
 			},
 			{
 				"id": 3,
-				"damage": 25,
-				"attackSpeed": 8000,
+				"damage": 15,
+				"attackSpeed": 1500,
 				"splash": 2,	
 				"ranged":true,
-				"range": 8,
-				"bulletSpeed": 160,
-				"barrelSize":0,
-				"projectileTexture":["", "", ""]
-			},
-			{
-				"id": 4,
-				"damage": 12,
-				"attackSpeed": 8000,
-				"splash": 125,	
-				"ranged":true,
-				"range": 8,
-				"bulletSpeed": 1600,
-				"barrelSize":0,
+				"range": 72,
+				"bulletSpeed": 180,
+				"barrelSize":3,
 				"projectileTexture":["", "", ""]
 			}
 	],
@@ -467,451 +474,220 @@
 			"weight":100
 		}
 	],
-	"formations":[
-		
+	"formationLayout":[
 		{
 			"id":0,
-			"type":"assault",
-			"forces":[1],
 			"connections":0,
 			"leader":-1,
-			"enabled":false,
-			"relativeAgroability":1.5,
 			"slots":[
-				{
-					"offset":{ "y":30, "x":50 },
-					"creepType":0,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-30, "x":50 },
-					"creepType":0,
-					"optional":false
-				},
-				{
-					"offset":{ "y":90, "x":50 },
-					"creepType":0,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-90, "x":50 },
-					"creepType":0,
-					"optional":false
-				}
+				{"offset":{ "y":30, "x":50 }},
+				{"offset":{ "y":-30, "x":50 }},
+				{"offset":{ "y":90, "x":50 }},
+				{"offset":{ "y":-90, "x":50 }}
 			]
 		},
 		{
 			"id":1,
-			"type":"assault",
-			"forces":[0, 1],
 			"connections":3,
 			"leader":-1,
-			"enabled":true,
-			"relativeAgroability":1,
 			"slots":[
-				{
-					"offset":{ "y":10, "x":-10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-10, "x":-10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":30, "x":-10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-30, "x":-10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":50, "x":-10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-50, "x":-10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":70, "x":-10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-70, "x":-10 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-90, "x":-10 },
-					"creepType":1,
-					"optional":false
-				},
+				{"offset":{ "y":10, "x":-10 }},
+				{"offset":{ "y":-10, "x":-10 }},
+				{"offset":{ "y":30, "x":-10 }},
+				{"offset":{ "y":-30, "x":-10 }},
+				{"offset":{ "y":50, "x":-10 }},
+				{"offset":{ "y":-50, "x":-10 }},
+				{"offset":{ "y":70, "x":-10 }},
+				{"offset":{ "y":-70, "x":-10 }},
+				{"offset":{ "y":-90, "x":-10 }},
 				
-				{
-					"offset":{ "y":0, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-20, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":20, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-40, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":40, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-60, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":60, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-80, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":80, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
+				{"offset":{ "y":0, "x":-30 }},
+				{"offset":{ "y":-20, "x":-30 }},
+				{"offset":{ "y":20, "x":-30 }},
+				{"offset":{ "y":-40, "x":-30 }},
+				{"offset":{ "y":40, "x":-30 }},
+				{"offset":{ "y":-60, "x":-30 }},
+				{"offset":{ "y":60, "x":-30 }},
+				{"offset":{ "y":-80, "x":-30 }},
+				{"offset":{ "y":80, "x":-30 }},
 				
-				{
-					"offset":{ "y":10, "x":-50 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-10, "x":-50 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":30, "x":-50 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-30, "x":-50 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":50, "x":-50 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-50, "x":-50 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":70, "x":-50 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-70, "x":-50 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-90, "x":-50 },
-					"creepType":1,
-					"optional":false
-				},
+				{"offset":{ "y":10, "x":-50 }},
+				{"offset":{ "y":-10, "x":-50 }},
+				{"offset":{ "y":30, "x":-50 }},
+				{"offset":{ "y":-30, "x":-50 }},
+				{"offset":{ "y":50, "x":-50 }},
+				{"offset":{ "y":-50, "x":-50 }},
+				{"offset":{ "y":70, "x":-50 }},
+				{"offset":{ "y":-70, "x":-50 }},
+				{"offset":{ "y":-90, "x":-50 }},
 				
-				{
-					"offset":{ "y":0, "x":-70 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-20, "x":-70 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":20, "x":-70 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-40, "x":-70 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":40, "x":-70 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-60, "x":-70 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "y":60, "x":-70 },
-					"creepType":2,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-80, "x":-70 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":80, "x":-70 },
-					"creepType":1,
-					"optional":false
-				}
+				{"offset":{ "y":0, "x":-70 }},
+				{"offset":{ "y":-20, "x":-70 }},
+				{"offset":{ "y":20, "x":-70 }},
+				{"offset":{ "y":-40, "x":-70 }},
+				{"offset":{ "y":40, "x":-70 }},
+				{"offset":{ "y":-60, "x":-70 }},
+				{"offset":{ "y":60, "x":-70 }},
+				{"offset":{ "y":-80, "x":-70 }},
+				{"offset":{ "y":80, "x":-70 }}
 			]
 		},
 		{
 			"id":2,
-			"type":"assault",
-			"forces":[0, 1],
-			"connections":2,
-			"leader":0,
-			"enabled":false,
-			"relativeAgroability":1,
+			"connections":0,
+			"leader":-1,
 			"slots":[
-				{
-					"offset":{ "y":0, "x":-40 },
-					"creepType":0,
-					"optional":false
-				},
+				{"offset":{ "y":0, "x":-40 }},
 				
-				{
-					"offset":{ "y":-25, "x":35 },
-					"creepType":0,
-					"optional":false
-				},
-				{
-					"offset":{ "y":25, "x":35 },
-					"creepType":0,
-					"optional":false
-				},
+				{"offset":{ "y":-25, "x":35 }},
+				{"offset":{ "y":25, "x":35 }},
 				
-				{
-					"offset":{ "y":45, "x":-15 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":60, "x":-20 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":45, "x":-25 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":60, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":45, "x":-35 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":60, "x":-40 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":45, "x":-45 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":60, "x":-50 },
-					"creepType":1,
-					"optional":false
-				},
+				{"offset":{ "y":45, "x":-15 }},
+				{"offset":{ "y":60, "x":-20 }},
+				{"offset":{ "y":45, "x":-25 }},
+				{"offset":{ "y":60, "x":-30 }},
+				{"offset":{ "y":45, "x":-35 }},
+				{"offset":{ "y":60, "x":-40 }},
+				{"offset":{ "y":45, "x":-45 }},
+				{"offset":{ "y":60, "x":-50 }},
 				
-				{
-					"offset":{ "y":-45, "x":-15 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-60, "x":-20 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-45, "x":-25 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-60, "x":-30 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-45, "x":-35 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-60, "x":-40 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-45, "x":-45 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-60, "x":-50 },
-					"creepType":1,
-					"optional":false
-				}
-				
+				{"offset":{ "y":-45, "x":-15 }},
+				{"offset":{ "y":-60, "x":-20 }},
+				{"offset":{ "y":-45, "x":-25 }},
+				{"offset":{ "y":-60, "x":-30 }},
+				{"offset":{ "y":-45, "x":-35 }},
+				{"offset":{ "y":-60, "x":-40 }},
+				{"offset":{ "y":-45, "x":-45 }},
+				{"offset":{ "y":-60, "x":-50 }}
 			]
 		},
 		{
 			"id":3,
-			"type":"assault",
-			"forces":[0, 1],
 			"connections":2,
 			"leader":-1,
-			"enabled":true,
-			"relativeAgroability":1.5,
 			"slots":[
-				{
-					"offset":{ "y":-10, "x":0 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":10, "x":0 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":0, "x":-20 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-20, "x":-20 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":20, "x":-20 },
-					"creepType":1,
-					"optional":false
-				}
+				{"offset":{ "y":-10, "x":0 }},
+				{"offset":{ "y":10, "x":0 }},
+				{"offset":{ "y":0, "x":-20 }},
+				{"offset":{ "y":-20, "x":-20 }},
+				{"offset":{ "y":20, "x":-20 }}
 			]
 		},
 		{
 			"id":4,
+			"connections":2,
+			"leader":-1,
+			"slots":[
+				{"offset":{ "y":-20, "x":20 }},
+				{"offset":{ "y":0, "x":20 }},
+				{"offset":{ "y":20, "x":20 }},
+				
+				{"offset":{ "y":-40, "x":0 }},
+				{"offset":{ "y":-20, "x":0 }},
+				{"offset":{ "y":0, "x":0 }},
+				{"offset":{ "y":20, "x":0 }},
+				{"offset":{ "y":40, "x":0 }},
+				
+				{"offset":{ "y":-40, "x":-20 }},
+				{"offset":{ "y":-20, "x":-20 }},
+				
+				{"offset":{ "y":20, "x":-20 }},
+				{"offset":{ "y":40, "x":-20 }}
+			]
+		}
+	],
+	"formationDef":[
+		
+		{
+			"id":0,
+			"layout":0,
 			"type":"assault",
-			"forces":[0, 1],
+			"forces":[0],
+			"enabled":false,
+			"relativeAgroability":1.5,
+			"slots":[0,0,0,0]
+		},
+		{
+			"id":1,
+			"layout":1,
+			"type":"assault",
+			"forces":[1],
+			"enabled":true,
+			"relativeAgroability":0.9,
+			"slots": [1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,2,2,1,1]
+		},
+		{
+			"id":2,
+			"layout":1,
+			"type":"assault",
+			"forces":[0],
+			"enabled":true,
+			"relativeAgroability":1.1,
+			"slots": [3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3]
+		},
+		{
+			"id":3,
+			"layout":2,
+			"type":"assault",
+			"forces":[1],
+			"enabled":false,
+			"relativeAgroability":1,
+			"slots": [0, 0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1]
+			
+		},
+		{
+			"id":4,
+			"layout":2,
+			"type":"assault",
+			"forces":[0],
+			"enabled":false,
+			"relativeAgroability":1,
+			"slots": [0, 0,0, 3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3]
+			
+		},
+		{
+			"id":5,
+			"layout":3,
+			"type":"assault",
+			"forces":[1],
 			"connections":2,
 			"leader":-1,
 			"enabled":true,
 			"relativeAgroability":1.5,
-			"slots":[
-				{
-					"offset":{ "y":-20, "x":20 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":0, "x":20 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":20, "x":20 },
-					"creepType":1,
-					"optional":false
-				},
-				
-				{
-					"offset":{ "y":-40, "x":0 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-20, "x":0 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":0, "x":0 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":20, "x":0 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":40, "x":0 },
-					"creepType":1,
-					"optional":false
-				},
-				
-				{
-					"offset":{ "y":-40, "x":-20 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":-20, "x":-20 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":20, "x":-20 },
-					"creepType":1,
-					"optional":false
-				},
-				{
-					"offset":{ "y":40, "x":-20 },
-					"creepType":1,
-					"optional":false
-				}
-			]
+			"slots":[1,1,1,1,1]
+		},
+		{
+			"id":6,
+			"layout":3,
+			"type":"assault",
+			"forces":[0],
+			"connections":2,
+			"leader":-1,
+			"enabled":true,
+			"relativeAgroability":1.5,
+			"slots":[3,3,3,3,3]
+		},
+		{
+			"id":7,
+			"layout":4,
+			"type":"assault",
+			"forces":[1],
+			"connections":2,
+			"leader":-1,
+			"enabled":true,
+			"relativeAgroability":1.5,
+			"slots":[1,1,1, 1,1,1,1,1, 1,1, 1,1]
+		},
+		{
+			"id":8,
+			"layout":4,
+			"type":"assault",
+			"forces":[0],
+			"connections":2,
+			"leader":-1,
+			"enabled":true,
+			"relativeAgroability":1.5,
+			"slots":[3,3,3, 3,3,3,3,3, 3,3, 3,3]
 		}
 		
 	]
