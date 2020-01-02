@@ -27,6 +27,9 @@ namespace Creeps
 		void compactFormation(FormationState& formation, GameState* state);
 		void findObjective(FormationState& formation, GameState* state, Prototypes* prototypes);
 		void setObjective(FormationState& formation, SUB_OBJECTIVE type, GameState* state, Prototypes* prototypes);
+		void changeObjective(FormationState& formation, SUB_OBJECTIVE type, TimeState& time);
+		int32_t findFormationToJoin(FormationState& formation, GameState* state, Prototypes* prototypes);
+		void mergeFormations(FormationState& from, FormationState& to, GameState* state, Prototypes* prototypes);
 		void moveFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void retreatFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void performAssault(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);

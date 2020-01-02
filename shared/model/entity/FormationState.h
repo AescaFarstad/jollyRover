@@ -37,10 +37,12 @@ public:
 	float orientation;
 	float targetOrientation;
 	int32_t spawnedAt;
+	int32_t objectiveChangedAt;
 	SUB_OBJECTIVE subObjective;
 	float agroAt;
 	float bravery;
 	int32_t carAgro;
+	int32_t targetFormationId;
 	
 	bool isDisposed_;
 	Point actualLocation_;

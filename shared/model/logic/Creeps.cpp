@@ -179,6 +179,8 @@ namespace Creeps
 			formation.agroAt = state->random.get(0.7f, 1.4f) * formationProto.relativeAgroability * var.baseAgroLevel;
 			formation.bravery = state->random.get(var.formationMinBravery, var.formationMaxBravery);
 			formation.carAgro = 0;
+			formation.targetFormationId = -1;
+			formation.objectiveChangedAt = formation.spawnedAt;
 			formation.subObjective = SUB_OBJECTIVE::NONE;
 			
 			for(auto& slot : formationProto.slots)
@@ -297,6 +299,7 @@ namespace Creeps
 			}
 			
 			formation.bravery = state->random.get(prototypes->variables.formationMinBravery, prototypes->variables.formationMaxBravery);
+			formation.objectiveChangedAt = state->time.time;
 		}
 		
 		void setObjective(FormationState& formation, SUB_OBJECTIVE type, GameState* state, Prototypes* prototypes)
@@ -310,14 +313,24 @@ namespace Creeps
 					THROW_FATAL_ERROR("unhandled objective type");
 			}
 			
+			changeObjective(formation, type, state->time);
+			
 			ObjectiveProto& objective = state->random.getFromVector(*protos);
 			
 			formation.objectiveID = objective.id;
 			formation.targetLocation = objective.location;
 			formation.targetOrientation = prototypes->variables.fieldCenter.subtract(objective.location).asAngle();
 			
-			formation.subObjective = type;
 			compactFormation(formation, state);
+		}
+		
+		void changeObjective(FormationState& formation, SUB_OBJECTIVE type, TimeState& time)
+		{
+			formation.subObjective = type;
+			formation.objectiveID = -1;
+			formation.targetFormationId = -1;
+			formation.objectiveChangedAt = time.time;
+			
 		}
 		
 		void retreatFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed)
@@ -328,8 +341,32 @@ namespace Creeps
 			float avgTurnLeft = 0;
 			
 			formation.actualLocation_ = Point();
-			formation.location = formation.targetLocation;
+			Point target = formation.targetLocation;
 			formation.orientation = formation.targetOrientation;
+			
+			if (formation.targetFormationId == -1)
+			{
+				if (((state->time.time - formation.objectiveChangedAt) / timePassed) % 200 == 199)
+				{
+					formation.targetFormationId = findFormationToJoin(formation, state, prototypes);
+				}
+			}
+			else
+			{
+				auto tform = GameUtil::formationById(formation.targetFormationId, state);
+				if (tform != state->formations.end())
+				{
+					target = tform->location;
+				}
+				else
+				{
+					formation.targetFormationId = -1;
+				}
+				
+			}			
+			formation.location = target;
+			
+			
 			
 			for(auto& id : formation.slots)
 			{
@@ -341,10 +378,10 @@ namespace Creeps
 				if (!creepP || creepP->unit.health <= 0)
 					continue;
 					
-				formation.actualLocation_ += creep.unit.location * creep.creepProto_->strength;
+				formation.actualLocation_ += creep.unit.location;
 				totalCreeps++;
 				
-				Point targetSlotLocation = getTargetSlotLocation(formation, creep.formationsSlot);
+				Point targetSlotLocation = getCurrentSlotLocation(formation, creep.formationsSlot);
 				Point creep2Target = targetSlotLocation - creep.unit.location;
 				float creep2TargetL = creep2Target.getLength();
 				avgMoveLeft += creep2TargetL;
@@ -362,9 +399,134 @@ namespace Creeps
 			if (totalTractors > 0)
 				avgTurnLeft /= totalTractors;
 			avgMoveLeft /= totalCreeps;
+			formation.actualLocation_ /= totalCreeps;
+			
+			//VisualDebug::drawArrow(formation.actualLocation_, formation.location, 0x000000);
+			
+			if (formation.targetFormationId != -1 && avgMoveLeft < 30)
+			{
+				if (findFormationToJoin(formation, state, prototypes) == formation.targetFormationId)
+				{
+					auto& tform = *GameUtil::formationById(formation.targetFormationId, state);
+					mergeFormations(formation, tform, state, prototypes);
+					return;
+				}
+				else
+				{
+					formation.targetFormationId = -1;
+				}
+				
+			}
 			
 			if (avgMoveLeft < 2 && avgTurnLeft < 0.1)
-				formation.subObjective = SUB_OBJECTIVE::NONE;
+				changeObjective(formation, SUB_OBJECTIVE::NONE, state->time);
+		}
+		
+		int32_t findFormationToJoin(FormationState& formation, GameState* state, Prototypes* prototypes)
+		{
+			std::vector<int32_t> mySlots(prototypes->creeps.size(), 0);
+			
+			int32_t total = 0;
+			formation.actualLocation_ = Point();
+			for(auto& id : formation.slots)
+			{
+				if (id < 0)
+					continue;
+					
+				CreepState* creepP = state->creepById_[id];
+				CreepState& creep = *creepP;
+				if (!creepP || creepP->unit.health <= 0)
+					continue;
+				
+				formation.actualLocation_ += creep.unit.location;
+				mySlots[creep.unit.prototypeId]++;
+				total++;
+			}
+			if (total == 0)
+				return -1;
+			formation.actualLocation_ /= total;
+			
+			std::vector<FormationState*> availableFormations;
+			
+			for(auto& form : state->formations)
+			{
+				if (form.force != formation.force || form.id == formation.id)
+					continue;
+					
+				std::vector<int32_t> theirSlots(prototypes->creeps.size(), 0);
+				
+				for(auto& slot : form.formationPrototype_->slots)
+				{
+					theirSlots[slot.creepType]++;
+				}
+				
+				for(auto& id : form.slots)
+				{
+					if (id < 0)
+						continue;
+						
+					CreepState* creepP = state->creepById_[id];
+					CreepState& creep = *creepP;
+					if (!creepP || creepP->unit.health <= 0)
+						continue;
+						
+					theirSlots[creep.unit.prototypeId]--;
+				}
+				
+				bool isAailable = true;
+				for(size_t i = 0; i < mySlots.size(); i++)
+				{
+					if (mySlots[i] > theirSlots[i])
+					{
+						isAailable = false;
+						break;
+					}
+				}
+				if (isAailable)
+					availableFormations.push_back(&form);
+			}
+			
+			if (availableFormations.size() == 0)
+			{
+				return -1;
+			}
+			else
+			{
+				auto func = [&formation](FormationState* fs){ return fs->location.distanceTo(formation.actualLocation_);};
+				auto res = std2::minElement(availableFormations, func);
+				return (*res)->id;
+			}
+		}
+		
+		void mergeFormations(FormationState& from, FormationState& to, GameState* state, Prototypes* prototypes)
+		{
+			for(auto& id : from.slots)
+			{
+				if (id < 0)
+					continue;
+					
+				CreepState* creepP = state->creepById_[id];
+				CreepState& creep = *creepP;
+				if (!creepP)
+					continue;
+					
+				for(auto& slot : prototypes->formations[to.prototypeId].slots)
+				{
+					if (slot.creepType == creep.unit.prototypeId)
+					{
+						if (to.slots[slot.index] == -1)
+						{
+							to.slots[slot.index] = creep.unit.id;
+							creep.formationId = to.id;
+							creep.formationsSlot = slot.index;
+							break;
+						}
+					}
+				}
+			}
+			
+			from.slots.assign(from.slots.size(), -1);
+			compactFormation(to, state);
 		}
 		
 		void moveFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed)
@@ -565,18 +727,18 @@ namespace Creeps
 			}
 			
 			if (formationMovementComplete && avgMoveBalance > -1 - tractorMoveBalanceFactor && avgOrientationImbalance < 0.1)
-				formation.subObjective = SUB_OBJECTIVE::NONE;
+				changeObjective(formation, SUB_OBJECTIVE::NONE, state->time);
 			
 			hostileThreat /= totalCreeps;
 			if (hostileThreat > formation.agroAt)
-				formation.subObjective = SUB_OBJECTIVE::ASSAULT;
+				changeObjective(formation, SUB_OBJECTIVE::ASSAULT, state->time);
 			formation.agro_ = hostileThreat;
 			
 			if (formation.carAgro > 0)
 			{
 				formation.carAgro -= timePassed;
 				if (formation.carAgro > prototypes->variables.carAgroThresholdPerSlot * totalCreeps)
-					formation.subObjective = SUB_OBJECTIVE::PURSUE;
+					changeObjective(formation, SUB_OBJECTIVE::PURSUE, state->time);
 			}
 		}
 		
@@ -695,7 +857,7 @@ namespace Creeps
 			{
 				formation.carAgro /= 2;
 				formation.objectiveID = -1;
-				formation.subObjective = SUB_OBJECTIVE::NONE;				
+				changeObjective(formation, SUB_OBJECTIVE::NONE, state->time);			
 			}
 		}
 		
@@ -805,8 +967,7 @@ namespace Creeps
 				}
 				for(auto& fid : nearByFormations)
 				{
-					auto nf = std::find_if(state->formations.begin(), state->formations.end(), [fid](FormationState& fs){return fs.id == fid;});
-					nf->bravery--;
+					GameUtil::formationById(fid, state)->bravery--;
 				}
 				return;
 			}
@@ -841,7 +1002,7 @@ namespace Creeps
 				if (!hasEnemies)
 				{
 					formation.objectiveID = -1;
-					formation.subObjective = SUB_OBJECTIVE::NONE;
+					changeObjective(formation, SUB_OBJECTIVE::NONE, state->time);
 				}
 			}
 		}
@@ -1273,11 +1434,11 @@ namespace Creeps
 			
 			auto removeDeadCreep = [&state](CreepState& creep){
 				state->creepById_.erase(creep.unit.id);
-				auto formation = GameUtil::formationByCreep(creep, state);
+				auto formation = GameUtil::formationById(creep.formationId, state);
 				formation->slots[creep.formationsSlot] = -1;
 				if (formation->subObjective == SUB_OBJECTIVE::MOVE && formation->carAgro <= 0)
 				{
-					formation->subObjective = SUB_OBJECTIVE::ASSAULT;
+					changeObjective(*formation, SUB_OBJECTIVE::ASSAULT, state->time);
 				}
 				if (state->isEventLoggerEnabled)
 				{	

@@ -575,7 +575,17 @@
 				{"offset":{ "y":-60, "x":-70 }},
 				{"offset":{ "y":60, "x":-70 }},
 				{"offset":{ "y":-80, "x":-70 }},
-				{"offset":{ "y":80, "x":-70 }}
+				{"offset":{ "y":80, "x":-70 }},
+				
+				{"offset":{ "y":10, "x":-90 }, "optional":true},
+				{"offset":{ "y":-10, "x":-90 }, "optional":true},
+				{"offset":{ "y":30, "x":-90 }, "optional":true},
+				{"offset":{ "y":-30, "x":-90 }, "optional":true},
+				{"offset":{ "y":50, "x":-90 }, "optional":true},
+				{"offset":{ "y":-50, "x":-90 }, "optional":true},
+				{"offset":{ "y":70, "x":-90 }, "optional":true},
+				{"offset":{ "y":-70, "x":-90 }, "optional":true},
+				{"offset":{ "y":-90, "x":-90 }, "optional":true}
 			]
 		},
 		{
@@ -637,8 +647,24 @@
 				{"offset":{ "y":-40, "x":-20 }},
 				{"offset":{ "y":-20, "x":-20 }},
 				
+				{"offset":{ "y":0, "x":-20 }, "optional":true},
+				
 				{"offset":{ "y":20, "x":-20 }},
-				{"offset":{ "y":40, "x":-20 }}
+				{"offset":{ "y":40, "x":-20 }},
+				
+				
+				{"offset":{ "y":-40, "x":-40 }, "optional":true},
+				{"offset":{ "y":-20, "x":-40 }, "optional":true},
+				
+				{"offset":{ "y":20, "x":-40 }, "optional":true},
+				{"offset":{ "y":40, "x":-40 }, "optional":true},
+				
+				{"offset":{ "y":-40, "x":-60 }, "optional":true},
+				{"offset":{ "y":40, "x":-60 }, "optional":true}
+				
+				
+				
+				
 			]
 		}
 	],
@@ -649,7 +675,7 @@
 			"layout":0,
 			"type":"assault",
 			"forces":[0],
-			"enabled":true,
+			"enabled":false,
 			"relativeAgroability":1.5,
 			"slots":[0,0,0,0]
 		},
@@ -660,7 +686,7 @@
 			"forces":[1],
 			"enabled":true,
 			"relativeAgroability":0.9,
-			"slots": [1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,2,2,1,1]
+			"slots": [1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,2,2,1,1, 1,1,1,1,1,2,2,1,1]
 		},
 		{
 			"id":2,
@@ -669,7 +695,7 @@
 			"forces":[0],
 			"enabled":true,
 			"relativeAgroability":1.1,
-			"slots": [3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3]
+			"slots": [3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3]
 		},
 		{
 			"id":3,
@@ -686,7 +712,7 @@
 			"layout":2,
 			"type":"assault",
 			"forces":[0],
-			"enabled":true,
+			"enabled":false,
 			"relativeAgroability":0.5,
 			"slots": [0, 0,0, 3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3]
 			
@@ -722,7 +748,7 @@
 			"leader":-1,
 			"enabled":true,
 			"relativeAgroability":1.5,
-			"slots":[1,1,1, 1,1,1,1,1, 1,1, 1,1]
+			"slots":[1,1,1, 1,1,1,1,1, 1,1, 2, 1,1, 1,1, 1,1, 2,2]
 		},
 		{
 			"id":8,
@@ -733,8 +759,8 @@
 			"leader":-1,
 			"enabled":true,
 			"relativeAgroability":1.5,
-			"slots":[3,3,3, 3,3,3,3,3, 3,3, 3,3]
-		}
+			"slots":[3,3,3, 3,3,3,3,3, 3,3, 3, 3,3, 3,3, 3,3, 3,3]
+		} 
 		
 	]
 }

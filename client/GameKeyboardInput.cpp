@@ -366,6 +366,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			S::drawSettings.remnants = value;
 			S::drawSettings.explosions = value;
 			S::drawSettings.obstacles_D = !value;
+			S::drawSettings.debug_D = !value;
 			break;
 		}
 		default:

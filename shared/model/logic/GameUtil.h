@@ -5,5 +5,5 @@ namespace GameUtil
 {
 	Unit* resolveTarget(Target& target, GameState* state);
 	
-	std::vector<FormationState>::iterator formationByCreep(CreepState& creep, GameState* state);
+	std::vector<FormationState>::iterator formationById(int32_t id, GameState* state);
 }

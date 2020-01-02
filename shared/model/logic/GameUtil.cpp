@@ -26,10 +26,10 @@ namespace GameUtil
 		return nullptr;
 	}
 	
-	std::vector<FormationState>::iterator  formationByCreep(CreepState& creep, GameState* state)
+	std::vector<FormationState>::iterator formationById(int32_t id, GameState* state)
 	{
-		return std::find_if(state->formations.begin(), state->formations.end(), [&creep](FormationState& f) {
-					return f.id == creep.formationId;
+		return std::find_if(state->formations.begin(), state->formations.end(), [id](FormationState& f) {
+					return f.id == id;
 					});
 	}
 }

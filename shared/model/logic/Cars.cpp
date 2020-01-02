@@ -150,7 +150,7 @@ namespace Cars
 					else
 					{
 						creep->unit.health = 0;
-						auto formation = GameUtil::formationByCreep(*creep, state);
+						auto formation = GameUtil::formationById(creep->formationId, state);
 						formation->carAgro += prototypes->variables.carAgroPerUnit;
 						car.score++;
 						car.speed *= creep->creepProto_->slowOnRollOver;
