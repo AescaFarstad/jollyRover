@@ -39,19 +39,21 @@ public:
 	int32_t spawnedAt;
 	SUB_OBJECTIVE subObjective;
 	float agroAt;
+	float bravery;
 	int32_t carAgro;
 	
 	bool isDisposed_;
 	Point actualLocation_;
 	float agro_;
+	float hostile_;
+	float friendly_;
 	FormationProto* formationPrototype_;
-	ObjectiveProto* objectivePrototype_;
 	
 
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
 	
-	void propagatePrototypes(std::vector<FormationProto>& formations, std::vector<std::vector<ObjectiveProto>>& objectives);
+	void propagatePrototypes(std::vector<FormationProto>& formations);
 
 };
 	

@@ -87,12 +87,21 @@ namespace std2
 	}
 	
 	template<typename T, typename L>
-	auto contains(T& iterable, L&& expression)
+	bool contains(T& iterable, L&& expression)
 	{
 		return iterable.end() != std::find_if(
 			iterable.begin(),
 			iterable.end(),
-			std::forward(expression));
+			std::forward<L>(expression));
+	}
+	
+	template<typename T, typename L>
+	bool containsValue(T& iterable, L&& value)
+	{
+		return iterable.end() != std::find(
+			iterable.begin(),
+			iterable.end(),
+			std::forward<L>(value));
 	}
 	
 	void replaceAll(std::string& str, const std::string& from, const std::string& to);

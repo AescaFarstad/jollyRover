@@ -17,8 +17,6 @@ using json = nlohmann::json;
 class Prototypes
 {
 public:
-	Prototypes();
-	~Prototypes();
 
 	VariableProto variables;
 	std::vector<Obstacle> obstacles;
@@ -28,7 +26,8 @@ public:
 	std::vector<WeaponProto> weapons;
 	std::vector<ForceProto> forces;
 	std::vector<FormationProto> formations;
-	std::vector<std::vector<ObjectiveProto>> objectives;
+	std::vector<std::vector<ObjectiveProto>> moveObjectives;
+	std::vector<std::vector<ObjectiveProto>> retreatObjectives;
 	SpatialMap<Obstacle> obstacleMap;
 	
 	void postProcess();

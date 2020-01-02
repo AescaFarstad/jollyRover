@@ -42,6 +42,13 @@ public:
 	int32_t carAgroGainPerUnit;
 	float carAgroFadeGainPerSecond;
 	
+	
+	float formationMaxBravery;	
+	float formationMinBravery;
+	float retreatSpeedModifier;
+	
+	int32_t minCreepsToRetreat;
+	
 
 	void load(json &source);
 

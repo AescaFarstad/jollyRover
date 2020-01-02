@@ -427,6 +427,15 @@ namespace GameLogic
 					}
 					break;
 				}
+				case DEBUG_ACTION::RETREAT :
+				{
+					for(auto& form : state->formations)
+					{
+						form.objectiveID = -1;
+						Creeps::CreepsInternal::setObjective(form, SUB_OBJECTIVE::RETREAT, state, prototypes);
+					}
+					break;
+				}
 				default:
 				{
 					S::log.add("Unknown input debug: " + std::to_string((int8_t)input->action), {LOG_TAGS::ERROR_});

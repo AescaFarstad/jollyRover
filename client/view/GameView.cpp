@@ -419,13 +419,15 @@ void GameView::drawFormationAgro()
 			case SUB_OBJECTIVE::PURSUE: {state = "P"; break;}
 			case SUB_OBJECTIVE::NONE: {state = "N"; break;}
 			case SUB_OBJECTIVE::ASSAULT: {state = "A"; break;}
+			case SUB_OBJECTIVE::RETREAT: {state = "R"; break;}
 			default: {state = "?"; break;}
 		}
 		m_fontDebug.draw(m_screen, location.x, location.y, "%s agro: %d, (%d%%)", state.c_str(), form.carAgro, (int32_t)percent);
 		
 		percent = 100 * hostileThreat / form.agroAt;
 		m_fontDebug_m.draw(m_screen, location.x, location.y + 16, "threat: %d, (%d%%)", (int32_t)hostileThreat, (int32_t)percent);
-		m_fontDebug_m.draw(m_screen, location.x, location.y + 28, "count: %d", totalCreeps); 
+		m_fontDebug_m.draw(m_screen, location.x, location.y + 28, "count: %d", totalCreeps);
+		m_fontDebug_m.draw(m_screen, location.x, location.y + 40, "H: %.1f F: %.1f /: %.1f / %.1f", form.hostile_, form.friendly_, form.hostile_ / form.friendly_, form.bravery); 
 	}
 }
 
@@ -435,7 +437,7 @@ void GameView::drawFormations()
 	
 	for (auto& form : m_state->formations)
 	{
-		if (form.subObjective != SUB_OBJECTIVE::MOVE)
+		if (form.subObjective != SUB_OBJECTIVE::MOVE && form.subObjective != SUB_OBJECTIVE::RETREAT)
 			continue;
 			
 		FormationProto& proto = m_prototypes->formations[form.prototypeId];

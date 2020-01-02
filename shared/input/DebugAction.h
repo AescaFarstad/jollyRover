@@ -8,7 +8,8 @@ enum class DEBUG_ACTION : int8_t
 	NONE,
 	BOOM,
 	KILL_LEFT,
-	KILL_RIGHT
+	KILL_RIGHT,
+	RETREAT
 };
 
 namespace Serializer {

@@ -41,6 +41,11 @@ void VariableProto::load(json &source)
 	
 	carAgroGainPerUnit = source.at("carAgroGainPerUnit");
 	carAgroFadeGainPerSecond = source.at("carAgroFadeGainPerSecond");
+	
+	formationMaxBravery = source.at("war").at("formationMaxBravery");
+	formationMinBravery = source.at("war").at("formationMinBravery");
+	retreatSpeedModifier = source.at("war").at("retreatSpeedModifier");
+	minCreepsToRetreat = source.at("war").at("minCreepsToRetreat");
 }
 
 

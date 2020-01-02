@@ -9,10 +9,10 @@ void from_json(const json &j, ObjectiveProto &objective)
 	objective.location = j.at("location");
 	
 	std::string strType = j.at("type");	
-	if (strType == "oil")
-		objective.type = OBJECTIVE_TYPE::OIL;
-	else if (strType == "point")
-		objective.type = OBJECTIVE_TYPE::POINT;
+	if (strType == "MOVE")
+		objective.type = OBJECTIVE_TYPE::MOVE;
+	else if (strType == "RETREAT")
+		objective.type = OBJECTIVE_TYPE::RETREAT;
 	else
 		THROW_FATAL_ERROR("josn parse error");
 		

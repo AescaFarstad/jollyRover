@@ -1,14 +1,5 @@
 #include <Prototypes.h>
 
-Prototypes::Prototypes()
-{
-}
-
-Prototypes::~Prototypes()
-{
-}
-
-
 void Prototypes::load(json &source)
 {
 	variables.load(source.at("variables"));
@@ -25,20 +16,20 @@ void Prototypes::load(json &source)
 	
 	auto allObjectives = source.at("objectives").get<std::vector<ObjectiveProto>>();
 	
-	objectives.resize(forces.size());
+	moveObjectives.resize(forces.size());
+	retreatObjectives.resize(forces.size());
 	
 	for(auto& o : allObjectives)
 	{
+		auto* obj = o.type == OBJECTIVE_TYPE::MOVE ? &moveObjectives : &retreatObjectives;
+		
 		for(auto& force : o.forces)
 		{
-			objectives[force].push_back(o);
+			(*obj)[force].push_back(o);
 		}
 	}
 	
 	postProcess();
-
-	//cars = source.at("loot").get<std::vector<LootProto>>();
-	//loot = source.at("cars").get<std::vector<CarProto>>();
 }
 
 void Prototypes::postProcess()

@@ -5,6 +5,7 @@
 #include <InputImpulseMessage.h>
 #include <PersistentStorage.h>
 #include <GameKeyboardActions.h>
+#include <DrawSettings.h>
 #include <AI.h>
 
 #ifdef __EMSCRIPTEN__
@@ -59,6 +60,12 @@ GameKeyboardInput::GameKeyboardInput()
 	actionByButton[SDL_SCANCODE_1] = GAME_KEYBOARD_ACTIONS::BOOM;
 	actionByButton[SDL_SCANCODE_3] = GAME_KEYBOARD_ACTIONS::KILL_LEFT;
 	actionByButton[SDL_SCANCODE_2] = GAME_KEYBOARD_ACTIONS::KILL_RIGHT;
+	actionByButton[SDL_SCANCODE_4] = GAME_KEYBOARD_ACTIONS::RETREAT;
+	actionByButton[SDL_SCANCODE_5] = GAME_KEYBOARD_ACTIONS::TRACE_POINT;
+	
+	actionByButton[SDL_SCANCODE_6] = GAME_KEYBOARD_ACTIONS::TOGGLE_FORMATION_DRAW;
+	actionByButton[SDL_SCANCODE_7] = GAME_KEYBOARD_ACTIONS::TOGGLE_AGRO_DRAW;
+	actionByButton[SDL_SCANCODE_8] = GAME_KEYBOARD_ACTIONS::TRACE_BACKGROUND_DRAW;
 	
 	for(uint16_t i = 0; i < 128; i++)
 		buttonByAction[(int)actionByButton[i]] = i;
@@ -328,6 +335,39 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			network.send(&msg);	
 			break;
 		}
+		case GAME_KEYBOARD_ACTIONS::RETREAT :
+		{
+			InputDebugMessage msg;
+			msg.action = DEBUG_ACTION::RETREAT;
+			network.send(&msg);	
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::TRACE_POINT :
+		{
+			S::log.add("{\"x\":" + std::to_string((int32_t)context.mouseCoords.x) + ", \"y\":" + std::to_string((int32_t)context.mouseCoords.y) + "}5");
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::TOGGLE_FORMATION_DRAW :
+		{
+			S::drawSettings.formations_D = !S::drawSettings.formations_D;
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::TOGGLE_AGRO_DRAW :
+		{
+			S::drawSettings.formAgro_D = !S::drawSettings.formAgro_D;
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::TRACE_BACKGROUND_DRAW :
+		{
+			bool value = !S::drawSettings.layer1;
+			S::drawSettings.layer1 = value;
+			S::drawSettings.layer2 = value;
+			S::drawSettings.layer3 = value;
+			S::drawSettings.remnants = value;
+			S::drawSettings.explosions = value;
+			S::drawSettings.obstacles_D = !value;
+			break;
+		}
 		default:
 		{
 			S::log.add("action not handled: " + std::to_string((int)code), {LOG_TAGS::ERROR_});
@@ -384,6 +424,11 @@ void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, const KeyboardInputContex
 		case GAME_KEYBOARD_ACTIONS::BOOM :
 		case GAME_KEYBOARD_ACTIONS::KILL_LEFT :
 		case GAME_KEYBOARD_ACTIONS::KILL_RIGHT :
+		case GAME_KEYBOARD_ACTIONS::RETREAT :
+		case GAME_KEYBOARD_ACTIONS::TRACE_POINT :
+		case GAME_KEYBOARD_ACTIONS::TOGGLE_FORMATION_DRAW :
+		case GAME_KEYBOARD_ACTIONS::TOGGLE_AGRO_DRAW :
+		case GAME_KEYBOARD_ACTIONS::TRACE_BACKGROUND_DRAW :
 		break;
 		
 		case GAME_KEYBOARD_ACTIONS::RIGHT :

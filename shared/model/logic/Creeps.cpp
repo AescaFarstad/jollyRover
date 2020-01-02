@@ -160,7 +160,9 @@ namespace Creeps
 				state->random.get(forceProto.spawnAA.y, forceProto.spawnBB.y)
 			);
 			
-			float angle = prototypes->variables.fieldCenter.subtract(formationCenter).asAngle();
+			auto& var = prototypes->variables;
+			
+			float angle = var.fieldCenter.subtract(formationCenter).asAngle();
 			state->formations.emplace_back();
 			FormationState& formation = state->formations.back();
 			formation.objectiveID = -1;
@@ -174,7 +176,8 @@ namespace Creeps
 			formation.speed = FMath::F_MAX;
 			formation.angularSpeed = 0;
 			formation.spawnedAt = state->time.time;
-			formation.agroAt = state->random.get(0.7f, 1.4f) * formationProto.relativeAgroability * prototypes->variables.baseAgroLevel;
+			formation.agroAt = state->random.get(0.7f, 1.4f) * formationProto.relativeAgroability * var.baseAgroLevel;
+			formation.bravery = state->random.get(var.formationMinBravery, var.formationMaxBravery);
 			formation.carAgro = 0;
 			formation.subObjective = SUB_OBJECTIVE::NONE;
 			
@@ -261,6 +264,11 @@ namespace Creeps
 					{
 						performPursue(formation, state, prototypes, timePassed);
 						break;
+					}					
+					case SUB_OBJECTIVE::RETREAT :
+					{
+						moveFormation(formation, state, prototypes, timePassed);
+						break;
 					}
 					default:
 					{
@@ -277,14 +285,9 @@ namespace Creeps
 			{
 				if (formation.objectiveID == -1)
 				{
-					ObjectiveProto& objective = state->random.getFromVector(prototypes->objectives[formation.force]);
-					formation.objectiveID = objective.id;
-					formation.targetLocation = objective.location;
-					formation.targetOrientation = prototypes->variables.fieldCenter.subtract(objective.location).asAngle();
-					formation.objectivePrototype_ = &objective;
-					
-					formation.subObjective = SUB_OBJECTIVE::MOVE;
-					compactFormation(formation, state);
+					if (formation.subObjective == SUB_OBJECTIVE::NONE)
+						formation.subObjective = SUB_OBJECTIVE::MOVE;
+					setObjective(formation, formation.subObjective, state, prototypes);
 				}
 				else
 				{
@@ -292,6 +295,29 @@ namespace Creeps
 					// or retreat / regroup if no enemies ...
 				}				
 			}
+			
+			formation.bravery = state->random.get(prototypes->variables.formationMinBravery, prototypes->variables.formationMaxBravery);
+		}
+		
+		void setObjective(FormationState& formation, SUB_OBJECTIVE type, GameState* state, Prototypes* prototypes)
+		{
+			std::vector<ObjectiveProto>* protos;
+			switch (type)
+			{
+				case SUB_OBJECTIVE::MOVE: { protos = &prototypes->moveObjectives[formation.force]; break; }
+				case SUB_OBJECTIVE::RETREAT: { protos = &prototypes->retreatObjectives[formation.force]; break; }				
+				default:
+					THROW_FATAL_ERROR("unhandled objective type");
+			}
+			
+			ObjectiveProto& objective = state->random.getFromVector(*protos);
+			
+			formation.objectiveID = objective.id;
+			formation.targetLocation = objective.location;
+			formation.targetOrientation = prototypes->variables.fieldCenter.subtract(objective.location).asAngle();
+			
+			formation.subObjective = type;
+			compactFormation(formation, state);
 		}
 		
 		void moveFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed)
@@ -300,6 +326,8 @@ namespace Creeps
 			
 			bool formationIsInFinalPhase = formation.location.distanceTo(formation.targetLocation) < 20;
 				
+			float speedModifier = formation.subObjective == SUB_OBJECTIVE::RETREAT ? prototypes->variables.retreatSpeedModifier : 1;
+			
 			float avgMoveBalance = 0;
 			float maxMoveImbalance = 0;
 			int32_t creepMoveBalanceCount = 1;
@@ -392,37 +420,40 @@ namespace Creeps
 				}
 				target->scaleBy(1.f/(targetPriority + partnerCount));
 				creep.formationAttraction_ = *target;
-				moveCreepTowardsPoint(creep, *target, prototypes, timePassed);
+				moveCreepTowardsPoint(creep, *target, prototypes, timePassed, speedModifier);
 				
-				if (creep.weapon.attackCooldown <= 0)
+				if (formation.subObjective != SUB_OBJECTIVE::RETREAT)
 				{
-					auto cars = state->carMap_.getInRadius(creep.unit.location, creep.weaponProto_->range * 1.5);
-					if (cars.size() > 0)
+					if (creep.weapon.attackCooldown <= 0)
 					{
-						auto interceptLoc = FMath::intercept(
-								creep.unit.location, 
-								cars[0]->unit.location, 
-								cars[0]->unit.voluntaryMovement / timePassed, 
-								creep.weaponProto_->bulletSpeed / 1000.f
-							);
-						Point nearestInterception;
-						if (!interceptLoc[0].isNaN())
+						auto cars = state->carMap_.getInRadius(creep.unit.location, creep.weaponProto_->range * 1.5);
+						if (cars.size() > 0)
 						{
-							if (interceptLoc[1].isNaN())
-								nearestInterception = interceptLoc[0];
-							else if ((creep.unit.location - interceptLoc[0]).getLength() < (creep.unit.location - interceptLoc[2]).getLength())
-								nearestInterception = interceptLoc[0];
+							auto interceptLoc = FMath::intercept(
+									creep.unit.location, 
+									cars[0]->unit.location, 
+									cars[0]->unit.voluntaryMovement / timePassed, 
+									creep.weaponProto_->bulletSpeed / 1000.f
+								);
+							Point nearestInterception;
+							if (!interceptLoc[0].isNaN())
+							{
+								if (interceptLoc[1].isNaN())
+									nearestInterception = interceptLoc[0];
+								else if ((creep.unit.location - interceptLoc[0]).getLength() < (creep.unit.location - interceptLoc[2]).getLength())
+									nearestInterception = interceptLoc[0];
+								else
+									nearestInterception = interceptLoc[1];
+							}
 							else
+							{
 								nearestInterception = interceptLoc[1];
+							}
+							
+							if (!nearestInterception.isNaN() && (nearestInterception - creep.unit.location).getLength() < creep.weaponProto_->range)		
+								performCreepAttack(creep, cars[0]->unit, state, nearestInterception - cars[0]->unit.location);
 						}
-						else
-						{
-							nearestInterception = interceptLoc[1];
-						}
-						
-						if (!nearestInterception.isNaN() && (nearestInterception - creep.unit.location).getLength() < creep.weaponProto_->range)		
-							performCreepAttack(creep, cars[0]->unit, state, nearestInterception - cars[0]->unit.location);
-					}
+					}					
 				}
 			}
 			
@@ -448,7 +479,7 @@ namespace Creeps
 				}
 			}
 			
-			float speedMulti = FMath::lerp(0, 0.8f + obstaclesAhead, -20 - obstaclesAhead, 0.5f, avgMoveBalance);
+			float speedMulti = FMath::lerp(0, 0.8f + obstaclesAhead, -20 - obstaclesAhead, 0.7f, avgMoveBalance);
 			speedMulti = std::max(0.1f, speedMulti);
 			speedMulti *= targetInObstacleCount + 1;
 			speedMulti = std::min(8.f, speedMulti);
@@ -462,7 +493,7 @@ namespace Creeps
 			float aDelta = FMath::angleDelta(formation.orientation, desiredOrientation);
 			float speedRatio = std::fabs(aDelta) > 0.05 ? 0.5 : 1;
 			
-			float stepSize = timePassed * formation.speed * speedMulti * speedRatio;			
+			float stepSize = timePassed * formation.speed * speedMulti * speedRatio * speedModifier * speedModifier;			
 			
 			bool formationMovementComplete = true;
 			if (formation2Target.getLength() > stepSize)
@@ -477,7 +508,7 @@ namespace Creeps
 				formation.location = formation.targetLocation;
 			}
 			
-			float turnSize = timePassed * formation.formationPrototype_->maxAngularSpeed * (1 - speedRatio + 0.1);
+			float turnSize = timePassed * formation.formationPrototype_->maxAngularSpeed * (1 - speedRatio + 0.1)  * speedModifier * speedModifier;
 			
 			if (std::fabs(aDelta) > turnSize)
 			{
@@ -494,7 +525,7 @@ namespace Creeps
 				formation.subObjective = SUB_OBJECTIVE::NONE;
 			
 			hostileThreat /= totalCreeps;
-			if (hostileThreat > formation.agroAt)
+			if (hostileThreat > formation.agroAt && formation.subObjective != SUB_OBJECTIVE::RETREAT)
 				formation.subObjective = SUB_OBJECTIVE::ASSAULT;
 			formation.agro_ = hostileThreat;
 			
@@ -671,6 +702,14 @@ namespace Creeps
 			float hostileNearbyForces = 0;
 			float totalCreeps = 0;
 			
+			int32_t resetTarget = ((state->time.time - formation.spawnedAt) / timePassed) % (100 + formation.formationPrototype_->slots.size() * 2);
+			if (resetTarget % 2 != 0)
+				resetTarget = -1;
+			else
+				resetTarget /= 2;
+			
+			formation.actualLocation_ = Point();
+			
 			for(auto& id : formation.slots)
 			{
 				if (id < 0)
@@ -687,13 +726,49 @@ namespace Creeps
 				friendlyNearbyForces += state->threatMap_[1 - mapIndex].getThreatAt(creep.unit.location);
 				totalCreeps++;
 				
+				formation.actualLocation_ += creep.unit.location;
+				
+				if (totalCreeps == resetTarget)
+					creep.weapon.target.id = -1;
+				
 				chaseAndDestroy(creep, state, prototypes, timePassed, [](CreepState& creep, GameState* state, Prototypes* prototypes){
 					auto result = getBestAssaultTargetForCreep(creep, state->creeps);
 					return result ? &result->unit : nullptr;
 					});
 			}
 			
-			if (hostileNearbyForces / totalCreeps < formation.agroAt / 2)
+			hostileNearbyForces /= totalCreeps;
+			friendlyNearbyForces /= totalCreeps;
+			formation.actualLocation_ /= totalCreeps;
+			
+			formation.hostile_ = hostileNearbyForces;
+			formation.friendly_ = friendlyNearbyForces;
+			
+			if (totalCreeps >= prototypes->variables.minCreepsToRetreat && hostileNearbyForces / friendlyNearbyForces > formation.bravery)
+			{
+				setObjective(formation, SUB_OBJECTIVE::RETREAT, state, prototypes);
+				auto nearbyCreeps = state->creepMap_.getInRadius(formation.actualLocation_, 100);
+				std::vector<int32_t> nearByFormations;
+				for(auto& ncreeep : nearbyCreeps)
+				{
+					if (
+						ncreeep->unit.force == formation.force && 
+						ncreeep->formationId != formation.id && 
+						!std2::containsValue(nearByFormations, ncreeep->formationId)
+						)
+					{
+						nearByFormations.push_back(ncreeep->formationId);
+					}
+				}
+				for(auto& fid : nearByFormations)
+				{
+					auto nf = std::find_if(state->formations.begin(), state->formations.end(), [fid](FormationState& fs){return fs.id == fid;});
+					nf->bravery--;
+				}
+				return;
+			}
+			
+			if (hostileNearbyForces < formation.agroAt / 2)
 			{
 				Point center;
 				
@@ -737,18 +812,18 @@ namespace Creeps
 			}
 		}
 		
-		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed)
+		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed, float speedModifier)
 		{
 			if (creep.creepProto_->moveType == MOVE_TYPE::TRACTOR)
-				moveTractorTowardsPoint(creep, target, prototypes, timePassed);
+				moveTractorTowardsPoint(creep, target, prototypes, timePassed, speedModifier);
 			else if (creep.creepProto_->moveType == MOVE_TYPE::WALKER)
-				moveWalkerTowardsPoint(creep, target, prototypes, timePassed);
+				moveWalkerTowardsPoint(creep, target, prototypes, timePassed, speedModifier);
 		}
 		
-		void moveTractorTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed)
+		void moveTractorTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed, float speedModifier)
 		{
 			auto& proto = creep.creepProto_;
-			float breakAccel = -creep.creepProto_->breaksStrength;
+			float breakAccel = -creep.creepProto_->breaksStrength * speedModifier;
 			float speed = creep.velocity.getLength();
 			float omniSpeed = creep.creepProto_->omniDirectionalSpeed;
 			
@@ -807,7 +882,7 @@ namespace Creeps
 			}
 			else
 			{
-				float accel = timePassed * FMath::lerpClipped(0, proto->acceleration.x, proto->speed, proto->acceleration.y, speed);
+				float accel = timePassed * FMath::lerpClipped(0, proto->acceleration.x, proto->speed * speedModifier, proto->acceleration.y, speed);
 				
 				if (accel * 1.05 > maxSpeed - speed)
 					accel = (maxSpeed - speed) / 1.05;
@@ -847,9 +922,9 @@ namespace Creeps
 		}
 		
 		
-		void moveWalkerTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed)
+		void moveWalkerTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed, float speedModifier)
 		{
-			float stepSize = creep.creepProto_->speed * timePassed;
+			float stepSize = creep.creepProto_->speed * timePassed * speedModifier;
 			Point nextTarget = avoidObstacles(creep, stepSize, target, prototypes);
 			creep.sensedAnObstacle = nextTarget != target;
 			

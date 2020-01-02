@@ -15,11 +15,11 @@ void FormationState::deserialize(SerializationStream &stream)
 	Serializer::read(spawnedAt, stream);
 	Serializer::read(subObjective, stream);
 	Serializer::read(agroAt, stream);
+	Serializer::read(bravery, stream);
 	Serializer::read(carAgro, stream);
 	Serializer::readVector(slots, stream);
 	
 	formationPrototype_ = nullptr;
-	objectivePrototype_ = nullptr;
 	isDisposed_ = false;
 }
 
@@ -38,18 +38,15 @@ void FormationState::serialize(SerializationStream &stream) const
 	Serializer::write(spawnedAt, stream);
 	Serializer::write(subObjective, stream);
 	Serializer::write(agroAt, stream);
+	Serializer::write(bravery, stream);
 	Serializer::write(carAgro, stream);
 	Serializer::writeVector(slots, stream);
 }
 
 
-void FormationState::propagatePrototypes(std::vector<FormationProto>& formations, std::vector<std::vector<ObjectiveProto>>& objectives)
+void FormationState::propagatePrototypes(std::vector<FormationProto>& formations)
 {
 	formationPrototype_ = &(formations[prototypeId]);
-	if (force >= 0 && objectiveID >= 0)
-		objectivePrototype_ = &(objectives[force][objectiveID]);
-	else
-		objectivePrototype_ = nullptr;
 	
 }
 

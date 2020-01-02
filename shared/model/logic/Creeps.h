@@ -26,6 +26,7 @@ namespace Creeps
 		void tryOptimiseFormation(FormationState& formation, GameState* state, int32_t timePassed);
 		void compactFormation(FormationState& formation, GameState* state);
 		void findObjective(FormationState& formation, GameState* state, Prototypes* prototypes);
+		void setObjective(FormationState& formation, SUB_OBJECTIVE type, GameState* state, Prototypes* prototypes);
 		void moveFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void performAssault(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void performPursue(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
@@ -36,9 +37,9 @@ namespace Creeps
 		CreepState* getBestAssaultTargetForCreep(CreepState& creep, std::vector<CreepState>& creeps);
 		void performCreepAttack(CreepState& creep, Unit& target, GameState* state, const Point& leading);
 		void moveUnitOutOfObstacle(CreepState& creep, Obstacle* obstacle, int32_t timePassed);		
-		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed);
-		void moveWalkerTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed);
-		void moveTractorTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed);
+		void moveCreepTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed, float speedModifier = 1);
+		void moveWalkerTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed, float speedModifier);
+		void moveTractorTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed, float speedModifier);
 		Point avoidObstacles(CreepState& creep, float stepSize, Point& target, Prototypes* prototypes);
 		
 		void processProjectiles(GameState* state, Prototypes* prototypes, int32_t timePassed);

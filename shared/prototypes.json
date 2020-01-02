@@ -14,13 +14,17 @@
 		"carAgroGainPerUnit":1000,
 		"carAgroFadeGainPerSecond":1,
 		"war":{
-			"intensity": 2000,
+			"intensity": 3000,
 			"creepRestitution": 0.6,
 			"additionalSpacing": 5,
 			"baseAgroLevel": 15,
 			"carAgroPerUnit": 1000,
 			"carAgroThresholdPerSlot":150,
-			"carChaseBreakoutDistance":400
+			"carChaseBreakoutDistance":400,
+			"formationMaxBravery":10,
+			"formationMinBravery":2,
+			"retreatSpeedModifier":2,
+			"minCreepsToRetreat":3
 		}
 	},
 	"forces":[
@@ -407,70 +411,98 @@
 			"id":0,
 			"forces":[0, 1],
 			"location":{ "x":628, "y":613 },
-			"type":"point",
+			"type":"MOVE",
 			"weight":100
 		},
 		{
 			"id":1,
 			"forces":[0, 1],
 			"location":{ "x":428, "y":96 },
-			"type":"point",
+			"type":"MOVE",
 			"weight":100
 		},
 		{
 			"id":2,
 			"forces":[0],
 			"location":{ "x":205, "y":107 },
-			"type":"point",
+			"type":"MOVE",
 			"weight":100
 		},
 		{
 			"id":3,
 			"forces":[0],
 			"location":{ "x":234, "y":314 },
-			"type":"point",
+			"type":"MOVE",
 			"weight":100
 		},
 		{
 			"id":4,
 			"forces":[1],
 			"location": { "x":848, "y":153 },
-			"type":"point",
+			"type":"MOVE",
 			"weight":100
 		},
 		{
 			"id":5,
 			"forces":[1],
 			"location":{ "x":1115, "y":101 },
-			"type":"point",
+			"type":"MOVE",
 			"weight":100
 		},
 		{
 			"id":6,
 			"forces":[0],
 			"location":{ "x":241, "y":496 },
-			"type":"point",
+			"type":"MOVE",
 			"weight":100
 		},
 		{
 			"id":7,
 			"forces":[0],
 			"location":{ "x":107, "y":643 },
-			"type":"point",
+			"type":"MOVE",
 			"weight":100
 		},
 		{
 			"id":8,
 			"forces":[1],
 			"location":{ "x":1071, "y":531 },
-			"type":"point",
+			"type":"MOVE",
 			"weight":100
 		},
 		{
 			"id":9,
 			"forces":[1],
 			"location":{ "x":873, "y":377 },
-			"type":"point",
+			"type":"MOVE",
+			"weight":100
+		},
+		{
+			"id":10,
+			"forces":[0],
+			"location":{ "x":973, "y":377 },
+			"type":"RETREAT",
+			"weight":100
+		},
+		{
+			"id":11,
+			"forces":[0],
+			"location":{ "x":1100, "y":90 },
+			"type":"RETREAT",
+			"weight":100
+		},
+		{
+			"id":12,
+			"forces":[1],
+			"location":{ "x":20, "y":60 },
+			"type":"RETREAT",
+			"weight":100
+		},
+		{
+			"id":13,
+			"forces":[1],
+			"location":{ "x":90, "y":620 },
+			"type":"RETREAT",
 			"weight":100
 		}
 	],
@@ -603,7 +635,7 @@
 			"layout":0,
 			"type":"assault",
 			"forces":[0],
-			"enabled":false,
+			"enabled":true,
 			"relativeAgroability":1.5,
 			"slots":[0,0,0,0]
 		},
@@ -640,8 +672,8 @@
 			"layout":2,
 			"type":"assault",
 			"forces":[0],
-			"enabled":false,
-			"relativeAgroability":1,
+			"enabled":true,
+			"relativeAgroability":0.5,
 			"slots": [0, 0,0, 3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3]
 			
 		},
