@@ -480,26 +480,40 @@
 		{
 			"id":10,
 			"forces":[0],
-			"location":{ "x":973, "y":377 },
+			"location":{ "x":1087, "y":525 },
 			"type":"RETREAT",
 			"weight":100
 		},
 		{
 			"id":11,
 			"forces":[0],
-			"location":{ "x":1100, "y":90 },
+			"location":{ "x":982, "y":363 },
 			"type":"RETREAT",
 			"weight":100
 		},
 		{
 			"id":12,
-			"forces":[1],
-			"location":{ "x":20, "y":60 },
+			"forces":[0],
+			"location":{ "x":1100, "y":90 },
 			"type":"RETREAT",
 			"weight":100
 		},
 		{
 			"id":13,
+			"forces":[1],
+			"location":{ "x":183, "y":307 },
+			"type":"RETREAT",
+			"weight":100
+		},
+		{
+			"id":14,
+			"forces":[1],
+			"location":{ "x":41, "y":60 },
+			"type":"RETREAT",
+			"weight":100
+		},
+		{
+			"id":15,
 			"forces":[1],
 			"location":{ "x":90, "y":620 },
 			"type":"RETREAT",

@@ -28,6 +28,7 @@ namespace Creeps
 		void findObjective(FormationState& formation, GameState* state, Prototypes* prototypes);
 		void setObjective(FormationState& formation, SUB_OBJECTIVE type, GameState* state, Prototypes* prototypes);
 		void moveFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
+		void retreatFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void performAssault(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void performPursue(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
 		Unit* chaseAndDestroy(CreepState& creep, GameState* state, Prototypes* prototypes, int32_t timePassed, 

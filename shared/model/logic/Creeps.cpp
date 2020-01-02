@@ -267,7 +267,7 @@ namespace Creeps
 					}					
 					case SUB_OBJECTIVE::RETREAT :
 					{
-						moveFormation(formation, state, prototypes, timePassed);
+						retreatFormation(formation, state, prototypes, timePassed);
 						break;
 					}
 					default:
@@ -320,13 +320,59 @@ namespace Creeps
 			compactFormation(formation, state);
 		}
 		
+		void retreatFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed)
+		{
+			int32_t totalCreeps = 0;
+			int32_t totalTractors = 0;
+			float avgMoveLeft = 0;
+			float avgTurnLeft = 0;
+			
+			formation.actualLocation_ = Point();
+			formation.location = formation.targetLocation;
+			formation.orientation = formation.targetOrientation;
+			
+			for(auto& id : formation.slots)
+			{
+				if (id < 0)
+					continue;
+					
+				CreepState* creepP = state->creepById_[id];
+				CreepState& creep = *creepP;
+				if (!creepP || creepP->unit.health <= 0)
+					continue;
+					
+				formation.actualLocation_ += creep.unit.location * creep.creepProto_->strength;
+				totalCreeps++;
+				
+				Point targetSlotLocation = getTargetSlotLocation(formation, creep.formationsSlot);
+				Point creep2Target = targetSlotLocation - creep.unit.location;
+				float creep2TargetL = creep2Target.getLength();
+				avgMoveLeft += creep2TargetL;
+				if (creep.creepProto_->moveType == MOVE_TYPE::TRACTOR)
+				{
+					totalTractors++;
+					avgTurnLeft += std::fabs(FMath::angleDelta(creep.orientation, formation.targetOrientation));
+					if (creep2TargetL < 1 && creep.velocity.getLength() == 0)
+						changeTractorOrientation(creep, formation.targetOrientation, timePassed);
+				}
+				
+				moveCreepTowardsPoint(creep, targetSlotLocation, prototypes, timePassed, prototypes->variables.retreatSpeedModifier);
+			}
+			
+			if (totalTractors > 0)
+				avgTurnLeft /= totalTractors;
+			avgMoveLeft /= totalCreeps;
+			
+			if (avgMoveLeft < 2 && avgTurnLeft < 0.1)
+				formation.subObjective = SUB_OBJECTIVE::NONE;
+		}
+		
 		void moveFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed)
 		{
 			tryOptimiseFormation(formation, state, timePassed);
 			
 			bool formationIsInFinalPhase = formation.location.distanceTo(formation.targetLocation) < 20;
 				
-			float speedModifier = formation.subObjective == SUB_OBJECTIVE::RETREAT ? prototypes->variables.retreatSpeedModifier : 1;
 			
 			float avgMoveBalance = 0;
 			float maxMoveImbalance = 0;
@@ -420,40 +466,37 @@ namespace Creeps
 				}
 				target->scaleBy(1.f/(targetPriority + partnerCount));
 				creep.formationAttraction_ = *target;
-				moveCreepTowardsPoint(creep, *target, prototypes, timePassed, speedModifier);
+				moveCreepTowardsPoint(creep, *target, prototypes, timePassed);
 				
-				if (formation.subObjective != SUB_OBJECTIVE::RETREAT)
+				if (creep.weapon.attackCooldown <= 0)
 				{
-					if (creep.weapon.attackCooldown <= 0)
+					auto cars = state->carMap_.getInRadius(creep.unit.location, creep.weaponProto_->range * 1.5);
+					if (cars.size() > 0)
 					{
-						auto cars = state->carMap_.getInRadius(creep.unit.location, creep.weaponProto_->range * 1.5);
-						if (cars.size() > 0)
+						auto interceptLoc = FMath::intercept(
+								creep.unit.location, 
+								cars[0]->unit.location, 
+								cars[0]->unit.voluntaryMovement / timePassed, 
+								creep.weaponProto_->bulletSpeed / 1000.f
+							);
+						Point nearestInterception;
+						if (!interceptLoc[0].isNaN())
 						{
-							auto interceptLoc = FMath::intercept(
-									creep.unit.location, 
-									cars[0]->unit.location, 
-									cars[0]->unit.voluntaryMovement / timePassed, 
-									creep.weaponProto_->bulletSpeed / 1000.f
-								);
-							Point nearestInterception;
-							if (!interceptLoc[0].isNaN())
-							{
-								if (interceptLoc[1].isNaN())
-									nearestInterception = interceptLoc[0];
-								else if ((creep.unit.location - interceptLoc[0]).getLength() < (creep.unit.location - interceptLoc[2]).getLength())
-									nearestInterception = interceptLoc[0];
-								else
-									nearestInterception = interceptLoc[1];
-							}
+							if (interceptLoc[1].isNaN())
+								nearestInterception = interceptLoc[0];
+							else if ((creep.unit.location - interceptLoc[0]).getLength() < (creep.unit.location - interceptLoc[2]).getLength())
+								nearestInterception = interceptLoc[0];
 							else
-							{
 								nearestInterception = interceptLoc[1];
-							}
-							
-							if (!nearestInterception.isNaN() && (nearestInterception - creep.unit.location).getLength() < creep.weaponProto_->range)		
-								performCreepAttack(creep, cars[0]->unit, state, nearestInterception - cars[0]->unit.location);
 						}
-					}					
+						else
+						{
+							nearestInterception = interceptLoc[1];
+						}
+						
+						if (!nearestInterception.isNaN() && (nearestInterception - creep.unit.location).getLength() < creep.weaponProto_->range)		
+							performCreepAttack(creep, cars[0]->unit, state, nearestInterception - cars[0]->unit.location);
+					}
 				}
 			}
 			
@@ -493,7 +536,7 @@ namespace Creeps
 			float aDelta = FMath::angleDelta(formation.orientation, desiredOrientation);
 			float speedRatio = std::fabs(aDelta) > 0.05 ? 0.5 : 1;
 			
-			float stepSize = timePassed * formation.speed * speedMulti * speedRatio * speedModifier * speedModifier;			
+			float stepSize = timePassed * formation.speed * speedMulti * speedRatio;			
 			
 			bool formationMovementComplete = true;
 			if (formation2Target.getLength() > stepSize)
@@ -508,7 +551,7 @@ namespace Creeps
 				formation.location = formation.targetLocation;
 			}
 			
-			float turnSize = timePassed * formation.formationPrototype_->maxAngularSpeed * (1 - speedRatio + 0.1)  * speedModifier * speedModifier;
+			float turnSize = timePassed * formation.formationPrototype_->maxAngularSpeed * (1 - speedRatio + 0.1);
 			
 			if (std::fabs(aDelta) > turnSize)
 			{
@@ -525,7 +568,7 @@ namespace Creeps
 				formation.subObjective = SUB_OBJECTIVE::NONE;
 			
 			hostileThreat /= totalCreeps;
-			if (hostileThreat > formation.agroAt && formation.subObjective != SUB_OBJECTIVE::RETREAT)
+			if (hostileThreat > formation.agroAt)
 				formation.subObjective = SUB_OBJECTIVE::ASSAULT;
 			formation.agro_ = hostileThreat;
 			
