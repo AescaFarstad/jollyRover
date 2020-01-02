@@ -23,9 +23,10 @@ namespace Creeps
 		void spawnProjectile(const Point& from, const Point& to, const WeaponProto* prototype, int16_t force, GameState* state);
 		
 		void processFormations(GameState* state, Prototypes* prototypes, int32_t timePassed);
-		void tryOptimiseFormation(FormationState& formation, GameState* state, int32_t timePassed);		
+		void tryOptimiseFormation(FormationState& formation, GameState* state, int32_t timePassed);
+		void compactFormation(FormationState& formation, GameState* state);
 		void findObjective(FormationState& formation, GameState* state, Prototypes* prototypes);
-		void moveFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);		
+		void moveFormation(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void performAssault(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void performPursue(FormationState& formation, GameState* state, Prototypes* prototypes, int32_t timePassed);
 		Unit* chaseAndDestroy(CreepState& creep, GameState* state, Prototypes* prototypes, int32_t timePassed, 
@@ -40,12 +41,12 @@ namespace Creeps
 		void moveTractorTowardsPoint(CreepState& creep, Point& target, Prototypes* prototypes, int32_t timePassed);
 		Point avoidObstacles(CreepState& creep, float stepSize, Point& target, Prototypes* prototypes);
 		
-		void processProjectiles(GameState* state, Prototypes* prototypes, int32_t timePassed);		
+		void processProjectiles(GameState* state, Prototypes* prototypes, int32_t timePassed);
 		
 		void applyCreepMovement(GameState* state);
 		void processCreeps(GameState* state, Prototypes* prototypes, int32_t timePassed);
 		void pushCreepsOutOfObstacles(GameState* state, Prototypes* prototypes, int32_t timePassed);
-		void preventCreepObstacleCollision(GameState* state, Prototypes* prototypes);		
+		void preventCreepObstacleCollision(GameState* state, Prototypes* prototypes);
 		
 		void removeDeadProjectiles(GameState* state);
 		void removeDeadCreeps(GameState* state);

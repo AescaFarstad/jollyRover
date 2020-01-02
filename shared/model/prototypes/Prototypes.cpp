@@ -66,6 +66,13 @@ void Prototypes::postProcess()
 			formation.BB.y = std::max(formation.BB.y, slot.offset.y + creep.size);
 		}
 		formation.width = formation.BB.y - formation.AA.y;
+		
+		Point circleCenter = (formation.AA + formation.BB) / 2;
+		float radius = (formation.BB - circleCenter).getLength();		
+		for(auto& slot : formation.slots)
+		{
+			slot.priority = radius - slot.offset.getLength();
+		}
 	}
 	
 	variables.maxCreepSize = 0;

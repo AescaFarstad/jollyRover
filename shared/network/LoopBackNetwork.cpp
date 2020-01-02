@@ -1,4 +1,6 @@
 #include <LoopBackNetwork.h>
+#include <GameStateMessage.h>
+#include <GreetingMessage.h>
 
 LoopBackNetwork::LoopBackNetwork(GameUpdater* gameUpdater)
 {
@@ -53,6 +55,7 @@ void LoopBackNetwork::send(NetworkMessage* message)
 		case MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG:
 		case MESSAGE_TYPE::TYPE_INPUT_TIME_MSG:
 		case MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG:
 		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
 		{
 			InputMessage* iMsg = dynamic_cast<InputMessage*>(message);

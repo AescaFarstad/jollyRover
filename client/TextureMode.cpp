@@ -83,12 +83,12 @@ void TextureMode::onMouseMove(SDL_MouseMotionEvent* event)
 	m_textureView.onMouseMove(event);
 }
 	
-void TextureMode::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard)
+void TextureMode::onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& context)
 {
 	
 }
 
-void TextureMode::onKeyUp(SDL_Scancode scancode, Keyboard& keyboard)
+void TextureMode::onKeyUp(SDL_Scancode scancode, const KeyboardInputContext& context)
 {
 	
 }

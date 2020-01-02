@@ -5,6 +5,7 @@ void from_json(const json &j, FormationSlotProto &slot)
 {
 	slot.offset = j.at("offset");
 	slot.creepType = -1;
+	slot.priority = 0;
 	//slot.creepType = j.find("creepType") == j.end() ? -1 : j.at("creepType");
 	slot.optional = j.find("optional") == j.end() ? false : (bool)j.at("optional");
 }

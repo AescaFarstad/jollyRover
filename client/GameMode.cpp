@@ -151,16 +151,16 @@ void GameMode::onMouseMove(SDL_MouseMotionEvent* event)
 	m_gameView.onMouseMove(event);
 }
 	
-void GameMode::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard)
+void GameMode::onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& context)
 {
 	if (!m_isLoaded)
 		return;
-	m_keyboardInput.onKeyDown(scancode, keyboard, *m_network, m_gameUpdater);
+	m_keyboardInput.onKeyDown(scancode, context, *m_network, m_gameUpdater);
 }
 
-void GameMode::onKeyUp(SDL_Scancode scancode, Keyboard& keyboard)
+void GameMode::onKeyUp(SDL_Scancode scancode, const KeyboardInputContext& context)
 {
 	if (!m_isLoaded)
 		return;
-	m_keyboardInput.onKeyUp(scancode, keyboard, *m_network, m_gameUpdater);	
+	m_keyboardInput.onKeyUp(scancode, context, *m_network, m_gameUpdater);	
 }

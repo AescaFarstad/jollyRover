@@ -2,6 +2,7 @@
 #include <Keyboard.h>
 #include <Creeps.h>
 #include <InputTimeMessage.h>
+#include <InputDebugMessage.h>
 #include <VisualDebug.h>
 #include <GameKeyboardActions.h>
 #include <AI.h>
@@ -36,6 +37,8 @@ namespace GameLogic
 				GameLogicInternal::handleGameLoad(state, static_cast<LoadGameMessage*>(inputs[i]), prototypes);
 			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG)
 				GameLogicInternal::handleInputImpulse(state, static_cast<InputImpulseMessage*>(inputs[i]), prototypes);
+			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG)
+				GameLogicInternal::handleInputDebug(state, static_cast<InputDebugMessage*>(inputs[i]), prototypes);
 			//S::log.add(std::to_string(prototypes->variables.fieldWidth), { LOG_TAGS::UNIQUE });
 		}
 		
@@ -381,9 +384,52 @@ namespace GameLogic
 					thisPlayer->isAI = !thisPlayer->isAI;
 					break;
 				}
+				case INPUT_IMPULSE::TMP_DEBUG :
+				{
+					for(auto& form : state->formations)
+					{
+						Creeps::CreepsInternal::compactFormation(form, state);
+					}
+					break;
+				}
 				default:
 				{
 					S::log.add("Unknown input impulse: " + std::to_string((int8_t)input->impulse), {LOG_TAGS::ERROR_});
+					break;
+				}
+			}
+		}
+		
+		void handleInputDebug(GameState* state, InputDebugMessage* input, Prototypes* prototypes)
+		{
+			switch (input->action)
+			{
+				case DEBUG_ACTION::BOOM :
+				{
+					Creeps::CreepsInternal::spawnProjectile(input->coords, input->coords, &prototypes->weapons[0], 0, state);
+					break;
+				}
+				case DEBUG_ACTION::KILL_LEFT :
+				{
+					for(auto& creep : state->creeps)
+					{
+						if (creep.unit.force == 0)
+							creep.unit.health = 0;
+					}
+					break;
+				}
+				case DEBUG_ACTION::KILL_RIGHT :
+				{
+					for(auto& creep : state->creeps)
+					{
+						if (creep.unit.force == 1)
+							creep.unit.health = 0;
+					}
+					break;
+				}
+				default:
+				{
+					S::log.add("Unknown input debug: " + std::to_string((int8_t)input->action), {LOG_TAGS::ERROR_});
 					break;
 				}
 			}

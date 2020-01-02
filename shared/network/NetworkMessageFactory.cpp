@@ -1,13 +1,18 @@
 #include <NetworkMessageFactory.h>
+#include <MessageTypes.h>
+#include <InputMessage.h>
+#include <GreetingMessage.h>
+#include <GenericRequestMessage.h>
+#include <InputRouteMessage.h>
+#include <InputTimeMessage.h>
+#include <InputActionMessage.h>
+#include <InputPlayerJoinedMessage.h>
+#include <InputPlayerLeftMessage.h>
 #include <InputImpulseMessage.h>
-
-NetworkMessageFactory::NetworkMessageFactory()
-{
-}
-
-NetworkMessageFactory::~NetworkMessageFactory()
-{
-}
+#include <InputDebugMessage.h>
+#include <LoadGameMessage.h>
+#include <ReadOnlySerializationStream.h>
+#include <GameStateMessage.h>
 
 std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(NetworkPacket* packet)
 {
@@ -18,7 +23,6 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(NetworkPacket* pack
 	p->deserialize(rstream);
 	return p;
 }
-
 
 std::unique_ptr<NetworkMessage> NetworkMessageFactory::pointerByType(MESSAGE_TYPE type)
 {
@@ -40,6 +44,8 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::pointerByType(MESSAGE_TYP
 		return std::make_unique<InputTimeMessage>();
 	else if (type == MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG)
 		return std::make_unique<InputImpulseMessage>();
+	else if (type == MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG)
+		return std::make_unique<InputDebugMessage>();
 	else if (type == MESSAGE_TYPE::TYPE_LOAD_GAME_MSG)
 		return std::make_unique<LoadGameMessage>();
 	else

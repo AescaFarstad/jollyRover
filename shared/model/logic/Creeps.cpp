@@ -284,6 +284,7 @@ namespace Creeps
 					formation.objectivePrototype_ = &objective;
 					
 					formation.subObjective = SUB_OBJECTIVE::MOVE;
+					compactFormation(formation, state);
 				}
 				else
 				{
@@ -530,6 +531,38 @@ namespace Creeps
 					formation.slots[i] = creep2->unit.id;
 					formation.slots[j] = creep1->unit.id;
 					return;
+				}
+			}
+		}		
+		
+		void compactFormation(FormationState& formation, GameState* state)
+		{
+			auto& proto = *formation.formationPrototype_;
+			for(size_t i = 0; i < formation.slots.size(); i++)			
+			{
+				CreepState* creep1 = state->creepById_[formation.slots[i]];
+				
+				if (!creep1)
+					continue;
+					
+				for(size_t j = 0; j < formation.slots.size(); j++)
+				{
+					if (
+							i == j || 
+							(!proto.slots[i].optional && proto.slots[j].optional) ||
+							proto.slots[i].creepType != proto.slots[j].creepType
+						)
+					{
+						continue;
+					}
+					
+					if (proto.slots[j].priority > proto.slots[i].priority && !state->creepById_[formation.slots[j]])
+					{					
+						creep1->formationsSlot = j;
+						formation.slots[i] = -1;
+						formation.slots[j] = creep1->unit.id;
+						break;
+					}
 				}
 			}
 		}

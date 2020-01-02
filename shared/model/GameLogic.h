@@ -9,6 +9,7 @@
 #include <InputTimeMessage.h>
 #include <LoadGameMessage.h>
 #include <InputImpulseMessage.h>
+#include <InputDebugMessage.h>
 #include <Cars.h>
 
 namespace GameLogic
@@ -31,6 +32,7 @@ namespace GameLogic
 		void handleTimeInput(GameState* state, InputTimeMessage* input, Prototypes* prototypes);
 		void handleGameLoad(GameState* state, LoadGameMessage* input, Prototypes* prototypes);
 		void handleInputImpulse(GameState* state, InputImpulseMessage* input, Prototypes* prototypes);
+		void handleInputDebug(GameState* state, InputDebugMessage* input, Prototypes* prototypes);
 		
 		void handlePlayerUpdate(GameState* state, Prototypes* prototypes, int32_t timePassed);
 

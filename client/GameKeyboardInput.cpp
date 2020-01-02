@@ -55,11 +55,16 @@ GameKeyboardInput::GameKeyboardInput()
 	actionByButton[SDL_SCANCODE_BACKSLASH] = GAME_KEYBOARD_ACTIONS::ACT_AI;
 	actionByButton[SDL_SCANCODE_APOSTROPHE] = GAME_KEYBOARD_ACTIONS::TOGGLE_AI;
 	
+	actionByButton[SDL_SCANCODE_RIGHTBRACKET] = GAME_KEYBOARD_ACTIONS::TMP_DEBUG;
+	actionByButton[SDL_SCANCODE_1] = GAME_KEYBOARD_ACTIONS::BOOM;
+	actionByButton[SDL_SCANCODE_3] = GAME_KEYBOARD_ACTIONS::KILL_LEFT;
+	actionByButton[SDL_SCANCODE_2] = GAME_KEYBOARD_ACTIONS::KILL_RIGHT;
+	
 	for(uint16_t i = 0; i < 128; i++)
 		buttonByAction[(int)actionByButton[i]] = i;
 }
 
-void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Network& network, GameUpdater& gameUpdater)
+void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& context, Network& network, GameUpdater& gameUpdater)
 {
 	GAME_KEYBOARD_ACTIONS code = actionByButton[scancode];
 	switch (code)
@@ -270,21 +275,21 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 		{			
 			InputImpulseMessage msg;
 			msg.impulse = INPUT_IMPULSE::ADD_AI;
-			network.send(&msg);			
+			network.send(&msg);
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::CLEAR_AI :
 		{			
 			InputImpulseMessage msg;
 			msg.impulse = INPUT_IMPULSE::CLEAR_AI;
-			network.send(&msg);			
+			network.send(&msg);
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::TOGGLE_AI :
 		{			
 			InputImpulseMessage msg;
 			msg.impulse = INPUT_IMPULSE::TOGGLE_AI;
-			network.send(&msg);			
+			network.send(&msg);
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::ACT_AI :
@@ -292,6 +297,35 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 			auto route = AI::getRandomWalk(gameUpdater.state.get(), gameUpdater.prototypes);
 			InputRouteMessage msg(route);
 			network.send(&msg);
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::TMP_DEBUG :
+		{
+			InputImpulseMessage msg;
+			msg.impulse = INPUT_IMPULSE::TMP_DEBUG;
+			network.send(&msg);	
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::BOOM :
+		{
+			InputDebugMessage msg;
+			msg.action = DEBUG_ACTION::BOOM;
+			msg.coords = context.mouseCoords;
+			network.send(&msg);	
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::KILL_LEFT :
+		{
+			InputDebugMessage msg;
+			msg.action = DEBUG_ACTION::KILL_LEFT;
+			network.send(&msg);	
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::KILL_RIGHT :
+		{
+			InputDebugMessage msg;
+			msg.action = DEBUG_ACTION::KILL_RIGHT;
+			network.send(&msg);	
 			break;
 		}
 		default:
@@ -302,7 +336,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, Keyboard& keyboard, Net
 	}
 }
 
-void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, Keyboard& keyboard, Network& network, GameUpdater& gameUpdater)
+void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, const KeyboardInputContext& context, Network& network, GameUpdater& gameUpdater)
 {
 	GAME_KEYBOARD_ACTIONS code = actionByButton[scancode];
 	switch (code)
@@ -312,10 +346,10 @@ void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, Keyboard& keyboard, Netwo
 		case GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_5 :
 		case GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_10 :
 		{
-			if (!keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_03]] &&
-				!keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_1]] &&
-				!keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_5]] &&
-				!keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_10]]
+			if (!context.keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_03]] &&
+				!context.keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_1]] &&
+				!context.keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_5]] &&
+				!context.keyboard.isDown[buttonByAction[(int)GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_10]]
 			)
 			{
 			InputTimeMessage timeMsg;
@@ -346,6 +380,10 @@ void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, Keyboard& keyboard, Netwo
 		case GAME_KEYBOARD_ACTIONS::CLEAR_AI :
 		case GAME_KEYBOARD_ACTIONS::ACT_AI :
 		case GAME_KEYBOARD_ACTIONS::TOGGLE_AI :
+		case GAME_KEYBOARD_ACTIONS::TMP_DEBUG :
+		case GAME_KEYBOARD_ACTIONS::BOOM :
+		case GAME_KEYBOARD_ACTIONS::KILL_LEFT :
+		case GAME_KEYBOARD_ACTIONS::KILL_RIGHT :
 		break;
 		
 		case GAME_KEYBOARD_ACTIONS::RIGHT :

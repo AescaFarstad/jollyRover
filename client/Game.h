@@ -42,7 +42,7 @@ private:
 	TextureMode m_textureMode;
 	size_t m_activeMode; 
 
-	Keyboard m_keyboard;
+	KeyboardInputContext m_keyboardContext;
 	int32_t m_login;
 	std::vector<int8_t> m_password;
 	

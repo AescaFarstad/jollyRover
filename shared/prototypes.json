@@ -304,7 +304,7 @@
 		{
 			"id": 1,
 			"name":"soldier",
-			"maxHealth":50,
+			"maxHealth":55,
 			"speed": 24,
 			"strength":100,
 			"slowOnRollOver":0.8,
@@ -340,9 +340,9 @@
 		{
 			"id": 3,
 			"name":"soldier2",
-			"maxHealth":40,
+			"maxHealth":50,
 			"speed": 30,
-			"strength":100,
+			"strength":135,
 			"slowOnRollOver":0.8,
 			"rolloverable":true,
 			"loot": 0,		
@@ -392,8 +392,8 @@
 			},
 			{
 				"id": 3,
-				"damage": 15,
-				"attackSpeed": 1500,
+				"damage": 18,
+				"attackSpeed": 1100,
 				"splash": 2,	
 				"ranged":true,
 				"range": 72,

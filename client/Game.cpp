@@ -17,6 +17,9 @@
 #include <GameState.h>
 #include <PersistentStorage.h>
 #include <InputImpulseMessage.h>
+#include <GameStateMessage.h>
+#include <GreetingMessage.h>
+
 Game::Game(GPU_Target* screen)
 {
 	loadConfig();
@@ -193,6 +196,8 @@ void Game::handleEvent(SDL_Event* event)
 
 	if (event->type == SDL_MOUSEMOTION)
 	{
+		m_keyboardContext.mouseCoords.x = event->motion.x;
+		m_keyboardContext.mouseCoords.y = event->motion.y;
 		m_modes[m_activeMode]->onMouseMove(&event->motion);
 		return;
 	}
@@ -206,21 +211,20 @@ void Game::handleEvent(SDL_Event* event)
 	switch (event->type) 
 	{
 		case SDL_KEYDOWN:
-			if (!m_keyboard.isDown[event->key.keysym.scancode])
+			if (!m_keyboardContext.keyboard.isDown[event->key.keysym.scancode])
 			{
-				//printf("Key press detected\n");
-				m_keyboard.isDown[event->key.keysym.scancode] = true;
-				m_modes[m_activeMode]->onKeyDown(event->key.keysym.scancode, m_keyboard);
+				m_keyboardContext.keyboard.isDown[event->key.keysym.scancode] = true;
+				m_modes[m_activeMode]->onKeyDown(event->key.keysym.scancode, m_keyboardContext);
 			}
 			break;
 
 		case SDL_KEYUP:
-			if (m_keyboard.isDown[event->key.keysym.scancode])
+			if (m_keyboardContext.keyboard.isDown[event->key.keysym.scancode])
 			{
 				//printf("Key release detected\n");
-				m_keyboard.isDown[event->key.keysym.scancode] = false;
+				m_keyboardContext.keyboard.isDown[event->key.keysym.scancode] = false;
 				if (!handleGlobalKey(event->key.keysym.scancode))				
-					m_modes[m_activeMode]->onKeyUp(event->key.keysym.scancode, m_keyboard);
+					m_modes[m_activeMode]->onKeyUp(event->key.keysym.scancode, m_keyboardContext);
 			}
 			break;
 
@@ -312,6 +316,13 @@ void Game::addNetworkBindings()
 	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_IMPULSE_MSG");
 	binding->
 	bindByMsgType(MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG)->
+	setCallOnce(false)->
+	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
+	m_network->binder.bind(std::move(binding));
+	
+	binding = std::make_unique<AnonymousBinding>("TYPE_INPUT_DEBUG_MSG");
+	binding->
+	bindByMsgType(MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG)->
 	setCallOnce(false)->
 	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
 	m_network->binder.bind(std::move(binding));

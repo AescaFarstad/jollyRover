@@ -31,6 +31,7 @@ public:
 	int32_t index;
 	Point offset;
 	int16_t creepType;
+	int32_t priority; //distance to the circle surrounding the bounding box of the formation
 	bool optional;
 	std::vector<FormationSlotConnectionProto> connections;
 	

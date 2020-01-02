@@ -1,5 +1,5 @@
 #pragma once
-#include <Keyboard.h>
+#include <KeyboardInputContext.h>
 #ifdef __EMSCRIPTEN__
 	#include <SDL_scancode.h>
 	#include <SDL.h>
@@ -21,8 +21,8 @@ public:
 	virtual void onMouseMove(SDL_MouseMotionEvent* event) = 0;
 	
 	
-	virtual	void onKeyDown(SDL_Scancode scancode, Keyboard& keyboard) = 0;
-	virtual	void onKeyUp(SDL_Scancode scancode, Keyboard& keyboard) = 0;
+	virtual	void onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& context) = 0;
+	virtual	void onKeyUp(SDL_Scancode scancode, const KeyboardInputContext& context) = 0;
 
 private:
 

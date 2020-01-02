@@ -218,6 +218,7 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 		case MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG:
 		case MESSAGE_TYPE::TYPE_INPUT_TIME_MSG:
 		case MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG:
 		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
 		case MESSAGE_TYPE::TYPE_REQUEST_MSG:
 		{

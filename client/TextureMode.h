@@ -17,8 +17,8 @@ public:
 	virtual void onMouseUp(SDL_MouseButtonEvent* event) override;
 	virtual void onMouseMove(SDL_MouseMotionEvent* event) override;
 	
-	virtual	void onKeyDown(SDL_Scancode scancode, Keyboard& keyboard) override;
-	virtual	void onKeyUp(SDL_Scancode scancode, Keyboard& keyboard) override;
+	virtual	void onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& context) override;
+	virtual	void onKeyUp(SDL_Scancode scancode, const KeyboardInputContext& context) override;
 
 private:
 
