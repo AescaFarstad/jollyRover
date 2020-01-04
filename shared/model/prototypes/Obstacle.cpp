@@ -122,7 +122,7 @@ void from_json(const json &j, Obstacle &obstacle)
 	
 	obstacle.edges.emplace_back(&obstacle.vertices.back(), &obstacle.vertices[0]);
 	
-	float extendSize = 5;
+	float extendSize = 2;
 	for (size_t i = 0; i < obstacle.vertices.size(); i++)
 	{
 		int32_t prev = (i - 1 + obstacle.vertices.size()) % obstacle.vertices.size();

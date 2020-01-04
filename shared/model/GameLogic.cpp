@@ -54,12 +54,12 @@ namespace GameLogic
 		else
 		{
 			int32_t stepsAtOnce = state->time.forcedStepsAtOnce > 0 ? state->time.forcedStepsAtOnce : state->time.stepsAtOnce;
+			VisualDebug::clear();
 			for(int32_t i = 0; i < stepsAtOnce; i++)
 			{
 				if (time.forcedTimeScale > 0 && time.allowedSteps >= 0)
 					time.allowedSteps++;
 				state->time.performedSteps++;
-				VisualDebug::clear();
 				GameLogicInternal::makeLogicStep(state, ingameTimePassed, prototypes);
 			}
 		}

@@ -38,7 +38,7 @@
 			"id": 1,
 			"spawn": { "x1":-50, "y1":100, "x2":150, "y2":620  },
 			"freq":[10, 200],
-			"alwaysOn":true
+			"alwaysOn":false
 		},
 		{
 			"id": 2,
@@ -286,7 +286,7 @@
 			"id": 0,
 			"name":"tank",
 			"maxHealth":200,
-			"speed": 180,
+			"speed": 100,
 			"strength":2000,
 			"slowOnRollOver":0.8,
 			"rolloverable":false,
@@ -298,7 +298,7 @@
 			"maxWhiskerLength":150,
 			"moveType":"tractor",
 			"angularSpeed":0.002,
-			"acceleration":{"0":0.00005, "1":0.000005},
+			"acceleration":{"0":0.00001, "1":0.000001},
 			"breaksStrength":0.0005,
 			"omniDirectionalSpeed":0.0001,
 			"normalFriction":0.9,
@@ -526,10 +526,10 @@
 			"connections":0,
 			"leader":-1,
 			"slots":[
-				{"offset":{ "y":30, "x":50 }},
-				{"offset":{ "y":-30, "x":50 }},
-				{"offset":{ "y":90, "x":50 }},
-				{"offset":{ "y":-90, "x":50 }}
+				{"offset":{ "y":30, "x":0 }},
+				{"offset":{ "y":-30, "x":0 }},
+				{"offset":{ "y":90, "x":0 }},
+				{"offset":{ "y":-90, "x":0 }}
 			]
 		},
 		{
@@ -685,6 +685,8 @@
 			"forces":[0],
 			"enabled":true,
 			"relativeAgroability":1.5,
+			"finalRotationModifier":10,
+			"moveSpeedModifier":0.8,
 			"slots":[0,0,0,0]
 		},
 		{
@@ -694,6 +696,8 @@
 			"forces":[1],
 			"enabled":false,
 			"relativeAgroability":0.9,
+			"finalRotationModifier":1,
+			"moveSpeedModifier":1,
 			"slots": [1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,2,2,1,1, 1,1,1,1,1,2,2,1,1]
 		},
 		{
@@ -703,6 +707,8 @@
 			"forces":[0],
 			"enabled":false,
 			"relativeAgroability":1.1,
+			"finalRotationModifier":1,
+			"moveSpeedModifier":1,
 			"slots": [3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3]
 		},
 		{
@@ -712,6 +718,8 @@
 			"forces":[1],
 			"enabled":true,
 			"relativeAgroability":1,
+			"finalRotationModifier":10,
+			"moveSpeedModifier":0.8,
 			"slots": [0, 0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1]
 			
 		},
@@ -722,6 +730,8 @@
 			"forces":[0],
 			"enabled":false,
 			"relativeAgroability":0.5,
+			"finalRotationModifier":10,
+			"moveSpeedModifier":0.8,
 			"slots": [0, 0,0, 3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3]
 			
 		},
@@ -734,6 +744,8 @@
 			"leader":-1,
 			"enabled":true,
 			"relativeAgroability":1.5,
+			"finalRotationModifier":1,
+			"moveSpeedModifier":1,
 			"slots":[1,1,1,1,1]
 		},
 		{
@@ -745,6 +757,8 @@
 			"leader":-1,
 			"enabled":false,
 			"relativeAgroability":1.5,
+			"finalRotationModifier":1,
+			"moveSpeedModifier":1,
 			"slots":[3,3,3,3,3]
 		},
 		{
@@ -756,6 +770,8 @@
 			"leader":-1,
 			"enabled":true,
 			"relativeAgroability":1.5,
+			"finalRotationModifier":1,
+			"moveSpeedModifier":1,
 			"slots":[1,1,1, 1,1,1,1,1, 1,1, 2, 1,1, 1,1, 1,1, 2,2]
 		},
 		{
@@ -767,6 +783,8 @@
 			"leader":-1,
 			"enabled":false,
 			"relativeAgroability":1.5,
+			"finalRotationModifier":1,
+			"moveSpeedModifier":1,
 			"slots":[3,3,3, 3,3,3,3,3, 3,3, 3, 3,3, 3,3, 3,3, 3,3]
 		},
 		{
@@ -776,6 +794,8 @@
 			"forces":[0],
 			"enabled":true,
 			"relativeAgroability":1.5,
+			"finalRotationModifier":10,
+			"moveSpeedModifier":0.8,
 			"slots":[0]
 		}
 		

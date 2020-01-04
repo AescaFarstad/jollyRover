@@ -178,7 +178,7 @@ void GameView::drawObstacles()
 	SDL_Color obstacleColor = ViewUtil::colorFromHex(0x004477);
 
 	for (auto &obstacle : m_prototypes->obstacles)
-	{/*
+	{/**/
 		size_t count = obstacle.vertices.size();
 		float* points = new float[(count * 2)];
 		for (size_t i = 0; i < count * 2; i+=2)
@@ -196,12 +196,12 @@ void GameView::drawObstacles()
 			obstacle.centroid.y - centroidSize/2,
 			obstacle.centroid.x + centroidSize/2,
 			obstacle.centroid.y + centroidSize/2,
-			obstacleColor);*/
-		
+			obstacleColor);
+		/*
 		for (auto& edge : obstacle.edges)
 		{
 			ViewUtil::drawArrow(m_screen, *edge.p1, *edge.p2, 0x004477);	
-		}
+		}*/
 	}	
 }
 
@@ -663,6 +663,24 @@ void GameView::drawDebugGraphics()
 		else
 			GPU_Circle(m_screen, circle.origin.x, circle.origin.y, circle.radius, color);
 	}
+	
+	for(auto& text : S::visualDebug.texts)
+	{
+		m_fontDebug.draw(m_screen, text.origin.x, text.origin.y, "%s", text.text.c_str());
+	}
+	
+	auto selectedCreep = m_state->creepById_[VisualDebug::interestingId];
+	if (selectedCreep)
+	{
+		SDL_Color color = ViewUtil::colorFromHex(0x0000ff, 0xff);
+		SDL_Color color2 = ViewUtil::colorFromHex(0xffff00, 0xff);
+		auto loc = selectedCreep->unit.location;
+		GPU_Line(m_screen, loc.x - 5, loc.y - 5, loc.x + 5, loc.y + 5, color);
+		GPU_Line(m_screen, loc.x + 5, loc.y - 5, loc.x - 5, loc.y + 5, color);
+		GPU_Circle(m_screen, loc.x, loc.y, 3, color2);
+		
+		m_fontDebug.draw(m_screen, loc.x, loc.y- 20, "mv: %.2f, sp: %.2f / %.2f", selectedCreep->movement_.getLength(), selectedCreep->velocity.getLength(), selectedCreep->creepProto_->speed);
+	}	
 }
 
 void GameView::drawThreatMap()

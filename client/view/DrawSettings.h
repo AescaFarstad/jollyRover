@@ -11,7 +11,7 @@ struct DrawSettings
 									bool connections_D = false;
 									bool formAgro_D = false;
 	bool explosions = true;
-									bool debug_D = false;
+									bool debug_D = true;
 									bool threat_D = false;
 									bool obstacles_D = false;
 	bool input = true;

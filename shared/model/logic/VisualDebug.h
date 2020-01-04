@@ -1,6 +1,17 @@
 #pragma once
 #include <Point.h>
 #include <SDL_gpu.h>
+#include <functional>
+
+namespace VisualDebug
+{
+	class VisualDebugStruct;
+}
+
+namespace S
+{
+	extern VisualDebug::VisualDebugStruct visualDebug;
+}
 
 namespace VisualDebug
 {
@@ -31,6 +42,13 @@ namespace VisualDebug
 		uint32_t color;
 		uint8_t alpha;
 	};
+	
+	class VisualDebugText
+	{
+	public:
+		Point origin;
+		std::string text;
+	};
 
 	class VisualDebugStruct
 	{
@@ -39,6 +57,7 @@ namespace VisualDebug
 		std::vector<VisualDebugLine> arrows;
 		std::vector<VisualDebugRect> rects;
 		std::vector<VisualDebugCircle> circles;
+		std::vector<VisualDebugText> texts;
 		
 		void clear();
 	};
@@ -53,10 +72,15 @@ namespace VisualDebug
 	void drawRect(float x1, float y1, float w, float h, bool fill, uint32_t color, uint8_t alpha = 0xff);
 	void drawRect(Point center, float size, bool fill, uint32_t color, uint8_t alpha = 0xff);
 	void drawCircle(Point origin, uint32_t radius, bool fill, uint32_t color, uint8_t alpha = 0xff);
+	
+	template<typename... Args>
+	void drawText(Point location, const char* text, Args... args)
+	{
+		char buffer[1024];
+		auto len = std::snprintf(buffer, 1024, text, std::forward<Args>(args)...);
+		std::string str(buffer);		
+		S::visualDebug.texts.push_back(VisualDebugText{location, str.substr(0, len)});
+	}
 	void clear();
 }
 
-namespace S
-{
-	extern VisualDebug::VisualDebugStruct visualDebug;
-}

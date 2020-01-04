@@ -56,6 +56,8 @@ public:
 	int16_t layout;
 	FORMATION_TYPE type;
 	float relativeAgroability;
+	float finalRotationModifier;
+	float moveSpeedModifier;
 	bool enabled;
 	std::vector<int16_t> forces;
 	std::vector<int32_t> slots;
@@ -82,4 +84,6 @@ public:
 	Point AA;
 	Point BB;
 	float relativeAgroability;
+	float finalRotationModifier;
+	float moveSpeedModifier;
 };

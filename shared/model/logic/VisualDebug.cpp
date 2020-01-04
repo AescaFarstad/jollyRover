@@ -53,6 +53,7 @@ namespace VisualDebug
 		arrows.clear();
 		rects.clear();
 		circles.clear();
+		texts.clear();
 	}
 	
 	void clear()

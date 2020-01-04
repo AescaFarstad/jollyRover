@@ -32,8 +32,10 @@ void from_json(const json &j, FormationDef &def)
 		def.type = FORMATION_TYPE::TRANSPORT;
 	else
 		THROW_FATAL_ERROR("josn parse error");
-		
+	
 	def.relativeAgroability = j.at("relativeAgroability");
+	def.finalRotationModifier = j.at("finalRotationModifier");
+	def.moveSpeedModifier = j.at("moveSpeedModifier");
 	def.enabled = j.at("enabled");	
 	
 	def.forces = j.at("forces").get<std::vector<int16_t>>();
@@ -63,6 +65,8 @@ std::vector<FormationProto> FormationProto::createFormations(std::vector<Formati
 		form.leader = layout->leader;
 		form.connections = layout->connections;
 		form.relativeAgroability = def.relativeAgroability;
+		form.finalRotationModifier = def.finalRotationModifier;
+		form.moveSpeedModifier = def.moveSpeedModifier;
 		
 		for(size_t i = 0; i < def.slots.size(); i++)
 		{

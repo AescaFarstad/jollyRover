@@ -145,12 +145,12 @@ namespace Creeps
 				state->threatMap_[creep.unit.force].addThreat(creep.unit.location, creep.creepProto_->strength);
 			}
 			state->threatMap_[0].blur(0.8);
-			state->threatMap_[0].blur(0.7);
-			state->threatMap_[0].blur(0.6);
+			//state->threatMap_[0].blur(0.7);
+			//state->threatMap_[0].blur(0.6);
 			
 			state->threatMap_[1].blur(0.8);
-			state->threatMap_[1].blur(0.7);
-			state->threatMap_[1].blur(0.6);
+			//state->threatMap_[1].blur(0.7);
+			//state->threatMap_[1].blur(0.6);
 		}
 		
 		void spawnFormation(GameState* state, Prototypes* prototypes, ForceProto& forceProto, FormationProto& formationProto)
@@ -201,6 +201,8 @@ namespace Creeps
 					formation.slots.push_back(-1);
 				}				
 			}
+			
+			formation.speed *= formationProto.moveSpeedModifier;
 		}		
 		
 		CreepState& spawnCreep(int16_t type, const Point& location, GameState* state, Prototypes* prototypes)
@@ -549,6 +551,7 @@ namespace Creeps
 			float hostileThreat = 0;
 			int32_t totalCreeps = 0;
 			int32_t mapIndex = formation.force == 0 ? 1 : 0;
+			FormationProto& fProto = *formation.formationPrototype_;
 			
 			formation.actualLocation_ = Point();
 			
@@ -616,7 +619,7 @@ namespace Creeps
 				target->scaleBy(targetPriority);
 				if (!formationIsInFinalPhase)
 				{
-					for(auto& connection : formation.formationPrototype_->slots[creep.formationsSlot].connections)
+					for(auto& connection : fProto.slots[creep.formationsSlot].connections)
 					{
 						CreepState* partner = state->creepById_[formation.slots[connection.slot]];
 						if (partner && partner->unit.health > 0)
@@ -674,7 +677,7 @@ namespace Creeps
 			
 			Point formationDirection;
 			formationDirection.setFromAngle(formation.orientation);
-			auto cells = prototypes->obstacleMap.getCellsInRadius(formation.location, formation.formationPrototype_->width * 0.35, 0.2);
+			auto cells = prototypes->obstacleMap.getCellsInRadius(formation.location, fProto.width * 0.35, 0.2);
 			int32_t obstaclesAhead = 0;
 			for(auto& cell : cells)
 			{
@@ -696,9 +699,10 @@ namespace Creeps
 			else
 				desiredOrientation = formation.targetOrientation;
 			float aDelta = FMath::angleDelta(formation.orientation, desiredOrientation);
-			float speedRatio = std::fabs(aDelta) > 0.05 ? 0.5 : 1;
+			float speedRatio = std::fabs(aDelta) > 0.05 ? 0.95 : 1;
 			
-			float stepSize = timePassed * formation.speed * speedMulti * speedRatio;			
+			float stepSize = timePassed * formation.speed * speedMulti * speedRatio;
+			//VisualDebug::drawText(formation.location, "%.3f = %d * %.3f * %.3f * %.3f", stepSize, timePassed, formation.speed, speedMulti, speedRatio);
 			
 			bool formationMovementComplete = true;
 			if (formation2Target.getLength() > stepSize)
@@ -706,6 +710,7 @@ namespace Creeps
 				formation2Target.scaleTo(stepSize);
 				formation.location += formation2Target;
 				formationMovementComplete = false;
+				//VisualDebug::drawArrow(formation.location, formation.location + formation2Target * 100, 0x00);
 			}
 			else
 			{
@@ -713,7 +718,9 @@ namespace Creeps
 				formation.location = formation.targetLocation;
 			}
 			
-			float turnSize = timePassed * formation.formationPrototype_->maxAngularSpeed * (1 - speedRatio + 0.1);
+			float turnSize = timePassed * fProto.maxAngularSpeed * (1 - speedRatio + 0.1);
+			if (formationMovementComplete)
+				turnSize *= fProto.finalRotationModifier;
 			
 			if (std::fabs(aDelta) > turnSize)
 			{
@@ -1098,7 +1105,7 @@ namespace Creeps
 			if (creep2Target.getLength() > 0)
 				omniDirectionalStep.scaleTo(std::min(creep2Target.getLength(), omniSpeed * timePassed));
 				
-			creep.movement_ = creep.velocity + omniDirectionalStep;
+			creep.movement_ = creep.velocity * timePassed + omniDirectionalStep;
 			creep.unit.voluntaryMovement = creep.velocity;
 		}
 		
@@ -1167,6 +1174,9 @@ namespace Creeps
 				{
 					Edge* bestEdge = Field::nearestIntersectedEdge(creep.unit.location, target, obstacle->edges, obstacle->extendedEdges);
 					
+					if (!bestEdge)
+						return target; //Rounding errors
+						
 					return bestEdge->p1->distanceTo(target) > bestEdge->p2->distanceTo(target) ? *bestEdge->p2 : *bestEdge->p1;
 				}
 				
@@ -1179,7 +1189,7 @@ namespace Creeps
 			auto nearestEdge = std2::minElement(obstacle->edges, 
 					[from = creep.unit.location](Edge& edge){return FMath::distanceToLine(from, *edge.p1, *edge.p2);});
 					
-			Point step = (*nearestEdge->p2 - *nearestEdge->p1).rotate(M_PI_2);
+			Point step = (*nearestEdge->p2 - *nearestEdge->p1).rotate(-M_PI_2);			
 			step.scaleTo(creep.creepProto_->speed * timePassed);
 			creep.movement_ = step;
 		}
