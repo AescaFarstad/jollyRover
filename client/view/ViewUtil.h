@@ -29,6 +29,7 @@ namespace ViewUtil
 
 	///0xrrggbb 0xaa
 	SDL_Color colorFromHex(uint32_t color, uint8_t alpha = 0xff);
+	void drawArrow(GPU_Target* target, const Point& from, const Point& to, const uint32_t color);
 }
 
 bool operator==(SDL_Color& x, SDL_Color& y);

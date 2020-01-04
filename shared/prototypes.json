@@ -14,7 +14,7 @@
 		"carAgroGainPerUnit":1000,
 		"carAgroFadeGainPerSecond":1,
 		"war":{
-			"intensity": 3000,
+			"intensity": 5000,
 			"creepRestitution": 0.6,
 			"additionalSpacing": 5,
 			"baseAgroLevel": 15,
@@ -300,7 +300,7 @@
 			"angularSpeed":0.002,
 			"acceleration":{"0":0.00005, "1":0.000005},
 			"breaksStrength":0.0005,
-			"omniDirectionalSpeed":0.002,
+			"omniDirectionalSpeed":0.0001,
 			"normalFriction":0.9,
 			"hullTexture":["tanks_2/tankBody_blue", "tanks_2/tankBody_sand", ""],
 			"gunTexture":["tanks_2/tankBlue_barrel2_outline", "tanks_2/tankSand_barrel2_outline", ""]
@@ -666,6 +666,14 @@
 				
 				
 			]
+		},
+		{
+			"id":5,
+			"connections":2,
+			"leader":-1,
+			"slots":[
+				{"offset":{ "y":0, "x":0 }}
+			]
 		}
 	],
 	"formationDef":[
@@ -675,7 +683,7 @@
 			"layout":0,
 			"type":"assault",
 			"forces":[0],
-			"enabled":false,
+			"enabled":true,
 			"relativeAgroability":1.5,
 			"slots":[0,0,0,0]
 		},
@@ -684,7 +692,7 @@
 			"layout":1,
 			"type":"assault",
 			"forces":[1],
-			"enabled":true,
+			"enabled":false,
 			"relativeAgroability":0.9,
 			"slots": [1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1,1, 1,1,1,1,1,2,2,1,1, 1,1,1,1,1,2,2,1,1]
 		},
@@ -693,7 +701,7 @@
 			"layout":1,
 			"type":"assault",
 			"forces":[0],
-			"enabled":true,
+			"enabled":false,
 			"relativeAgroability":1.1,
 			"slots": [3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3, 3,3,3,3,3,3,3,3,3]
 		},
@@ -702,7 +710,7 @@
 			"layout":2,
 			"type":"assault",
 			"forces":[1],
-			"enabled":false,
+			"enabled":true,
 			"relativeAgroability":1,
 			"slots": [0, 0,0, 1,1,1,1,1,1,1,1, 1,1,1,1,1,1,1,1]
 			
@@ -735,7 +743,7 @@
 			"forces":[0],
 			"connections":2,
 			"leader":-1,
-			"enabled":true,
+			"enabled":false,
 			"relativeAgroability":1.5,
 			"slots":[3,3,3,3,3]
 		},
@@ -757,10 +765,19 @@
 			"forces":[0],
 			"connections":2,
 			"leader":-1,
-			"enabled":true,
+			"enabled":false,
 			"relativeAgroability":1.5,
 			"slots":[3,3,3, 3,3,3,3,3, 3,3, 3, 3,3, 3,3, 3,3, 3,3]
-		} 
+		},
+		{
+			"id":9,
+			"layout":5,
+			"type":"assault",
+			"forces":[0],
+			"enabled":true,
+			"relativeAgroability":1.5,
+			"slots":[0]
+		}
 		
 	]
 }

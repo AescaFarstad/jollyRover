@@ -1167,21 +1167,9 @@ namespace Creeps
 				{
 					Edge* bestEdge = Field::nearestIntersectedEdge(creep.unit.location, target, obstacle->edges, obstacle->extendedEdges);
 					
-					if (!bestEdge)
-						return target; // Can happen because of rounding errors
-					
-					Point creepToTarget = target - creep.unit.location;
-					Point creepToCentroid = obstacle->centroid - creep.unit.location;
-					Point creepToP1 = *bestEdge->p1 - creep.unit.location;
-					
-					float creepSide = creepToCentroid.crossProduct(creepToTarget);
-					float p1Side = creepToCentroid.crossProduct(creepToP1);
-					
-					if ((creepSide > 0) == (p1Side > 0))
-						return *bestEdge->p1;
-					else
-						return *bestEdge->p2;
+					return bestEdge->p1->distanceTo(target) > bestEdge->p2->distanceTo(target) ? *bestEdge->p2 : *bestEdge->p1;
 				}
+				
 			}
 			return target;
 		}

@@ -135,15 +135,15 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	if (S::drawSettings.formAgro_D)
 		drawFormationAgro();
 	if (S::drawSettings.explosions)
-		drawProjectileExplosion();	
-	if (S::drawSettings.debug_D)
-		drawDebugGraphics();
+		drawProjectileExplosion();
+	if (S::drawSettings.obstacles_D)
+		drawObstacles();	
 	if (S::drawSettings.threat_D)
 		drawThreatMap();
-	if (S::drawSettings.obstacles_D)
-		drawObstacles();
 	if (S::drawSettings.input)
 		drawInput();	
+	if (S::drawSettings.debug_D)
+		drawDebugGraphics();
 	if (S::drawSettings.hud)
 		drawHUD();
 	if (S::drawSettings.flyingMessage)		
@@ -178,7 +178,7 @@ void GameView::drawObstacles()
 	SDL_Color obstacleColor = ViewUtil::colorFromHex(0x004477);
 
 	for (auto &obstacle : m_prototypes->obstacles)
-	{
+	{/*
 		size_t count = obstacle.vertices.size();
 		float* points = new float[(count * 2)];
 		for (size_t i = 0; i < count * 2; i+=2)
@@ -196,7 +196,12 @@ void GameView::drawObstacles()
 			obstacle.centroid.y - centroidSize/2,
 			obstacle.centroid.x + centroidSize/2,
 			obstacle.centroid.y + centroidSize/2,
-			obstacleColor);
+			obstacleColor);*/
+		
+		for (auto& edge : obstacle.edges)
+		{
+			ViewUtil::drawArrow(m_screen, *edge.p1, *edge.p2, 0x004477);	
+		}
 	}	
 }
 
@@ -638,27 +643,7 @@ void GameView::drawDebugGraphics()
 	
 	for(auto& arrow : S::visualDebug.arrows)
 	{
-		SDL_Color color = ViewUtil::colorFromHex(arrow.color, 0xff);
-		GPU_Line(m_screen, arrow.from.x, arrow.from.y, arrow.to.x, arrow.to.y, color);
-		
-		Point vec = arrow.to - arrow.from;
-		
-		float angle = M_PI / 5;
-		float headSize = FMath::lerp(0.f, 0.f, 100.f, 8.f, vec.getLength());
-		headSize = std::min(headSize, 10.f);
-		headSize++;
-		
-		vec = vec.rotate(angle);
-		vec.scaleTo(headSize);
-		
-		Point branch = arrow.to - vec;
-		
-		GPU_Line(m_screen, arrow.to.x, arrow.to.y, branch.x, branch.y, color);
-		
-		vec = vec.rotate(-angle*2);
-		branch = arrow.to - vec;
-		
-		GPU_Line(m_screen, arrow.to.x, arrow.to.y, branch.x, branch.y, color);
+		ViewUtil::drawArrow(m_screen, arrow.from, arrow.to, arrow.color);
 	}
 	
 	for(auto& rect : S::visualDebug.rects)
