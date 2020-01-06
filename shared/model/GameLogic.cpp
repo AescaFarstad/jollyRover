@@ -1,10 +1,8 @@
 #include <GameLogic.h>
-#include <Keyboard.h>
 #include <Creeps.h>
 #include <InputTimeMessage.h>
 #include <InputDebugMessage.h>
 #include <VisualDebug.h>
-#include <GameKeyboardActions.h>
 #include <AI.h>
 #include <std2.h>
 
@@ -13,12 +11,6 @@ namespace GameLogic
 {		
 	void update(GameState* state, int32_t timePassed, std::vector<InputMessage*> &inputs, Prototypes* prototypes)
 	{
-		if (state->timeStamp < 20)
-		{
-			
-		}
-		
-		
 		state->timeStamp += timePassed;
 		
 		for (size_t i = 0; i < inputs.size(); i++)

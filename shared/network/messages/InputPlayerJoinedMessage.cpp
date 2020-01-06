@@ -7,12 +7,6 @@ InputPlayerJoinedMessage::InputPlayerJoinedMessage()
 	typeId = MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG;
 }
 
-
-InputPlayerJoinedMessage::~InputPlayerJoinedMessage()
-{
-}
-
-
 void InputPlayerJoinedMessage::deserialize(SerializationStream& stream)
 {
 	InputMessage::deserialize(stream);

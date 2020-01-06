@@ -7,11 +7,6 @@ InputActionMessage::InputActionMessage()
 	typeId = MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG;
 }
 
-
-InputActionMessage::~InputActionMessage()
-{
-}
-
 void InputActionMessage::deserialize(SerializationStream& stream)
 {
 	InputMessage::deserialize(stream);

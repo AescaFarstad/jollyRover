@@ -8,13 +8,6 @@ GreetingMessage::GreetingMessage()
 	login = 0;
 }
 
-
-GreetingMessage::~GreetingMessage()
-{
-}
-
-
-
 void GreetingMessage::deserialize(SerializationStream& stream)
 {
 	NetworkMessage::deserialize(stream);

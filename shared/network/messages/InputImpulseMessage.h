@@ -7,7 +7,6 @@ class InputImpulseMessage :
 {
 public:
 	InputImpulseMessage();
-	~InputImpulseMessage();
 
 	INPUT_IMPULSE impulse;
 

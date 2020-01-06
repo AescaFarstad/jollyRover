@@ -5,7 +5,6 @@ class InputPlayerJoinedMessage :
 {
 public:
 	InputPlayerJoinedMessage();
-	~InputPlayerJoinedMessage();
 
 	int32_t login;
 

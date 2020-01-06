@@ -5,7 +5,6 @@ class InputTimeMessage :
 {
 public:
 	InputTimeMessage();
-	~InputTimeMessage() = default;
 
 	int32_t allowSteps;
 	bool modifyAllowSteps;

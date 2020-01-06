@@ -7,11 +7,6 @@ InputPlayerLeftMessage::InputPlayerLeftMessage()
 	typeId = MESSAGE_TYPE::TYPE_INPUT_LEFT_MSG;
 }
 
-
-InputPlayerLeftMessage::~InputPlayerLeftMessage()
-{
-}
-
 void InputPlayerLeftMessage::deserialize(SerializationStream& stream)
 {
 	InputMessage::deserialize(stream);

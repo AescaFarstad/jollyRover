@@ -5,7 +5,6 @@ class InputActionMessage :
 {
 public:
 	InputActionMessage();
-	~InputActionMessage();
 
 	float angle = 0;
 	std::vector<int8_t> downedButtons;

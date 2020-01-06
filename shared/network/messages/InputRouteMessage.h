@@ -9,8 +9,6 @@ class InputRouteMessage : public InputMessage
 {
 public:
 	InputRouteMessage();
-	InputRouteMessage(const std::vector<Point> &route);
-	~InputRouteMessage();
 
 	std::vector<Point> route;
 

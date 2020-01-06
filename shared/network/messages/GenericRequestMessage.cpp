@@ -7,13 +7,6 @@ GenericRequestMessage::GenericRequestMessage()
 	typeId = MESSAGE_TYPE::TYPE_REQUEST_MSG;
 }
 
-
-GenericRequestMessage::~GenericRequestMessage()
-{
-}
-
-
-
 void GenericRequestMessage::deserialize(SerializationStream& stream)
 {
 	NetworkMessage::deserialize(stream);

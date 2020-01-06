@@ -8,7 +8,7 @@ class InputMessage :
 {
 public:
 	InputMessage() = default;
-	~InputMessage() = default;
+	
 	int32_t serverStamp;
 	int16_t localId;
 	int16_t serverId;

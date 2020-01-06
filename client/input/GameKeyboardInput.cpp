@@ -301,8 +301,8 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		}
 		case GAME_KEYBOARD_ACTIONS::ACT_AI :
 		{
-			auto route = AI::getRandomWalk(gameUpdater.state.get(), gameUpdater.prototypes);
-			InputRouteMessage msg(route);
+			InputRouteMessage msg;
+			msg.route = AI::getRandomWalk(gameUpdater.state.get(), gameUpdater.prototypes);
 			network.send(msg);
 			break;
 		}

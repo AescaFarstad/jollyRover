@@ -6,7 +6,6 @@ class GreetingMessage :
 {
 public:
 	GreetingMessage();
-	~GreetingMessage();
 
 	int32_t login;
 	std::vector<int8_t> password;

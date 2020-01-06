@@ -9,7 +9,6 @@ class InputDebugMessage :
 {
 public:
 	InputDebugMessage();
-	~InputDebugMessage();
 
 	DEBUG_ACTION action;
 	Point coords;

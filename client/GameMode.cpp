@@ -101,7 +101,8 @@ void GameMode::handleRouteInput()
 			}
 			else
 			{
-				InputRouteMessage nim(m_routeInput.getPoints());
+				InputRouteMessage nim;
+				nim.route = m_routeInput.getPoints();
 				m_network->send(nim);
 				m_routeInput.reset();
 			}

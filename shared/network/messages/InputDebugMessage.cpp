@@ -6,10 +6,6 @@ InputDebugMessage::InputDebugMessage()
 	action = DEBUG_ACTION::NONE;
 }
 
-InputDebugMessage::~InputDebugMessage()
-{
-}
-
 void InputDebugMessage::deserialize(SerializationStream& stream)
 {
 	InputMessage::deserialize(stream);

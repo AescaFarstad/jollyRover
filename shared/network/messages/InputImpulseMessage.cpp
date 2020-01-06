@@ -7,10 +7,6 @@ InputImpulseMessage::InputImpulseMessage()
 	impulse = INPUT_IMPULSE::NONE;
 }
 
-InputImpulseMessage::~InputImpulseMessage()
-{
-}
-
 void InputImpulseMessage::deserialize(SerializationStream& stream)
 {
 	InputMessage::deserialize(stream);

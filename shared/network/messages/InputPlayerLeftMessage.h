@@ -5,7 +5,6 @@ class InputPlayerLeftMessage :
 {
 public:
 	InputPlayerLeftMessage();
-	~InputPlayerLeftMessage();
 
 	int32_t login;
 

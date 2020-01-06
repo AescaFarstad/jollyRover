@@ -24,6 +24,7 @@ SERVER_LIBS := -lSDL2 -lSDL2_net -lutil
 
 DIR_CLIENT =client
 DIR_CLIENT +=client/view
+DIR_CLIENT +=client/input
 DIR_CLIENT +=client/resources
 DIR_CLIENT +=client/thirdParty/NFont
 DIR_CLIENT +=client/thirdParty/SDL_FontCache
@@ -45,6 +46,7 @@ DIR_SHARED +=shared/network/bindings
 DIR_SHARED +=shared/network/messages
 DIR_SHARED +=shared/thirdParty
 DIR_SHARED +=shared/utils
+DIR_SHARED +=shared/utils/serialization
 DIR_SHARED +=shared/model/ref
 
 

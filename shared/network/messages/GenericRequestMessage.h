@@ -6,7 +6,6 @@ class GenericRequestMessage :
 {
 public:
 	GenericRequestMessage();
-	~GenericRequestMessage();
 
 	REQUEST_TYPE request;
 
