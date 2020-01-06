@@ -14,11 +14,11 @@
 #include <ReadOnlySerializationStream.h>
 #include <GameStateMessage.h>
 
-std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(NetworkPacket* packet)
+std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(const NetworkPacket& packet)
 {
 	int16_t type;
-	Serializer::read(type, packet->payload);
-	ReadOnlySerializationStream rstream(packet->payload, packet->payloadSize);
+	Serializer::read(type, packet.payload);
+	ReadOnlySerializationStream rstream(packet.payload, packet.payloadSize);
 	std::unique_ptr<NetworkMessage> p = pointerByType((MESSAGE_TYPE)type);
 	p->deserialize(rstream);
 	return p;

@@ -1155,7 +1155,7 @@ namespace Creeps
 						
 			for(int32_t i = -2; i < (int32_t)creep.whiskers.size(); i++)
 			{
-				float whisker;
+				float whisker = -1;
 				if (i == -2)
 					whisker = stepSize;
 				else if (i == -1)

@@ -4,6 +4,9 @@
 
 namespace Serializer {
 	
+	#ifdef __EMSCRIPTEN__
+	void write(const size_t& value, char buffer[]);
+	#endif
 	void write(const int64_t& value, char buffer[]);
 	void write(const uint64_t& value, char buffer[]);
 	void write(const int32_t& value, char buffer[]);
@@ -15,6 +18,9 @@ namespace Serializer {
 	void write(const float& value, char buffer[]);
 	void write(const std::string& value, char buffer[]);
 	
+	#ifdef __EMSCRIPTEN__
+	void read(size_t& out, const char* value);
+	#endif
 	void read(int64_t& out, const char* value);
 	void read(uint64_t& out, const char* value);
 	void read(int32_t& out, const char* value);

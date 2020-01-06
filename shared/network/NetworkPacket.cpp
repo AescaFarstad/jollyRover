@@ -104,11 +104,11 @@ void NetworkPacket::setPayloadFromRawData(const char* newRawData, size_t size)
 	//S::log.add("RWW original\n" + Serializer::toHex(newRawData, size));
 }
 
-void NetworkPacket::setPayloadFromSerializable(ISerializable* serializable, size_t expectedSize)
+void NetworkPacket::setPayloadFromSerializable(const ISerializable& serializable, size_t expectedSize)
 {
-	SerializationStream stream(new StreamGrowerExp(expectedSize, 2));
+	SerializationStream stream = SerializationStream::createExp(expectedSize, 2);
 	//S::log.add("setPayloadFromSerializable ::");
-	serializable->serialize(stream); 
+	serializable.serialize(stream); 
 	
 	//std::string h;
 	//h.assign(stream.readAllAsHex(), stream.getLength() * 3);

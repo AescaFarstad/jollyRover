@@ -3,11 +3,7 @@
 class SystemInfo
 {
 public:
-	SystemInfo();
-	~SystemInfo();
-	static SystemInfo* instance;
-
-	bool isBigEndian = testIsBigEndian();
+	static bool isBigEndian;
 
 private:
 

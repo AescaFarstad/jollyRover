@@ -17,7 +17,7 @@ class NetworkClient
 {
 public:
 	NetworkClient(std::function< int() > globalSocketNudgeFunction);
-	virtual ~NetworkClient();
+	virtual ~NetworkClient() = default;
 
 	TCPsocket socket;
 	bool wasConnected;
@@ -27,16 +27,15 @@ public:
 	std::vector<int8_t> password;
 
 	virtual std::unique_ptr<NetworkPacket> poll();
-	virtual void sendMessage(NetworkMessage* msg);
-	virtual void sendMessage(const char * payload, size_t size);
-	virtual void init();
+	virtual void sendMessage(const NetworkMessage& msg) = 0;
+	virtual void sendMessage(const char* payload, size_t size) = 0;
 
 protected:
-	PacketReader* packetReader;
 	bool isInitialized;
+	std::unique_ptr<PacketReader> packetReader;
+	std::function< int() > globalSocketNudgeFunction;
 
 	void logSend(std::string messageName, NetworkPacket &packet);
-
+	virtual void init();
 	static std::unique_ptr<NetworkPacket> getPacket();
-	std::function< int() > globalSocketNudgeFunction;
 };

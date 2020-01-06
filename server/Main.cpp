@@ -10,6 +10,7 @@
 #include <GameStateMessage.h>
 #include <InputPlayerJoinedMessage.h>
 #include <InputPlayerLeftMessage.h>
+#include <GenericRequestMessage.h>
 #include <chrono>
 #include <thread>
 #include <Prototypes.h>
@@ -21,8 +22,8 @@ namespace MainInternal
 
 	bool isFinished = false;
 	int lastTicks = 0;
-	ServerNetwork network;
-	std::unique_ptr<NetworkMessage>* messageBuffer;
+	ServerNetwork network;	
+	MessageBuffer messageBuffer;
 	GameUpdater gameUpdater;
 	int32_t inputIdCounter = 0;
 	Prototypes prototypes;
@@ -47,7 +48,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 			std::unique_ptr<InputMessage> iMsg = std::unique_ptr<InputMessage>(t);
 			iMsg->serverId = inputIdCounter++;
 			iMsg->serverStamp = gameUpdater.state->timeStamp;
-			network.sendToAllPlaying(iMsg.get());
+			network.sendToAllPlaying(*iMsg);
 			gameUpdater.addNewInput(std::move(iMsg));
 			break;
 		}
@@ -64,14 +65,14 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
 					gsMsg.state = gameUpdater.state.get();
-					network.send(&gsMsg, genericRequestMsg->login);
+					network.send(gsMsg, genericRequestMsg->login);
 
 					std::unique_ptr<InputPlayerJoinedMessage> pjMsg = std::make_unique<InputPlayerJoinedMessage>();
 					pjMsg->serverId = inputIdCounter++;
 					pjMsg->serverStamp = gameUpdater.state->timeStamp;
 					pjMsg->login = genericRequestMsg->login;
 					//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-					network.sendToAllPlaying(pjMsg.get());
+					network.sendToAllPlaying(*pjMsg);
 					gameUpdater.addNewInput(std::move(pjMsg));
 					break;
 				}
@@ -80,7 +81,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
 					gsMsg.state = gameUpdater.state.get(); 
-					network.send(&gsMsg, genericRequestMsg->login);
+					network.send(gsMsg, genericRequestMsg->login);
 					break;
 				}
 				case REQUEST_TYPE::REQUEST_PING:
@@ -88,7 +89,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					GenericRequestMessage grMsg;
 					grMsg.request = REQUEST_TYPE::REQUEST_PONG;
 					grMsg.inResponseTo = genericRequestMsg->initiator_id;
-					network.send(&grMsg, genericRequestMsg->login);
+					network.send(grMsg, genericRequestMsg->login);
 					break;
 				}
 				default:
@@ -161,52 +162,22 @@ void mainLoop()
 	}
 }
 
-
-void initLog()
-{
-	S::log.disableTags({
-		//LOG_TAGS::UNIQUE,
-		//LOG_TAGS::NET,
-		//LOG_TAGS::GAME,
-
-		LOG_TAGS::NET_MESSAGE,
-		LOG_TAGS::Z
-	});
-
-	S::log.enableTags({
-		LOG_TAGS::UNIQUE,
-		//LOG_TAGS::NET,
-		//LOG_TAGS::GAME,
-		LOG_TAGS::ERROR_,
-
-		//LOG_TAGS::NET_MESSAGE,
-		LOG_TAGS::Z
-	});
-}
-
 int main()
 {
 	printf(".\n");
 
 	SDL_Init(SDL_INIT_EVERYTHING);
-
 	SDLNet_Init();
-
-	initLog();
-
 
 	loadPrototypes();
 	loadConfig();
 	
 	network.init();
 
-	messageBuffer = new std::unique_ptr<NetworkMessage>[SERVER_CONST::messageBufferSize + 1];
 	gameUpdater.load(std::make_unique<GameState>(), &prototypes, false);
 
 	while (!isFinished)
 		mainLoop();
-
-	network.finish();
 
 	SDLNet_Quit();
 	SDL_Quit();

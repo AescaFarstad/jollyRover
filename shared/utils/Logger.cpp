@@ -1,28 +1,17 @@
 #include "Logger.h"
 
-Logger::Logger()
-{
-}
-
 Logger::Logger(std::initializer_list<LOG_TAGS> enabledTags, std::initializer_list<LOG_TAGS> disabledTags)
 {
 	enableTags(enabledTags);
 	disableTags(disabledTags);
 }
 
-Logger::~Logger()
-{
-}
-
 void Logger::add(const std::string& message, std::initializer_list<LOG_TAGS> tags)
 {
-	LogMessage* msg = new LogMessage();
-	msg->message = message;
-	msg->stamp = SDL_GetTicks();
-	m_messages.push_back(*msg);
+	m_messages.push_back(LogMessage{SDL_GetTicks(), message});
 
 	if (isReportable(tags))
-		report(msg);
+		report(m_messages.back());
 }
 
 void Logger::add(const std::string& message)
@@ -52,7 +41,7 @@ void Logger::disableTags(std::initializer_list<LOG_TAGS> disabledTags)
 	}
 }
 
-bool Logger::isReportable(std::initializer_list<LOG_TAGS> tags)
+bool Logger::isReportable(const std::initializer_list<LOG_TAGS>& tags)
 {
 	bool accept = false;
 	bool reject = false;
@@ -67,9 +56,9 @@ bool Logger::isReportable(std::initializer_list<LOG_TAGS> tags)
 	return accept || !reject;
 }
 
-void Logger::report(LogMessage* msg)
+void Logger::report(LogMessage& msg)
 {
-	std::cout << std::setfill(' ') << std::setw(6) << msg->stamp << " " << msg->message << std::endl;
+	std::cout << std::setfill(' ') << std::setw(6) << msg.stamp << " " << msg.message << std::endl;
 }
 
 void Logger::toggleTag(LOG_TAGS tag)

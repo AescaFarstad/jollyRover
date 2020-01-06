@@ -98,7 +98,7 @@ void Prototypes::postProcess()
 		for(size_t i = 0; i < formation.slots.size(); i++)
 		{
 			std::sort(slots.begin(), slots.end(), 
-				[this, slot = formation.slots[i], leader = formation.leader](FormationSlotProto& a, FormationSlotProto& b)
+				[slot = formation.slots[i], leader = formation.leader](FormationSlotProto& a, FormationSlotProto& b)
 				{					
 					if (a.index == slot.index)
 						return false;

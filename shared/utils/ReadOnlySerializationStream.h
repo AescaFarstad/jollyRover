@@ -7,8 +7,8 @@ class ReadOnlySerializationStream :
 {
 public:
 	ReadOnlySerializationStream(const char* data, size_t length);
-	~ReadOnlySerializationStream();
+	~ReadOnlySerializationStream() override;
 
-	void write(const char* data, size_t length);
+	void write(const char* data, size_t length) override;
 };
 

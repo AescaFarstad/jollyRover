@@ -2,18 +2,14 @@
 #include <SerializeSimpleTypes.h>
 #include <cmath>
 
-SerializationStream::SerializationStream(StreamGrower* grower)
+SerializationStream::SerializationStream(std::unique_ptr<StreamGrower> grower)
 {
-	this->m_grower = grower;
-	if (grower)
-		m_grower->grow(this, 0);
+	m_grower = std::move(grower);
+	m_grower->grow(this, 0);
 }
 
 SerializationStream::~SerializationStream()
-{
-	if (m_grower)
-		delete m_grower;
-		
+{		
 	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
 		delete m_blocks[i];
@@ -29,9 +25,6 @@ SerializationStream& SerializationStream::operator=(SerializationStream&& that)
 {
 	if (this != &that)
 	{
-		if (m_grower)
-			delete m_grower;
-		
 		for (size_t i = 0; i < m_blocks.size(); i++)
 		{
 			delete m_blocks[i];
@@ -39,7 +32,7 @@ SerializationStream& SerializationStream::operator=(SerializationStream&& that)
 		
 		m_blocks = std::move(that.m_blocks);
 		m_totalLength = that.m_totalLength;
-		m_grower = that.m_grower;
+		m_grower = std::move(that.m_grower);
 		m_cursor = that.m_cursor;
 		
 		auto iter = std::find(that.m_blocks.begin(), that.m_blocks.end(), that.m_cursor.block);
@@ -126,7 +119,7 @@ char* SerializationStream::nullTerminate(char* source, size_t length)
 	return result;
 }
 
-char* SerializationStream::peek()
+const char* SerializationStream::peek()
 {
 	return &m_cursor.block->block[m_cursor.index];
 }
@@ -310,7 +303,7 @@ void SerializationStream::serialize(SerializationStream& stream) const
 
 SerializationStream SerializationStream::createExp(size_t base, size_t exponent)
 {
-	return SerializationStream(new StreamGrowerExp(base, exponent));
+	return SerializationStream(std::make_unique<StreamGrowerExp>(base, exponent));
 }
 
 void SerializationStream::grow(size_t blockSize)
@@ -349,14 +342,6 @@ CharBlock* SerializationStream::getNextBlock(CharBlock* currentBlock)
 	return nullptr;
 }
 
-StreamGrower::StreamGrower()
-{
-}
-
-StreamGrower::~StreamGrower()
-{
-}
-
 void StreamGrower::grow(SerializationStream * stream, size_t minimum)
 {
 	stream->grow(minimum);
@@ -376,10 +361,6 @@ StreamGrowerExp::StreamGrowerExp(size_t base, size_t exponent)
 {
 	this->base = base;
 	this->exponent = exponent;
-}
-
-StreamGrowerExp::~StreamGrowerExp()
-{
 }
 
 void StreamGrowerExp::grow(SerializationStream * stream, size_t minimum)

@@ -17,11 +17,11 @@
 class Game
 {
 public:
-	Game(GPU_Target* screen);
+	Game() = default;
 	~Game();
 
-	void initRenderer(GPU_Target* screen);
-	void load();
+	void init(GPU_Target* screen);
+	void start();
 	void update();
 	void handleEvent(SDL_Event* event);
 	void loadPrototypes();
@@ -33,7 +33,7 @@ private:
 	TaskManager m_taskManager;
 	Prototypes m_prototypes;
 	
-	GPU_Image* m_image;	
+	GPU_Image* m_atlas;	
 	Renderer m_renderer;
 	SDL_Window* m_window;
 	

@@ -23,7 +23,7 @@ void InputImpulseMessage::serialize(SerializationStream& stream) const
 	Serializer::write(impulse, stream);
 }
 
-std::string InputImpulseMessage::getName()
+std::string InputImpulseMessage::getName() const
 {
 	return "I-impl";
 }

@@ -8,16 +8,12 @@ LoopBackNetwork::LoopBackNetwork(GameUpdater* gameUpdater)
 	idCounter = 0;
 }
 
-LoopBackNetwork::~LoopBackNetwork()
-{
-}
-
 void LoopBackNetwork::connect()
 {
 	timeSync.addMeasurement(0, 0, 0);
 	GenericRequestMessage grm;
 	grm.request = REQUEST_TYPE::REQUEST_GREETING;
-	addToIncoming(&grm);
+	addToIncoming(grm);
 }
 
 void LoopBackNetwork::update()
@@ -38,16 +34,20 @@ void LoopBackNetwork::update()
 	}
 }
 
-void LoopBackNetwork::send(NetworkPacket* packet)
+void LoopBackNetwork::send(const NetworkPacket& packet)
 {
 	std::unique_ptr<NetworkMessage> msg = factory.parse(packet);
-	send(msg.get());
+	send(*msg);
 }
 
-void LoopBackNetwork::send(NetworkMessage* message)
+void LoopBackNetwork::send(const NetworkMessage& message)
 {
-	message->login = LOGIN;
-	switch (message->typeId)
+	NetworkPacket tmpPacket;
+	tmpPacket.setPayloadFromSerializable(message);
+	auto copy = factory.parse(tmpPacket);
+	
+	copy->login = LOGIN;
+	switch (copy->typeId)
 	{
 		case MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG:
 		case MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG:
@@ -58,16 +58,15 @@ void LoopBackNetwork::send(NetworkMessage* message)
 		case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG:
 		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
 		{
-			InputMessage* iMsg = dynamic_cast<InputMessage*>(message);
+			InputMessage* iMsg = dynamic_cast<InputMessage*>(copy.get());
 			iMsg->serverStamp = gameUpdater->state->timeStamp;
 			iMsg->serverId = idCounter++;
-			addToIncoming(message);
+			addToIncoming(*copy);
 			break;
 		}
 		case MESSAGE_TYPE::TYPE_REQUEST_MSG:
 		{
-			GenericRequestMessage* t = dynamic_cast<GenericRequestMessage*>(message);
-			std::unique_ptr<GenericRequestMessage> genericRequestMsg = std::make_unique<GenericRequestMessage>(*t);
+			GenericRequestMessage* genericRequestMsg = dynamic_cast<GenericRequestMessage*>(copy.get());
 			switch (genericRequestMsg->request)
 			{
 				case REQUEST_TYPE::REQUEST_JOIN_GAME:
@@ -76,13 +75,13 @@ void LoopBackNetwork::send(NetworkMessage* message)
 					GameState tempState(1934);
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
 					gsMsg.state = &tempState;
-					addToIncoming(&gsMsg);
+					addToIncoming(gsMsg);
 
 					InputPlayerJoinedMessage pjMsg;
 					pjMsg.serverId = idCounter++;
 					pjMsg.serverStamp = tempState.timeStamp;
 					pjMsg.login = genericRequestMsg->login;
-					addToIncoming(&pjMsg);
+					addToIncoming(pjMsg);
 					break;
 				}
 				case REQUEST_TYPE::REQUEST_GAME_STATE:
@@ -90,7 +89,7 @@ void LoopBackNetwork::send(NetworkMessage* message)
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
 					gsMsg.state = gameUpdater->state.get(); 
-					addToIncoming(&gsMsg);
+					addToIncoming(gsMsg);
 					break;
 				}
 				case REQUEST_TYPE::REQUEST_PING:
@@ -98,7 +97,7 @@ void LoopBackNetwork::send(NetworkMessage* message)
 					GenericRequestMessage grMsg;
 					grMsg.request = REQUEST_TYPE::REQUEST_PONG;
 					grMsg.inResponseTo = genericRequestMsg->initiator_id;
-					addToIncoming(&grMsg);
+					addToIncoming(grMsg);
 					break;
 				}
 				default:
@@ -111,26 +110,26 @@ void LoopBackNetwork::send(NetworkMessage* message)
 		}
 		case MESSAGE_TYPE::TYPE_GREETING_MSG:
 		{
-			GreetingMessage* gMsg = dynamic_cast<GreetingMessage*>(message);
+			GreetingMessage* gMsg = dynamic_cast<GreetingMessage*>(copy.get());
 			gMsg->login = LOGIN;
 			gMsg->password = {1, 2, 3, 4, 5};
-			addToIncoming(message);
+			addToIncoming(*copy);
 			break;
 		}
 		default:
 		{
-			S::log.add("Message type not handled: " + std::to_string((int)message->typeId), {LOG_TAGS::ERROR_});
+			S::log.add("Message type not handled: " + std::to_string((int16_t)copy->typeId), {LOG_TAGS::ERROR_});
 			break;
 		}
 	}
 }
 
 
-void LoopBackNetwork::addToIncoming(NetworkMessage* message)
+void LoopBackNetwork::addToIncoming(NetworkMessage& message)
 {
-	message->login = LOGIN;
-	message->stamp = SDL_GetTicks();
-	message->inResponseTo = message->initiator_id;
+	message.login = LOGIN;
+	message.stamp = SDL_GetTicks();
+	message.inResponseTo = message.initiator_id;
 	NetworkPacket* newPacket = new NetworkPacket();
 	buffer.push_back(newPacket);
 	newPacket->setPayloadFromSerializable(message);

@@ -8,11 +8,11 @@
 
 
 
-class ConsequtiveTask : public Task
+class ConsecutiveTask : public Task
 {
 public:
-	ConsequtiveTask();
-	~ConsequtiveTask();
+	ConsecutiveTask();
+	~ConsecutiveTask();
 
 	void exec();
 	void update() override;
@@ -44,10 +44,10 @@ private:
 		SUB_TASK
 	};
 
-	struct ConsequtiveSubTask
+	struct ConsecutiveSubTask
 	{
-		ConsequtiveSubTask();
-		~ConsequtiveSubTask();
+		ConsecutiveSubTask();
+		~ConsecutiveSubTask();
 
 		SUB_TASK_TYPE type;
 		std::string name;
@@ -57,5 +57,5 @@ private:
 		std::function<bool()> repeatedFunction;
 		Task* subTask;
 	}; 
-	std::vector<ConsequtiveSubTask> subTasks;
+	std::vector<ConsecutiveSubTask> subTasks;
 };

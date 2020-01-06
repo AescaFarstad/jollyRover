@@ -2,7 +2,7 @@
 
 Network::Network()
 {
-	packetReader = new PacketReader(&socket, getNewPacket, [this]() {
+	packetReader = std::make_unique<PacketReader>(&socket, getNewPacket, [this]() {
 		activeSockets = SDLNet_CheckSockets(socketSet, 0);
 		if (activeSockets == -1)
 		{
@@ -32,11 +32,6 @@ Network::Network()
 	binder.bind(std::move(binding));
 
 	//----------------------------------
-}
-
-Network::~Network()
-{
-	delete packetReader;
 }
 
 void Network::connect()
@@ -85,7 +80,7 @@ void Network::update()
 	}
 }
 
-void Network::send(NetworkPacket* packet)
+void Network::send(const NetworkPacket& packet)
 {
 	if (socket == nullptr)
 	{
@@ -93,25 +88,23 @@ void Network::send(NetworkPacket* packet)
 	}
 	else
 	{
-		SDLNet_TCP_Send(socket, packet->rawData, packet->rawSize);
+		SDLNet_TCP_Send(socket, packet.rawData, packet.rawSize);
 	}
 }
 
-void Network::send(NetworkMessage* msg)
+void Network::send(const NetworkMessage& msg)
 {
-	msg->initiator_id = NetworkMessage::getMessageId();
-
 	std::unique_ptr<NetworkPacket> packet = getNewPacket();
 	packet->setPayloadFromSerializable(msg);
 
-	S::log.add("SEND " + msg->getName() + " " + std::to_string(packet->payloadSize) + ":\n\t" +
+	S::log.add("SEND " + msg.getName() + " " + std::to_string(packet->payloadSize) + ":\n\t" +
 		Serializer::toHex(packet->payload, packet->payloadSize),
 		{ LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
-	S::log.add("SEND " + msg->getName() + "[" + std::to_string(packet->payloadSize) + "]",
+	S::log.add("SEND " + msg.getName() + "[" + std::to_string(packet->payloadSize) + "]",
 		{ LOG_TAGS::NET_BRIEF });
 
-	requestTimeByInitiatorId[msg->initiator_id] = SDL_GetTicks();
-	send(packet.get());
+	requestTimeByInitiatorId[msg.initiator_id] = SDL_GetTicks();
+	send(*packet);
 }
 
 std::unique_ptr<NetworkMessage> Network::poll()
@@ -136,7 +129,7 @@ std::unique_ptr<NetworkMessage> Network::poll()
 	auto result = processIncomingPacket(std::move(packet));
 	
 	if (result)
-		return std::move(result);
+		return result;
 	else return poll();
 }
 
@@ -146,7 +139,7 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 		Serializer::toHex(packet->payload, packet->payloadSize),
 		{ LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
 
-	std::unique_ptr<NetworkMessage> resultMessage = factory.parse(packet.get());
+	std::unique_ptr<NetworkMessage> resultMessage = factory.parse(*packet);
 
 	//auto t = requestTimeByInitiatorId[resultMessage->inResponseTo];
 	int32_t ticks = SDL_GetTicks();

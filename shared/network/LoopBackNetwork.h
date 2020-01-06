@@ -8,14 +8,12 @@ class LoopBackNetwork : public Network
 {
 public:
 	LoopBackNetwork(GameUpdater* gameUpdater);
-	virtual ~LoopBackNetwork();
-
-
+	virtual ~LoopBackNetwork() = default;
 
 	virtual void connect() override;
 	virtual void update() override;
-	virtual void send(NetworkPacket* packet) override;
-	virtual void send(NetworkMessage* msg) override;
+	virtual void send(const NetworkPacket& packet) override;
+	virtual void send(const NetworkMessage& msg) override;
 	
 
 private:
@@ -23,7 +21,7 @@ private:
 	GameUpdater* gameUpdater;
 	int16_t idCounter;
 	
-	void addToIncoming(NetworkMessage* msg);
+	void addToIncoming(NetworkMessage& msg);
 	
 	const int16_t LOGIN = 102;
 };

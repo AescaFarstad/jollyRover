@@ -24,7 +24,7 @@ void InputPlayerLeftMessage::serialize(SerializationStream& stream) const
 	Serializer::write(login, stream);
 }
 
-std::string InputPlayerLeftMessage::getName()
+std::string InputPlayerLeftMessage::getName() const
 {
 	return "I-left";
 }

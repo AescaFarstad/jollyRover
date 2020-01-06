@@ -16,7 +16,7 @@
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
-      "preLaunchTask": "em lc",
+      "preLaunchTask": "lc",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb and add better child debugging",
@@ -40,7 +40,7 @@
       "environment": [],
       "externalConsole": false,
       "MIMode": "gdb",
-      "preLaunchTask": "em s",
+      "preLaunchTask": "s",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb and add better child debugging",
@@ -64,7 +64,7 @@
 		"request": "launch",
 		"program": "${workspaceFolder}/out/local",
 		"args": [],
-		"preLaunchTask": "em lc",
+		"preLaunchTask": "lc",
 	}
   ]
 }

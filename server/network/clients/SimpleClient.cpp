@@ -1,12 +1,13 @@
 #include <SimpleClient.h>
 
+SimpleClient::SimpleClient(std::function< int() > globalSocketNudgeFunction) : NetworkClient(globalSocketNudgeFunction){}
 
-void SimpleClient::sendMessage(NetworkMessage* msg)
+void SimpleClient::sendMessage(const NetworkMessage& msg)
 {
 	NetworkPacket packet;
 	packet.setPayloadFromSerializable(msg);
 
-	logSend(msg->getName(), packet);
+	logSend(msg.getName(), packet);
 
 	auto sentSize = SDLNet_TCP_Send(socket, packet.rawData, packet.rawSize);
 	if (packet.rawSize != sentSize)

@@ -24,7 +24,7 @@ void InputDebugMessage::serialize(SerializationStream& stream) const
 	Serializer::write(coords, stream);
 }
 
-std::string InputDebugMessage::getName()
+std::string InputDebugMessage::getName() const
 {
 	return "I-dbga";
 }

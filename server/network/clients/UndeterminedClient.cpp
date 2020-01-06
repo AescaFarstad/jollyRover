@@ -1,4 +1,5 @@
 #include <UndeterminedClient.h>
+#include <Global.h>
 
 
 
@@ -9,11 +10,6 @@ UndeterminedClient::UndeterminedClient(
 	this->onClientDetermined = onClientDetermined;
 	isSimpleClient = false;
 	state = NETWORK_CLIENT_STATE::UNDETERMINED;
-}
-
-
-UndeterminedClient::~UndeterminedClient()
-{
 }
 
 std::unique_ptr<NetworkPacket> UndeterminedClient::poll()
@@ -43,7 +39,5 @@ std::unique_ptr<NetworkPacket> UndeterminedClient::poll()
 	return nullptr;
 }
 
-void UndeterminedClient::clear()
-{
-
-}
+void UndeterminedClient::sendMessage(const NetworkMessage& msg){THROW_FATAL_ERROR("Cannot send messages to the UndeterminedClient");}
+void UndeterminedClient::sendMessage(const char* payload, size_t size){THROW_FATAL_ERROR("Cannot send messages to the UndeterminedClient");}

@@ -6,15 +6,10 @@ int32_t NetworkMessage::idCounter = 1;
 
 NetworkMessage::NetworkMessage()
 {
-	initiator_id = -1;
+	initiator_id = getMessageId();
 	typeId = MESSAGE_TYPE::TYPE_UNINITIALIZED;
 	stamp = 0;
 	inResponseTo = -1;
-}
-
-
-NetworkMessage::~NetworkMessage()
-{
 }
 
 void NetworkMessage::deserialize(SerializationStream& stream)
@@ -35,7 +30,7 @@ void NetworkMessage::serialize(SerializationStream& stream) const
 	Serializer::write(inResponseTo, stream);
 }
 
-std::string NetworkMessage::getName()
+std::string NetworkMessage::getName() const
 {
 	return "NetMsg";
 }

@@ -34,7 +34,7 @@ inline void InputRouteMessage::serialize(SerializationStream &stream) const
 	//S::log.add("post ser result: " + h);
 }
 
-inline std::string InputRouteMessage::getName()
+inline std::string InputRouteMessage::getName() const
 {
 	return "I-rout";
 }

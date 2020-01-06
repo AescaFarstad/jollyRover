@@ -81,7 +81,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			InputTimeMessage timeMsg;
 			timeMsg.allowSteps = 1;	
 			timeMsg.modifyAllowSteps = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::TIME_STEP5 :
@@ -89,7 +89,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			InputTimeMessage timeMsg;
 			timeMsg.allowSteps = 5;	
 			timeMsg.modifyAllowSteps = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::TIME_STEP25 :
@@ -97,7 +97,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			InputTimeMessage timeMsg;
 			timeMsg.allowSteps = 25;	
 			timeMsg.modifyAllowSteps = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		
@@ -108,7 +108,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			timeMsg.forcedStepsAtOnce = 1;
 			timeMsg.modifyForcedTimeScale = true;
 			timeMsg.modifyForcedStepsAtOnce = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_1 :
@@ -118,7 +118,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			timeMsg.forcedStepsAtOnce = 1;
 			timeMsg.modifyForcedTimeScale = true;
 			timeMsg.modifyForcedStepsAtOnce = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_5 :
@@ -128,7 +128,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			timeMsg.forcedStepsAtOnce = 3;
 			timeMsg.modifyForcedTimeScale = true;
 			timeMsg.modifyForcedStepsAtOnce = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::TIME_SCALE_T_10 :
@@ -138,7 +138,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			timeMsg.forcedStepsAtOnce = 10;
 			timeMsg.modifyForcedTimeScale = true;
 			timeMsg.modifyForcedStepsAtOnce = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		
@@ -151,7 +151,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			timeMsg.modifyStepsAtOnce = true;
 			timeMsg.allowSteps = -1;
 			timeMsg.modifyAllowSteps = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::TIME_SCALE1 :
@@ -163,7 +163,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			timeMsg.modifyStepsAtOnce = true;
 			timeMsg.allowSteps = -1;
 			timeMsg.modifyAllowSteps = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::TIME_SCALE5 :
@@ -175,7 +175,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			timeMsg.modifyStepsAtOnce = true;
 			timeMsg.allowSteps = -1;
 			timeMsg.modifyAllowSteps = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::TIME_TOGGLE_PAUSE :
@@ -183,7 +183,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			InputTimeMessage timeMsg;
 			timeMsg.allowSteps = gameUpdater.state->time.allowedSteps > 0 ? -1 : 0;
 			timeMsg.modifyAllowSteps = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::REVERT1 :
@@ -193,7 +193,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			if (!state)
 				return;
 			state->serialize(loadMsg.state);
-			network.send(&loadMsg);
+			network.send(loadMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::REVERT5 :
@@ -203,7 +203,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			if (!state)
 				return;
 			state->serialize(loadMsg.state);
-			network.send(&loadMsg);
+			network.send(loadMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::REVERT25 :
@@ -213,7 +213,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			if (!state)
 				return;
 			state->serialize(loadMsg.state);
-			network.send(&loadMsg);
+			network.send(loadMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::REVERT125 :
@@ -223,7 +223,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			if (!state)
 				return;
 			state->serialize(loadMsg.state);
-			network.send(&loadMsg);
+			network.send(loadMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::REVERT_FULL :
@@ -231,7 +231,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			LoadGameMessage loadMsg;
 			auto state = gameUpdater.getFirstState();
 			state->serialize(loadMsg.state);
-			network.send(&loadMsg);
+			network.send(loadMsg);
 			break;
 		};
 		case GAME_KEYBOARD_ACTIONS::RIGHT :
@@ -242,7 +242,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			InputActionMessage im;
 
 			im.downedButtons.push_back((int8_t)code);
-			network.send(&im);
+			network.send(im);
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::SAVE_GAME :
@@ -275,42 +275,42 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			LoadGameMessage loadMsg;
 			auto state = gameUpdater.getFirstState();
 			S::persistentStorage.savedState->serialize(loadMsg.state);
-			network.send(&loadMsg);
+			network.send(loadMsg);
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::ADD_AI :
 		{			
 			InputImpulseMessage msg;
 			msg.impulse = INPUT_IMPULSE::ADD_AI;
-			network.send(&msg);
+			network.send(msg);
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::CLEAR_AI :
 		{			
 			InputImpulseMessage msg;
 			msg.impulse = INPUT_IMPULSE::CLEAR_AI;
-			network.send(&msg);
+			network.send(msg);
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::TOGGLE_AI :
 		{			
 			InputImpulseMessage msg;
 			msg.impulse = INPUT_IMPULSE::TOGGLE_AI;
-			network.send(&msg);
+			network.send(msg);
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::ACT_AI :
 		{
 			auto route = AI::getRandomWalk(gameUpdater.state.get(), gameUpdater.prototypes);
 			InputRouteMessage msg(route);
-			network.send(&msg);
+			network.send(msg);
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::TMP_DEBUG :
 		{
 			InputImpulseMessage msg;
 			msg.impulse = INPUT_IMPULSE::TMP_DEBUG;
-			network.send(&msg);	
+			network.send(msg);	
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::BOOM :
@@ -318,28 +318,28 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			InputDebugMessage msg;
 			msg.action = DEBUG_ACTION::BOOM;
 			msg.coords = context.mouseCoords;
-			network.send(&msg);	
+			network.send(msg);	
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::KILL_LEFT :
 		{
 			InputDebugMessage msg;
 			msg.action = DEBUG_ACTION::KILL_LEFT;
-			network.send(&msg);	
+			network.send(msg);	
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::KILL_RIGHT :
 		{
 			InputDebugMessage msg;
 			msg.action = DEBUG_ACTION::KILL_RIGHT;
-			network.send(&msg);	
+			network.send(msg);	
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::RETREAT :
 		{
 			InputDebugMessage msg;
 			msg.action = DEBUG_ACTION::RETREAT;
-			network.send(&msg);	
+			network.send(msg);	
 			break;
 		}
 		case GAME_KEYBOARD_ACTIONS::TRACE_POINT :
@@ -398,7 +398,7 @@ void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, const KeyboardInputContex
 			timeMsg.forcedStepsAtOnce = -1;
 			timeMsg.modifyForcedTimeScale = true;
 			timeMsg.modifyForcedStepsAtOnce = true;
-			network.send(&timeMsg);
+			network.send(timeMsg);
 			}
 			break;
 			
@@ -440,7 +440,7 @@ void GameKeyboardInput::onKeyUp(SDL_Scancode scancode, const KeyboardInputContex
 			InputActionMessage im;
 
 			im.uppedButtons.push_back((int8_t)code);
-			network.send(&im);
+			network.send(im);
 			break;
 		}
 		default:

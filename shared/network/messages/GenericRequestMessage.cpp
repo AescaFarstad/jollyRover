@@ -26,7 +26,7 @@ void GenericRequestMessage::serialize(SerializationStream& stream) const
 	Serializer::write(request, stream);
 }
 
-std::string GenericRequestMessage::getName()
+std::string GenericRequestMessage::getName() const
 {
 	return "GenReq";
 }

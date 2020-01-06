@@ -31,7 +31,7 @@ void GameStateMessage::serialize(SerializationStream& stream) const
 }
 
 
-std::string GameStateMessage::getName()
+std::string GameStateMessage::getName() const
 {
 	return "GState";
 }

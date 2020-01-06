@@ -38,7 +38,7 @@
 			"id": 1,
 			"spawn": { "x1":-50, "y1":100, "x2":150, "y2":620  },
 			"freq":[10, 200],
-			"alwaysOn":false
+			"alwaysOn":true
 		},
 		{
 			"id": 2,

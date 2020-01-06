@@ -18,7 +18,7 @@ void InputMessage::serialize(SerializationStream& stream) const
 	Serializer::write(serverStamp, stream);
 }
 
-std::string InputMessage::getName()
+std::string InputMessage::getName() const
 {
 	return "I-abst";
 }

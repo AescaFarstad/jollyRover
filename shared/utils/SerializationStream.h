@@ -18,7 +18,8 @@ class SerializationStream
 {
 	friend class StreamGrower;
 public:
-	SerializationStream(StreamGrower* m_grower = nullptr);
+	SerializationStream() = default;
+	SerializationStream(std::unique_ptr<StreamGrower> grower);
 	virtual ~SerializationStream();
 	
 	//TODO copy constructors
@@ -35,13 +36,13 @@ public:
 	char* readAllAsHex();
 	char* readAllAsHex_c();
 	char* readAllAsBase64();
-	char* peek();
+	const char* peek();
 	void seekAbsolute(size_t position);
 	void seekRelative(size_t position);
 	void seekEnd();
 	size_t getLength();
 
-	void write(const char* data, size_t length);
+	virtual void write(const char* data, size_t length);
 	
 	void deserialize(SerializationStream& stream);
 	void serialize(SerializationStream& stream) const;
@@ -51,7 +52,7 @@ public:
 protected:
 	std::vector<CharBlock*> m_blocks;
 	size_t m_totalLength = 0;
-	StreamGrower* m_grower;
+	std::unique_ptr<StreamGrower> m_grower;
 	BlockCursor m_cursor;
 
 	void grow(size_t blockSize); 
@@ -77,8 +78,8 @@ public:
 class StreamGrower
 {
 public:
-	StreamGrower();
-	virtual ~StreamGrower();
+	StreamGrower() = default;
+	virtual ~StreamGrower() = default;
 
 	virtual void grow(SerializationStream* stream, size_t minimum);
 	size_t getBlockCount(SerializationStream* stream);
@@ -92,7 +93,7 @@ class StreamGrowerExp : public StreamGrower
 {
 public:
 	StreamGrowerExp(size_t base, size_t exponent);
-	~StreamGrowerExp();
+	~StreamGrowerExp() = default;
 
 	virtual void grow(SerializationStream* stream, size_t minimum);
 

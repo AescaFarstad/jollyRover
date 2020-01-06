@@ -8,7 +8,7 @@ class NetworkMessage :
 {
 public:
 	NetworkMessage();
-	virtual ~NetworkMessage();
+	virtual ~NetworkMessage() = default;
 	MESSAGE_TYPE typeId;
 	int32_t initiator_id;
 	int32_t login;
@@ -17,7 +17,7 @@ public:
 
 	virtual void deserialize(SerializationStream& stream);
 	virtual void serialize(SerializationStream& stream) const;
-	virtual std::string getName();
+	virtual std::string getName() const;
 
 	static int32_t getMessageId();
 private: 

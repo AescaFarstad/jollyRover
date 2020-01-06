@@ -10,13 +10,6 @@ NetworkClient::NetworkClient(std::function< int() > globalSocketNudgeFunction)
 	this->globalSocketNudgeFunction = globalSocketNudgeFunction;
 }
 
-
-NetworkClient::~NetworkClient()
-{
-	if (isInitialized)
-		delete packetReader;
-}
-
 std::unique_ptr<NetworkPacket> NetworkClient::poll()
 {
 	if (!isInitialized)
@@ -31,17 +24,9 @@ std::unique_ptr<NetworkPacket> NetworkClient::poll()
 	return std::move(packet);
 }
 
-void NetworkClient::sendMessage(NetworkMessage * msg)
-{
-}
-
-void NetworkClient::sendMessage(const char * payload, size_t size)
-{
-}
-
 void NetworkClient::init()
 {
-	packetReader = new PacketReader(&socket, getPacket, [this]() {
+	packetReader = std::make_unique<PacketReader>(&socket, getPacket, [this]() {
 		int activeSockets = globalSocketNudgeFunction();
 		return activeSockets > 0 && SDLNet_SocketReady(socket); });
 	isInitialized = true;

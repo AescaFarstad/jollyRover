@@ -24,7 +24,7 @@ class Network
 {
 public:
 	Network();
-	virtual ~Network();
+	virtual ~Network() = default;
 
 	NetworkMessageFactory factory;
 	TimeSync timeSync;
@@ -33,8 +33,8 @@ public:
 	
 	virtual void connect();
 	virtual void update();
-	virtual void send(NetworkPacket* packet);
-	virtual void send(NetworkMessage* msg);
+	virtual void send(const NetworkPacket& packet);
+	virtual void send(const NetworkMessage& msg);
 	
 	void interceptOnce(MESSAGE_TYPE messageType, MessageHandler handler);
 	void interceptGenericRequestOnce(REQUEST_TYPE requestType, GenericRequestHandler handler);
@@ -46,7 +46,7 @@ protected:
 private:
 
 	TCPsocket socket;
-	PacketReader* packetReader;
+	std::unique_ptr<PacketReader> packetReader;
 	SDLNet_SocketSet socketSet = SDLNet_AllocSocketSet(1);
 	int activeSockets = 0;
 	bool isConnected = false;

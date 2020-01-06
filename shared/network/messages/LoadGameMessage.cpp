@@ -18,7 +18,7 @@ void LoadGameMessage::serialize(SerializationStream& stream) const
 	Serializer::write(state, stream);
 }
 
-std::string LoadGameMessage::getName()
+std::string LoadGameMessage::getName() const
 {
 	return "I-Load";
 }

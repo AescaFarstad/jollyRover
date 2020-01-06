@@ -41,7 +41,7 @@ void InputTimeMessage::serialize(SerializationStream& stream) const
 	Serializer::write(modifyForcedStepsAtOnce, stream);
 }
 
-std::string InputTimeMessage::getName()
+std::string InputTimeMessage::getName() const
 {
 	return "I-Time";
 }

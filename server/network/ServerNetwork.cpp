@@ -1,5 +1,6 @@
 #include <ServerNetwork.h>
-
+#include <GenericRequestMessage.h>
+#include <GreetingMessage.h>
 
 
 ServerNetwork::ServerNetwork()
@@ -25,21 +26,16 @@ ServerNetwork::ServerNetwork()
 			newClient->state = NETWORK_CLIENT_STATE::GREETING;
 			GenericRequestMessage grm;
 			grm.request = REQUEST_TYPE::REQUEST_GREETING;
-			newClient->sendMessage(&grm);
+			newClient->sendMessage(grm);
 		}
 	};
 
-	onHandshakeDone = [](NetworkClient* client) {
-		client->state = NETWORK_CLIENT_STATE::GREETING;
+	onHandshakeDone = [](NetworkClient& client) {
+		client.state = NETWORK_CLIENT_STATE::GREETING;
 		GenericRequestMessage grm;
 		grm.request = REQUEST_TYPE::REQUEST_GREETING;
-		client->sendMessage(&grm);
+		client.sendMessage(grm);
 	};
-}
-
-
-ServerNetwork::~ServerNetwork()
-{
 }
 
 void ServerNetwork::init()
@@ -55,11 +51,7 @@ void ServerNetwork::init()
 	socketSet = SDLNet_AllocSocketSet(SERVER_CONST::maxNumberOfConnections);
 }
 
-void ServerNetwork::finish()
-{
-}
-
-void ServerNetwork::update(std::unique_ptr<NetworkMessage> externalBuffer[])
+void ServerNetwork::update(MessageBuffer& externalBuffer)
 {
 	handleConnections();
 	handleData(externalBuffer);
@@ -75,7 +67,7 @@ int ServerNetwork::getClientCount()
 	return clientCount;
 }
 
-void ServerNetwork::sendToAllPlaying(NetworkMessage * message)
+void ServerNetwork::sendToAllPlaying(const NetworkMessage& message)
 {
 	for (size_t i = 0; i < clients.size(); i++)
 	{
@@ -97,11 +89,10 @@ void ServerNetwork::addPlayer(int32_t login)
 			clients[i]->state = NETWORK_CLIENT_STATE::PLAYING;
 			break;
 		}
-
 	}
 }
 
-void ServerNetwork::send(NetworkMessage * message, int32_t login)
+void ServerNetwork::send(NetworkMessage& message, int32_t login)
 {
 	for (size_t i = 0; i < clients.size(); i++)
 	{
@@ -109,8 +100,7 @@ void ServerNetwork::send(NetworkMessage * message, int32_t login)
 			continue;
 		if (clients[i]->login == login)
 		{
-			message->stamp = SDL_GetTicks();
-			message->initiator_id = NetworkMessage::getMessageId();
+			message.stamp = SDL_GetTicks();
 			clients[i]->sendMessage(message);
 			return;
 		}
@@ -160,7 +150,7 @@ void ServerNetwork::handleConnections()
 	}
 }
 
-void ServerNetwork::handleData(std::unique_ptr<NetworkMessage> externalBuffer[])
+void ServerNetwork::handleData(MessageBuffer& externalBuffer)
 {
 	int active = SDLNet_CheckSockets(socketSet, 1);
 	if (active <= 0)
@@ -204,11 +194,9 @@ void ServerNetwork::handleData(std::unique_ptr<NetworkMessage> externalBuffer[])
 	}
 }
 
-
-
-void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkClient* client, std::unique_ptr<NetworkMessage> externalBuffer[])
+void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkClient* client, MessageBuffer& externalBuffer)
 {
-	std::unique_ptr<NetworkMessage> msg = factory.parse(packet.get());
+	std::unique_ptr<NetworkMessage> msg = factory.parse(*packet);
 	msg->login = client->login;
 	switch (msg->typeId)
 	{
@@ -235,7 +223,7 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 			client->password = gMsg->password;
 			gMsg->inResponseTo = gMsg->initiator_id;
 			gMsg->stamp = SDL_GetTicks();
-			client->sendMessage(gMsg);
+			client->sendMessage(*gMsg);
 			client->wasConnected = true;
 			client->state = NETWORK_CLIENT_STATE::CONNECTED;
 			break;
@@ -248,7 +236,7 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 	}
 }
 
-void ServerNetwork::addMessageToBuffer(std::unique_ptr<NetworkMessage> msg, std::unique_ptr<NetworkMessage> externalBuffer[])
+void ServerNetwork::addMessageToBuffer(std::unique_ptr<NetworkMessage> msg, MessageBuffer& externalBuffer)
 {
 	for (size_t i = 0; true; i++)
 	{
@@ -282,7 +270,6 @@ bool ServerNetwork::loginExists(int32_t login)
 {
 	for (size_t i = 0; i < clients.size(); i++)
 	{
-
 		if (clients[i] == nullptr)
 			continue;
 		if (clients[i]->login == login)

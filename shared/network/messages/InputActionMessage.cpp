@@ -28,7 +28,7 @@ void InputActionMessage::serialize(SerializationStream& stream) const
 	Serializer::writeVector(uppedButtons, stream);
 }
 
-std::string InputActionMessage::getName()
+std::string InputActionMessage::getName() const
 {
 	return "I-actn";
 }

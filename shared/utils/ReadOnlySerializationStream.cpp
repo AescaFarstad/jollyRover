@@ -5,17 +5,10 @@
 class StreamNoGrower : public StreamGrower
 {
 public:
-	StreamNoGrower()
-	{
-	}
+	StreamNoGrower() = default;
+	~StreamNoGrower() = default;
 
-	~StreamNoGrower()
-	{
-	}
-
-	void grow(SerializationStream * stream, size_t minimum)
-	{
-	}
+	void grow(SerializationStream * stream, size_t minimum) override {THROW_FATAL_ERROR("this stream must not grow");};
 
 private:
 };
@@ -25,7 +18,7 @@ private:
 
 ReadOnlySerializationStream::ReadOnlySerializationStream(const char* data, size_t length)
 {
-	m_grower = new StreamNoGrower();
+	m_grower = std::make_unique<StreamNoGrower>();
 	CharBlock* newBlock = new CharBlock(length);
 	newBlock->block = const_cast<char*>(data);
 	newBlock->occupied = length;

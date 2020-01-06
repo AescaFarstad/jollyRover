@@ -25,7 +25,7 @@ void InputPlayerJoinedMessage::serialize(SerializationStream& stream) const
 	Serializer::write(login, stream);
 }
 
-std::string InputPlayerJoinedMessage::getName()
+std::string InputPlayerJoinedMessage::getName() const
 {
 	return "I-join";
 }

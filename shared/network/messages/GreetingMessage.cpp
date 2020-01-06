@@ -29,7 +29,7 @@ void GreetingMessage::serialize(SerializationStream& stream) const
 	Serializer::writeVector(password, stream);
 }
 
-std::string GreetingMessage::getName()
+std::string GreetingMessage::getName() const
 {
 	return "greetM";
 }

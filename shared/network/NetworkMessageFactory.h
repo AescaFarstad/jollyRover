@@ -8,7 +8,7 @@ class NetworkMessageFactory
 {
 public:
 
-	std::unique_ptr<NetworkMessage> parse(NetworkPacket* packet);
+	std::unique_ptr<NetworkMessage> parse(const NetworkPacket& packet);
 
 	std::unique_ptr<NetworkMessage> pointerByType(MESSAGE_TYPE type);
 	

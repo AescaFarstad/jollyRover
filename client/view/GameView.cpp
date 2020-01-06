@@ -12,6 +12,23 @@
 GameView::GameView()
 {
 	m_loadCount = 0;
+}
+
+GameView::~GameView()
+{
+	if (m_layer1Image)
+		GPU_FreeImage(m_layer1Image);
+	if (m_layer2Image)
+		GPU_FreeImage(m_layer2Image);
+	if (m_layer3Image)
+		GPU_FreeImage(m_layer3Image);
+}
+
+void GameView::init(Renderer* renderer, Prototypes* prototypes)
+{
+	m_screen = renderer->getScreen();
+	m_prototypes = prototypes;
+	m_renderer = renderer;
 	
 	m_layer1Image = loadImage("out/assets/map layer 1.png");
 	m_layer1Image->anchor_x = 0;
@@ -27,36 +44,18 @@ GameView::GameView()
 	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 32);
 	m_fontDebug.load("out/assets/Cousine-Regular.ttf", 18);
 	m_fontDebug_m.load("out/assets/Cousine-Regular.ttf", 12);
+	
+	resolveTextures(prototypes);
 }
-
-GameView::~GameView()
-{
-	if (m_layer1Image)
-		delete m_layer1Image;
-	if (m_layer2Image)
-		delete m_layer2Image;
-	if (m_layer3Image)
-		delete m_layer3Image;
-}
-
 
 GPU_Image* GameView::loadImage(std::string path)
 {
-	GPU_Image* result = GPU_LoadImage(path.c_str());
+	auto result = GPU_LoadImage(path.c_str());
 	if (!result)
  		THROW_FATAL_ERROR("IMG IS NULL")
  	GPU_SetSnapMode(result, GPU_SNAP_NONE);
 	GPU_SetBlending(result, 1);
 	return result;
-}
-
-void GameView::init(Renderer* renderer, Prototypes* prototypes)
-{
-	m_screen = renderer->getScreen();
-	m_prototypes = prototypes;
-	m_renderer = renderer;
-	
-	resolveTextures(prototypes);
 }
 
 void GameView::resolveTextures(Prototypes* prototypes)
@@ -761,15 +760,18 @@ void GameView::drawHUD()
 		m_fontAmaticBold.draw(m_screen, 5.f, vars.fieldHeight - 50, "fps: %.1f", S::fpsMeter.getfps(500));
 		
 	auto player = GameLogic::playerByLogin(m_state, m_login);
-	if (player->repairsLeft > 0)
+	if (player)
 	{
-		int32_t repairs = (player->repairsTotal - player->repairsLeft) * 100 / player->repairsTotal;
-		m_fontAmaticBoldBig.draw(m_screen, vars.fieldWidth / 2, 30, NFont::AlignEnum::CENTER, "Hull repairs: %d%%", repairs);
-	}
-	else if (player->refuelLeft > 0)
-	{
-		int32_t refuels = (player->refuelTotal - player->refuelLeft) * 100 / player->refuelTotal;
-		m_fontAmaticBoldBig.draw(m_screen, vars.fieldWidth / 2, 30, NFont::AlignEnum::CENTER, "Refueling: %d%%", refuels);
+		if (player->repairsLeft > 0)
+		{
+			int32_t repairs = (player->repairsTotal - player->repairsLeft) * 100 / player->repairsTotal;
+			m_fontAmaticBoldBig.draw(m_screen, vars.fieldWidth / 2, 30, NFont::AlignEnum::CENTER, "Hull repairs: %d%%", repairs);
+		}
+		else if (player->refuelLeft > 0)
+		{
+			int32_t refuels = (player->refuelTotal - player->refuelLeft) * 100 / player->refuelTotal;
+			m_fontAmaticBoldBig.draw(m_screen, vars.fieldWidth / 2, 30, NFont::AlignEnum::CENTER, "Refueling: %d%%", refuels);
+		}		
 	}
 }
 

@@ -98,7 +98,7 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int bytesAvaila
 			char* readable = static_cast<char*>(tempBuffer2);
 			
 			Serializer::read(tmp, readable);
-			if (!SystemInfo::instance->isBigEndian)
+			if (!SystemInfo::isBigEndian)
 				Serializer::swapBytes(&tmp);
 			rawPayloadLength = tmp;
 		}
@@ -161,7 +161,7 @@ void WebNetworkPacket::setPayloadFromRawData(const char* newRawData, size_t size
 		
 		uint16_t tmp = payloadSize;
 			
-		if (!SystemInfo::instance->isBigEndian)
+		if (!SystemInfo::isBigEndian)
 			Serializer::swapBytes(&tmp);
 			
 		Serializer::write(tmp, rawData + cursor);

@@ -5,7 +5,7 @@
 #include <SerializationStream.h>
 #include <GreetingMessage.h>
 #include <GenericRequestMessage.h>
-#include <ConsequtiveTask.h>
+#include <ConsecutiveTask.h>
 #include <string>
 #include <istream>
 #include <sstream>
@@ -20,7 +20,15 @@
 #include <GameStateMessage.h>
 #include <GreetingMessage.h>
 
-Game::Game(GPU_Target* screen)
+Game::~Game()
+{
+	if (m_network != nullptr)
+		delete m_network;
+	if (m_atlas != nullptr)
+		GPU_FreeImage(m_atlas);
+}
+
+void Game::init(GPU_Target* screen)
 {
 	loadConfig();
 	loadPrototypes();
@@ -33,53 +41,38 @@ Game::Game(GPU_Target* screen)
 		m_network = new Network();		
 	m_network->connect();
 	
-	initRenderer(screen);
-		
-	m_modes.push_back(&m_gameMode);
-	m_gameMode.init(&m_renderer, &m_prototypes, m_network);
-	m_activeMode = 0;
-	
-	
-	m_modes.push_back(&m_textureMode);
-	m_textureMode.init(&m_renderer, &m_prototypes);
-		
-}
-
-Game::~Game()
-{
-	delete m_network;
-	if (m_image != nullptr)
-		GPU_FreeImage(m_image);
-}
-
-void Game::initRenderer(GPU_Target* screen)
-{
 	m_window = SDL_GetWindowFromID(screen->context->windowID);
 	SDL_SetWindowSize(m_window, m_prototypes.variables.fieldWidth, m_prototypes.variables.fieldHeight);
 	GPU_SetWindowResolution(m_prototypes.variables.fieldWidth, m_prototypes.variables.fieldHeight);
 	SDL_SetWindowPosition(m_window, S::config.window_X, S::config.window_Y);
 	
-	m_image = GPU_LoadImage("out/assets/atlas.png");
- 	if (!m_image)
+	m_atlas = GPU_LoadImage("out/assets/atlas.png");
+ 	if (!m_atlas)
  		THROW_FATAL_ERROR("IMG IS NULL")
- 	GPU_SetSnapMode(m_image, GPU_SNAP_NONE);
-	GPU_SetBlending(m_image, 1);
+ 	GPU_SetSnapMode(m_atlas, GPU_SNAP_NONE);
+	GPU_SetBlending(m_atlas, 1);
 	 
-	m_renderer.init(screen, m_image);
+	m_renderer.init(screen, m_atlas);
+	
+	m_modes.push_back(&m_textureMode);
+	m_textureMode.init(&m_renderer, &m_prototypes);
+	
+	m_gameMode.init(&m_renderer, &m_prototypes, m_network);
+	m_modes.push_back(&m_gameMode);
+	m_activeMode = 1;	
 }
 
-void Game::load()
+void Game::start()
 {
-	auto loadGameTask = std::make_unique<ConsequtiveTask>();
-	//std::unique_ptr<ConsequtiveTask> loadGameTask(new ConsequtiveTask);
+	auto loadGameTask = std::make_unique<ConsecutiveTask>();
+	//std::unique_ptr<ConsecutiveTask> loadGameTask(new ConsecutiveTask);
 
 	loadGameTask->pushAsync([this](std::unique_ptr<Callback> callback) {
 		auto binding = std::make_unique<AnonymousBinding>("wait for greetings prompt from the server and send it");
 
 		auto handleRequest = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this, cb = callback.release()](std::unique_ptr<NetworkMessage> message) {
 
-			GreetingMessage gMsg;
-			m_network->send(&gMsg);
+			m_network->send(GreetingMessage());
 
 			cb->execute();
 			delete cb;
@@ -117,7 +110,7 @@ void Game::load()
 
 		GenericRequestMessage grMsg;
 		grMsg.request = REQUEST_TYPE::REQUEST_PING;
-		m_network->send(&grMsg);
+		m_network->send(grMsg);
 	};
 
 	loadGameTask->pushAsync(ping, "ping1");
@@ -127,7 +120,7 @@ void Game::load()
 	loadGameTask->pushSync([this]() {
 		GenericRequestMessage grMsg;
 		grMsg.request = REQUEST_TYPE::REQUEST_JOIN_GAME;
-		m_network->send(&grMsg);
+		m_network->send(grMsg);
 	}, "request to JOIN_GAME");	
 
 	loadGameTask->pushAsync([this](std::unique_ptr<Callback> callback) {
@@ -345,9 +338,9 @@ void Game::addNetworkBindings()
 
 		GameStateMessage* gameStateMsg = dynamic_cast<GameStateMessage*>(message.get());
 
-		SerializationStream stream1(new StreamGrowerExp(128, 2)),
-			stream2(new StreamGrowerExp(128, 2)),
-			stream3(new StreamGrowerExp(128, 2));
+		SerializationStream stream1 = SerializationStream::createExp();
+		SerializationStream stream2 = SerializationStream::createExp();
+		SerializationStream stream3 = SerializationStream::createExp();
 		Serializer::write(*gameStateMsg->state, stream1);
 		S::log.add("SERVER STATE (" + std::to_string(gameStateMsg->state->timeStamp) + ")\n\t" +
 			Serializer::toHex(stream1.readAll(), stream1.getLength()), { LOG_TAGS::UNIQUE });

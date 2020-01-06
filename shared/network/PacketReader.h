@@ -1,9 +1,7 @@
 #pragma once
 #include <memory>
-
 #include <functional>
 #include <NetworkPacket.h>
-
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL_net.h>
@@ -17,7 +15,6 @@ public:
 	PacketReader(TCPsocket* socket, 
 		std::function< std::unique_ptr<NetworkPacket> () > packetCreateFunction,
 		std::function< bool() > socketNudgeFunction);
-	~PacketReader();
 
 	std::unique_ptr<NetworkPacket> poll();
 	void setDataAvailable(bool value);
@@ -29,7 +26,7 @@ private:
 	int16_t bytesInBuffer;
 	TCPsocket* socket;
 	std::unique_ptr<NetworkPacket> currentPacket;
-	bool lastReadWasExastive;
+	bool lastReadWasExhaustive;
 	bool hasDataAvailable;
 	std::function< std::unique_ptr<NetworkPacket>() > packetCreateFunction;
 	std::function< bool() > socketNudgeFunction;

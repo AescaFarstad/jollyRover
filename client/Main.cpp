@@ -21,14 +21,14 @@
 
 namespace MainInternal
 {
-	const int SCREEN_WIDTH = 640;
-	const int SCREEN_HEIGHT = 480;
+	const int SCREEN_WIDTH = 1280;
+	const int SCREEN_HEIGHT = 720;
 	const int MAX_TIME_PER_FRAME = 100;
 	const int MIN_TIME_PER_FRAME = 5;
 
 	GPU_Target* screen;
 	
-	Game* game;
+	Game game;
 
 	bool isFinished = false;
 	int lastTicks = 0;
@@ -52,7 +52,7 @@ void mainLoop(void*)
 		}
 		else
 		{
-			game->handleEvent(&e);
+			game.handleEvent(&e);
 		}
 	}
 	
@@ -73,7 +73,7 @@ void mainLoop(void*)
 		}*/
 
 		lastTicks = ticks;
-		game->update();
+		game.update();
 		
 		
 		S::fpsMeter.registerFrame(ticks);
@@ -142,7 +142,7 @@ typedef struct EmscriptenWebGLContextAttributes {
 #endif
 
 
-	printf("endiness: %s\n", (SystemInfo::instance->isBigEndian ? "big" : "little"));
+	printf("endiness: %s\n", (SystemInfo::isBigEndian ? "big" : "little"));
 	
 	GPU_SetPreInitFlags(GPU_INIT_DISABLE_VSYNC);
 	screen = GPU_InitRenderer(GPU_RENDERER_GLES_2, SCREEN_WIDTH, SCREEN_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
@@ -158,8 +158,8 @@ typedef struct EmscriptenWebGLContextAttributes {
 	SDL_Window* window = SDL_GetWindowFromID(screen->context->windowID);
 	SDL_SetWindowPosition(window, S::config.window_X, S::config.window_Y);	
 	
-	game = new Game(screen);
-	game->load();
+	game.init(screen);
+	game.start();
 	
 #ifdef __EMSCRIPTEN__
 	printf("EMSCRIPTEN mode\n");

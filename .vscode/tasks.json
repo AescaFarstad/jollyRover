@@ -2,13 +2,14 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "emsc clean",
+            "label": "clean all",
             "type": "shell",
             "command": "make clean",
             "args": [],
             "problemMatcher": [],
             "presentation": {
-                "reveal": "never"
+                "reveal": "never",
+				"revealProblems": "onProblem"
             }
         },
         {
@@ -18,7 +19,8 @@
             "args": [],
             "problemMatcher": [],
             "presentation": {
-                "reveal": "never"
+                "reveal": "never",
+				"revealProblems": "onProblem"
             }
         },
         {
@@ -28,7 +30,8 @@
             "args": [],
             "problemMatcher": [],
             "presentation": {
-                "reveal": "never"
+				"reveal": "never",
+				"revealProblems": "onProblem"
             }
         },
         {
@@ -38,7 +41,8 @@
             "args": [],
             "problemMatcher": [],
             "presentation": {
-                "reveal": "never"
+                "reveal": "never",
+				"revealProblems": "onProblem"
             }
         },
         {
@@ -49,18 +53,20 @@
             "problemMatcher": [],
             "presentation": {
                 "reveal": "always",
-                "panel": "new"
+                "panel": "new",
+				"revealProblems": "onProblem"
             }
         },
         {
-            "label": "em lc",
+            "label": "lc",
             "type": "shell",
             "command": "make local",
             "args": [],
             "problemMatcher": [],
             "presentation": {
                 "reveal": "always",
-                "panel": "new"
+                "panel": "new",
+				"revealProblems": "onProblem"
             },
             "group": {
                 "kind": "build",
@@ -68,14 +74,15 @@
             }
         },
         {
-            "label": "em s",
+            "label": "s",
             "type": "shell",
             "command": "make server",
             "args": [],
             "problemMatcher": [],
             "presentation": {
                 "reveal": "always",
-                "panel": "new"
+                "panel": "new",
+				"revealProblems": "onProblem"
             }
         }
     ]

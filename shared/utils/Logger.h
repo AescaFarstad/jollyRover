@@ -34,16 +34,16 @@ enum class LOG_TAGS : int8_t
 
 struct LogMessage
 {
-	int32_t stamp;
-	std::string message;
+	const uint32_t stamp;
+	const std::string message;
 };
 
 class Logger
 {
 public:
-	Logger();
+	Logger() = default;
 	Logger(std::initializer_list<LOG_TAGS> m_enabledTags, std::initializer_list<LOG_TAGS> m_disabledTags);
-	~Logger();
+	~Logger() = default;
 
 	void add(const std::string& message, std::initializer_list<LOG_TAGS> tags);
 	void add(const std::string& message);
@@ -57,6 +57,6 @@ private:
 	std::vector<LOG_TAGS> m_enabledTags;
 	std::vector<LOG_TAGS> m_disabledTags;
 
-	bool isReportable(std::initializer_list<LOG_TAGS> tags);
-	void report(LogMessage* msg);
+	bool isReportable(const std::initializer_list<LOG_TAGS>& tags);
+	void report(LogMessage& msg);
 };

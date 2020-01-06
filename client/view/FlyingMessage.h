@@ -20,7 +20,7 @@ private:
 	
 	static constexpr int32_t LIFETIME = 2000;
 	static constexpr int32_t MOVEMENT = -170;
-	static constexpr int32_t ACCEL = 3.5;
+	static constexpr float ACCEL = 3.5;
 	static constexpr float FADE_POINT = 0.65;
 	
 

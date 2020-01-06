@@ -12,12 +12,6 @@ PacketReader::PacketReader(TCPsocket* socket,
 	this->socketNudgeFunction = socketNudgeFunction;
 }
 
-
-PacketReader::~PacketReader()
-{
-
-}
-
 std::unique_ptr<NetworkPacket> PacketReader::poll()
 {
 	if (!currentPacket)
@@ -42,7 +36,7 @@ void PacketReader::setDataAvailable(bool value)
 {
 	hasDataAvailable = value;
 	if (value)
-		lastReadWasExastive = false;
+		lastReadWasExhaustive = false;
 }
 
 bool PacketReader::tryToRead()
@@ -58,18 +52,18 @@ bool PacketReader::tryToRead()
 	if (currentPacket->isFullyLoaded())
 		return false;
 
-	//Get new block of data from socket
-	//If last time data in the socket was less than the buffer size -> there isn't anything else, don't try to received anything
-	//If we didn't receive any data during this update -> socket must have some data in it, can receive it once
+	//Get new block of data from the socket
+	//If the last time data in the socket was smaller than the buffer size -> there isn't anything else, don't try to received anything
+	//If no data has been received during this update -> socket must have some data in it, can receive it once
 	//If socket had at least as much data as its buffer size -> we don't know if it has data or not -> need to nudge
-	if (lastReadWasExastive)
+	if (lastReadWasExhaustive)
 		return true;
 
 	if (!hasDataAvailable ? nudgeSocket() : true)
 	{
 		bufferCursor = 0;
 		bytesInBuffer = SDLNet_TCP_Recv(*socket, buffer, BUFFER_SIZE);
-		lastReadWasExastive = bytesInBuffer < BUFFER_SIZE;
+		lastReadWasExhaustive = bytesInBuffer < BUFFER_SIZE;
 		hasDataAvailable = false;
 		return false;
 	}
@@ -81,7 +75,7 @@ bool PacketReader::tryToRead()
 
 bool PacketReader::nudgeSocket()
 {
-	lastReadWasExastive = false;
+	lastReadWasExhaustive = false;
 	return socketNudgeFunction();
 
 }

@@ -3,7 +3,7 @@
 
 
 WebClient::WebClient(
-	std::function<void(NetworkClient* client)> onHttpHandshakeDone, 
+	std::function<void(NetworkClient& client)> onHttpHandshakeDone, 
 	std::function< int() > globalSocketNudgeFunction) : NetworkClient(globalSocketNudgeFunction)
 {
 	this->onHttpHandshakeDone = onHttpHandshakeDone;
@@ -79,7 +79,7 @@ std::unique_ptr<NetworkPacket> WebClient::poll()
 			isHandshakeDone = true;
 
 			delete[] responseHash;
-			onHttpHandshakeDone(this);
+			onHttpHandshakeDone(*this);
 		}
 		return nullptr;
 	}
@@ -87,12 +87,12 @@ std::unique_ptr<NetworkPacket> WebClient::poll()
 }
 
 
-void WebClient::sendMessage(NetworkMessage* msg)
+void WebClient::sendMessage(const NetworkMessage& msg)
 {
 	NetworkPacket packet;
 	packet.setPayloadFromSerializable(msg);
 
-	logSend(msg->getName(), packet);	
+	logSend(msg.getName(), packet);
 
 	WebNetworkPacket wpacket;
 	wpacket.setPayloadFromRawData(packet.rawData, packet.rawSize);
@@ -115,7 +115,7 @@ void WebClient::sendMessage(const char* payload, size_t size)
 
 void WebClient::init()
 {
-	packetReader = new PacketReader(&socket, getPacket, [this]() {
+	packetReader = std::make_unique<PacketReader>(&socket, getPacket, [this]() {
 		return SDLNet_SocketReady(socket); });
 	isInitialized = true;
 }

@@ -17,14 +17,14 @@ class WebClient :
 {
 public:
 	WebClient(
-		std::function<void(NetworkClient* client)> onHttpHandshakeDone,
+		std::function<void(NetworkClient& client)> onHttpHandshakeDone,
 		std::function< int() > globalSocketNudgeFunction);
 	virtual ~WebClient();
 
 	bool isHandshakeDone;
 
 	virtual std::unique_ptr<NetworkPacket> poll();
-	virtual void sendMessage(NetworkMessage* msg);
+	virtual void sendMessage(const NetworkMessage& msg);
 	virtual void sendMessage(const char * payload, size_t size);
 	virtual void init() override;
 
@@ -33,6 +33,6 @@ protected:
 	static std::unique_ptr<NetworkPacket> getPacket();
 
 private:
-	std::function<void(NetworkClient* client)> onHttpHandshakeDone;
+	std::function<void(NetworkClient& client)> onHttpHandshakeDone;
 };
 
