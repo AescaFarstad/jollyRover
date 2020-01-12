@@ -38,17 +38,16 @@ private:
 
 	TCPsocket serverSocketRaw;
 	TCPsocket serverSocketWeb;
-	std::vector<NetworkClient*> clients;
+	std::vector<std::unique_ptr<NetworkClient>> clients;
 	SDLNet_SocketSet socketSet;
 	int clientCount;
 	std::function<void(UndeterminedClient* client)> onClientDetermined;
 	std::function<void(NetworkClient& client)> onHandshakeDone;
-	//void onHandshakeDone(NetworkClient* client);
 	SeededRandom random;
 
 	void handleConnections();
 	void handleData(MessageBuffer& externalBuffer);
-	void handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkClient* client, MessageBuffer& externalBuffer);
+	void handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkClient& client, MessageBuffer& externalBuffer);
 	void addMessageToBuffer(std::unique_ptr<NetworkMessage> msg, MessageBuffer& externalBuffer);
 	void generateNewLogin(int32_t &login);
 	void generateNewPassword(std::vector<int8_t> &password);

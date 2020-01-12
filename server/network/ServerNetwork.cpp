@@ -8,25 +8,20 @@ ServerNetwork::ServerNetwork()
 	clientCount = 0;
 
 	onClientDetermined = [this, &clients = clients, &onHandshakeDone = onHandshakeDone](UndeterminedClient* client) {
-		NetworkClient* newClient = nullptr;
 		if (client->isSimpleClient)
 		{
-			SimpleClient* newSimpleClient = new SimpleClient([this]() {
+			auto newSimpleClient = std::make_unique<SimpleClient>([this]() {
 				return SDLNet_CheckSockets(socketSet, 0);
 			});
-			auto index = std::find(clients.begin(), clients.end(), client);
-			*index = newSimpleClient;
-			newSimpleClient->socket = client->socket;
-			newClient = newSimpleClient;
-		}
-		delete client;
-		if (newClient != nullptr)
-		{
-			//onHandshakeDone(newClient);
-			newClient->state = NETWORK_CLIENT_STATE::GREETING;
+			auto index = std::find_if(clients.begin(), clients.end(), [client](auto& c){ return c.get() == client;});
+			newSimpleClient->socket = client->socket;			
+			newSimpleClient->state = NETWORK_CLIENT_STATE::GREETING;
+			*index = std::move(newSimpleClient); //deletes 'client'
+			
 			GenericRequestMessage grm;
 			grm.request = REQUEST_TYPE::REQUEST_GREETING;
-			newClient->sendMessage(grm);
+			static_cast<SimpleClient*>(index->get())->sendMessage(grm);
+			
 		}
 	};
 
@@ -127,11 +122,11 @@ void ServerNetwork::handleConnections()
 	if (clientSocket)
 	{
 		S::log.add("Client connected R", {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
-		UndeterminedClient* uclient = new UndeterminedClient(onClientDetermined, [this]() {
+		auto uclient = std::make_unique<UndeterminedClient>(onClientDetermined, [this]() {
 			return SDLNet_CheckSockets(socketSet, 0);
 		});
 		uclient->socket = clientSocket;
-		clients.push_back(uclient);
+		clients.push_back(std::move(uclient));
 		SDLNet_TCP_AddSocket(socketSet, clientSocket);
 		clientCount++;
 	}
@@ -140,11 +135,11 @@ void ServerNetwork::handleConnections()
 	if (clientSocket)
 	{
 		S::log.add("Client connected W", { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
-		WebClient* wclient = new WebClient(onHandshakeDone, [this]() {
+		auto wclient = std::make_unique<WebClient>(onHandshakeDone, [this]() {
 			return SDLNet_CheckSockets(socketSet, 0);
 		});
 		wclient->socket = clientSocket;
-		clients.push_back(wclient);
+		clients.push_back(std::move(wclient));
 		SDLNet_TCP_AddSocket(socketSet, clientSocket);
 		clientCount++;
 	}
@@ -166,7 +161,7 @@ void ServerNetwork::handleData(MessageBuffer& externalBuffer)
 			if (packet)
 			{
 				S::log.add("> incoming " + std::to_string(packet->payloadSize) + ":\n\t" + Serializer::toHex(packet->payload, packet->payloadSize), { LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
-				handlePacket(std::move(packet), clients[i], externalBuffer);
+				handlePacket(std::move(packet), *clients[i], externalBuffer);
 			}
 			else
 			{
@@ -187,17 +182,16 @@ void ServerNetwork::handleData(MessageBuffer& externalBuffer)
 
 			S::log.add("Client disconnected " + std::to_string(clients[i]->login), { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
 
-			delete clients[i];
 			clients[i] = nullptr;
 			clientCount--;
 		}
 	}
 }
 
-void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkClient* client, MessageBuffer& externalBuffer)
+void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkClient& client, MessageBuffer& externalBuffer)
 {
 	std::unique_ptr<NetworkMessage> msg = factory.parse(*packet);
-	msg->login = client->login;
+	msg->login = client.login;
 	switch (msg->typeId)
 	{
 		case MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG:
@@ -219,13 +213,13 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 			//TODO check login, password
 			generateNewLogin(gMsg->login);
 			generateNewPassword(gMsg->password);
-			client->login = gMsg->login;
-			client->password = gMsg->password;
+			client.login = gMsg->login;
+			client.password = gMsg->password;
 			gMsg->inResponseTo = gMsg->initiator_id;
 			gMsg->stamp = SDL_GetTicks();
-			client->sendMessage(*gMsg);
-			client->wasConnected = true;
-			client->state = NETWORK_CLIENT_STATE::CONNECTED;
+			client.sendMessage(*gMsg);
+			client.wasConnected = true;
+			client.state = NETWORK_CLIENT_STATE::CONNECTED;
 			break;
 		}
 		default:

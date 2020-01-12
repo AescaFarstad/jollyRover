@@ -1,4 +1,33 @@
 #include <Serializer.h>
+#include <SerializationStream.h>
+
+void Serializer::write(const int64_t& value, std::ostream& stream)
+{
+	char out[8];
+	write(value, out);
+	stream.write(out, 8);
+}
+
+void Serializer::read(int64_t& out, std::istream& stream)
+{
+	char value[8];
+	stream.read(value, 8);
+	read(out, value);
+}
+
+void Serializer::write(const uint64_t& value, std::ostream& stream)
+{
+	char out[8];
+	write(value, out);
+	stream.write(out, 8);
+}
+
+void Serializer::read(uint64_t& out, std::istream& stream)
+{
+	char value[8];
+	stream.read(value, 8);
+	read(out, value);
+}
 
 void Serializer::write(const int32_t& value, std::ostream& stream)
 {
@@ -204,6 +233,32 @@ std::string base64_decode(std::string const& s);*/
 //---------------------------------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------------------------------
 //---------------------------------------------------------------------------------------------------------------------------------------------
+
+void Serializer::write(const int64_t& value, SerializationStream& stream)
+{
+	char out[8];
+	write(value, out);
+	stream.write(out, 8);
+}
+
+void Serializer::read(int64_t& out, SerializationStream& stream)
+{
+	const char* value = stream.read(8);
+	read(out, value);
+}
+
+void Serializer::write(const uint64_t& value, SerializationStream& stream)
+{
+	char out[8];
+	write(value, out);
+	stream.write(out, 8);
+}
+
+void Serializer::read(uint64_t& out, SerializationStream& stream)
+{
+	const char* value = stream.read(8);
+	read(out, value);
+}
 
 void Serializer::write(const int32_t& value, SerializationStream& stream)
 {

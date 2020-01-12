@@ -8,8 +8,6 @@ class SeededRandom
 public:
 	SeededRandom();
 	SeededRandom(uint32_t m_seed);
-	~SeededRandom();
-
 
 	void initFromSeed(uint32_t m_seed);
 	int32_t get(int32_t min, int32_t max);

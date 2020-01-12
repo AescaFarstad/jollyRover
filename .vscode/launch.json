@@ -65,6 +65,14 @@
 		"program": "${workspaceFolder}/out/local",
 		"args": [],
 		"preLaunchTask": "lc",
+	},
+	{
+		"name": "lldb s",
+		"type": "lldb",
+		"request": "launch",
+		"program": "${workspaceFolder}/out/JRserver",
+		"args": [],
+		"preLaunchTask": "s"
 	}
   ]
 }

@@ -1,11 +1,9 @@
 #include <SerializeSimpleTypes.h>
+
 #ifdef __EMSCRIPTEN__
 void Serializer::write(const size_t& value, char buffer[])
 {
-	for(size_t i = 0 ; i < sizeof(size_t); i++)
-	{
-		buffer[i] = (value >> (8 * i)) & 0xff;
-	}
+	write((int64_t)value, buffer);
 }
 #endif
 
@@ -90,16 +88,16 @@ void Serializer::read(std::string& out, const char* value)
 	read(length, value);
 	out.assign(value + sizeof(int16_t), length);
 }
+
 #ifdef __EMSCRIPTEN__
 void Serializer::read(size_t& out, const char* value)
 {
-	out = 0;
-	for(size_t i = 0 ; i < sizeof(size_t); i++)
-	{
-		out += (size_t)(unsigned char)value[i] << (8 * i);
-	}
+	int64_t v;
+	read(v, value);
+	out = v;
 }
 #endif
+
 void Serializer::read(int64_t& out, const char* value)
 {
 	out = (int64_t)(unsigned char)value[0];

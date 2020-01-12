@@ -3,12 +3,14 @@
 #include <vector>
 #include <sstream>
 #include <base64_2.h>
-#include <SerializationStream.h>
 #include <iomanip>
 #include <SerializeSimpleTypes.h>
 
+class SerializationStream;
 namespace Serializer {
 
+	void write(const int64_t& value, std::ostream& stream);
+	void write(const uint64_t& value, std::ostream& stream);
 	void write(const int32_t& value, std::ostream& stream);
 	void write(const uint32_t& value, std::ostream& stream);
 	void write(const int16_t& value, std::ostream& stream);
@@ -18,6 +20,8 @@ namespace Serializer {
 	void write(const float& value, std::ostream& stream);
 	void write(const std::string& value, std::ostream& stream);
 
+	void write(const int64_t& value, SerializationStream& stream);
+	void write(const uint64_t& vavalue, SerializationStream& stream);
 	void write(const int32_t& value, SerializationStream& stream);
 	void write(const uint32_t& value, SerializationStream& stream);
 	void write(const int16_t& value, SerializationStream& stream);
@@ -28,6 +32,8 @@ namespace Serializer {
 	void write(const std::string& value, SerializationStream& stream);
 
 
+	void read(int64_t& out, std::istream& stream);
+	void read(uint64_t& out, std::istream& stream);
 	void read(int32_t& out, std::istream& stream);
 	void read(uint32_t& out, std::istream& stream);
 	void read(int16_t& out, std::istream& stream);
@@ -37,6 +43,8 @@ namespace Serializer {
 	void read(float& out, std::istream& stream);
 	void read(std::string& out, std::istream& stream);
 
+	void read(int64_t& out, SerializationStream& stream);
+	void read(uint64_t& out, SerializationStream& stream);
 	void read(int32_t& out, SerializationStream& stream);
 	void read(uint32_t& out, SerializationStream& stream);
 	void read(int16_t& out, SerializationStream& stream);

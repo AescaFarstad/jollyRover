@@ -18,11 +18,6 @@ void SeededRandom::initFromSeed(uint32_t seed)
 	this->m_seed = seed;
 }
 
-
-SeededRandom::~SeededRandom()
-{
-}
-
 int32_t SeededRandom::get(int32_t min, int32_t max)
 {
 	return (int32_t)(min + get() * (max - min));

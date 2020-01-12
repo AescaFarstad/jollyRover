@@ -1,5 +1,6 @@
 #pragma once
 #include <Serializer.h>
+#include <SerializationStream.h>
 
 class ISerializable
 {

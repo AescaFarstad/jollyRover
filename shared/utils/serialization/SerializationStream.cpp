@@ -1,5 +1,6 @@
 #include <SerializationStream.h>
 #include <SerializeSimpleTypes.h>
+#include <Serializer.h>
 #include <cmath>
 
 SerializationStream::SerializationStream(std::unique_ptr<StreamGrower> grower)
@@ -281,20 +282,18 @@ void SerializationStream::deserialize(SerializationStream& stream)
 	}
 	m_blocks.clear();
 	
-	auto lengthBuffer = stream.read(sizeof(m_totalLength));
-	Serializer::read(m_totalLength, lengthBuffer);	
-	m_grower->grow(this, m_totalLength);
 	
-	write(stream.read(m_totalLength), m_totalLength);
+	int64_t totalLength;
+	Serializer::read(totalLength, stream);
+	m_grower->grow(this, totalLength);
+	
+	write(stream.read(totalLength), totalLength);
 	seekAbsolute(0);
 }
 
 void SerializationStream::serialize(SerializationStream& stream) const
 {
-	char out[sizeof(m_totalLength)];
-	Serializer::write(m_totalLength, out);
-	stream.write(out, sizeof(m_totalLength));
-	
+	Serializer::write((int64_t)m_totalLength, stream);	
 	for(auto& block : m_blocks)
 	{
 		stream.write(block->block, block->occupied); 
