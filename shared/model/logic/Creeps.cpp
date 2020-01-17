@@ -1293,17 +1293,24 @@ namespace Creeps
 					float penetration = (collisionRadius - creep2Creep.getLength()) / 2;
 					if (penetration > 0)
 					{
-						//float direction = creep2Creep.asAngle();
-						int32_t totalWeight = creep.creepProto_->weight + creep2->creepProto_->weight;
-						float force = penetration * prototypes->variables.creepRestitution / totalWeight;
+						float force = penetration * prototypes->variables.creepRestitution;
 						
-						if (creep.unit.force == creep2->unit.force && creep.unit.prototypeId != creep2->unit.prototypeId)
-							force /= 10;
+						/*if (creep.unit.force == creep2->unit.force && creep.unit.prototypeId != creep2->unit.prototypeId)
+							force /= 10;*/
+							
+						float creep1Part = creep2->creepProto_->weight;
+						float creep2Part = creep.creepProto_->weight;
 						
-						creep2Creep.scaleTo(force * creep2->creepProto_->weight);
+						//Scale by how much the movement aligns with the direction the tractor is facing. It's hard to move tractors sideways.
+						if (creep.creepProto_->moveType == MOVE_TYPE::TRACTOR)
+							creep1Part *= std::fabs(creep2Creep * Point::fromAngle(creep.orientation) / creep2Creep.getLength());
+						if (creep2->creepProto_->moveType == MOVE_TYPE::TRACTOR)
+							creep2Part *= std::fabs(creep2Creep * Point::fromAngle(creep2->orientation) / creep2Creep.getLength());
+						
+						creep2Creep.scaleTo(force * creep1Part / (creep1Part + creep2Part));
 						creep.movement_ += creep2Creep;
 						
-						creep2Creep.scaleTo(force * creep.creepProto_->weight);
+						creep2Creep.scaleTo(force * creep2Part / (creep1Part + creep2Part));
 						creep2->movement_ -= creep2Creep;
 						
 					}
