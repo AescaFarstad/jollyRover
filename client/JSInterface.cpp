@@ -81,15 +81,17 @@ extern "C" {
 			case 6: drawSettings.layer3 = !drawSettings.layer3; break;
 			case 7: drawSettings.formations_D = !drawSettings.formations_D; break;
 			case 8: drawSettings.connections_D = !drawSettings.connections_D; break;
-			case 9: drawSettings.explosions = !drawSettings.explosions; break;
-			case 10: drawSettings.debug_D = !drawSettings.debug_D; break;
-			case 11: drawSettings.threat_D = !drawSettings.threat_D; break;
-			case 12: drawSettings.obstacles_D = !drawSettings.obstacles_D; break;
-			case 13: drawSettings.input = !drawSettings.input; break;
-			case 14: drawSettings.hud = !drawSettings.hud; break;
-			case 15: drawSettings.fps_D = !drawSettings.fps_D; break;
-			case 16: drawSettings.timing_D = !drawSettings.timing_D; break;
-			case 17: drawSettings.scores = !drawSettings.scores; break;
+			case 9: drawSettings.formAgro_D = !drawSettings.formAgro_D; break;
+			case 10: drawSettings.explosions = !drawSettings.explosions; break;
+			case 11: drawSettings.debug_D = !drawSettings.debug_D; break;
+			case 12: drawSettings.threat_D = !drawSettings.threat_D; break;
+			case 13: drawSettings.obstacles_D = !drawSettings.obstacles_D; break;
+			case 14: drawSettings.input = !drawSettings.input; break;
+			case 15: drawSettings.hud = !drawSettings.hud; break;
+			case 16: drawSettings.flyingMessage = !drawSettings.flyingMessage; break;
+			case 17: drawSettings.fps_D = !drawSettings.fps_D; break;
+			case 18: drawSettings.timing_D = !drawSettings.timing_D; break;
+			case 19: drawSettings.scores = !drawSettings.scores; break;
 			
 			default:
 				globalLog.add("Wrong draw setting index: " + std::to_string(index), {LOG_TAGS::ERROR_});
@@ -99,8 +101,7 @@ extern "C" {
 	
 	int8_t* EMSCRIPTEN_KEEPALIVE getDrawSettings(int8_t *buf, int bufSize) 
 	{
-		int8_t result[18];
-		
+		int8_t result[20];
 		result[0] = drawSettings.layer1 ? 1 : 0;
 		result[1] = drawSettings.remnants ? 1 : 0;
 		result[2] = drawSettings.layer2 ? 1 : 0;
@@ -110,15 +111,17 @@ extern "C" {
 		result[6] = drawSettings.layer3 ? 1 : 0;
 		result[7] = drawSettings.formations_D ? 1 : 0;
 		result[8] = drawSettings.connections_D ? 1 : 0;
-		result[9] = drawSettings.explosions ? 1 : 0;
-		result[10] = drawSettings.debug_D ? 1 : 0;
-		result[11] = drawSettings.threat_D ? 1 : 0;
-		result[12] = drawSettings.obstacles_D ? 1 : 0;
-		result[13] = drawSettings.input ? 1 : 0;
-		result[14] = drawSettings.hud ? 1 : 0;
-		result[15] = drawSettings.fps_D ? 1 : 0;
-		result[16] = drawSettings.timing_D ? 1 : 0;
-		result[17] = drawSettings.scores ? 1 : 0;
+		result[9] = drawSettings.formAgro_D ? 1 : 0;
+		result[10] = drawSettings.explosions ? 1 : 0;
+		result[11] = drawSettings.debug_D ? 1 : 0;
+		result[12] = drawSettings.threat_D ? 1 : 0;
+		result[13] = drawSettings.obstacles_D ? 1 : 0;
+		result[14] = drawSettings.input ? 1 : 0;
+		result[15] = drawSettings.hud ? 1 : 0;
+		result[16] = drawSettings.flyingMessage ? 1 : 0;
+		result[17] = drawSettings.fps_D ? 1 : 0;
+		result[18] = drawSettings.timing_D ? 1 : 0;
+		result[19] = drawSettings.scores ? 1 : 0;
 		
 		globalLog.add("getDrawSettings " + 
 				std::to_string(result[0]) + "," +
