@@ -240,7 +240,7 @@ namespace GameLogic
 		{
 			auto player = playerByLogin(state, input->login);
 			
-			if (player->refuelLeft > 0 || player->repairsLeft > 0  || player->activeCars.size() > 0)
+			if (!Cars::canLaunchCar(*player))
 			{
 				S::log.add("Attempt to lauch a car before its ready", { LOG_TAGS::GAME });
 				return;

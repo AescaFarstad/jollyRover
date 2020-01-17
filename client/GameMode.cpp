@@ -3,6 +3,8 @@
 GameMode::GameMode()
 {
 	m_isLoaded = false;
+	m_lastAutodrawNotificationStamp = 0;
+	m_numRandomClicks = 0;
 }
 
 void GameMode::init(Renderer* renderer, Prototypes* prototypes, Network* network)
@@ -39,7 +41,6 @@ void GameMode::update(bool isActive)
 		laggingTime = std::max((int64_t)0, laggingTime);
 		m_gameUpdater.update(laggingTime);
 	}
-	
 }
 
 Point GameMode::normalizeMessageLocation(Point location)
@@ -65,6 +66,23 @@ void GameMode::handleRouteInput()
 					break;
 				}
 			}
+			m_routeInput.reset();
+			break;
+		}
+		case ROUTE_STATE::E_RANDOM_CLICK:
+		{
+			//ignores the first click, shows notification no more than once evry few seconds.
+			m_numRandomClicks++;
+			if (m_numRandomClicks != 1)
+			{
+				auto ticks = SDL_GetTicks();
+				if (m_lastAutodrawNotificationStamp + 5000 < ticks)
+				{
+					Point loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
+					m_gameView.addMessage("Hold Left Mouse Button and draw!", loc, NFont::AlignEnum::CENTER);
+					m_lastAutodrawNotificationStamp = ticks;
+				}
+			}			
 			m_routeInput.reset();
 			break;
 		}

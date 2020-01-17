@@ -113,6 +113,11 @@ namespace Cars
 		car.unit.voluntaryMovement = Point(0, 0);
 	}
 	
+	bool canLaunchCar(const PlayerState& player)
+	{
+		return player.activeCars.size() == 0 && player.refuelLeft <= 0 && player.repairsLeft <= 0;
+	}
+	
 	namespace CarsInternal
 	{
 		void updateCar(CarState& car, PlayerState& player, GameState* state, Prototypes* prototypes, int32_t timePassed)

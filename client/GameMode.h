@@ -42,6 +42,9 @@ private:
 	RouteInput m_routeInput;
 	GameKeyboardInput m_keyboardInput;
 	
+	uint32_t m_lastAutodrawNotificationStamp;
+	uint32_t m_numRandomClicks;
+	
 	void handleRouteInput();
 	Point normalizeMessageLocation(Point location);
 

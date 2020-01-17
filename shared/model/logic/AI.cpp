@@ -11,7 +11,7 @@ namespace AI
 	{
 		for(auto& p : state->players)
 		{
-			if (p.isAI && p.activeCars.size() == 0)
+			if (p.isAI && Cars::canLaunchCar(p))
 			{
 				Cars::launchCar(state, &p, getRandomWalk(state, prototypes), prototypes);
 			}

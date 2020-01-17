@@ -8,6 +8,7 @@ RouteInput::RouteInput()
 {
 	m_state = ROUTE_STATE::EMPTY;
 	m_isLoaded = false;
+	m_autoDrawnPoints = 0;
 }
 
 void RouteInput::load(Prototypes* prototypes)
@@ -48,6 +49,7 @@ void RouteInput::onMouseDown(SDL_MouseButtonEvent* event)
 		Point touch(event->x, event->y);
 		m_route.push_back(RoutePoint{Point(event->x, m_prototypes->variables.fieldHeight), true});
 		GameLogic::buildRouteToTarget(touch, m_route, m_prototypes);
+		m_autoDrawnPoints = m_route.size() - 1;
 
 		m_state = ROUTE_STATE::ACTIVE;
 	}
@@ -66,10 +68,15 @@ void RouteInput::onMouseUp(SDL_MouseButtonEvent* event)
 			return;
 		}
 		
+		int32_t originalLength = m_route.size() - m_autoDrawnPoints;
+		
 		RoutePoint finish{Point(event->x, m_prototypes->variables.fieldHeight), true}; //Assumed no obstacles next to the field edge
 		if (!GameLogic::isRouteAnglePositive(m_route, finish.location, m_prototypes))
 		{
-			m_state = ROUTE_STATE::E_GOES_UP;
+			if (originalLength < 2)
+				m_state = ROUTE_STATE::E_RANDOM_CLICK;
+			else
+				m_state = ROUTE_STATE::E_GOES_UP;
 			return;
 		}
 		
@@ -120,4 +127,5 @@ void RouteInput::reset()
 {
 	m_route.clear();
 	m_state = ROUTE_STATE::EMPTY;
+	m_autoDrawnPoints = 0;
 }

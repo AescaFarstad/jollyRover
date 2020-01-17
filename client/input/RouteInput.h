@@ -17,7 +17,8 @@ enum class ROUTE_STATE
 	E_TOO_SHORT,
 	E_TOO_LONG,
 	E_COLLIDES,
-	E_GOES_UP
+	E_GOES_UP,
+	E_RANDOM_CLICK
 };
 
 class RouteInput
@@ -43,6 +44,7 @@ private:
 
 	bool m_isLoaded;	
 	ROUTE_STATE m_state;
+	int32_t m_autoDrawnPoints;
 	
 	Prototypes* m_prototypes;
 	std::vector<RoutePoint> m_route;
