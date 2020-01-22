@@ -204,17 +204,33 @@ void GameView::drawObstacles()
 	}	
 }
 
+void GameView::renderPathStep(Point from, Point to, SequenceDef& dash, SequenceDef& dot, uint32_t rndSeed, float ratio)
+{
+	SeededRandom rnd(rndSeed);
+	{
+		auto& texture = rnd.getFromVector(dash.frames);
+		auto loc = (from + to) / 2;
+		m_renderer->blit(texture, loc, (to - from).asAngle(), 0.5, FMath::lerp_ui8(0, 0xaa, 0.5, 0, ratio));
+	}
+	{
+		auto& texture = rnd.getFromVector(dot.frames);
+		m_renderer->blit(texture, to, rnd.getAngle(), 0.5, FMath::lerp_ui8(0.5, 0xaa, 1, 0, ratio));
+	}
+}
+
 void GameView::drawInput()
 {
-	SDL_Color validColor = ViewUtil::colorFromHex(0x00ff00);
-	SDL_Color invalidColor = ViewUtil::colorFromHex(0xff0000);
-	int rectSize = 6;
 	
 	auto& route = m_routeInput->getRoutePoints();
 
 	for (size_t i = 1; i < route.size(); i++)
 	{
-		bool isValidEdge = route[i].isValid_;
+		auto& dashSeq = route[i].isValid_ ? S::sequences.greenPathDash : S::sequences.redPathDash;
+		auto& dotSeq = route[i].isValid_ ? S::sequences.greenPathDot : S::sequences.redPathDot;
+		renderPathStep(route[i - 1].location, route[i].location, dashSeq, dotSeq, m_login + i, 0);
+		/*
+		SDL_Color validColor = ViewUtil::colorFromHex(0x00ff00);
+		SDL_Color invalidColor = ViewUtil::colorFromHex(0xff0000);
 		SDL_Color& newColor = isValidEdge ? validColor : invalidColor;
 		GPU_Line(m_screen,
 			route[i - 1].location.x,
@@ -227,6 +243,7 @@ void GameView::drawInput()
 		//S::log.add(std::to_string(i) + " draw " + routeInput->route[i - 1].toString() + " -> " + routeInput->route[i].toString());
 
 		SDL_Color& newColor2 = route[i].isValid_ ? validColor : invalidColor;
+		int rectSize = 6;
 
 		GPU_Rectangle(
 			m_screen, 
@@ -236,30 +253,31 @@ void GameView::drawInput()
 			route[i].location.y + rectSize / 2,
 			newColor2
 			);
+		*/
 	}
 }
 
 void GameView::drawCars()
 {
-	SDL_Color myColor = ViewUtil::colorFromHex(0x0000ff);
-	SDL_Color theirColor = ViewUtil::colorFromHex(0x555555);
-	int rectSize = 4;
-
 	for (PlayerState &player : m_state->players)
 	{
 		for (CarState &car : player.activeCars)
 		{
 			if ((size_t)car.routeIndex >= car.route.size() - 1)
 				continue;
-			for (size_t i = car.routeIndex + 1; i < car.route.size(); i++)
+			
+			for (size_t i = car.routeIndex + 2; i < car.route.size(); i++)
 			{
+				SeededRandom rnd(car.unit.id + i);
+				/*
+				int rectSize = 4;
 				GPU_Line(
 					m_screen,
 					car.route[i - 1].x,
 					car.route[i - 1].y,
 					car.route[i].x,
 					car.route[i].y,
-					player.login == m_login ? myColor : theirColor
+					player.login == m_login ? ViewUtil::colorFromHex(0x0000ff) : ViewUtil::colorFromHex(0x555555)
 				);
 				GPU_Rectangle(
 					m_screen,
@@ -267,8 +285,13 @@ void GameView::drawCars()
 					car.route[i].y - rectSize / 2,
 					car.route[i].x + rectSize / 2,
 					car.route[i].y + rectSize / 2,
-					player.login == m_login ? myColor : theirColor
+					player.login == m_login ? ViewUtil::colorFromHex(0x0000ff) : ViewUtil::colorFromHex(0x555555)
 				);
+				*/
+				auto ratio = (i == car.routeIndex + 2) ? car.progress : 0;
+				auto& dashSeq = player.login == m_login ? S::sequences.greenPathDash : S::sequences.grayPathDash;
+				auto& dotSeq = player.login == m_login ? S::sequences.greenPathDot : S::sequences.grayPathDot;
+				renderPathStep(car.route[i - 1], car.route[i], dashSeq, dotSeq, player.login + i, ratio);
 			}
 			auto& proto = m_prototypes->cars[car.unit.prototypeId];			
 			auto& carTexture = player.login == m_login ? 
@@ -678,7 +701,7 @@ void GameView::drawDebugGraphics()
 		GPU_Line(m_screen, loc.x + 5, loc.y - 5, loc.x - 5, loc.y + 5, color);
 		GPU_Circle(m_screen, loc.x, loc.y, 3, color2);
 		
-		m_fontDebug.draw(m_screen, loc.x, loc.y- 20, "mv: %.2f, sp: %.2f / %.2f", selectedCreep->movement_.getLength(), selectedCreep->velocity.getLength(), selectedCreep->creepProto_->speed);
+		//m_fontDebug.draw(m_screen, loc.x, loc.y- 20, "mv: %.2f, sp: %.2f / %.2f", selectedCreep->movement_.getLength(), selectedCreep->velocity.getLength(), selectedCreep->creepProto_->speed);
 	}	
 }
 

@@ -14,12 +14,13 @@ public:
 	int32_t getInt();
 	float get(float min, float max);
 	float get();
+	float getAngle();
 	float peekNext();
 	
 	template <typename T>
 	T& getFromVector(std::vector<T> &vec)
 	{
-		return 	vec[std::floor(get() * vec.size())];
+		return vec[std::floor(get() * vec.size())];
 	}
 
 	void deserialize(SerializationStream& stream);

@@ -16,5 +16,11 @@ public:
 	
 	SequenceDef explosion;
 	SequenceDef explosionSmoke;
+	SequenceDef greenPathDash;
+	SequenceDef greenPathDot;
+	SequenceDef redPathDash;
+	SequenceDef redPathDot;
+	SequenceDef grayPathDash;
+	SequenceDef grayPathDot;
 	
 };
