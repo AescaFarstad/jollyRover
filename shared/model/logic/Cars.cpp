@@ -177,10 +177,12 @@ namespace Cars
 							if (anotherCar.speed > car.speed)
 							{
 								car.unit.health = 0;
+								anotherCar.speed /= 2;
 							}
 							else
 							{
 								anotherCar.unit.health = 0;
+								car.speed /= 2;
 							}
 							
 						}

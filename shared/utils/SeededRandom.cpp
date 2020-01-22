@@ -39,6 +39,11 @@ float SeededRandom::get()
 	return m_seed / 2147483647.0;
 }
 
+float SeededRandom::getAngle()
+{
+	return get(0, M_PI * 2);
+}
+
 float SeededRandom::peekNext()
 {
 	auto saveSeed = m_seed;

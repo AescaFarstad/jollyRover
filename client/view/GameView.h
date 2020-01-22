@@ -75,6 +75,8 @@ private:
 	void drawHUD();
 	void drawFlyingMessages();
 	
+	void renderPathStep(Point from, Point to, SequenceDef& dash, SequenceDef& dot, uint32_t rndSeed, float ratio);
+	
 	GPU_Image* loadImage(std::string path);
 	void resolveTextures(Prototypes* prototypes);
 	

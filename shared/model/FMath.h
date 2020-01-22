@@ -21,7 +21,7 @@ namespace FMath
 	float lerpClipped(float x1, float y1, float x2, float y2, float argument);
 	Point lerp(float x1, Point& p1, float x2, Point& p2, float argument);
 	///Does not overflow
-	uint8_t lerp(float x1, uint8_t y1, float x2, uint8_t y2, float argument);
+	uint8_t lerp_ui8(float x1, uint8_t y1, float x2, uint8_t y2, float argument);
 	std::array<Point, 2> intercept(const Point& origin, const Point& target, const Point& velocity, float speed);
 	float atan2(float y, float x);
 	float angleDelta(float from, float to);

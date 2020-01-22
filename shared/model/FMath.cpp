@@ -34,7 +34,7 @@ Point FMath::lerp(float x1, Point& p1, float x2, Point& p2, float argument)
 	return Point(lerp(x1, p1.x, x2, p2.x, argument), lerp(x1, p1.y, x2, p2.y, argument));
 }
 
-uint8_t FMath::lerp(float x1, uint8_t y1, float x2, uint8_t y2, float argument)
+uint8_t FMath::lerp_ui8(float x1, uint8_t y1, float x2, uint8_t y2, float argument)
 {
 	if (x1 == x2)
 		return y1 == y2 ? y1 : 0;
