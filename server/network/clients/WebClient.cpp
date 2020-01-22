@@ -17,14 +17,14 @@ WebClient::~WebClient()
 
 
 static inline void ltrim(std::string &s) {
-	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int32_t ch) {
 		return !std::isspace(ch);
 	}));
 }
 
 // trim from end (in place)
 static inline void rtrim(std::string &s) {
-	s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+	s.erase(std::find_if(s.rbegin(), s.rend(), [](int32_t ch) {
 		return !std::isspace(ch);
 	}).base(), s.end());
 }
@@ -44,7 +44,7 @@ std::unique_ptr<NetworkPacket> WebClient::poll()
 	else
 	{
 		char buffer[S::config.maxMessageSize];
-		int bytes = SDLNet_TCP_Recv(socket, buffer, S::config.maxMessageSize);
+		int32_t bytes = SDLNet_TCP_Recv(socket, buffer, S::config.maxMessageSize);
 		if (bytes <= 0)
 		{
 			wasDisconnected = true;

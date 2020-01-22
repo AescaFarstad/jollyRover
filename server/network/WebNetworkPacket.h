@@ -11,7 +11,7 @@ public:
 
 	virtual void setPayloadFromRawData(const char* newRawData, size_t size);
 
-	virtual void loadFromRawData(const char* rawData, int bytesAvailable = 4096);
+	virtual void loadFromRawData(const char* rawData, int32_t bytesAvailable = 4096);
 
 
 private:

@@ -52,9 +52,9 @@ SDL_Color FMath::lerp(float x1, SDL_Color& c1, float x2, SDL_Color& c2, float ar
 	if (x1 == x2)
 		return c1 == c2 ? c1 : ViewUtil::FAIL_COLOR;
 	return SDL_Color{
-		lerp(x1, c1.r, x2, c2.r, argument),
-		lerp(x1, c1.g, x2, c2.g, argument),
-		lerp(x1, c1.b, x2, c2.b, argument),
-		lerp(x1, c1.a, x2, c2.a, argument)
+		static_cast<uint8_t>(lerp(x1, c1.r, x2, c2.r, argument)),
+		static_cast<uint8_t>(lerp(x1, c1.g, x2, c2.g, argument)),
+		static_cast<uint8_t>(lerp(x1, c1.b, x2, c2.b, argument)),
+		static_cast<uint8_t>(lerp(x1, c1.a, x2, c2.a, argument))
 		};
 }

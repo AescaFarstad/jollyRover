@@ -159,18 +159,18 @@ SpatialMap<T>::SpatialMap(int32_t cellSize, bool useLayeredMap, Point AA, Point 
 	m_offsetByMap[&m_map[1][1]] = &m_gridOffset[1][1];
 	
 	//extend the size to be exactly divisible by cellSize
-	int extraX = (int)(m_dimensions.x) % cellSize;
+	int32_t extraX = (int32_t)(m_dimensions.x) % cellSize;
 	if (extraX != 0)
 	{
-		int delta = cellSize - extraX;
+		int32_t delta = cellSize - extraX;
 		m_BB.x += delta;
 		m_dimensions.x += delta;
 	}
 	
-	int extraY = (int)(m_dimensions.y) % cellSize;
+	int32_t extraY = (int32_t)(m_dimensions.y) % cellSize;
 	if (extraY != 0)
 	{
-		int delta = cellSize - extraY;
+		int32_t delta = cellSize - extraY;
 		m_BB.y += delta;
 		m_dimensions.y += delta;
 	}

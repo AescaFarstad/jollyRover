@@ -6,19 +6,18 @@
 class TextureMode : public Mode
 {
 public:
-	TextureMode() = default;
 	virtual ~TextureMode() = default;
 	
 	void init(Renderer* renderer, Prototypes* prototypes);
 
-	virtual void update(bool isActive) override;
+	void update(bool isActive) override;
 	
-	virtual void onMouseDown(SDL_MouseButtonEvent* event) override;
-	virtual void onMouseUp(SDL_MouseButtonEvent* event) override;
-	virtual void onMouseMove(SDL_MouseMotionEvent* event) override;
+	void onMouseDown(const SDL_MouseButtonEvent& event) override;
+	void onMouseUp(const SDL_MouseButtonEvent& event) override;
+	void onMouseMove(const SDL_MouseMotionEvent& event) override;
 	
-	virtual	void onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& context) override;
-	virtual	void onKeyUp(SDL_Scancode scancode, const KeyboardInputContext& context) override;
+	void onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& context) override;
+	void onKeyUp(SDL_Scancode scancode, const KeyboardInputContext& context) override;
 
 private:
 

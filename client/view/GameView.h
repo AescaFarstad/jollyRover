@@ -29,7 +29,7 @@ public:
 	void render(GameState* state, RouteInput* routeInput);
 	void addMessage(std::string message, Point location, NFont::AlignEnum aligment = NFont::AlignEnum::LEFT);
 	
-	void onMouseMove(SDL_MouseMotionEvent* event);
+	void onMouseMove(const SDL_MouseMotionEvent& event);
 	
 	void setLogin(int32_t login);
 	

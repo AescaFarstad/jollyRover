@@ -1,2 +1,0 @@
-logging via macros
-refactor network into server-like clients

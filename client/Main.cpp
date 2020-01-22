@@ -21,17 +21,17 @@
 
 namespace MainInternal
 {
-	const int SCREEN_WIDTH = 1280;
-	const int SCREEN_HEIGHT = 720;
-	const int MAX_TIME_PER_FRAME = 100;
-	const int MIN_TIME_PER_FRAME = 5;
+	const int32_t SCREEN_WIDTH = 1280;
+	const int32_t SCREEN_HEIGHT = 720;
+	const int32_t MAX_TIME_PER_FRAME = 100;
+	const int32_t MIN_TIME_PER_FRAME = 5;
 
 	GPU_Target* screen;
 	
 	Game game;
 
 	bool isFinished = false;
-	int lastTicks = 0;
+	int32_t lastTicks = 0;
 	
 	std::string line = "";
 	int32_t lineCount = 0;
@@ -52,33 +52,20 @@ void mainLoop(void*)
 		}
 		else
 		{
-			game.handleEvent(&e);
+			game.handleEvent(e);
 		}
 	}
 	
-	int ticks = SDL_GetTicks();
-	int delta = ticks - lastTicks > MAX_TIME_PER_FRAME ? MAX_TIME_PER_FRAME : ticks - lastTicks;
+	int32_t ticks = SDL_GetTicks();
+	int32_t delta = ticks - lastTicks > MAX_TIME_PER_FRAME ? MAX_TIME_PER_FRAME : ticks - lastTicks;
 	
 	if (!isFinished && delta >= MIN_TIME_PER_FRAME)
 	{
-		GPU_Clear(screen);/*
-		lineCount++;
-		line += ", " + std::to_string(delta);
-		
-		if (lineCount == 30)
-		{
-			lineCount = 0;
-			printf("%s\n", line.c_str());
-			line="";
-		}*/
+		GPU_Clear(screen);
 
 		lastTicks = ticks;
 		game.update();
-		
-		
 		S::fpsMeter.registerFrame(ticks);
-		/*if (fpsMeter.getMeasurementDuration() > 5000)
-			printf(fpsMeter.report().c_str());*/
 
 		GPU_Flip(screen);
 	}
@@ -96,59 +83,20 @@ int main(int argc, char* args[])
 		freopen("CONOUT$", "w", stdout);
 		freopen("CONOUT$", "w", stderr);
 	#elif LINUX
-		int amaster;
-		int slave;
+		int32_t amaster;
+		int32_t slave;
 		termios params;
 		openpty(&amaster, &slave, NULL, &params, NULL);
 	#endif
-#else
-/*
-typedef struct EmscriptenWebGLContextAttributes {
-  EM_BOOL alpha;
-  EM_BOOL depth;
-  EM_BOOL stencil;
-  EM_BOOL antialias;
-  EM_BOOL premultipliedAlpha;
-  EM_BOOL preserveDrawingBuffer;
-  EM_BOOL preferLowPowerToHighPerformance;
-  EM_BOOL failIfMajorPerformanceCaveat;
-
-  int majorVersion;
-  int minorVersion;
-
-  EM_BOOL enableExtensionsByDefault;
-  EM_BOOL explicitSwapControl;
-  EM_BOOL renderViaOffscreenBackBuffer;
-} EmscriptenWebGLContextAttributes;
-*/
-	EmscriptenWebGLContextAttributes webGlContextAttributes{
-		EM_FALSE,
-		EM_FALSE,
-		EM_FALSE,
-		EM_TRUE,
-		EM_FALSE,
-		EM_FALSE,
-		EM_FALSE,
-		EM_FALSE,
-		
-		2,
-		0,
-		
-		EM_TRUE,
-		EM_FALSE,
-		EM_FALSE
-	};
-	emscripten_webgl_init_context_attributes(&webGlContextAttributes);
 #endif
 
-
-	printf("endiness: %s\n", (SystemInfo::isBigEndian ? "big" : "little"));
+	std::cout << "endiness: " << (SystemInfo::isBigEndian ? "big" : "little") << std::endl;
 	
 	GPU_SetPreInitFlags(GPU_INIT_DISABLE_VSYNC);
 	screen = GPU_InitRenderer(GPU_RENDERER_GLES_2, SCREEN_WIDTH, SCREEN_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
 	if (screen == NULL)
 	{
-		printf("Failed to create window %s\n", SDL_GetError());
+		std::cout << "Failed to create window " << SDL_GetError() << std::endl;
 		return 1;
 	}
 	
@@ -162,22 +110,10 @@ typedef struct EmscriptenWebGLContextAttributes {
 	game.start();
 	
 #ifdef __EMSCRIPTEN__
-	printf("EMSCRIPTEN mode\n");
-	emscripten_set_main_loop_arg(mainLoop, NULL, -1, true);
-	
-	emscripten_webgl_init_context_attributes(&webGlContextAttributes);
-	
-	EmscriptenWebGLContextAttributes attr;
-	attr.depth=true;
-	attr.antialias=true;
-	attr.alpha=true;
-	attr.stencil=true;
-	attr.majorVersion=3;
-	attr.minorVersion=3;
-	emscripten_webgl_init_context_attributes(&attr);
-	
+	std::cout << "EMSCRIPTEN mode" << std::endl;
+	emscripten_set_main_loop_arg(mainLoop, NULL, -1, true);	
 #else
-	printf("Endless loop mode\n");
+	std::cout << "Endless loop mode" << std::endl;
 	while (!isFinished)
 		mainLoop(NULL);
 #endif
@@ -199,16 +135,16 @@ void printRenderers()
 	auto renderers = std::make_unique<GPU_RendererID[]>(GPU_GetNumRegisteredRenderers());
 	GPU_GetRegisteredRendererList(renderers.get());
 	GPU_Log("\nAvailable renderers:\n");
-	for(int i = 0; i < GPU_GetNumRegisteredRenderers(); i++)
+	for(int32_t i = 0; i < GPU_GetNumRegisteredRenderers(); i++)
 	{
 		GPU_Log("* %s (%d.%d)\n", renderers[i].name, renderers[i].major_version, renderers[i].minor_version);
 	}
 
 	GPU_RendererID order[GPU_RENDERER_ORDER_MAX];
-	int order_size;
+	int32_t order_size;
 	GPU_GetRendererOrder(&order_size, order);
 	GPU_Log("Renderer init order:\n");
-	for(int i = 0; i < order_size; i++)
+	for(int32_t i = 0; i < order_size; i++)
 	{
 		GPU_Log("%d) %s (%d.%d)\n", i+1, order[i].name, order[i].major_version, order[i].minor_version);
 	}

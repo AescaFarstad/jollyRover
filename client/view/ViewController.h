@@ -9,10 +9,6 @@ template <typename V>
 class ViewController
 {
 public:
-	ViewController() = default;
-	~ViewController() = default;
-	
-	
 	template<typename T>
 	void render(Renderer* renderer, T begin, T end, GameState* state, Prototypes* prototypes, int32_t thisPlayer)
 	{

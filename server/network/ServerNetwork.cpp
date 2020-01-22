@@ -57,7 +57,7 @@ bool ServerNetwork::hasClients()
 	return clientCount > 0;
 }
 
-int ServerNetwork::getClientCount()
+int32_t ServerNetwork::getClientCount()
 {
 	return clientCount;
 }
@@ -147,7 +147,7 @@ void ServerNetwork::handleConnections()
 
 void ServerNetwork::handleData(MessageBuffer& externalBuffer)
 {
-	int active = SDLNet_CheckSockets(socketSet, 1);
+	int32_t active = SDLNet_CheckSockets(socketSet, 1);
 	if (active <= 0)
 		return;
 

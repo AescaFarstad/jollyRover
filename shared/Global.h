@@ -26,6 +26,7 @@ public:
 	uint32_t saveStateInterval;
 	int32_t networkUpdateInterval;
 	bool loopBack;
+	bool runBenchmark;
 	int32_t window_X;
 	int32_t window_Y;
 	

@@ -5,9 +5,7 @@
 
 class Renderer
 {
-public:
-	Renderer() = default;
-	
+public:	
 	void init(GPU_Target* screen, GPU_Image* atlas);
 	void blit(TextureDef& texture, Point& location, float rotation = 0, float scale = 1, uint8_t alpha = 0xff);
 	void blit(TextureDef& texture, Point& location, float rotation, float scale, SDL_Color& tint);

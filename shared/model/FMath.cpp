@@ -219,7 +219,7 @@ float FMath::normalizeAngle(float angle)
 	return angle;
 }
 
-const int SIN_VALUES_LENGTH = 101;
+const int32_t SIN_VALUES_LENGTH = 101;
 const float SIN_VALUES[SIN_VALUES_LENGTH] = {
 			0.000000,
 			0.015707,
@@ -355,7 +355,7 @@ float FMath::cos(float angle)
 int32_t FMath::q_sdbm(int32_t number)
 {
 	int32_t out = 0;
-    int c;
+    int32_t c;
 	unsigned char *str = (unsigned char *)&number;
 	for(size_t i = 0; i < sizeof(int32_t); i++)
 	{

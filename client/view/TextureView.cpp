@@ -38,8 +38,8 @@ void TextureView::render(std::vector<TextureDisplay>& displays)
 	
 }
 
-void TextureView::onMouseMove(SDL_MouseMotionEvent* event)
+void TextureView::onMouseMove(const SDL_MouseMotionEvent& event)
 {
-	m_mouseLocation.x = event->x;
-	m_mouseLocation.y = event->y;	
+	m_mouseLocation.x = event.x;
+	m_mouseLocation.y = event.y;	
 }

@@ -18,7 +18,7 @@ WebNetworkPacket::~WebNetworkPacket()
 }
 
 
-void WebNetworkPacket::loadFromRawData(const char* incomingData, int bytesAvailable)
+void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAvailable)
 {
 	//Load size of the packet size
 	if (bytesLoaded < bufferSize1)
@@ -82,7 +82,7 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int bytesAvaila
 	//When packet size + keys are fully loaded and can be parsed
 	if (bytesLoaded == bufferSize1 + bufferSize2 && rawSize == 0)
 	{
-		int rawPayloadLength = 0;
+		int32_t rawPayloadLength = 0;
 		if (bufferSize2 == 4)
 		{
 			int8_t tmp;
@@ -120,7 +120,7 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int bytesAvaila
 	if (rawSize > 0 && rawSize == bytesLoaded)
 	{
 		char* key = tempBuffer2 + bufferSize2 - CYPHER_KEY_SIZE;
-		for (int i = 0; i < this->payloadSize; i++)
+		for (int32_t i = 0; i < this->payloadSize; i++)
 		{
 			this->payload[i] = (this->payload[i] ^ key[i % CYPHER_KEY_SIZE]);
 		}
@@ -145,7 +145,7 @@ void WebNetworkPacket::setPayloadFromRawData(const char* newRawData, size_t size
 
 	memcpy(payload, newRawData, size);
 	
-	int cursor = 0;
+	int32_t cursor = 0;
 	rawData[cursor] = (unsigned char)130; //Binary, unmasked
 	cursor++;
 

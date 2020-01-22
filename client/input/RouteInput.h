@@ -36,9 +36,9 @@ public:
 	
 	void reset();	
 
-	void onMouseDown(SDL_MouseButtonEvent* event);
-	void onMouseUp(SDL_MouseButtonEvent* event);
-	void onMouseMove(SDL_MouseMotionEvent* event);
+	void onMouseDown(const SDL_MouseButtonEvent& event);
+	void onMouseUp(const SDL_MouseButtonEvent& event);
+	void onMouseMove(const SDL_MouseMotionEvent& event);
 
 private:
 

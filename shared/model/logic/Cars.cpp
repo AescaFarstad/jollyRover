@@ -93,6 +93,7 @@ namespace Cars
 		CarState& car = player->activeCars.back();
 		
 		car.route = route;
+		car.startStamp = state->time.time;
 		car.progress = 0;
 		car.routeIndex = 0;
 		car.isFinished = false;

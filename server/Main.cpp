@@ -18,10 +18,10 @@
 
 namespace MainInternal 
 {
-	const int MIN_TIME_PER_FRAME = 10;
+	const int32_t MIN_TIME_PER_FRAME = 10;
 
 	bool isFinished = false;
-	int lastTicks = 0;
+	int32_t lastTicks = 0;
 	ServerNetwork network;	
 	MessageBuffer messageBuffer;
 	GameUpdater gameUpdater;
@@ -102,7 +102,6 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 	}
 }
 
-#include <DEBUG.h>
 void loadPrototypes()
 {
 	std::ifstream file("out/prototypes.json");
@@ -131,15 +130,11 @@ void mainLoop()
 			isFinished = true;
 			break;
 		}
-		else
-		{
-			//game->handleEvent(&e);
-		}
 	}
 
 
 	network.update(messageBuffer);
-	int i = 0;
+	int32_t i = 0;
 	while (messageBuffer[i] != nullptr)
 	{
 		handleNetworkMessage(std::move(messageBuffer[i]));
@@ -152,8 +147,8 @@ void mainLoop()
 		gameUpdater.load(std::make_unique<GameState>(), &prototypes, false);
 	hasClients = newHasClients;
 
-	int ticks = SDL_GetTicks();
-	int delta = ticks - lastTicks;
+	int32_t ticks = SDL_GetTicks();
+	int32_t delta = ticks - lastTicks;
 	if (delta >= MIN_TIME_PER_FRAME)
 	{
 		lastTicks = ticks;

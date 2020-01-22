@@ -21,7 +21,7 @@ void runTest()
 	SpatialMap<TestObject> map(100, Point(-1000, -1000), Point(1000, 1000));
 	SeededRandom random(124124);
 	
-	const int numObjects = 10000;
+	const int32_t numObjects = 10000;
 	std::vector<TestObject> vec;
 	vec.reserve(numObjects);
 	for(size_t i = 0; i < numObjects; i++)
@@ -29,7 +29,7 @@ void runTest()
 		vec.push_back(TestObject(random.get(-1040, 1040), random.get(-1040, 1040)));
 	}
 	
-	const int numQueries = 10000;
+	const int32_t numQueries = 10000;
 	
 	Point points[numQueries];
 	int32_t rads[numQueries];
@@ -42,16 +42,16 @@ void runTest()
 		rads[i]*=rads[i];
 	}
 	
-	int start = SDL_GetTicks();
+	int32_t start = SDL_GetTicks();
 	map.set(vec);
 	
-	int mid = SDL_GetTicks();
+	int32_t mid = SDL_GetTicks();
 	for(size_t i = 0; i < numQueries; i++)
 	{
 		auto result = map.getInRadius(points[i], rads[i]);
 	}
 	
-	int op = SDL_GetTicks();
+	int32_t op = SDL_GetTicks();
 	for(size_t i = 0; i < numQueries; i++)
 	{
 		std::vector<TestObject*> brute;
@@ -62,7 +62,7 @@ void runTest()
 		}
 	}
 	
-	int end = SDL_GetTicks();
+	int32_t end = SDL_GetTicks();
 	
 	std::cout << "init:  " << mid - start << "\n";
 	std::cout << "map:   " << op - mid << "\n";

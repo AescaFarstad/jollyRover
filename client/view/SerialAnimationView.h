@@ -7,8 +7,6 @@
 class SerialAnimationView
 {
 public:
-	SerialAnimationView() = default;
-	
 	uint32_t lastUpdate;
 	
 	template<typename T>

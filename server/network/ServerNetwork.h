@@ -27,7 +27,7 @@ public:
 	void init();
 	void update(MessageBuffer& externalBuffer);
 	bool hasClients();
-	int getClientCount();
+	int32_t getClientCount();
 	void sendToAllPlaying(const NetworkMessage& message);
 	void addPlayer(int32_t login);
 	void send(NetworkMessage& message, int32_t login);
@@ -40,7 +40,7 @@ private:
 	TCPsocket serverSocketWeb;
 	std::vector<std::unique_ptr<NetworkClient>> clients;
 	SDLNet_SocketSet socketSet;
-	int clientCount;
+	int32_t clientCount;
 	std::function<void(UndeterminedClient* client)> onClientDetermined;
 	std::function<void(NetworkClient& client)> onHandshakeDone;
 	SeededRandom random;

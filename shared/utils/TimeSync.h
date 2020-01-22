@@ -16,7 +16,7 @@ public:
 	int32_t getUncertainty();
 
 private:
-	int m_measurementCount;
+	int32_t m_measurementCount;
 	int64_t m_maxDelta;
 	int64_t m_minDelta;
 };

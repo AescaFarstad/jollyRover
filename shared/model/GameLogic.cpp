@@ -46,7 +46,7 @@ namespace GameLogic
 		else
 		{
 			int32_t stepsAtOnce = state->time.forcedStepsAtOnce > 0 ? state->time.forcedStepsAtOnce : state->time.stepsAtOnce;
-			VisualDebug::clear();
+			//VisualDebug::clear();
 			for(int32_t i = 0; i < stepsAtOnce; i++)
 			{
 				if (time.forcedTimeScale > 0 && time.allowedSteps >= 0)
@@ -126,7 +126,7 @@ namespace GameLogic
 
 	void buildRouteToTarget(Point& target, std::vector<RoutePoint>& route, Prototypes* prototypes)
 	{
-		int stepsLeft = route.back().location.distanceTo(target) / prototypes->variables.routeStepSize;
+		int32_t stepsLeft = route.back().location.distanceTo(target) / prototypes->variables.routeStepSize;
 		route.resize(route.size() + stepsLeft);	
 		
 		auto iter = route.end() - stepsLeft;

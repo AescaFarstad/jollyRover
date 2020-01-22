@@ -143,26 +143,21 @@ void GameMode::addNewInput(std::unique_ptr<InputMessage> input)
 	m_gameUpdater.addNewInput(std::move(input));
 }
 	
-void GameMode::onMouseDown(SDL_MouseButtonEvent* event)
+void GameMode::onMouseDown(const SDL_MouseButtonEvent& event)
 {
 	if (!m_isLoaded)
 		return;		
 	m_routeInput.onMouseDown(event);
-	//m_gameView.addMessage("test message. please ignore.", Point(event->x, event->y));
-	/*if (event->button == 0x1)
-		std::cout<<("\t\t{ \"x\":" + std::to_string(event->x) + ", \"y\":" + std::to_string(event->y) + " },")<<"\n";
-	if (event->button == 0x3)
-		std::cout<<("\t]\n\t},\n\t{\n\t\t\"vertices\":[")<<"\n";*/
 }
 
-void GameMode::onMouseUp(SDL_MouseButtonEvent* event)
+void GameMode::onMouseUp(const SDL_MouseButtonEvent& event)
 {
 	if (!m_isLoaded)
 		return;
 	m_routeInput.onMouseUp(event);	
 }
 
-void GameMode::onMouseMove(SDL_MouseMotionEvent* event)
+void GameMode::onMouseMove(const SDL_MouseMotionEvent& event)
 {
 	if (!m_isLoaded)
 		return;

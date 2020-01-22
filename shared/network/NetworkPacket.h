@@ -9,7 +9,7 @@ public:
 	NetworkPacket();
 	virtual ~NetworkPacket();
 
-	int protocol;
+	int32_t protocol;
 
 	uint16_t rawSize;
 	char* rawData;
@@ -24,11 +24,10 @@ public:
 	virtual void setPayloadFromRawData(const char* newRawData, size_t size);
 	virtual void setPayloadFromSerializable(const ISerializable& serializable, size_t expectedSize = 2048);
 
-	virtual void loadFromRawData(const char* rawData, int bytesAvailable = 4096);
+	virtual void loadFromRawData(const char* rawData, int32_t bytesAvailable = 4096);
 
 	void tracePayload();
 	bool isFullyLoaded();
-	//std::string payloadAsString();
 
 
 

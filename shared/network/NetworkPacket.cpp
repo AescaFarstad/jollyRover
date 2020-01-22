@@ -23,7 +23,7 @@ void NetworkPacket::setPayloadFromString(std::string str)
 	setPayloadFromRawData(str.c_str(), str.length());
 }
 
-void NetworkPacket::loadFromRawData(const char* rawData, int bytesAvailable)
+void NetworkPacket::loadFromRawData(const char* rawData, int32_t bytesAvailable)
 {
 	if (bytesLoaded < bufferSize)
 	{

@@ -118,11 +118,11 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 	if (S::drawSettings.remnants)
 		drawRemnants();
 	if (S::drawSettings.layer2)
-		m_renderer->blit(m_layer2Image, layerRect, location);	
+		m_renderer->blit(m_layer2Image, layerRect, location);
+	if (S::drawSettings.cars)
+		drawCars();	
 	if (S::drawSettings.creeps)
 		drawCreeps();
-	if (S::drawSettings.cars)
-		drawCars();
 	if (S::drawSettings.projectiles)
 		drawProjectiles();
 	if (S::drawSettings.layer3)
@@ -161,12 +161,12 @@ void GameView::setLogin(int32_t login)
 	m_login = login;
 }
 
-void GameView::onMouseMove(SDL_MouseMotionEvent* event)
+void GameView::onMouseMove(const SDL_MouseMotionEvent& event)
 {
 	if (!m_state)
 		return;
-	auto nearestCreep = std2::minElement(m_state->creeps, [event](CreepState& creep){return Point(event->x, event->y).distanceTo(creep.unit.location);});
-	if (Point(event->x, event->y).distanceTo(nearestCreep->unit.location) < 50)	
+	auto nearestCreep = std2::minElement(m_state->creeps, [event](CreepState& creep){return Point(event.x, event.y).distanceTo(creep.unit.location);});
+	if (Point(event.x, event.y).distanceTo(nearestCreep->unit.location) < 50)	
 		VisualDebug::interestingId = nearestCreep->unit.id;
 	else
 		VisualDebug::interestingId = -1;
@@ -177,7 +177,7 @@ void GameView::drawObstacles()
 	SDL_Color obstacleColor = ViewUtil::colorFromHex(0x004477);
 
 	for (auto &obstacle : m_prototypes->obstacles)
-	{/**/
+	{
 		size_t count = obstacle.vertices.size();
 		float* points = new float[(count * 2)];
 		for (size_t i = 0; i < count * 2; i+=2)
@@ -196,11 +196,6 @@ void GameView::drawObstacles()
 			obstacle.centroid.x + centroidSize/2,
 			obstacle.centroid.y + centroidSize/2,
 			obstacleColor);
-		/*
-		for (auto& edge : obstacle.edges)
-		{
-			ViewUtil::drawArrow(m_screen, *edge.p1, *edge.p2, 0x004477);	
-		}*/
 	}	
 }
 
@@ -228,32 +223,6 @@ void GameView::drawInput()
 		auto& dashSeq = route[i].isValid_ ? S::sequences.greenPathDash : S::sequences.redPathDash;
 		auto& dotSeq = route[i].isValid_ ? S::sequences.greenPathDot : S::sequences.redPathDot;
 		renderPathStep(route[i - 1].location, route[i].location, dashSeq, dotSeq, m_login + i, 0);
-		/*
-		SDL_Color validColor = ViewUtil::colorFromHex(0x00ff00);
-		SDL_Color invalidColor = ViewUtil::colorFromHex(0xff0000);
-		SDL_Color& newColor = isValidEdge ? validColor : invalidColor;
-		GPU_Line(m_screen,
-			route[i - 1].location.x,
-			route[i - 1].location.y,
-			route[i].location.x,
-			route[i].location.y,
-			newColor
-		);
-
-		//S::log.add(std::to_string(i) + " draw " + routeInput->route[i - 1].toString() + " -> " + routeInput->route[i].toString());
-
-		SDL_Color& newColor2 = route[i].isValid_ ? validColor : invalidColor;
-		int rectSize = 6;
-
-		GPU_Rectangle(
-			m_screen, 
-			route[i].location.x - rectSize / 2,
-			route[i].location.y - rectSize / 2,
-			route[i].location.x + rectSize / 2,
-			route[i].location.y + rectSize / 2,
-			newColor2
-			);
-		*/
 	}
 }
 
@@ -265,30 +234,14 @@ void GameView::drawCars()
 		{
 			if ((size_t)car.routeIndex >= car.route.size() - 1)
 				continue;
-			
-			for (size_t i = car.routeIndex + 2; i < car.route.size(); i++)
+			size_t upperLimit = FMath::lerp(0, 0, 1000, 80, m_state->time.time - car.startStamp);
+			if (player.login == m_login)
+				upperLimit = car.route.size();
+			upperLimit = std::min(car.route.size(), upperLimit);
+			for (size_t i = car.routeIndex + 2; i < upperLimit; i++)
 			{
-				SeededRandom rnd(car.unit.id + i);
-				/*
-				int rectSize = 4;
-				GPU_Line(
-					m_screen,
-					car.route[i - 1].x,
-					car.route[i - 1].y,
-					car.route[i].x,
-					car.route[i].y,
-					player.login == m_login ? ViewUtil::colorFromHex(0x0000ff) : ViewUtil::colorFromHex(0x555555)
-				);
-				GPU_Rectangle(
-					m_screen,
-					car.route[i].x - rectSize / 2,
-					car.route[i].y - rectSize / 2,
-					car.route[i].x + rectSize / 2,
-					car.route[i].y + rectSize / 2,
-					player.login == m_login ? ViewUtil::colorFromHex(0x0000ff) : ViewUtil::colorFromHex(0x555555)
-				);
-				*/
-				auto ratio = (i == car.routeIndex + 2) ? car.progress : 0;
+				SeededRandom rnd(car.unit.id + i);				
+				auto ratio = (i == (size_t)car.routeIndex + 2) ? car.progress : 0;
 				auto& dashSeq = player.login == m_login ? S::sequences.greenPathDash : S::sequences.grayPathDash;
 				auto& dotSeq = player.login == m_login ? S::sequences.greenPathDot : S::sequences.grayPathDot;
 				renderPathStep(car.route[i - 1], car.route[i], dashSeq, dotSeq, player.login + i, ratio);
@@ -327,18 +280,6 @@ void GameView::drawCars()
 			auto gunLocation = Point::fromAngle(angle, 9);
 			gunLocation += car.unit.location;
 			m_renderer->blit(*carGunTexture, gunLocation, angle, 0.8);
-			
-			//m_fontDebug.draw(m_screen, car.unit.location.x, car.unit.location.y, "agro:%d", car.agro);
-			
-			/*
-			GPU_RectangleFilled(
-					m_screen,
-					car.unit.location.x - carSize / 2,
-					car.unit.location.y - carSize / 2,
-					car.unit.location.x + carSize / 2,
-					car.unit.location.y + carSize / 2,
-					player.login == m_login ? myColor : theirColor
-				);*/
 		}
 	}
 }
@@ -359,7 +300,7 @@ void GameView::drawCreeps()
 void GameView::drawProjectiles()
 {
 	SDL_Color color = ViewUtil::colorFromHex(0x333333);
-	int rectSize = 2;
+	int32_t rectSize = 2;
 	
 	for (Projectile &projectile : m_state->projectiles)
 	{
@@ -494,7 +435,7 @@ void GameView::drawFormations()
 		GPU_Polygon(m_screen, 5, points, color);
 		
 		//--------------------------------------------------------
-		int padding = 2;
+		int32_t padding = 2;
 		Point pi1 = form.location + (proto.AA + Point(padding, padding)).rotate(form.orientation);
 		Point pi2 = form.location + (AB + Point(padding, -padding)).rotate(form.orientation);
 		Point pi3 = form.location + (proto.BB + Point(-padding, -padding)).rotate(form.orientation);
@@ -542,7 +483,7 @@ void GameView::drawFormations()
 		
 		for (size_t i = 0; i < form.slots.size(); i++)
 		{
-			int slotSize = 4;
+			int32_t slotSize = 4;
 			
 			auto& slot = form.slots[i];
 			Point slotLocation = Creeps::getCurrentSlotLocation(form, i);
@@ -606,21 +547,6 @@ void GameView::drawProjectileExplosion()
 			m_prototypes,
 			m_login
 		);
-	/*
-	size_t projectilesTotal = std::min(m_state->eventLogger.projectileExplosions.size, m_state->eventLogger.projectileExplosions.total);
-	int32_t minTime = m_state->time.time - m_prototypes->variables.maxEventAnimationTime;
-	
-	for(size_t i = 0; i < projectilesTotal; i++)
-	{
-		ProjectileExplosionEvent& event = m_state->eventLogger.projectileExplosions.array[i];
-		if (event.stamp > minTime && event.stamp < m_state->time.time)
-		{
-			int32_t seed = FMath::q_sdbm(id);
-			if (m_seed != seed)
-				init(seed, state, prototypes);
-			m_renderer->blit(S::textures.tanks_1.Smoke.smokeGrey2, event.location, 0, 0.2, 0x55);
-		}
-	}*/
 }
 
 void GameView::drawRemnants()
@@ -642,17 +568,7 @@ void GameView::drawRemnants()
 			m_state, 
 			m_prototypes,
 			m_login
-		);	
-		/*
-	size_t unitsTotal = std::min(m_state->eventLogger.unitDeaths.size, m_state->eventLogger.unitDeaths.total);
-	int32_t minTime = m_state->time.time - m_prototypes->variables.maxEventAnimationTime;
-	
-	for(size_t i = 0; i < unitsTotal; i++)
-	{
-		UnitDeathEvent& event = m_state->eventLogger.unitDeaths.array[i];
-		if (event.stamp > minTime && event.stamp < m_state->time.time)
-			m_renderer->blit(S::textures.tanks_1.Smoke.smokeOrange0, event.location, 0, 0.2, 0x55);
-	}*/
+		);
 }
 
 void GameView::drawDebugGraphics()
@@ -739,9 +655,7 @@ void GameView::drawThreatMap()
 }
 
 void GameView::drawHUD()
-{
-	//m_fontAmaticBold.draw(m_screen, 20.f, 20.f, "Score: %d", m_state->timeStamp);
-	
+{	
 	if (S::drawSettings.scores)
 	{	
 		std::vector<PlayerState> players = m_state->players;

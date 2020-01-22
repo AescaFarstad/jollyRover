@@ -48,7 +48,7 @@ private:
 	TCPsocket socket;
 	std::unique_ptr<PacketReader> packetReader;
 	SDLNet_SocketSet socketSet = SDLNet_AllocSocketSet(1);
-	int activeSockets = 0;
+	int32_t activeSockets = 0;
 	bool isConnected = false;
 	std::unordered_map<int32_t, uint32_t> requestTimeByInitiatorId;
 	std::unordered_map<MESSAGE_TYPE, MessageHandler> interceptors_once;

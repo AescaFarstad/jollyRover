@@ -11,14 +11,13 @@
 class Mode
 {
 public:
-	Mode() = default;
 	virtual ~Mode() = default;
 
 	virtual void update(bool isActive) = 0;
 
-	virtual void onMouseDown(SDL_MouseButtonEvent* event) = 0;
-	virtual void onMouseUp(SDL_MouseButtonEvent* event) = 0;
-	virtual void onMouseMove(SDL_MouseMotionEvent* event) = 0;
+	virtual void onMouseDown(const SDL_MouseButtonEvent& event) = 0;
+	virtual void onMouseUp(const SDL_MouseButtonEvent& event) = 0;
+	virtual void onMouseMove(const SDL_MouseMotionEvent& event) = 0;
 	
 	
 	virtual	void onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& context) = 0;

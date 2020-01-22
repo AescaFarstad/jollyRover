@@ -12,7 +12,7 @@ namespace AI
 		{
 			std::vector<Point> route;
 			size_t index;
-			int32_t failureStreak;
+			uint32_t failureStreak;
 			int32_t stepCount;
 			bool isFinished;
 		};

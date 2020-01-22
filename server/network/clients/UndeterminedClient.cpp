@@ -16,7 +16,7 @@ std::unique_ptr<NetworkPacket> UndeterminedClient::poll()
 {
 	char buffer[S::config.maxMessageSize];
 
-	int bytes = SDLNet_TCP_Recv(socket, buffer, S::config.maxMessageSize);
+	int32_t bytes = SDLNet_TCP_Recv(socket, buffer, S::config.maxMessageSize);
 
 	if (bytes <= 0)
 	{

@@ -16,19 +16,6 @@ void CreepView::render(Renderer* renderer, CreepState& creep, GameState* state, 
 					
 		renderer->blit(*creep.creepProto_->hullTexture[creep.unit.force], creep.unit.location, bodyAngle, 1);
 		renderer->blit(*creep.creepProto_->gunTexture[creep.unit.force], creep.unit.location, barrelAngle, 1);
-		
-		//GPU_Circle(renderer->getScreen(), creep.unit.location.x, creep.unit.location.y, 1, ViewUtil::colorFromHex(0x00));
-		/*
-		auto scaledMovement = creep.unit.voluntaryMovement;
-		if (scaledMovement.getLength() > 0)
-		{
-			scaledMovement.scaleTo(100);
-			scaledMovement += creep.unit.location;
-			
-			GPU_Line(m_renderer->getScreen(), creep.unit.location.x, creep.unit.location.y, scaledMovement.x, scaledMovement.y, color);			
-		}
-		if (creep.targetLoc_.getLength() > 0)
-			GPU_Line(m_renderer->getScreen(), creep.unit.location.x, creep.unit.location.y, creep.targetLoc_.x, creep.targetLoc_.y, color2);*/
 	}
 	else
 	{

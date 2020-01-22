@@ -17,6 +17,7 @@ public:
 	int16_t routeIndex;
 	float progress;
 	bool isFinished;
+	int32_t startStamp;
 	int32_t score;
 	float speed;
 	float accel;

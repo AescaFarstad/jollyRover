@@ -57,15 +57,15 @@ void TextureMode::arrange()
 }
 
 	
-void TextureMode::onMouseDown(SDL_MouseButtonEvent* event)
+void TextureMode::onMouseDown(const SDL_MouseButtonEvent& event)
 {
 	for(auto& display : m_displays)
 	{		
 		if (
-			event->x > display.location.x - display.texture->rect.w / 2 &&
-			event->x < display.location.x + display.texture->rect.w / 2 &&
-			event->y > display.location.y - display.texture->rect.h / 2 &&
-			event->y < display.location.y + display.texture->rect.h / 2
+			event.x > display.location.x - display.texture->rect.w / 2 &&
+			event.x < display.location.x + display.texture->rect.w / 2 &&
+			event.y > display.location.y - display.texture->rect.h / 2 &&
+			event.y < display.location.y + display.texture->rect.h / 2
 		)
 		{
 			std::cout << display.texture->name << "\n";
@@ -73,12 +73,12 @@ void TextureMode::onMouseDown(SDL_MouseButtonEvent* event)
 	}
 }
 
-void TextureMode::onMouseUp(SDL_MouseButtonEvent* event)
+void TextureMode::onMouseUp(const SDL_MouseButtonEvent& event)
 {
 	
 }
 
-void TextureMode::onMouseMove(SDL_MouseMotionEvent* event)
+void TextureMode::onMouseMove(const SDL_MouseMotionEvent& event)
 {
 	m_textureView.onMouseMove(event);
 }

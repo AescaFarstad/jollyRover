@@ -17,13 +17,13 @@
 class Game
 {
 public:
-	Game() = default;
+	Game();
 	~Game();
 
 	void init(GPU_Target* screen);
 	void start();
 	void update();
-	void handleEvent(SDL_Event* event);
+	void handleEvent(const SDL_Event& event);
 	void loadPrototypes();
 	void loadConfig();
 

@@ -71,11 +71,11 @@ namespace AI
 			if (last.y < boundary)
 				attraction += Point(0, FMath::nlerp(0, 0, boundary, 100, boundary - last.y, boundaryPower));
 			
-			if (data.index > prototypes->variables.maxRouteSteps / 30)
+			if (data.index > (size_t)prototypes->variables.maxRouteSteps / 30)
 			{
 				attraction += Point(0, 1);
 			}
-			if (data.index < prototypes->variables.minRouteSteps)
+			if (data.index < (size_t)prototypes->variables.minRouteSteps)
 			{
 				attraction += Point(0, -10);
 			}

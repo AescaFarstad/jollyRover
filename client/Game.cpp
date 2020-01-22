@@ -20,6 +20,12 @@
 #include <GameStateMessage.h>
 #include <GreetingMessage.h>
 
+Game::Game()
+{
+	m_network = nullptr;
+	m_atlas = nullptr;
+}
+
 Game::~Game()
 {
 	if (m_network != nullptr)
@@ -65,7 +71,6 @@ void Game::init(GPU_Target* screen)
 void Game::start()
 {
 	auto loadGameTask = std::make_unique<ConsecutiveTask>();
-	//std::unique_ptr<ConsecutiveTask> loadGameTask(new ConsecutiveTask);
 
 	loadGameTask->pushAsync([this](std::unique_ptr<Callback> callback) {
 		auto binding = std::make_unique<AnonymousBinding>("wait for greetings prompt from the server and send it");
@@ -84,7 +89,6 @@ void Game::start()
 			setHandler(std::move(handleRequest));
 		
 		m_network->genericRequestBinder.bind(std::move(binding));
-		//binding->handle(std::make_unique<NetworkMessage>());
 	}, "wait for greetings prompt from the server and send it");
 
 	loadGameTask->pushAsync([this](std::unique_ptr<Callback> callback) {
@@ -98,7 +102,6 @@ void Game::start()
 			cb->execute();
 			delete cb;
 		});
-		//network->binder.traceBindings("added #2");
 	}, "wait for greetings response from the server");
 
 	auto ping = [this](std::unique_ptr<Callback> callback) {
@@ -139,24 +142,27 @@ void Game::start()
 			delete cb;
 		});
 	}, "wait for game state from the server and load the game");
-	/*
-	auto testPerformance = [this](std::unique_ptr<Callback> callback) {
-			GameUpdater gu;
-			auto state = std::make_unique<GameState>(892422);
-			gu.load(std::move(state), &prototypes);
-			
-			int32_t startTime = SDL_GetTicks();
-			for(int i = 0; i < 100; i++)
-			{
-				gu.update(i * 1000 + 100);
-				S::log.add(std::to_string(i) + "%");
-			}
-			S::log.add("Finished in " + std::to_string(SDL_GetTicks() - startTime));
-			S::log.add("Performance buffer: " + std::to_string((float)100 * 1000 / (SDL_GetTicks() - startTime)));
-			
-			callback->execute();
-		};
-	loadGameTask->pushAsync(testPerformance, "testPerformance");*/
+	
+	if (S::config.runBenchmark)
+	{
+		auto testPerformance = [this](std::unique_ptr<Callback> callback) {
+				GameUpdater gu;
+				auto state = std::make_unique<GameState>(892422);
+				gu.load(std::move(state), &m_prototypes, true);
+				
+				int32_t startTime = SDL_GetTicks();
+				for(int32_t i = 0; i < 100; i++)
+				{
+					gu.update(i * 10000 + 100);
+					S::log.add(std::to_string(i) + "%");
+				}
+				S::log.add("Finished in " + std::to_string(SDL_GetTicks() - startTime));
+				S::log.add("Performance buffer: " + std::to_string((float)100 * 10000 / (SDL_GetTicks() - startTime)));
+				
+				callback->execute();
+			};
+		loadGameTask->pushAsync(testPerformance, "testPerformance");		
+	}
 	
 	loadGameTask->exec();
 
@@ -173,51 +179,49 @@ void Game::update()
 		mode->update(mode == m_modes[m_activeMode]);
 }
 
-void Game::handleEvent(SDL_Event* event)
+void Game::handleEvent(const SDL_Event& event)
 {
-	if (event->type == SDL_MOUSEBUTTONDOWN)
+	if (event.type == SDL_MOUSEBUTTONDOWN)
 	{
-		m_modes[m_activeMode]->onMouseDown(&event->button);
+		m_modes[m_activeMode]->onMouseDown(event.button);
 		return;
 	}
 
-	if (event->type == SDL_MOUSEBUTTONUP)
+	if (event.type == SDL_MOUSEBUTTONUP)
 	{
-		m_modes[m_activeMode]->onMouseUp(&event->button);
+		m_modes[m_activeMode]->onMouseUp(event.button);
 		return;
 	}
 
-	if (event->type == SDL_MOUSEMOTION)
+	if (event.type == SDL_MOUSEMOTION)
 	{
-		m_keyboardContext.mouseCoords.x = event->motion.x;
-		m_keyboardContext.mouseCoords.y = event->motion.y;
-		m_modes[m_activeMode]->onMouseMove(&event->motion);
+		m_keyboardContext.mouseCoords.x = event.motion.x;
+		m_keyboardContext.mouseCoords.y = event.motion.y;
+		m_modes[m_activeMode]->onMouseMove(event.motion);
 		return;
 	}
 	
 	if (
-		(event->type != SDL_KEYDOWN && 
-		 event->type != SDL_KEYUP) || false
-		//keyboard.actionByButton[event->key.keysym.scancode] == GAME_KEYBOARD_ACTIONS::NONE
+		(event.type != SDL_KEYDOWN && 
+		 event.type != SDL_KEYUP) || false
 		)
 		return;
-	switch (event->type) 
+	switch (event.type) 
 	{
 		case SDL_KEYDOWN:
-			if (!m_keyboardContext.keyboard.isDown[event->key.keysym.scancode])
+			if (!m_keyboardContext.keyboard.isDown[event.key.keysym.scancode])
 			{
-				m_keyboardContext.keyboard.isDown[event->key.keysym.scancode] = true;
-				m_modes[m_activeMode]->onKeyDown(event->key.keysym.scancode, m_keyboardContext);
+				m_keyboardContext.keyboard.isDown[event.key.keysym.scancode] = true;
+				m_modes[m_activeMode]->onKeyDown(event.key.keysym.scancode, m_keyboardContext);
 			}
 			break;
 
 		case SDL_KEYUP:
-			if (m_keyboardContext.keyboard.isDown[event->key.keysym.scancode])
+			if (m_keyboardContext.keyboard.isDown[event.key.keysym.scancode])
 			{
-				//printf("Key release detected\n");
-				m_keyboardContext.keyboard.isDown[event->key.keysym.scancode] = false;
-				if (!handleGlobalKey(event->key.keysym.scancode))				
-					m_modes[m_activeMode]->onKeyUp(event->key.keysym.scancode, m_keyboardContext);
+				m_keyboardContext.keyboard.isDown[event.key.keysym.scancode] = false;
+				if (!handleGlobalKey(event.key.keysym.scancode))				
+					m_modes[m_activeMode]->onKeyUp(event.key.keysym.scancode, m_keyboardContext);
 			}
 			break;
 
@@ -247,8 +251,6 @@ void Game::loadPrototypes()
 	json j = json::parse(file);
 	file.close();
 	m_prototypes.load(j);
-	
-	//std::ifstream file2("out/assets/sheet_tanks.png");
 }
 
 void Game::loadConfig()

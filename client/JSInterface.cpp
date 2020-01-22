@@ -1,17 +1,17 @@
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#include <emscripten/html5.h>
+
 #include <Global.h>
 #include <DrawSettings.h>
 
 auto& globalLog = S::log;
 auto& drawSettings = S::drawSettings;
 
-#ifdef __EMSCRIPTEN__
-#include <emscripten.h>
-#include <emscripten/html5.h>
-
 
 extern "C" {
 
-	void EMSCRIPTEN_KEEPALIVE toggleLogSetting(int index) 
+	void EMSCRIPTEN_KEEPALIVE toggleLogSetting(int32_t index) 
 	{
 		globalLog.add("toggleLogSetting " + std::to_string(index), {LOG_TAGS::UNIQUE});
 		switch (index)
@@ -34,7 +34,7 @@ extern "C" {
 		}
 	}
 	
-	int8_t* EMSCRIPTEN_KEEPALIVE getLogSettings(int8_t *buf, int bufSize) 
+	int8_t* EMSCRIPTEN_KEEPALIVE getLogSettings(int8_t *buf, int32_t bufSize) 
 	{
 		int8_t result[11];
 		
@@ -64,10 +64,10 @@ extern "C" {
 				std::to_string(result[10]) + ",", 
 				{LOG_TAGS::UNIQUE});
 		
-		return &result[0];
+		return &result[0]; //This is OK
 	}
 	
-	void EMSCRIPTEN_KEEPALIVE toggleDrawSetting(int index) 
+	void EMSCRIPTEN_KEEPALIVE toggleDrawSetting(int32_t index) 
 	{
 		globalLog.add("toggleDrawSetting " + std::to_string(index), {LOG_TAGS::UNIQUE});
 		switch (index)
@@ -99,7 +99,7 @@ extern "C" {
 		}
 	}
 	
-	int8_t* EMSCRIPTEN_KEEPALIVE getDrawSettings(int8_t *buf, int bufSize) 
+	int8_t* EMSCRIPTEN_KEEPALIVE getDrawSettings(int8_t *buf, int32_t bufSize) 
 	{
 		int8_t result[20];
 		result[0] = drawSettings.layer1 ? 1 : 0;
@@ -144,7 +144,7 @@ extern "C" {
 				std::to_string(result[17]) + ",", 
 				{LOG_TAGS::UNIQUE});
 		
-		return &result[0];
+		return &result[0]; // this is OK
 	}
 	 
 }

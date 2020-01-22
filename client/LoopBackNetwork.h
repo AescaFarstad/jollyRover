@@ -10,10 +10,10 @@ public:
 	LoopBackNetwork(GameUpdater* gameUpdater);
 	virtual ~LoopBackNetwork() = default;
 
-	virtual void connect() override;
-	virtual void update() override;
-	virtual void send(const NetworkPacket& packet) override;
-	virtual void send(const NetworkMessage& msg) override;
+	void connect() override;
+	void update() override;
+	void send(const NetworkPacket& packet) override;
+	void send(const NetworkMessage& msg) override;
 	
 
 private:

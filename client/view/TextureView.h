@@ -22,12 +22,10 @@ public:
 class TextureView
 {
 public:
-	TextureView() = default;
-
 	void init(Renderer* renderer, Prototypes* prototypes);
 	void render(std::vector<TextureDisplay>& displays);
 	
-	void onMouseMove(SDL_MouseMotionEvent* event);
+	void onMouseMove(const SDL_MouseMotionEvent& event);
 	
 private:
 

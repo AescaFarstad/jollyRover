@@ -35,7 +35,7 @@ std::vector<RoutePoint>& RouteInput::getRoutePoints()
 	return m_route;
 }
 
-void RouteInput::onMouseDown(SDL_MouseButtonEvent* event)
+void RouteInput::onMouseDown(const SDL_MouseButtonEvent& event)
 {
 	if (!m_isLoaded)
 		return;
@@ -43,11 +43,11 @@ void RouteInput::onMouseDown(SDL_MouseButtonEvent* event)
 	if (m_state != ROUTE_STATE::EMPTY)
 		reset();
 		
-	if (event->x < m_prototypes->variables.fieldWidth && event->x > 0 &&
-		event->y < m_prototypes->variables.fieldHeight && event->y > 0)
+	if (event.x < m_prototypes->variables.fieldWidth && event.x > 0 &&
+		event.y < m_prototypes->variables.fieldHeight && event.y > 0)
 	{
-		Point touch(event->x, event->y);
-		m_route.push_back(RoutePoint{Point(event->x, m_prototypes->variables.fieldHeight), true});
+		Point touch(event.x, event.y);
+		m_route.push_back(RoutePoint{Point(event.x, m_prototypes->variables.fieldHeight), true});
 		GameLogic::buildRouteToTarget(touch, m_route, m_prototypes);
 		m_autoDrawnPoints = m_route.size() - 1;
 
@@ -55,7 +55,7 @@ void RouteInput::onMouseDown(SDL_MouseButtonEvent* event)
 	}
 }
 
-void RouteInput::onMouseUp(SDL_MouseButtonEvent* event)
+void RouteInput::onMouseUp(const SDL_MouseButtonEvent& event)
 {
 	if (!m_isLoaded)
 		return;
@@ -70,7 +70,7 @@ void RouteInput::onMouseUp(SDL_MouseButtonEvent* event)
 		
 		int32_t originalLength = m_route.size() - m_autoDrawnPoints;
 		
-		RoutePoint finish{Point(event->x, m_prototypes->variables.fieldHeight), true}; //Assumed no obstacles next to the field edge
+		RoutePoint finish{Point(event.x, m_prototypes->variables.fieldHeight), true}; //Assumed no obstacles next to the field edge
 		if (!GameLogic::isRouteAnglePositive(m_route, finish.location, m_prototypes))
 		{
 			if (originalLength < 2)
@@ -102,15 +102,15 @@ void RouteInput::onMouseUp(SDL_MouseButtonEvent* event)
 	}
 }
 
-void RouteInput::onMouseMove(SDL_MouseMotionEvent* event)
+void RouteInput::onMouseMove(const SDL_MouseMotionEvent& event)
 {
 	if (m_state != ROUTE_STATE::ACTIVE || !m_isLoaded)
 		return;
 
-	if (event->x < m_prototypes->variables.fieldWidth && event->x > 0 &&
-		event->y < m_prototypes->variables.fieldHeight && event->y > 0)
+	if (event.x < m_prototypes->variables.fieldWidth && event.x > 0 &&
+		event.y < m_prototypes->variables.fieldHeight && event.y > 0)
 	{
-		Point touch(event->x, event->y);
+		Point touch(event.x, event.y);
 
 		while (m_route.size() > 1 && !GameLogic::isRouteAnglePositive(m_route, touch, m_prototypes))
 		{

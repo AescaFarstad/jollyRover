@@ -32,8 +32,8 @@ void SerialAnimationView::initFragAnimation(UnitDeathEvent& event, SeededRandom&
 	p.to = p.from;
 	particles.push_back(p);
 	
-	int32_t wShreds = random.get(5, 8) + 3;
-	int32_t hShreds = random.get(5, 8) + 3;
+	int32_t wShreds = random.get(8, 11);
+	int32_t hShreds = random.get(8, 11);
 	
 	p.sequence = nullptr;
 	shreds.reserve(wShreds * hShreds);

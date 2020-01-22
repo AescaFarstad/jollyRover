@@ -27,7 +27,7 @@ std::unique_ptr<NetworkPacket> NetworkClient::poll()
 void NetworkClient::init()
 {
 	packetReader = std::make_unique<PacketReader>(&socket, getPacket, [this]() {
-		int activeSockets = globalSocketNudgeFunction();
+		int32_t activeSockets = globalSocketNudgeFunction();
 		return activeSockets > 0 && SDLNet_SocketReady(socket); });
 	isInitialized = true;
 }
