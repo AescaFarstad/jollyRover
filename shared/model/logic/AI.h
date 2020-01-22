@@ -11,7 +11,7 @@ namespace AI
 		struct RouteStruct
 		{
 			std::vector<Point> route;
-			int32_t index;
+			size_t index;
 			int32_t failureStreak;
 			int32_t stepCount;
 			bool isFinished;

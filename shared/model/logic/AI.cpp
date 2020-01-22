@@ -1,9 +1,10 @@
 #include <AI.h>
 #include <GameLogic.h>
+#include <VisualDebug.h>
 
 namespace AI
 {		
-	int32_t boundary = 100;
+	int32_t boundary = 80;
 	float boundaryPower = 3;
 	float desireBase = 10;
 	
@@ -25,16 +26,16 @@ namespace AI
 		
 		while(!GameLogic::testRouteIsValid(data.route, prototypes))
 		{
-			Point start = { (float)state->random.get(0, prototypes->variables.fieldWidth), (float)prototypes->variables.fieldHeight };
-			Point firstStep = { start.x, start.y - prototypes->variables.routeStepSize };
+			Point start{ (float)state->random.get(0, prototypes->variables.fieldWidth), (float)prototypes->variables.fieldHeight };
+			Point firstStep{ start.x, start.y - prototypes->variables.routeStepSize };
 			data = {
 				.route = { start, firstStep },
-				.index = 0,
+				.index = 1,
 				.failureStreak = 0,
 				.stepCount = 0,
 				.isFinished = false
 			};
-			while (!data.isFinished && data.stepCount < 5000)
+			while (!data.isFinished && data.stepCount < 10000)
 				AIInternal::makeStep(data, state->random, prototypes);
 		}
 		data.route.erase(data.route.begin() + data.index + 1, data.route.end());
@@ -78,7 +79,7 @@ namespace AI
 			{
 				attraction += Point(0, -10);
 			}
-			if (data.index < 50)
+			if (data.index < 40)
 			{
 				attraction += Point(0, -1);
 			}
@@ -111,21 +112,29 @@ namespace AI
 				}
 			}
 			Point step = Point::fromAngle(stepAngle, prototypes->variables.routeStepSize) + data.route[data.index];
-				
+			
+			//VisualDebug::drawLine(data.route[data.index], step, 0x0);
 			
 			if (prototypes->obstacleMap.getInCell(step).size() > 0)
 			{
-				data.index--;
 				data.failureStreak++;
+				if (data.failureStreak >= data.index)
+					data.index = 1;
+				else
+					data.index -= data.failureStreak;
 			}
 			else
 			{
 				data.index++;
 				if (data.route.size() > (size_t)data.index)
+				{
 					data.route[data.index] = step;
+				}
 				else
+				{
 					data.route.push_back(step);
-				data.failureStreak = 0;
+					data.failureStreak = 0;
+				}
 			}
 		}
 	}
