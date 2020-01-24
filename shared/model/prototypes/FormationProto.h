@@ -2,8 +2,6 @@
 #include <json.hpp>
 #include <Point.h>
 
-using json = nlohmann::json;
-
 enum class FORMATION_TYPE : int32_t
 {
 	ASSAULT,
@@ -14,29 +12,24 @@ enum class FORMATION_TYPE : int32_t
 
 class FormationSlotConnectionProto
 {
-public:
-	FormationSlotConnectionProto() = default;
-	~FormationSlotConnectionProto() = default;
-	
+public:	
 	int32_t slot;
 	Point offset;	
 };
 
 class FormationSlotProto
 {
-public:
-	FormationSlotProto() = default;
-	~FormationSlotProto() = default;
-	
+public:	
 	int32_t index;
 	Point offset;
 	int16_t creepType;
-	int32_t priority; //distance to the circle surrounding the bounding box of the formation
+	///distance to the circle surrounding the bounding box of the formation
+	int32_t priority; 
 	bool optional;
 	std::vector<FormationSlotConnectionProto> connections;
 	
 };
-void from_json(const json &j, FormationSlotProto &slot);
+void from_json(const nlohmann::json& j, FormationSlotProto& slot);
 
 class FormationLayout
 {
@@ -47,7 +40,7 @@ public:
 	int32_t connections;
 };
 
-void from_json(const json &j, FormationLayout &layout);
+void from_json(const nlohmann::json& j, FormationLayout& layout);
 
 class FormationDef
 {
@@ -63,7 +56,7 @@ public:
 	std::vector<int32_t> slots;
 };
 
-void from_json(const json &j, FormationDef &def);
+void from_json(const nlohmann::json& j, FormationDef& def);
 
 class FormationProto
 {

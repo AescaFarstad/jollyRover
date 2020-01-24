@@ -5,9 +5,8 @@ class Point;
 class Edge
 {
 public:
-	Edge();
+	Edge() = default;
 	Edge(Point* p1, Point* p2);
-	~Edge();
 
 	Point* p1;
 	Point* p2;

@@ -1,4 +1,5 @@
 #include <InputRouteMessage.h>
+#include <MessageTypes.h>
 
 InputRouteMessage::InputRouteMessage()
 {

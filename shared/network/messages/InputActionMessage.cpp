@@ -1,7 +1,5 @@
 #include <InputActionMessage.h>
 
-
-
 InputActionMessage::InputActionMessage()
 {
 	typeId = MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG;

@@ -1,4 +1,7 @@
 #include "Logger.h"
+#include <algorithm>
+#include <iostream>
+#include <iomanip>
 
 Logger::Logger(std::initializer_list<LOG_TAGS> enabledTags, std::initializer_list<LOG_TAGS> disabledTags)
 {

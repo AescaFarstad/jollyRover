@@ -1,7 +1,5 @@
 #include <GreetingMessage.h>
 
-
-
 GreetingMessage::GreetingMessage()
 {
 	typeId = MESSAGE_TYPE::TYPE_GREETING_MSG;

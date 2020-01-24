@@ -32,7 +32,7 @@ void NetworkClient::init()
 	isInitialized = true;
 }
 
-void NetworkClient::logSend(std::string messageName, NetworkPacket &packet)
+void NetworkClient::logSend(std::string messageName, NetworkPacket& packet)
 {
 	S::log.add("< SEND " + messageName + " to " + std::to_string(login) + ":\n\t" +
 		Serializer::toHex(packet.payload, packet.payloadSize),

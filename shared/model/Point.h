@@ -1,4 +1,5 @@
 #pragma once
+#include <Global.h>
 #include <ISerializable.h>
 #include <json.hpp>
 #include <math.h>
@@ -7,16 +8,10 @@
 #include <iomanip>
 #include <sstream>
 
-using json = nlohmann::json;
-
 class Point
 {
 public:
 	Point(float x = 0, float y = 0);
-	/*
-	~Point() = default;
-	Point(const Point&) = default;
-	Point& operator=(const Point&) = default;*/
 	
 	static Point getNullPoint();
 	static Point fromAngle(float angle, float length = 1);
@@ -39,15 +34,15 @@ public:
 	float sqDistanceTo(const Point& anotherPoint) const;
 	float sqDistanceTo(const float x, const float y) const;
 	Point subtract(const Point& anotherPoint) const;
-	void subtract(const Point& anotherPoint, Point &out);
+	void subtract(const Point& anotherPoint, Point& out);
 	Point add(const Point& anotherPoint) const;
-	void add(const Point& anotherPoint, Point &out);
+	void add(const Point& anotherPoint, Point& out);
 	Point rotate(const float angle) const;
-	void rotate(const float angle, Point &out);
-	float crossProduct(const Point &anotherPoint) const;
-	float cos(const Point &anotherPoint) const;
-	float sin(const Point &anotherPoint) const;
-	float projectOnto(const Point &anotherPoint) const;
+	void rotate(const float angle, Point& out);
+	float crossProduct(const Point& anotherPoint) const;
+	float cos(const Point& anotherPoint) const;
+	float sin(const Point& anotherPoint) const;
+	float projectOnto(const Point& anotherPoint) const;
 	
 	void operator+=(const Point& p);
 	void operator-=(const Point& p);
@@ -60,7 +55,7 @@ public:
 
 };
 
-void from_json(const json& j, Point& point);
+void from_json(const nlohmann::json& j, Point& point);
 Point operator+(const Point& x, const Point& y);
 Point operator-(const Point& x, const Point& y);
 bool operator==(const Point& x, const Point& y);

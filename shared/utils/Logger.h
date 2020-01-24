@@ -1,10 +1,6 @@
 #pragma once
 #include <vector>
-#include <cstdarg>
-#include <algorithm>
-#include <iostream>
 #include <string>
-#include <iomanip>
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL.h>
@@ -43,7 +39,6 @@ class Logger
 public:
 	Logger() = default;
 	Logger(std::initializer_list<LOG_TAGS> m_enabledTags, std::initializer_list<LOG_TAGS> m_disabledTags);
-	~Logger() = default;
 
 	void add(const std::string& message, std::initializer_list<LOG_TAGS> tags);
 	void add(const std::string& message);

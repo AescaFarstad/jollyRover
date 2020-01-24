@@ -242,7 +242,7 @@ void ServerNetwork::addMessageToBuffer(std::unique_ptr<NetworkMessage> msg, Mess
 	}
 }
 
-void ServerNetwork::generateNewLogin(int32_t &login)
+void ServerNetwork::generateNewLogin(int32_t& login)
 {
 	do
 	{
@@ -251,7 +251,7 @@ void ServerNetwork::generateNewLogin(int32_t &login)
 	while (loginExists(login));
 }
 
-void ServerNetwork::generateNewPassword(std::vector<int8_t> &password)
+void ServerNetwork::generateNewPassword(std::vector<int8_t>& password)
 {
 	password.clear();
 	for (size_t i = 0; i < 12; i++)

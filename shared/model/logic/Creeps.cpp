@@ -1294,16 +1294,13 @@ namespace Creeps
 					if (penetration > 0)
 					{
 						float force = penetration * prototypes->variables.creepRestitution;
-						
-						/*if (creep.unit.force == creep2->unit.force && creep.unit.prototypeId != creep2->unit.prototypeId)
-							force /= 10;*/
 							
 						float creep1Part = creep2->creepProto_->weight;
 						float creep2Part = creep.creepProto_->weight;
 						
 						//Scale by how much the movement aligns with the direction the tractor is facing. It's hard to move tractors sideways.
 						if (creep.creepProto_->moveType == MOVE_TYPE::TRACTOR)
-							creep1Part *= std::fabs(creep2Creep * Point::fromAngle(creep.orientation) / creep2Creep.getLength());
+							creep1Part *= std::fabs(creep2Creep * Point::fromAngle(creep.orientation) / creep2Creep.getLength()); //sin * L = projection
 						if (creep2->creepProto_->moveType == MOVE_TYPE::TRACTOR)
 							creep2Part *= std::fabs(creep2Creep * Point::fromAngle(creep2->orientation) / creep2Creep.getLength());
 						

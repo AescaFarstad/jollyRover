@@ -8,7 +8,6 @@ namespace S
 		return idCounter++;
 	}
 	GameConfig config;
-	FPSMeter fpsMeter;
 }
 
 

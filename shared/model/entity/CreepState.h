@@ -9,7 +9,6 @@ class CreepState
 {
 public:
 	CreepState();
-	~CreepState() = default;
 	
 	static const int8_t MAX_WHISKER_COUNT = 32;
 	

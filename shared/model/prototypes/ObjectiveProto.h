@@ -1,7 +1,6 @@
 #pragma once
 #include <json.hpp>
 #include <Point.h>
-using json = nlohmann::json;
 
 enum class OBJECTIVE_TYPE : int8_t
 {
@@ -19,4 +18,4 @@ public:
 	int32_t weight;
 };
 
-void from_json(const json &j, ObjectiveProto &objective);
+void from_json(const nlohmann::json& j, ObjectiveProto& objective);

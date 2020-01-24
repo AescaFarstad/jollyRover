@@ -1,8 +1,6 @@
 #include <ObjectiveProto.h>
 
-
-
-void from_json(const json &j, ObjectiveProto &objective)
+void from_json(const nlohmann::json& j, ObjectiveProto& objective)
 {
 	objective.id = j.at("id");
 	objective.forces = j.at("forces").get<std::vector<int16_t>>();

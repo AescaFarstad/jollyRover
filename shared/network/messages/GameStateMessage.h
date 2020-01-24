@@ -7,10 +7,8 @@ class GameStateMessage :
 {
 public:
 	GameStateMessage();
-	~GameStateMessage();
 
-	GameState* state;
-	bool ownsState;
+	std::unique_ptr<GameState> state;
 
 	void deserialize(SerializationStream& stream) override;
 	void serialize(SerializationStream& stream) const override;

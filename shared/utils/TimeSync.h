@@ -6,7 +6,6 @@ class TimeSync
 {
 public:
 	TimeSync();
-	~TimeSync();
 
 	void addMeasurement(uint32_t localRequest, uint32_t serverResponse, uint32_t localResponse);
 	int64_t localToServerUpperBound(uint32_t local);

@@ -29,7 +29,7 @@ void GameState::deserialize(SerializationStream& stream)
 	Serializer::readVector(creeps, stream);
 	Serializer::readVector(projectiles, stream);
 	Serializer::readVector(formations, stream);
-	for(auto&creep : creeps)
+	for(auto& creep : creeps)
 		creepById_[creep.unit.id] = &creep;
 }
 

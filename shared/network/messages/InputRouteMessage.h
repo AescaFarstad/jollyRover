@@ -1,7 +1,6 @@
 #pragma once
 #include <Point.h>
 #include <InputMessage.h>
-#include <MessageTypes.h>
 #include <SerializationStream.h>
 
 

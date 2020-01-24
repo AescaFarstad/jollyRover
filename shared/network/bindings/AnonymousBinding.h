@@ -6,7 +6,7 @@ class AnonymousBinding :
 {
 public:
 	AnonymousBinding(std::string name);
-	virtual ~AnonymousBinding();
+	virtual ~AnonymousBinding() = default;
 	AnonymousBinding(const AnonymousBinding& that) = delete;
 	AnonymousBinding(AnonymousBinding&& that);
 

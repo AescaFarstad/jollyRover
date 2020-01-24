@@ -1,7 +1,6 @@
 #pragma once
 #include <Point.h>
 #include <json.hpp>
-using json = nlohmann::json;
 
 enum class MOVE_TYPE : uint8_t
 {
@@ -12,10 +11,7 @@ enum class MOVE_TYPE : uint8_t
 class TextureDef;
 class WeaponProto
 {
-public:
-	WeaponProto() = default;
-	~WeaponProto() = default;
-	
+public:	
 	int16_t id;
 	int32_t damage;
 	int32_t attackSpeed;
@@ -34,9 +30,6 @@ private:
 class CreepProto
 {
 public:
-	CreepProto() = default;
-	~CreepProto() = default;
-
 	int16_t id;
 	std::string name;
 	int32_t maxHealth;
@@ -66,5 +59,5 @@ private:
 
 };
 
-void from_json(const json &j, CreepProto &creep);
-void from_json(const json &j, WeaponProto &weapon);
+void from_json(const nlohmann::json& j, CreepProto& creep);
+void from_json(const nlohmann::json& j, WeaponProto& weapon);

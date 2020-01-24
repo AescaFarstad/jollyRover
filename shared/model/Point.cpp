@@ -86,7 +86,7 @@ std::string Point::toString() const
 	return stream.str();
 }
 
-float Point::distanceTo(const Point &anotherPoint) const
+float Point::distanceTo(const Point& anotherPoint) const
 {
 	return std::sqrt(
 			(anotherPoint.x - x)*(anotherPoint.x - x) +
@@ -102,7 +102,7 @@ float Point::distanceTo(const float x, const float y) const
 	);
 }
 
-float Point::sqDistanceTo(const Point &anotherPoint) const
+float Point::sqDistanceTo(const Point& anotherPoint) const
 {
 	return (anotherPoint.x - x)*(anotherPoint.x - x) +
 			(anotherPoint.y - y)*(anotherPoint.y - y);
@@ -114,23 +114,23 @@ float Point::sqDistanceTo(const float x, const float y) const
 			(this->y - y)*(this->y - y);
 }
 
-Point Point::subtract(const Point &anotherPoint) const
+Point Point::subtract(const Point& anotherPoint) const
 {
 	return Point(x - anotherPoint.x, y - anotherPoint.y);
 }
 
-void Point::subtract(const Point &anotherPoint, Point &out)
+void Point::subtract(const Point& anotherPoint, Point& out)
 {
 	out.x = x - anotherPoint.x;
 	out.y = y - anotherPoint.y;
 }
 
-Point Point::add(const Point & anotherPoint) const
+Point Point::add(const Point& anotherPoint) const
 {
 	return Point(x + anotherPoint.x, y + anotherPoint.y);
 }
 
-void Point::add(const Point & anotherPoint, Point & out)
+void Point::add(const Point& anotherPoint, Point& out)
 {
 	out.x = x + anotherPoint.x;
 	out.y = y + anotherPoint.y;
@@ -141,7 +141,7 @@ Point Point::rotate(const float angle) const
 	return Point(x * FMath::cos(angle) - y * FMath::sin(angle),  x * FMath::sin(angle) + y * FMath::cos(angle));
 }
 
-void Point::rotate(const float angle, Point &out)
+void Point::rotate(const float angle, Point& out)
 {
 	//&out can be the point itself -> don't mutate it until both x and y are final
 	float nx = x * FMath::cos(angle) - y * FMath::sin(angle);
@@ -150,22 +150,22 @@ void Point::rotate(const float angle, Point &out)
 	out.y = ny;
 }
 
-float Point::crossProduct(const Point &anotherPoint) const
+float Point::crossProduct(const Point& anotherPoint) const
 {
 	return x*anotherPoint.y - anotherPoint.x * y;
 }
 
-float Point::cos(const Point &anotherPoint) const
+float Point::cos(const Point& anotherPoint) const
 {
 	return (*this * anotherPoint) / (getLength() * anotherPoint.getLength());
 }
 
-float Point::sin(const Point &anotherPoint) const
+float Point::sin(const Point& anotherPoint) const
 {
 	return crossProduct(anotherPoint) / (getLength() * anotherPoint.getLength());
 }
 
-float Point::projectOnto(const Point &anotherPoint) const
+float Point::projectOnto(const Point& anotherPoint) const
 {
 	return *this * anotherPoint / anotherPoint.getLength();
 }
@@ -195,19 +195,19 @@ void Point::operator/=(const float& p)
 	y /= p;
 }
 
-void Point::deserialize(SerializationStream &stream)
+void Point::deserialize(SerializationStream& stream)
 {
 	Serializer::read(x, stream);
 	Serializer::read(y, stream);
 }
 
-void Point::serialize(SerializationStream &stream) const
+void Point::serialize(SerializationStream& stream) const
 {
 	Serializer::write(x, stream);
 	Serializer::write(y, stream);
 }
 
-void from_json(const json &j, Point &point)
+void from_json(const nlohmann::json& j, Point& point)
 {
 	point.x = j.at("x");
 	point.y = j.at("y");

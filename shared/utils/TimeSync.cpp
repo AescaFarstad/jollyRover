@@ -1,17 +1,10 @@
 #include <TimeSync.h>
 
-
-
 TimeSync::TimeSync()
 {
 	m_measurementCount = 0;
 	m_minDelta = INT32_MAX;
 	m_maxDelta = INT32_MIN;
-}
-
-
-TimeSync::~TimeSync()
-{
 }
 
 void TimeSync::addMeasurement(uint32_t localRequest, uint32_t serverResponse, uint32_t localResponse)

@@ -2,7 +2,7 @@
 #include <EventLogger.h>
 #include <algorithm>
 
-//input with time T is not yet applied to state with stamp T
+//input with time T is not yet applied to the state with stamp T
 
 GameUpdater::GameUpdater()
 {
@@ -19,12 +19,11 @@ void GameUpdater::update(uint32_t time)
 
 	while (state->timeStamp < time - prototypes->variables.fixedStepDuration)
 	{		
-		std::vector<InputMessage*>* inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + prototypes->variables.fixedStepDuration);
-		GameLogic::update(state.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
+		std::vector<InputMessage*> inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + prototypes->variables.fixedStepDuration);
+		GameLogic::update(state.get(), prototypes->variables.fixedStepDuration, inputs, prototypes);
 		lastValidTimeStamp = state->timeStamp;
 		if (lastSavedSteps != state->time.performedSteps && state->time.performedSteps % S::config.saveStateInterval == 0)
 			saveState(state.get());
-		delete inputs;
 	}
 }
 
@@ -56,9 +55,8 @@ std::unique_ptr<GameState> GameUpdater::getNewStateByStamp(uint32_t stamp)
 
 	while (result->timeStamp < stamp - prototypes->variables.fixedStepDuration)
 	{
-		std::vector<InputMessage*>* inputs = getThisFrameInputs(result->timeStamp, result->timeStamp + prototypes->variables.fixedStepDuration);
-		GameLogic::update(result.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
-		delete inputs;
+		std::vector<InputMessage*> inputs = getThisFrameInputs(result->timeStamp, result->timeStamp + prototypes->variables.fixedStepDuration);
+		GameLogic::update(result.get(), prototypes->variables.fixedStepDuration, inputs, prototypes);
 	}
 
 	return result;
@@ -79,9 +77,8 @@ std::unique_ptr<GameState> GameUpdater::getNewStateBySteps(int32_t steps)
 
 	while (result->time.performedSteps < steps && result->timeStamp < state->timeStamp)
 	{
-		std::vector<InputMessage*>* inputs = getThisFrameInputs(result->timeStamp, result->timeStamp + prototypes->variables.fixedStepDuration);
-		GameLogic::update(result.get(), prototypes->variables.fixedStepDuration, *inputs, prototypes);
-		delete inputs;
+		std::vector<InputMessage*> inputs = getThisFrameInputs(result->timeStamp, result->timeStamp + prototypes->variables.fixedStepDuration);
+		GameLogic::update(result.get(), prototypes->variables.fixedStepDuration, inputs, prototypes);
 	}
 
 	return result;
@@ -104,16 +101,16 @@ uint32_t GameUpdater::getExecutionStamp(InputMessage* input)
 	return input->serverStamp;
 }
 
-std::vector<InputMessage*>* GameUpdater::getThisFrameInputs(uint32_t fromInclusive, uint32_t toExclusive)
+std::vector<InputMessage*> GameUpdater::getThisFrameInputs(uint32_t fromInclusive, uint32_t toExclusive)
 {
-	std::vector<InputMessage*>* result = new std::vector<InputMessage*>();
+	std::vector<InputMessage*> result;
 
 	for (size_t i = 0; i < inputs.size(); i++)
 	{
 		uint32_t execTime = getExecutionStamp(inputs[i].get());
 		if (execTime >= fromInclusive && execTime < toExclusive)
 		{
-			result->push_back(inputs[i].get());
+			result.push_back(inputs[i].get());
 		}
 	}
 	return result;

@@ -1,7 +1,7 @@
 #include <FormationProto.h>
 
 
-void from_json(const json &j, FormationSlotProto &slot)
+void from_json(const nlohmann::json& j, FormationSlotProto& slot)
 {
 	slot.offset = j.at("offset");
 	slot.creepType = -1;
@@ -10,7 +10,7 @@ void from_json(const json &j, FormationSlotProto &slot)
 	slot.optional = j.find("optional") == j.end() ? false : (bool)j.at("optional");
 }
 
-void from_json(const json &j, FormationLayout &layout)
+void from_json(const nlohmann::json& j, FormationLayout& layout)
 {
 	layout.id = j.at("id");	
 	layout.leader = j.at("leader");
@@ -18,7 +18,7 @@ void from_json(const json &j, FormationLayout &layout)
 	layout.slots = j.at("slots").get<std::vector<FormationSlotProto>>();	
 }
 
-void from_json(const json &j, FormationDef &def)
+void from_json(const nlohmann::json& j, FormationDef& def)
 {
 	def.id = j.at("id");	
 	def.layout = j.at("layout");

@@ -4,9 +4,6 @@
 class ForceProto
 {
 public:
-	ForceProto() = default;
-	~ForceProto() = default;
-	
 	
 	int16_t id;
 	Point spawnAA;
@@ -16,4 +13,4 @@ public:
 
 };
 
-void from_json(const json &j, ForceProto &force);
+void from_json(const nlohmann::json& j, ForceProto& force);

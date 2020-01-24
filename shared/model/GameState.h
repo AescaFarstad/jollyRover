@@ -11,28 +11,17 @@
 #include <EventLogger.h>
 #include <ThreatMap.h>
 #include <vector>
-/*
-class ForceState
-{
-	ForceState() = default;
-	~ForceState() = default;
-	
-	
-	
-};*/
 
 class GameState
 {
 public:
 	GameState();
 	GameState(uint32_t randomSeed);
-	~GameState() = default;
 	
 	static const int32_t MAX_CREEPS = 1500;
 	
 	std::vector<CreepState> creeps;
 	std::vector<Projectile> projectiles;
-	//std::vector<ForceState> forces;
 	
 	std::vector<PlayerState> players;
 	std::vector<FormationState> formations;

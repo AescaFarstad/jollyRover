@@ -1,5 +1,4 @@
-
-	
+#pragma once
 #include <CircularContainer.h>
 #include <ISerializable.h>
 
@@ -19,5 +18,5 @@ void write(const CircularContainer<T, arraySize> value, SerializationStream& str
 	write(value.cursor, stream);
 	write(value.total, stream);
 	write(value.size, stream);
-	stream.write(value.array, std::min((int)sizeof(value.array), (int)value.total));
+	stream.write(value.array, std::min((int32_t)sizeof(value.array), (int32_t)value.total));
 }

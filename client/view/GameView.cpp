@@ -7,6 +7,7 @@
 #include <FPSMeter.h>
 #include <DrawSettings.h>
 #include <GameLogic.h>
+#include <FPSMeter.h>
 
 
 GameView::GameView()

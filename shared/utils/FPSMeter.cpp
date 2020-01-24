@@ -50,3 +50,8 @@ size_t FPSMeter::getMeasurementDuration()
 {
 	return (m_time - m_lastMeasurement);
 }
+
+namespace S
+{
+	FPSMeter fpsMeter;
+}

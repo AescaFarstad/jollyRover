@@ -133,8 +133,7 @@ void Game::start()
 			int64_t clientToServerDelta = m_network->timeSync.localToServerUpperBound(0);
 			S::log.add("server time delta: " + std::to_string(clientToServerDelta) + 
 					" uncertainty: " + std::to_string(m_network->timeSync.getUncertainty()), { LOG_TAGS::NET });
-			m_gameMode.loadGame(std::unique_ptr<GameState>(gameStateMsg->state), clientToServerDelta, m_login);
-			gameStateMsg->ownsState = false;
+			m_gameMode.loadGame(std::move(gameStateMsg->state), clientToServerDelta, m_login);
 			
 			addNetworkBindings();
 
@@ -248,7 +247,7 @@ bool Game::handleGlobalKey(SDL_Scancode scancode)
 void Game::loadPrototypes()
 {
 	std::ifstream file("out/prototypes.json");
-	json j = json::parse(file);
+	nlohmann::json j = nlohmann::json::parse(file);
 	file.close();
 	m_prototypes.load(j);
 }
@@ -256,7 +255,7 @@ void Game::loadPrototypes()
 void Game::loadConfig()
 {
 	std::ifstream file("out/config.json");
-	json j = json::parse(file);
+	nlohmann::json j = nlohmann::json::parse(file);
 	file.close();
 	S::config.load(j);	
 }

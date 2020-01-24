@@ -10,7 +10,7 @@ class ResponseBinding
 {
 public:
 	ResponseBinding(std::string name);
-	virtual ~ResponseBinding();
+	virtual ~ResponseBinding() = default;
 	ResponseBinding(const ResponseBinding& that) = delete;
 	ResponseBinding(ResponseBinding&& that) = default;
 	

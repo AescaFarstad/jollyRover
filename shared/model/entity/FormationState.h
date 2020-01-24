@@ -20,8 +20,6 @@ enum class SUB_OBJECTIVE : int8_t
 class FormationState
 {
 public:
-	FormationState() = default;
-	~FormationState() = default;
 	
 	static const int8_t MAX_FORMATION_COUNT = 32;
 		

@@ -9,6 +9,7 @@
 #include <functional>
 #include <ResponseBinder.h>
 #include <AnonymousBinding.h>
+#include <GenericRequestMessage.h>
 
 #ifdef __EMSCRIPTEN__
 	#include <SimplePacket.h>

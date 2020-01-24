@@ -79,7 +79,7 @@ public:
 	int32_t idCounter;
 	CircularContainer<ProjectileExplosionEvent, 501> projectileExplosions;
 	CircularContainer<CreepDeathEvent, 51> creepDeaths;
-	CircularContainer<CarDeathEvent, 5> carDeaths;
+	CircularContainer<CarDeathEvent, 10> carDeaths;
 	
 	void addProjectileExplosion(int32_t stamp, int32_t id, int32_t prototypeId, const Point& target)
 	{

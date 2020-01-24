@@ -12,9 +12,9 @@ namespace FMath
 	const float F_MAX = std::numeric_limits<float>::max();
 	const float F_MIN = std::numeric_limits<float>::min();
 
-	Point getEdgeIntersection(Edge &e1, Edge &e2);
-	Point getLinesIntersection(Point &s11, Point &s12, Point &s21, Point &s22);
-	float distanceToLine(const Point &from, const Point &l1, const Point &l2);
+	Point getEdgeIntersection(Edge& e1, Edge& e2);
+	Point getLinesIntersection(Point& s11, Point& s12, Point& s21, Point& s22);
+	float distanceToLine(const Point& from, const Point& l1, const Point& l2);
 
 	float lerp(float x1, float y1, float x2, float y2, float argument);
 	float nlerp(float x1, float y1, float x2, float y2, float argument, float power);
@@ -28,6 +28,6 @@ namespace FMath
 	float normalizeAngle(float angle);
 	float cos(float angle);
 	float sin(float angle);
-	//quick simple hash sdbm
+	///quick simple hash sdbm
 	int32_t q_sdbm(int32_t number);
 }

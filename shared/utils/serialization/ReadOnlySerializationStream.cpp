@@ -1,20 +1,10 @@
 #include <ReadOnlySerializationStream.h>
 
-
-
 class StreamNoGrower : public StreamGrower
 {
 public:
-	StreamNoGrower() = default;
-	~StreamNoGrower() = default;
-
 	void grow(SerializationStream * stream, size_t minimum) override {THROW_FATAL_ERROR("this stream must not grow");};
-
-private:
 };
-
-
-
 
 ReadOnlySerializationStream::ReadOnlySerializationStream(const char* data, size_t length)
 {

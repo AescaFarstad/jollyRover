@@ -13,7 +13,6 @@ class GameUpdater
 {
 public:
 	GameUpdater();
-	~GameUpdater() = default;
 
 	std::unique_ptr<GameState> state;
 	Prototypes* prototypes;
@@ -31,7 +30,7 @@ private:
 	std::vector<std::unique_ptr<InputMessage>> inputs;
 	uint32_t lastValidTimeStamp;
 	uint32_t getExecutionStamp(InputMessage* input);
-	std::vector<InputMessage*>* getThisFrameInputs(uint32_t fromInclusive, uint32_t toExclusive);
+	std::vector<InputMessage*> getThisFrameInputs(uint32_t fromInclusive, uint32_t toExclusive);
 	std::map<uint32_t, std::unique_ptr<SerializationStream>, std::greater<uint32_t>> statesByStamps;
 	std::map<uint32_t, uint32_t, std::greater<uint32_t>> stampsBySteps;
 	void rewindToPrecedingState(uint32_t stamp);

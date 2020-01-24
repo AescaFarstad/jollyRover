@@ -12,12 +12,10 @@
 #include <ForceProto.h>
 #include <SpatialMap.h>
 
-using json = nlohmann::json;
 
 class Prototypes
 {
 public:
-
 	VariableProto variables;
 	std::vector<Obstacle> obstacles;
 	std::vector<CarProto> cars;
@@ -32,5 +30,5 @@ public:
 	
 	void postProcess();
 
-	void load(json &source);
+	void load(nlohmann::json& source);
 };

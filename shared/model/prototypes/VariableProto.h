@@ -1,14 +1,10 @@
 #pragma once
 #include <json.hpp>
 #include <Point.h>
-using json = nlohmann::json;
-
 
 class VariableProto
 {
 public:
-	VariableProto();
-	~VariableProto();
 
 	int32_t fixedStepDuration;
 	
@@ -50,7 +46,7 @@ public:
 	int32_t minCreepsToRetreat;
 	
 
-	void load(json &source);
+	void load(nlohmann::json& source);
 
 private:
 

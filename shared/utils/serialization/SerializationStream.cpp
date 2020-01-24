@@ -1,7 +1,6 @@
 #include <SerializationStream.h>
-#include <SerializeSimpleTypes.h>
 #include <Serializer.h>
-#include <cmath>
+#include <Global.h>
 
 SerializationStream::SerializationStream(std::unique_ptr<StreamGrower> grower)
 {
@@ -149,7 +148,7 @@ void SerializationStream::seekAbsolute(size_t position)
 		return;
 	}
 	printf(" ");
-	THROW_FATAL_ERROR("seekAbsolute is out if bounds (" + std::to_string(position) + ")");
+	THROW_FATAL_ERROR("seekAbsolute is out if bounds");
 }
 
 void SerializationStream::seekRelative(size_t position)

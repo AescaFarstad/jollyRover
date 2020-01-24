@@ -62,13 +62,9 @@ void ConsecutiveTask::tryToAdvance()
 		}
 		case SUB_TASK_TYPE::ASYNC:
 		{
-			//std::function<void()> function = [this]() {/* this->onTaskComplete();*/ };
-			//function();
 			std::unique_ptr<Callback> callback = std::make_unique<Callback>([this]() { this->onTaskComplete(); });
-			//callback->execute();
 			pendingCallback = callback->createPendingCallback();
 			isWaitingForCallback = true;
-			//callback->execute();
 			subTasks[currentSubTask].asyncFunction(std::move(callback));
 			return;
 		}

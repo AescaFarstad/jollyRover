@@ -1,6 +1,8 @@
 #include <NetworkPacket.h>
 #include <string>
 #include <iostream>
+#include <SerializationStream.h>
+#include <Global.h>
 
 NetworkPacket::NetworkPacket()
 {
@@ -98,21 +100,11 @@ void NetworkPacket::setPayloadFromRawData(const char* newRawData, size_t size)
 	Serializer::write((uint16_t)size, rawData + 2);
 
 	bytesLoaded = rawSize;
-
-	//S::log.add("RWW payload\n" + Serializer::toHex(payload, payloadSize));
-	//S::log.add("RWW all\n" + Serializer::toHex(rawData, rawSize));
-	//S::log.add("RWW original\n" + Serializer::toHex(newRawData, size));
 }
 
 void NetworkPacket::setPayloadFromSerializable(const ISerializable& serializable, size_t expectedSize)
 {
 	SerializationStream stream = SerializationStream::createExp(expectedSize, 2);
-	//S::log.add("setPayloadFromSerializable ::");
 	serializable.serialize(stream); 
-	
-	//std::string h;
-	//h.assign(stream.readAllAsHex(), stream.getLength() * 3);
-
-	//S::log.add("setPayloadFromSerializable " + h);
 	setPayloadFromRawData(stream.readAll(), stream.getLength());
 }

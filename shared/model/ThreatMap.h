@@ -6,7 +6,6 @@ class ThreatMap
 public:
 	ThreatMap();
 	ThreatMap(int32_t cellSize, Point AA, Point BB);
-	~ThreatMap() = default;
 	
 	void addThreat(Point& origin, int32_t value);
 	void blur(float amount);

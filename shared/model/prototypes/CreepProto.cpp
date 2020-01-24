@@ -1,7 +1,7 @@
 #include <CreepProto.h>
 #include <CreepState.h>
 
-void from_json(const json &j, CreepProto &creep)
+void from_json(const nlohmann::json& j, CreepProto& creep)
 {
 	creep.id = j.at("id");
 	creep.name = j.at("name");
@@ -48,7 +48,7 @@ void from_json(const json &j, CreepProto &creep)
 	creep.gunTextureName = j.at("gunTexture").get<std::vector<std::string>>();
 }
 
-void from_json(const json &j, WeaponProto &weapon)
+void from_json(const nlohmann::json& j, WeaponProto& weapon)
 {
 	weapon.id = j.at("id");
 	weapon.damage = j.at("damage");

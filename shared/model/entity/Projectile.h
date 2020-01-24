@@ -6,8 +6,6 @@
 class Projectile
 {
 public:
-	Projectile() = default;
-	~Projectile() = default;
 		
 	int32_t id;
 	int16_t prototypeId;

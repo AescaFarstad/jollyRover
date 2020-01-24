@@ -46,7 +46,7 @@ uint8_t FMath::lerp_ui8(float x1, uint8_t y1, float x2, uint8_t y2, float argume
 	return (uint8_t)rawValue;
 }
 	
-Point FMath::getEdgeIntersection(Edge &e1, Edge &e2)
+Point FMath::getEdgeIntersection(Edge& e1, Edge& e2)
 {
 	Point nullResult;
 	nullResult.setToNaN();
@@ -70,7 +70,7 @@ Point FMath::getEdgeIntersection(Edge &e1, Edge &e2)
 	return belongs ? intersection : nullResult;
 }
 
-Point FMath::getLinesIntersection(Point &s11, Point &s12, Point &s21, Point &s22)
+Point FMath::getLinesIntersection(Point& s11, Point& s12, Point& s21, Point& s22)
 {
 	float A1 = s12.y - s11.y;
 	float B1 = s11.x - s12.x;
@@ -92,7 +92,7 @@ Point FMath::getLinesIntersection(Point &s11, Point &s12, Point &s21, Point &s22
 	return Point(intersectionX, intersectionY);
 }
 
-float FMath::distanceToLine(const Point &from, const Point &l1, const Point &l2)
+float FMath::distanceToLine(const Point& from, const Point& l1, const Point& l2)
 {
 	if (l1.x == l2.x)
 	{
@@ -329,7 +329,13 @@ float firstQuarterSin(float angle)
 {
 	float index = angle / (float)M_PI * 2 * (SIN_VALUES_LENGTH - 1);
 				
-	return FMath::lerp(std::floor(index), SIN_VALUES[(int)(std::floor(index))], std::ceil(index), SIN_VALUES[(int)(std::ceil(index))], index);
+	return FMath::lerp(
+						std::floor(index), 
+						SIN_VALUES[(int)(std::floor(index))], 
+						std::ceil(index), 
+						SIN_VALUES[(int)(std::ceil(index))], 
+						index
+					);
 		
 }
 

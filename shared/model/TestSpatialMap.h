@@ -18,7 +18,7 @@ public:
 
 void runTest()
 {
-	SpatialMap<TestObject> map(100, Point(-1000, -1000), Point(1000, 1000));
+	SpatialMap<TestObject> map(100, true, Point(-1000, -1000), Point(1000, 1000));
 	SeededRandom random(124124);
 	
 	const int32_t numObjects = 10000;

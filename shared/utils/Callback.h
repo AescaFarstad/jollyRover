@@ -29,7 +29,7 @@ class PendingCallback
 {
 	friend Callback;
 public:
-	PendingCallback();
+	PendingCallback() = default;
 	~PendingCallback();
 	PendingCallback(PendingCallback&& that);
 	PendingCallback& operator=(PendingCallback&& that);
@@ -44,7 +44,7 @@ private:
 class DeathNotice : Callback
 {
 public:
-	DeathNotice();
+	DeathNotice() = default;
 	~DeathNotice();
 	DeathNotice(const DeathNotice& that) = delete;
 	DeathNotice(DeathNotice&& that);

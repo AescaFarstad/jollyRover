@@ -1,38 +1,20 @@
 #include <GameLogic.h>
 #include <Creeps.h>
-#include <InputTimeMessage.h>
-#include <InputDebugMessage.h>
 #include <VisualDebug.h>
+#include <Cars.h>
 #include <AI.h>
 #include <std2.h>
 
 
 namespace GameLogic
-{		
-	void update(GameState* state, int32_t timePassed, std::vector<InputMessage*> &inputs, Prototypes* prototypes)
+{
+	using namespace GameLogicInternal;
+	
+	void update(GameState* state, int32_t timePassed, std::vector<InputMessage*>& inputs, Prototypes* prototypes)
 	{
 		state->timeStamp += timePassed;
 		
-		for (size_t i = 0; i < inputs.size(); i++)
-		{
-			if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG)
-				GameLogicInternal::handleActionInput(state, static_cast<InputActionMessage*>(inputs[i]));
-			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG)
-				GameLogicInternal::handlePlayerJoinedInput(state, static_cast<InputPlayerJoinedMessage*>(inputs[i]));
-			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_LEFT_MSG)
-				GameLogicInternal::handlePlayerLeftInput(state, static_cast<InputPlayerLeftMessage*>(inputs[i]));
-			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG)
-				GameLogicInternal::handleRouteInput(state, static_cast<InputRouteMessage*>(inputs[i]), prototypes);
-			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_TIME_MSG)
-				GameLogicInternal::handleTimeInput(state, static_cast<InputTimeMessage*>(inputs[i]), prototypes);
-			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_LOAD_GAME_MSG)
-				GameLogicInternal::handleGameLoad(state, static_cast<LoadGameMessage*>(inputs[i]), prototypes);
-			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG)
-				GameLogicInternal::handleInputImpulse(state, static_cast<InputImpulseMessage*>(inputs[i]), prototypes);
-			else if (inputs[i]->typeId == MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG)
-				GameLogicInternal::handleInputDebug(state, static_cast<InputDebugMessage*>(inputs[i]), prototypes);
-			//S::log.add(std::to_string(prototypes->variables.fieldWidth), { LOG_TAGS::UNIQUE });
-		}
+		handleInput(state, inputs, prototypes);
 		
 		TimeState& time = state->time;
 		float timeScale = time.forcedTimeScale > 0 ? time.forcedTimeScale : time.timeScale;
@@ -46,7 +28,7 @@ namespace GameLogic
 		else
 		{
 			int32_t stepsAtOnce = state->time.forcedStepsAtOnce > 0 ? state->time.forcedStepsAtOnce : state->time.stepsAtOnce;
-			//VisualDebug::clear();
+			VisualDebug::clear();
 			for(int32_t i = 0; i < stepsAtOnce; i++)
 			{
 				if (time.forcedTimeScale > 0 && time.allowedSteps >= 0)
@@ -76,9 +58,6 @@ namespace GameLogic
 			{
 				if (i != route.size() - 1 || route[i - 1].distanceTo(route[i]) > prototypes->variables.routeStepSize + 100 *FMath::EPSILON)
 				{
-					//float ds = route[i - 1].distanceTo(route[i]);
-					//float max = prototypes->variables.routeStepSize + FMath::EPSILON;
-					//float abs = std::fabsf(route[i - 1].distanceTo(route[i]) - prototypes->variables.routeStepSize);
 					S::log.add("INVALID step distance");
 					return false;
 				}
@@ -100,7 +79,7 @@ namespace GameLogic
 		
 		//TODO replace rect with traceLine?
 		auto obstacles = prototypes->obstacleMap.getInCellsIntersectingRect(AA, BB);
-		std::sort(obstacles.begin(), obstacles.end());
+		std::sort(obstacles.begin(), obstacles.end()); //to group all copies of each obstacle
 		
 		Obstacle* previous = nullptr;
 		for (Obstacle* obstacle : obstacles)
@@ -112,7 +91,7 @@ namespace GameLogic
 			{
 				return false;
 			}
-			for (Edge &edge : obstacle->edges)
+			for (Edge& edge : obstacle->edges)
 			{
 				Point intersection = FMath::getEdgeIntersection(testEdge, edge);
 				if (!std::isnan(intersection.x))
@@ -144,8 +123,6 @@ namespace GameLogic
 			newPoint.y = last_p->y + step.y;
 
 			iter->isValid_ = testEdgeIsValid(*last_p, newPoint, prototypes);
-			//std::cout << "+point:" + newPoint.toString() + " " + (newPoint.isValid ? "true" : "false") << "\n";
-			//S::log.add("+point:" + newPoint.toString() + " " + (iter->isValid_ ? "true" : "false"), { LOG_TAGS::INPUT_ });
 
 			last_p = &newPoint;
 			iter++;
@@ -190,6 +167,58 @@ namespace GameLogic
 			
 			Creeps::handleCreepDeath(state, prototypes, timePassed);
 			Cars::handleCarDeath(state, prototypes, timePassed);
+		}
+		
+		void handleInput(GameState* state, std::vector<InputMessage*>& inputs, Prototypes* prototypes)
+		{
+			for (size_t i = 0; i < inputs.size(); i++)
+			{
+				switch (inputs[i]->typeId)
+				{
+				case MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG:
+				{
+					handleActionInput(state, static_cast<InputActionMessage*>(inputs[i]));
+					break;
+				}
+				case MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG:
+				{
+					handlePlayerJoinedInput(state, static_cast<InputPlayerJoinedMessage*>(inputs[i]));
+					break;
+				}
+				case MESSAGE_TYPE::TYPE_INPUT_LEFT_MSG:
+				{
+					handlePlayerLeftInput(state, static_cast<InputPlayerLeftMessage*>(inputs[i]));
+					break;
+				}
+				case MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG:
+				{
+					handleRouteInput(state, static_cast<InputRouteMessage*>(inputs[i]), prototypes);
+					break;
+				}
+				case MESSAGE_TYPE::TYPE_INPUT_TIME_MSG:
+				{
+					handleTimeInput(state, static_cast<InputTimeMessage*>(inputs[i]), prototypes);
+					break;
+				}
+				case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
+				{
+					handleGameLoad(state, static_cast<LoadGameMessage*>(inputs[i]), prototypes);
+					break;
+				}
+				case MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG:
+				{
+					handleInputImpulse(state, static_cast<InputImpulseMessage*>(inputs[i]), prototypes);
+					break;
+				}
+				case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG:
+				{
+					handleInputDebug(state, static_cast<InputDebugMessage*>(inputs[i]), prototypes);
+					break;
+				}
+				default:
+					break;
+				}
+			}
 		}
 		
 		void handlePlayerUpdate(GameState* state, Prototypes* prototypes, int32_t timePassed)

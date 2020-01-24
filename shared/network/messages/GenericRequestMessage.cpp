@@ -1,7 +1,5 @@
 #include <GenericRequestMessage.h>
 
-
-
 GenericRequestMessage::GenericRequestMessage()
 {
 	typeId = MESSAGE_TYPE::TYPE_REQUEST_MSG;

@@ -1,9 +1,6 @@
 #pragma once
-#include <iostream>
 #include <vector>
-#include <string> 
 #include <memory> 
-#include <Global.h>
 
 class StreamGrower;
 class CharBlock;

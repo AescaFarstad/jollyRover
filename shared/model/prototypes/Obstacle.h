@@ -4,13 +4,11 @@
 #include <Edge.h>
 #include <limits>
 
-using json = nlohmann::json;
-
 class Obstacle
 {
 public:
 	Obstacle() = default;
-	Obstacle(Obstacle const& other);
+	Obstacle(const Obstacle& other);
 
 	std::vector<Point> vertices;
 	std::vector<Point> extendedVertices[2];
@@ -32,4 +30,4 @@ private:
 
 };
 
-void from_json(const json& j, Obstacle& obstacle);
+void from_json(const nlohmann::json& j, Obstacle& obstacle);

@@ -49,8 +49,8 @@ private:
 	void handleData(MessageBuffer& externalBuffer);
 	void handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkClient& client, MessageBuffer& externalBuffer);
 	void addMessageToBuffer(std::unique_ptr<NetworkMessage> msg, MessageBuffer& externalBuffer);
-	void generateNewLogin(int32_t &login);
-	void generateNewPassword(std::vector<int8_t> &password);
+	void generateNewLogin(int32_t& login);
+	void generateNewPassword(std::vector<int8_t>& password);
 	bool loginExists(int32_t login);
 };
 

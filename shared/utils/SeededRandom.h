@@ -18,7 +18,7 @@ public:
 	float peekNext();
 	
 	template <typename T>
-	T& getFromVector(std::vector<T> &vec)
+	T& getFromVector(std::vector<T>& vec)
 	{
 		return vec[std::floor(get() * vec.size())];
 	}

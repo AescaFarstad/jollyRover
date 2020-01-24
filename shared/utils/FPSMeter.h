@@ -9,7 +9,6 @@ class FPSMeter
 {
 public:
 	FPSMeter();
-	~FPSMeter() = default;
 	
 	size_t frameCount();
 	
@@ -27,4 +26,9 @@ private:
 	CircularContainer<size_t, 180>  m_ticks;
 };
 
+
+namespace S
+{
+	extern FPSMeter fpsMeter;
+};
 

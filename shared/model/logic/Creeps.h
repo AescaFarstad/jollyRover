@@ -18,7 +18,7 @@ namespace Creeps
 		void spawnFormations(GameState* state, Prototypes* prototypes);
 		void updateCache(GameState* state, Prototypes* prototypes);
 		
-		void spawnFormation(GameState* state, Prototypes* prototypes, ForceProto& forceProto, FormationProto &formationProto);
+		void spawnFormation(GameState* state, Prototypes* prototypes, ForceProto& forceProto, FormationProto& formationProto);
 		CreepState& spawnCreep(int16_t type, const Point& location, GameState* state, Prototypes* prototypes);
 		void spawnProjectile(const Point& from, const Point& to, const WeaponProto* prototype, int16_t force, GameState* state);
 		

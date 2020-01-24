@@ -1,19 +1,8 @@
 #include <ResponseBinder.h>
-
-
-
-ResponseBinder::ResponseBinder()
-{
-}
-
-
-ResponseBinder::~ResponseBinder()
-{
-}
+#include <GenericRequestMessage.h>
 
 int32_t ResponseBinder::bind(std::unique_ptr<ResponseBinding> binding)
 {
-	//std::cout << "add binding " << binding->name << "\n";
 	int32_t id = S::getId();
 	std::unique_ptr<PendingCallback> pendingCallback = binding->deathNotice.subscribe([this, id]() {this->unbind(id); });
 	bindings.push_back(BindingStruct {
@@ -22,7 +11,6 @@ int32_t ResponseBinder::bind(std::unique_ptr<ResponseBinding> binding)
 			std::move(pendingCallback)
 		}
 	);
-	//traceBindings();
 	return id;
 }
 
@@ -31,7 +19,6 @@ void ResponseBinder::unbind(int32_t id)
 	for (auto i = bindings.begin(); i != bindings.end(); i++) {
 		if (i->id == id)
 		{
-			//std::cout<< "unbind " + i->binding->name + "\n";
 			auto p = i->pendingCallback.get();
 			if (p)
 				p->disconnect();
@@ -53,8 +40,6 @@ bool ResponseBinder::process(std::unique_ptr<NetworkMessage> msg)
 
 			if (i->binding->callOnce)
 			{
-				//traceBindings("remove " + i->binding->name + " because callOnce");
-				//std::cout<< "unbind because call once " + i->binding->name + "\n";
 				i->pendingCallback->disconnect();
 				bindings.erase(i);
 			}
@@ -79,14 +64,6 @@ void ResponseBinder::traceBindings(std::string reason)
 		result += iter.binding->toString() + "\n has pendingCallback: " + std::to_string((int64_t)iter.pendingCallback.get()) +  "\n";
 	});
 	S::log.add(result, {LOG_TAGS::UNIQUE});
-}
-
-GenericRequestBinder::GenericRequestBinder()
-{
-}
-
-GenericRequestBinder::~GenericRequestBinder()
-{
 }
 
 bool GenericRequestBinder::match(ResponseBinding* binding, NetworkMessage* msg)

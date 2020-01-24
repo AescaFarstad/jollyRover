@@ -1,6 +1,6 @@
 #include <Obstacle.h>
 
-Obstacle::Obstacle(Obstacle const &other)
+Obstacle::Obstacle(const Obstacle& other)
 {
 	vertices = other.vertices;
 	extendedVertices[0] = other.extendedVertices[0];
@@ -28,10 +28,10 @@ Obstacle::Obstacle(Obstacle const &other)
 	//end of the important bit
 }
 
-bool Obstacle::isInside(Point &p)
+bool Obstacle::isInside(Point& p)
 {
 	bool oddNodes = false;
-	for (Edge &edge : edges)
+	for (Edge& edge : edges)
 	{
 		if (
 			((edge.p1->y < p.y && edge.p2->y >= p.y) || (edge.p2->y < p.y && edge.p1->y >= p.y)) &&
@@ -79,7 +79,7 @@ bool Obstacle::hitTest(Edge& e)
 	return false;
 }
 	
-void from_json(const json &j, Obstacle &obstacle)
+void from_json(const nlohmann::json& j, Obstacle& obstacle)
 {
 	obstacle.vertices = j.at("vertices").get<std::vector<Point>>();
 	

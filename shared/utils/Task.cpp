@@ -8,11 +8,6 @@ Task::Task()
 	id = idCounter++;
 }
 
-Task::~Task()
-{
-	
-}
-
 bool Task::isComplete()
 {
 	return _isComplete;

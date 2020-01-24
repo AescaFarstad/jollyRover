@@ -65,11 +65,6 @@ std::unique_ptr<PendingCallback> Callback::createPendingCallback()
 
 
 //-------------------------------------------------------------------------------------------------------------------
-
-PendingCallback::PendingCallback()
-{
-}
-
 PendingCallback::~PendingCallback()
 {
 	cancel();
@@ -113,10 +108,6 @@ void PendingCallback::cancel()
 		callback->m_pendingCallback = nullptr;
 		callback = nullptr;
 	}
-}
-
-DeathNotice::DeathNotice()
-{
 }
 
 DeathNotice::~DeathNotice()

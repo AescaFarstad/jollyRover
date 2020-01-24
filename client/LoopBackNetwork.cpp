@@ -74,7 +74,7 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 					GameStateMessage gsMsg;
 					GameState tempState(1934);
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = &tempState;
+					gsMsg.state = Serializer::copyThroughSerialization(tempState);
 					addToIncoming(gsMsg);
 
 					InputPlayerJoinedMessage pjMsg;
@@ -88,7 +88,7 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 				{
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = gameUpdater->state.get(); 
+					gsMsg.state = Serializer::copyThroughSerialization(*gameUpdater->state); 
 					addToIncoming(gsMsg);
 					break;
 				}

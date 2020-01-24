@@ -1,6 +1,6 @@
 #include<ForceProto.h>
 
-void from_json(const json &j, ForceProto &force)
+void from_json(const nlohmann::json& j, ForceProto& force)
 {
 	auto spawn = j.at("spawn");
 	force.id = j.at("id");

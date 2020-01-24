@@ -9,8 +9,6 @@ class CarState
 {
 public:
 	CarState();
-	~CarState() = default;
-
 	
 	Unit unit;
 	std::vector<Point> route;

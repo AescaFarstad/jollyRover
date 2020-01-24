@@ -23,21 +23,20 @@ class SpatialMap
 public:
 	SpatialMap<T>();
 	SpatialMap<T>(int32_t cellSize, bool useLayeredMap, Point AA, Point BB);
-	~SpatialMap() = default;	
 	SpatialMap<T>& operator=(SpatialMap<T>&& that);	
-	SpatialMap<T>& operator=(SpatialMap<T>& that) = delete;
+	SpatialMap<T>& operator=(const SpatialMap<T>& that) = delete;
 	SpatialMap<T>(SpatialMap<T>&& that) = delete;
-	SpatialMap<T>(SpatialMap<T>& that) = delete;
+	SpatialMap<T>(const SpatialMap<T>& that) = delete;
 	
 	void reset(int32_t expectedCount);
-	void addUnique(std::vector<T>& data);
-	void addNonUnique(std::vector<T>& data);
+	void addUnique(std::vector<T>& data); //Добавить данные, которые могут оказаться только в одной ячейке
+	void addNonUnique(std::vector<T>& data); //Добавить даннеы, которые могут присутствовать сразу в нескольких ячейках
 	std::vector<T*> getInRadius(const Point& origin, int32_t radius);
 	std::vector<T*>& getInCell(const Point& origin);
 	std::vector<T*> getInCellsIntersectingRect(const Point& AA, const Point& BB);
 	std::vector<std::pair<Point, std::vector<T*>*>> getCellsInRadius(const Point& origin, int32_t radius, float in_out_ratio = 0.5);
-	template <typename F>
-	std::vector<T*> getNearest(const Point& origin, F predicate);
+	//template <typename F>
+	//std::vector<T*> getNearest(const Point& origin, F predicate);
 	int32_t getCellSize();
 	bool isValid();
 	

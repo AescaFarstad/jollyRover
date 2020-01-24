@@ -8,7 +8,6 @@ class GameInputBinding :
 {
 public:
 	GameInputBinding(GameUpdater* gameUpdater, std::string name);
-	~GameInputBinding();
 
 	void handle(std::unique_ptr<NetworkMessage> message) override;
 private:

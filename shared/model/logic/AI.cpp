@@ -1,6 +1,7 @@
 #include <AI.h>
 #include <GameLogic.h>
 #include <VisualDebug.h>
+#include <Cars.h>
 
 namespace AI
 {		

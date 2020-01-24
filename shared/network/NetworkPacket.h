@@ -1,7 +1,5 @@
 #pragma once
-#include <string>
 #include <ISerializable.h>
-#include <SerializationStream.h>
 
 class NetworkPacket
 {

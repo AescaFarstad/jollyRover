@@ -10,7 +10,6 @@
 #include <LoadGameMessage.h>
 #include <InputImpulseMessage.h>
 #include <InputDebugMessage.h>
-#include <Cars.h>
 
 namespace GameLogic
 {
@@ -25,6 +24,7 @@ namespace GameLogic
 	namespace GameLogicInternal
 	{
 		void makeLogicStep(GameState* state, int32_t timePassed, Prototypes* prototypes);
+		void handleInput(GameState* state, std::vector<InputMessage*>& inputs, Prototypes* prototypes);
 		void handleActionInput(GameState* state, InputActionMessage* input);
 		void handlePlayerJoinedInput(GameState* state, InputPlayerJoinedMessage* input);
 		void handlePlayerLeftInput(GameState* state, InputPlayerLeftMessage* input);

@@ -1,16 +1,8 @@
 #include <AnonymousBinding.h>
 
-
-
 AnonymousBinding::AnonymousBinding(std::string name) : ResponseBinding(name)
 {
 }
-
-
-AnonymousBinding::~AnonymousBinding()
-{
-}
-
 
 AnonymousBinding::AnonymousBinding(AnonymousBinding&& that) : ResponseBinding::ResponseBinding(std::move(that))
 {

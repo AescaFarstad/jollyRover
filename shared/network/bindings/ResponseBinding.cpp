@@ -1,7 +1,5 @@
 #include <ResponseBinding.h>
 
-
-
 ResponseBinding::ResponseBinding(std::string name)
 {
 	bindsLogin = false;
@@ -10,11 +8,6 @@ ResponseBinding::ResponseBinding(std::string name)
 	bindsGenericType = false;
 	callOnce = true;
 	this->name = name;
-}
-
-
-ResponseBinding::~ResponseBinding()
-{	
 }
 
 std::string  ResponseBinding::toString()

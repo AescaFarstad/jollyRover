@@ -9,14 +9,12 @@ void TaskManager::push(std::unique_ptr<Task> task)
 
 void TaskManager::update()
 {
-	// TODO: Merge this loop with the next one?
-	//       Or at least explain why it has been separated.
-	for (auto && task : tasks)
+	for (auto& task : tasks)
 	{
 		task->update();
 	}
 
-	for (auto && task : tasks)
+	for (auto& task : tasks)
 	{
 		if (task->isComplete())
 		{

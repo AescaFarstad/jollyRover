@@ -35,7 +35,7 @@ protected:
 	std::unique_ptr<PacketReader> packetReader;
 	std::function< int() > globalSocketNudgeFunction;
 
-	void logSend(std::string messageName, NetworkPacket &packet);
+	void logSend(std::string messageName, NetworkPacket& packet);
 	virtual void init();
 	static std::unique_ptr<NetworkPacket> getPacket();
 };

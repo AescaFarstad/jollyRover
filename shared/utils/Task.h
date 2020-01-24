@@ -5,7 +5,7 @@ class Task
 {
 public:
 	Task();
-	virtual ~Task();
+	virtual ~Task() = default;
 
 	bool isComplete();
 	virtual void update();

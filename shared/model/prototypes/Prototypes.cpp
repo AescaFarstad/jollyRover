@@ -1,6 +1,6 @@
 #include <Prototypes.h>
 
-void Prototypes::load(json &source)
+void Prototypes::load(nlohmann::json& source)
 {
 	variables.load(source.at("variables"));
 	obstacles = source.at("obstacles").get<std::vector<Obstacle>>();

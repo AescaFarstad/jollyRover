@@ -1,14 +1,6 @@
 #include <VariableProto.h>
 
-VariableProto::VariableProto()
-{
-}
-
-VariableProto::~VariableProto()
-{
-}
-
-void VariableProto::load(json &source)
+void VariableProto::load(nlohmann::json& source)
 {
 	fixedStepDuration = source.at("fixedStepDuration");
 	
