@@ -1,5 +1,4 @@
 #pragma once
-#include <memory>
 #include <SDL2/SDL_net.h>
 #include <NetworkPacket.h>
 #include <NetworkMessage.h>
@@ -16,7 +15,7 @@ enum class NETWORK_CLIENT_STATE : int8_t {
 class NetworkClient
 {
 public:
-	NetworkClient(std::function< int() > globalSocketNudgeFunction);
+	NetworkClient(std::function< int32_t() > globalSocketNudgeFunction);
 	virtual ~NetworkClient() = default;
 
 	TCPsocket socket;
@@ -33,7 +32,7 @@ public:
 protected:
 	bool isInitialized;
 	std::unique_ptr<PacketReader> packetReader;
-	std::function< int() > globalSocketNudgeFunction;
+	std::function< int32_t() > globalSocketNudgeFunction;
 
 	void logSend(std::string messageName, NetworkPacket& packet);
 	virtual void init();

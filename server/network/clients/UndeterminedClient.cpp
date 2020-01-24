@@ -1,8 +1,6 @@
 #include <UndeterminedClient.h>
 #include <Global.h>
 
-
-
 UndeterminedClient::UndeterminedClient(
 	std::function<void(UndeterminedClient* client)> onClientDetermined,
 	std::function<int()> globalSocketNudgeFunction) : NetworkClient(globalSocketNudgeFunction)

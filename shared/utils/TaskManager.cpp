@@ -1,5 +1,5 @@
-#include "TaskManager.h"
-#include "Global.h"
+#include <TaskManager.h>
+#include <Global.h>
 
 void TaskManager::push(std::unique_ptr<Task> task)
 {

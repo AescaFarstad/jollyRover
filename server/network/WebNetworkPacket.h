@@ -1,6 +1,5 @@
 #pragma once
-#include "NetworkPacket.h"
-#include "SystemInfo.h"
+#include <NetworkPacket.h>
 
 class WebNetworkPacket :
 	public NetworkPacket

@@ -1,6 +1,9 @@
 #include <ServerNetwork.h>
 #include <GenericRequestMessage.h>
 #include <GreetingMessage.h>
+#include <WebClient.h>
+#include <InputPlayerLeftMessage.h>
+#include <Global.h>
 
 
 ServerNetwork::ServerNetwork()

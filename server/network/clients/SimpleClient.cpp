@@ -1,6 +1,7 @@
 #include <SimpleClient.h>
+#include <NetworkPacket.h>
 
-SimpleClient::SimpleClient(std::function< int() > globalSocketNudgeFunction) : NetworkClient(globalSocketNudgeFunction){}
+SimpleClient::SimpleClient(std::function< int32_t() > globalSocketNudgeFunction) : NetworkClient(globalSocketNudgeFunction){}
 
 void SimpleClient::sendMessage(const NetworkMessage& msg)
 {

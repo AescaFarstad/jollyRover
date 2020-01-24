@@ -9,7 +9,7 @@ class UndeterminedClient :
 public:
 	UndeterminedClient(
 		std::function<void(UndeterminedClient* client)> onClientDetermined,
-		std::function< int() > globalSocketNudgeFunction);
+		std::function< int32_t() > globalSocketNudgeFunction);
 
 	bool isSimpleClient;
 

@@ -1,8 +1,7 @@
 #include <NetworkClient.h>
+#include <Global.h>
 
-
-
-NetworkClient::NetworkClient(std::function< int() > globalSocketNudgeFunction)
+NetworkClient::NetworkClient(std::function< int32_t() > globalSocketNudgeFunction)
 {
 	wasConnected = false;
 	wasDisconnected = false;

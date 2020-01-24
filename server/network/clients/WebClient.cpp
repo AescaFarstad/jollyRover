@@ -1,36 +1,41 @@
 #include <WebClient.h>
-
-
+#include <libwshandshake.hpp>
+#include <base64_2.h>
+#include <regex>
+#include <algorithm> 
+#include <cctype>
+#include <locale>
+#include <Serializer.h>
+#include <WebNetworkPacket.h>
+#include <Global.h>
 
 WebClient::WebClient(
 	std::function<void(NetworkClient& client)> onHttpHandshakeDone, 
-	std::function< int() > globalSocketNudgeFunction) : NetworkClient(globalSocketNudgeFunction)
+	std::function< int32_t() > globalSocketNudgeFunction) : NetworkClient(globalSocketNudgeFunction)
 {
 	this->onHttpHandshakeDone = onHttpHandshakeDone;
 	isHandshakeDone = false;
 }
 
 
-WebClient::~WebClient()
+static inline void ltrim(std::string& s) 
 {
-}
-
-
-static inline void ltrim(std::string &s) {
 	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int32_t ch) {
 		return !std::isspace(ch);
 	}));
 }
 
 // trim from end (in place)
-static inline void rtrim(std::string &s) {
+static inline void rtrim(std::string& s) 
+{
 	s.erase(std::find_if(s.rbegin(), s.rend(), [](int32_t ch) {
 		return !std::isspace(ch);
 	}).base(), s.end());
 }
 
 // trim from both ends (in place)
-static inline void trim(std::string &s) {
+static inline void trim(std::string& s) 
+{
 	ltrim(s);
 	rtrim(s);
 }
@@ -60,7 +65,7 @@ std::unique_ptr<NetworkPacket> WebClient::poll()
 			std::regex_search(requestString, match, code);
 			std::string hashParam = match[1].str();
 			std::string debug = "requestcode:" + hashParam + "\n";
-			//printf(debug.c_str());
+			
 			trim(hashParam);
 			char* responseHash = new char[29];
 			WebSocketHandshake::generate(hashParam.c_str(), responseHash);

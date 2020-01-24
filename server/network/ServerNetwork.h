@@ -1,18 +1,12 @@
 #pragma once
-#include <memory>
-#include <vector>
-#include <functional>
 #include <SDL2/SDL_net.h>
-#include <Global.h>
-#include <ServerConstants.h>
 #include <NetworkMessage.h>
-#include <InputPlayerLeftMessage.h>
 #include <NetworkClient.h>
 #include <SimpleClient.h>
-#include <WebClient.h>
 #include <NetworkPacket.h>
 #include <UndeterminedClient.h>
 #include <NetworkMessageFactory.h>
+#include <ServerConstants.h>
 #include <SeededRandom.h>
 
 using MessageBuffer = std::array<std::unique_ptr<NetworkMessage>, SERVER_CONST::messageBufferSize + 1>;

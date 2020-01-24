@@ -64,7 +64,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = gameUpdater.state.get();
+					gsMsg.state = Serializer::copyThroughSerialization(*gameUpdater.state);
 					network.send(gsMsg, genericRequestMsg->login);
 
 					std::unique_ptr<InputPlayerJoinedMessage> pjMsg = std::make_unique<InputPlayerJoinedMessage>();
@@ -80,7 +80,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 				{
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = gameUpdater.state.get(); 
+					gsMsg.state = Serializer::copyThroughSerialization(*gameUpdater.state); 
 					network.send(gsMsg, genericRequestMsg->login);
 					break;
 				}
@@ -105,7 +105,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 void loadPrototypes()
 {
 	std::ifstream file("out/prototypes.json");
-	json j = json::parse(file);
+	nlohmann::json j = nlohmann::json::parse(file);
 	file.close();
 	prototypes.load(j);
 }
@@ -113,7 +113,7 @@ void loadPrototypes()
 void loadConfig()
 {
 	std::ifstream file("out/config.json");
-	json j = json::parse(file);
+	nlohmann::json j = nlohmann::json::parse(file);
 	file.close();
 	S::config.load(j);
 	S::config.saveStateInterval = -1; //Server never needs to save states

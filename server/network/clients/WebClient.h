@@ -1,16 +1,7 @@
 #pragma once
 #include <NetworkClient.h>
-#include <WebNetworkPacket.h>
-#include <Global.h>
 #include <SDL2/SDL_net.h>
-#include <Serializer.h>
 #include <functional>
-#include <libwshandshake.hpp>
-#include <regex>
-#include <algorithm> 
-#include <cctype>
-#include <locale>
-#include <base64_2.h>
 
 class WebClient :
 	public NetworkClient
@@ -18,14 +9,14 @@ class WebClient :
 public:
 	WebClient(
 		std::function<void(NetworkClient& client)> onHttpHandshakeDone,
-		std::function< int() > globalSocketNudgeFunction);
-	virtual ~WebClient();
+		std::function< int32_t() > globalSocketNudgeFunction);
+	virtual ~WebClient() = default;
 
 	bool isHandshakeDone;
 
 	virtual std::unique_ptr<NetworkPacket> poll();
 	virtual void sendMessage(const NetworkMessage& msg);
-	virtual void sendMessage(const char * payload, size_t size);
+	virtual void sendMessage(const char* payload, size_t size);
 	virtual void init() override;
 
 protected:

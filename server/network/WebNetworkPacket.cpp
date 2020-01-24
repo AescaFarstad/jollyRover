@@ -1,4 +1,6 @@
-#include "WebNetworkPacket.h"
+#include <WebNetworkPacket.h>
+#include <Global.h>
+#include <SystemInfo.h>
 
 //const char* WebNetworkPacket::DEEB_DAAB = "\xde\xed\xda\xab";
 
