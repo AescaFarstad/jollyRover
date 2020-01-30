@@ -15,7 +15,7 @@ void from_json(const nlohmann::json& j, FormationLayout& layout)
 	layout.id = j.at("id");	
 	layout.leader = j.at("leader");
 	layout.connections = j.at("connections");
-	layout.slots = j.at("slots").get<std::vector<FormationSlotProto>>();	
+	layout.slots = j.at("slots").get<std::vector<FormationSlotProto>>();
 }
 
 void from_json(const nlohmann::json& j, FormationDef& def)

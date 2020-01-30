@@ -17,7 +17,7 @@ void GameUpdater::update(uint32_t time)
 	if (lastValidTimeStamp < state->timeStamp)
 		rewindToPrecedingState(lastValidTimeStamp);
 
-	while (state->timeStamp < time - prototypes->variables.fixedStepDuration)
+	while (state->timeStamp + prototypes->variables.fixedStepDuration < time)
 	{		
 		std::vector<InputMessage*> inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + prototypes->variables.fixedStepDuration);
 		GameLogic::update(state.get(), prototypes->variables.fixedStepDuration, inputs, prototypes);
@@ -42,6 +42,7 @@ void GameUpdater::load(std::unique_ptr<GameState> state, Prototypes* prototypes,
 
 void GameUpdater::addNewInput(std::unique_ptr<InputMessage> input)
 {
+	S::log.add("addNewInput: " + std::to_string((int16_t)input->typeId));
 	lastValidTimeStamp = std::min(lastValidTimeStamp, getExecutionStamp(input.get()));
 	inputs.push_back(std::move(input));
 }
@@ -110,6 +111,7 @@ std::vector<InputMessage*> GameUpdater::getThisFrameInputs(uint32_t fromInclusiv
 		uint32_t execTime = getExecutionStamp(inputs[i].get());
 		if (execTime >= fromInclusive && execTime < toExclusive)
 		{
+			//S::log.add("this frame inputs: " + S::crc(*state));
 			result.push_back(inputs[i].get());
 		}
 	}

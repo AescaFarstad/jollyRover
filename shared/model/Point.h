@@ -28,6 +28,7 @@ public:
 	float asAngle() const;
 	float asAngleInDegrees() const;
 	std::string toString() const;
+	std::string toFullString() const;
 
 	float distanceTo(const Point& anotherPoint) const;
 	float distanceTo(const float x, const float y) const;

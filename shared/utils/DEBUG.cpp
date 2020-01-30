@@ -1,5 +1,5 @@
+#include <DEBUG.h>
 #ifndef __EMSCRIPTEN__
-	#include <DEBUG.h>
 
 	void traceFiles(std::string path)
 	{/*

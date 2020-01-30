@@ -33,7 +33,7 @@ public:
 	bool isEventLoggerEnabled;
 	EventLogger eventLogger;
 	
-	std::vector<int> forceStrength_;
+	std::vector<int32_t> forceStrength_;
 	SpatialMap<CreepState> creepMap_;
 	SpatialMap<CarState> carMap_;
 	ThreatMap threatMap_[2];

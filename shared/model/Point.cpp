@@ -86,6 +86,13 @@ std::string Point::toString() const
 	return stream.str();
 }
 
+std::string Point::toFullString() const
+{
+	std::stringstream stream;
+	stream << "[" << std::fixed << std::setprecision(17) << x << ", " << std::fixed << std::setprecision(17) << y << "]";
+	return stream.str();
+}
+
 float Point::distanceTo(const Point& anotherPoint) const
 {
 	return std::sqrt(

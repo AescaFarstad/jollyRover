@@ -22,6 +22,7 @@
                 "${workspaceFolder}/shared/network/bindings",
                 "${workspaceFolder}/shared/network/messages",
                 "${workspaceFolder}/shared/thirdParty",
+                "${workspaceFolder}/shared/thirdParty/hash",
                 "${workspaceFolder}/shared/utils",
                 "${workspaceFolder}/shared/utils/serialization"
             ],
@@ -46,6 +47,7 @@
                 "${workspaceFolder}/shared/network/bindings",
                 "${workspaceFolder}/shared/network/messages",
                 "${workspaceFolder}/shared/thirdParty",
+                "${workspaceFolder}/shared/thirdParty/hash",
                 "${workspaceFolder}/shared/utils",
                 "${workspaceFolder}/shared/utils/serialization"
 				]

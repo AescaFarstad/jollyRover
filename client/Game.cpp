@@ -19,6 +19,7 @@
 #include <InputImpulseMessage.h>
 #include <GameStateMessage.h>
 #include <GreetingMessage.h>
+#include <DEBUG.h>
 
 Game::Game()
 {
@@ -70,8 +71,57 @@ void Game::init(GPU_Target* screen)
 
 void Game::start()
 {
-	auto loadGameTask = std::make_unique<ConsecutiveTask>();
+	if (S::config.runBenchmark)
+		runBenchmark();
+	else
+		startGame();
+}
 
+void Game::runBenchmark()
+{
+	GameUpdater gu;
+	auto state = std::make_unique<GameState>(892422);
+	S::log.add("State checksum: " + S::crc(*state));
+	gu.load(std::move(state), &m_prototypes, true);
+	
+	auto joined = std::make_unique<InputPlayerJoinedMessage>();
+	joined->login = 102;
+	joined->serverStamp = 500;
+	
+	auto addAI1 = std::make_unique<InputImpulseMessage>();
+	addAI1->impulse = INPUT_IMPULSE::ADD_AI;
+	addAI1->login = 102;
+	addAI1->serverStamp = 1000;
+	
+	auto addAI2 = std::make_unique<InputImpulseMessage>();
+	addAI2->impulse = INPUT_IMPULSE::ADD_AI;
+	addAI2->login = 102;
+	addAI2->serverStamp = 1100;
+	
+	gu.addNewInput(std::move(joined));
+	gu.addNewInput(std::move(addAI1));
+	gu.addNewInput(std::move(addAI2));
+	
+	int32_t startTime = SDL_GetTicks();
+	int32_t iters = 20;
+	for(int32_t i = 0; i < iters; i++)
+	{
+		gu.update(i * 10000 + 100);
+		S::log.add("State checksum at: " + std::to_string(i) + " = " + S::crc(*gu.state));
+		S::log.add(std::to_string(i * 100 / iters) + "%");
+	}
+	S::log.add("Finished in " + std::to_string(SDL_GetTicks() - startTime));
+	S::log.add("Performance buffer: " + std::to_string((float)iters * 10000 / (SDL_GetTicks() - startTime)));
+	
+	S::log.add("State checksum: " + S::crc(*gu.state));
+	
+	startGame();
+}
+
+void Game::startGame()
+{
+	auto loadGameTask = std::make_unique<ConsecutiveTask>();	
+	
 	loadGameTask->pushAsync([this](std::unique_ptr<Callback> callback) {
 		auto binding = std::make_unique<AnonymousBinding>("wait for greetings prompt from the server and send it");
 
@@ -142,29 +192,7 @@ void Game::start()
 		});
 	}, "wait for game state from the server and load the game");
 	
-	if (S::config.runBenchmark)
-	{
-		auto testPerformance = [this](std::unique_ptr<Callback> callback) {
-				GameUpdater gu;
-				auto state = std::make_unique<GameState>(892422);
-				gu.load(std::move(state), &m_prototypes, true);
-				
-				int32_t startTime = SDL_GetTicks();
-				for(int32_t i = 0; i < 100; i++)
-				{
-					gu.update(i * 10000 + 100);
-					S::log.add(std::to_string(i) + "%");
-				}
-				S::log.add("Finished in " + std::to_string(SDL_GetTicks() - startTime));
-				S::log.add("Performance buffer: " + std::to_string((float)100 * 10000 / (SDL_GetTicks() - startTime)));
-				
-				callback->execute();
-			};
-		loadGameTask->pushAsync(testPerformance, "testPerformance");		
-	}
-	
 	loadGameTask->exec();
-
 
 	m_taskManager.push(std::move(loadGameTask));
 }

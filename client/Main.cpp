@@ -61,7 +61,7 @@ void mainLoop(void*)
 	
 	if (!isFinished && delta >= MIN_TIME_PER_FRAME)
 	{
-		GPU_Clear(screen);
+		//GPU_Clear(screen);
 
 		lastTicks = ticks;
 		game.update();

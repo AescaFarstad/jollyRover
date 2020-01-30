@@ -14,7 +14,7 @@
 		"carAgroGainPerUnit":1000,
 		"carAgroFadeGainPerSecond":1,
 		"war":{
-			"intensity": 5000,
+			"intensity": 10000,
 			"creepRestitution": 0.3,
 			"additionalSpacing": 5,
 			"baseAgroLevel": 15,
@@ -30,13 +30,13 @@
 	"forces":[
 		{
 			"id": 0,
-			"spawn": { "x1":1100, "y1":100, "x2":1200, "y2":620  },
+			"spawn": { "x1":1300, "y1":0, "x2":1350, "y2":720  },
 			"freq":[20, 100],
 			"alwaysOn":true
 		},
 		{
 			"id": 1,
-			"spawn": { "x1":-50, "y1":100, "x2":150, "y2":620  },
+			"spawn": { "x1":-70, "y1":0, "x2":-20, "y2":720  },
 			"freq":[10, 200],
 			"alwaysOn":true
 		},
@@ -56,8 +56,8 @@
 			"size": 18,
 			"fuelPerMeter": 2,
 			"maxHealth": 1500,
-			"repairTime": 200,
-			"refuelTime": 50,
+			"repairTime": 180,
+			"refuelTime": 40,
 			"hullTexture":{
 				"player":"tanks_2/tankBody_green", 
 				"opponent": "tanks_2/tankBody_red"
@@ -694,7 +694,7 @@
 			"layout":1,
 			"type":"assault",
 			"forces":[1],
-			"enabled":false,
+			"enabled":true,
 			"relativeAgroability":0.9,
 			"finalRotationModifier":1,
 			"moveSpeedModifier":1,
@@ -705,7 +705,7 @@
 			"layout":1,
 			"type":"assault",
 			"forces":[0],
-			"enabled":false,
+			"enabled":true,
 			"relativeAgroability":1.1,
 			"finalRotationModifier":1,
 			"moveSpeedModifier":1,
@@ -728,7 +728,7 @@
 			"layout":2,
 			"type":"assault",
 			"forces":[0],
-			"enabled":false,
+			"enabled":true,
 			"relativeAgroability":0.5,
 			"finalRotationModifier":10,
 			"moveSpeedModifier":0.8,
@@ -755,7 +755,7 @@
 			"forces":[0],
 			"connections":2,
 			"leader":-1,
-			"enabled":false,
+			"enabled":true,
 			"relativeAgroability":1.5,
 			"finalRotationModifier":1,
 			"moveSpeedModifier":1,
@@ -781,7 +781,7 @@
 			"forces":[0],
 			"connections":2,
 			"leader":-1,
-			"enabled":false,
+			"enabled":true,
 			"relativeAgroability":1.5,
 			"finalRotationModifier":1,
 			"moveSpeedModifier":1,

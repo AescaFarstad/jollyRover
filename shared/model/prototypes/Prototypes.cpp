@@ -89,16 +89,15 @@ void Prototypes::postProcess()
 	obstacleMap.addNonUnique(obstacles);
 	
 	
-	
 	for(auto& formation : formations)
 	{
 		formation.maxAngularSpeed = M_PI;
 		
 		auto slots = formation.slots;
-		for(size_t i = 0; i < formation.slots.size(); i++)
+		for(size_t i = 0; i < slots.size(); i++)
 		{
-			std::sort(slots.begin(), slots.end(), 
-				[slot = formation.slots[i], leader = formation.leader](FormationSlotProto& a, FormationSlotProto& b)
+			std::stable_sort(slots.begin(), slots.end(), 
+				[slot = slots[i], leader = formation.leader](const FormationSlotProto& a, const FormationSlotProto& b)
 				{					
 					if (a.index == slot.index)
 						return false;
@@ -120,7 +119,6 @@ void Prototypes::postProcess()
 							
 					return b.offset.distanceTo(slot.offset) > a.offset.distanceTo(slot.offset);
 				});
-				
 			for(int32_t j = 0; j < formation.connections && j < (int32_t)slots.size(); j++)
 			{
 				if (j == formation.leader || creeps[slots[j].creepType].weight >= creeps[formation.slots[i].creepType].weight)

@@ -155,10 +155,9 @@ namespace Creeps
 		
 		void spawnFormation(GameState* state, Prototypes* prototypes, ForceProto& forceProto, FormationProto& formationProto)
 		{
-			Point formationCenter(
-				state->random.get(forceProto.spawnAA.x, forceProto.spawnBB.x),
-				state->random.get(forceProto.spawnAA.y, forceProto.spawnBB.y)
-			);
+			Point formationCenter;
+			formationCenter.x = state->random.get(forceProto.spawnAA.x, forceProto.spawnBB.x);
+			formationCenter.y = state->random.get(forceProto.spawnAA.y, forceProto.spawnBB.y);
 			
 			auto& var = prototypes->variables;
 			
@@ -172,7 +171,9 @@ namespace Creeps
 			formation.formationPrototype_ = &formationProto;
 			formation.isDisposed_ = false;
 			formation.orientation = angle;
+			formation.targetOrientation = angle;
 			formation.location = formationCenter;
+			formation.targetLocation = formationCenter;
 			formation.speed = FMath::F_MAX;
 			formation.angularSpeed = 0;
 			formation.spawnedAt = state->time.time;
@@ -207,8 +208,7 @@ namespace Creeps
 		
 		CreepState& spawnCreep(int16_t type, const Point& location, GameState* state, Prototypes* prototypes)
 		{
-			state->creeps.emplace_back();
-			CreepState& creep = state->creeps.back();
+			CreepState& creep = state->creeps.emplace_back();
 			creep.creepProto_ = &(prototypes->creeps[type]);
 			creep.weaponProto_ = &(prototypes->weapons[creep.creepProto_->weapon]);
 			
@@ -234,11 +234,17 @@ namespace Creeps
 			creep.weapon.prototypeId = creep.creepProto_->weapon;
 			creep.weapon.attackCooldown = 0;
 			creep.weapon.target.id = -1;
+			creep.weapon.target.type = ENTTITY_TYPE::CREEP;
 			
 			creep.formationId = -1;
 			creep.formationsSlot = -1;
 			
 			creep.sensedAnObstacle = false;
+			
+			creep.velocity = {0, 0};
+			creep.orientation = 0;
+			creep.unit.force = 0;
+			creep.unit.voluntaryMovement = {0, 0};
 			
 			return creep;
 		}
@@ -831,7 +837,7 @@ namespace Creeps
 				
 				auto target = chaseAndDestroy(creep, state, prototypes, timePassed, [](CreepState& creep, GameState* state, Prototypes* prototypes){
 					
-					CarState* bestCar;
+					CarState* bestCar = nullptr;
 					float bestValue = std::numeric_limits<float>::max();
 					
 					for(auto& player : state->players)

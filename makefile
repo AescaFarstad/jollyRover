@@ -45,6 +45,7 @@ DIR_SHARED +=shared/network
 DIR_SHARED +=shared/network/bindings
 DIR_SHARED +=shared/network/messages
 DIR_SHARED +=shared/thirdParty
+DIR_SHARED +=shared/thirdParty/hash
 DIR_SHARED +=shared/utils
 DIR_SHARED +=shared/utils/serialization
 DIR_SHARED +=shared/model/ref
@@ -83,8 +84,8 @@ web: $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT)
 	rsync -r assets/ out/assets/
 	rsync -r web/ out/
 	$(WEB_COMPILER) \
-		-g4 -O0 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
-		-s WASM=1 -s TOTAL_MEMORY=268435456 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=0 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
+		-g3 -O0 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
+		-s WASM=1 -s TOTAL_MEMORY=268435456 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=1 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
 		--use-preload-plugins -v -o $(WEB_TARGET).html lib/SDL_gpu.bc $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT) \
 		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets \
 		--memory-init-file 1 --shell-file out/index.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']" 
@@ -101,11 +102,11 @@ all: local server web
 
 $(SDL_FontCache_LOCAL_OBJECT):
 	@mkdir -p $(dir $@)
-	gcc -g -c $(SDL_FontCachePATH).c -o $(SDL_FontCache_LOCAL_OBJECT) -DFC_USE_SDL_GPU -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu $(LOCAL_LIBS)
+	gcc -c $(SDL_FontCachePATH).c -o $(SDL_FontCache_LOCAL_OBJECT) -DFC_USE_SDL_GPU -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu $(LOCAL_LIBS)
 	
 $(SDL_FontCache_WEB_OBJECT):
 	@mkdir -p $(dir $@)
-	$(EMSCRIPTEN)/emcc -g -c $(SDL_FontCachePATH).c -o $(SDL_FontCache_WEB_OBJECT) -DFC_USE_SDL_GPU -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu $(LOCAL_LIBS)
+	$(EMSCRIPTEN)/emcc -c $(SDL_FontCachePATH).c -o $(SDL_FontCache_WEB_OBJECT) -DFC_USE_SDL_GPU -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu $(LOCAL_LIBS)
 
 deploy:
 	rsync -Pav $(SERVER_TARGET) $(CONFIG) $(PROTOTYPES) '$(SSH_CONFIG):$(REMOTE_DEPLOY_PATH)/$(OUT)'

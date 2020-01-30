@@ -50,6 +50,8 @@ private:
 	void addNetworkBindings();
 	void handleGameInput(std::unique_ptr<NetworkMessage>);
 	bool handleGlobalKey(SDL_Scancode scancode);
+	void runBenchmark();
+	void startGame();
 
 
 
