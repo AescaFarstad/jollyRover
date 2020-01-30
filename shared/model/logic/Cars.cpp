@@ -89,8 +89,7 @@ namespace Cars
 	
 	void launchCar(GameState* state, PlayerState* player, const std::vector<Point>& route, Prototypes* prototypes)
 	{
-		player->activeCars.emplace_back();
-		CarState& car = player->activeCars.back();
+		CarState& car = player->activeCars.emplace_back();
 		
 		car.route = route;
 		car.startStamp = state->time.time;

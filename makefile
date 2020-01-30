@@ -1,7 +1,7 @@
 NPROCS = $(shell grep -c 'processor' /proc/cpuinfo)
 MAKEFLAGS += -j$(NPROCS)
 
-EMSCRIPTEN ?= ../../emsdk/emscripten/1.38.24
+EMSCRIPTEN ?= ../../emsdk/upstream/emscripten
 WEB_COMPILER := $(EMSCRIPTEN)/em++
 LOCAL_COMPILER := $(CXX)
 
@@ -16,7 +16,7 @@ SSH_CONFIG := JollyRover
 REMOTE_DEPLOY_PATH := ~/JollyRover
 
 AUTODEPS = -MMD -MF $(subst .bc,.d,$@)
-COMPILE_FLAGS := -g -O0 -Wall -c -std=c++17 -D_REENTRANT -DFC_USE_SDL_GPU $(CXXFLAGS)
+COMPILE_FLAGS := -g -O0 -Wall -c -std=c++17 -D_REENTRANT -DSDL_DISABLE_IMMINTRIN_H -DFC_USE_SDL_GPU $(CXXFLAGS)
 LINK_FLAGS := -g -O0 -std=c++17  $(LDFLAGS)
 
 LOCAL_LIBS := -lSDL2_gpu -lSDL2 -lSDL2_net -lSDL2_image -lSDL2_ttf -lutil
@@ -86,9 +86,11 @@ web: $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT)
 	$(WEB_COMPILER) \
 		-g3 -O0 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
 		-s WASM=1 -s TOTAL_MEMORY=268435456 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=1 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
-		--use-preload-plugins -v -o $(WEB_TARGET).html lib/SDL_gpu.bc $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT) \
+		--use-preload-plugins -v -o $(WEB_TARGET).html \
+		lib/renderer_GLES_2.o lib/SDL_gpu_matrix.o lib/SDL_gpu_renderer.o lib/SDL_gpu_shapes.o lib/SDL_gpu.o lib/stb_image_write.o lib/stb_image.o \
+		$(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT) \
 		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets \
-		--memory-init-file 1 --shell-file out/index.html -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']" 
+		--memory-init-file 1 --shell-file out/index.html -lidbfs.js -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']" 
 	sed -i 's/antialias\:false/antialias\:true/g' $(WEB_TARGET).js
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
@@ -102,11 +104,11 @@ all: local server web
 
 $(SDL_FontCache_LOCAL_OBJECT):
 	@mkdir -p $(dir $@)
-	gcc -c $(SDL_FontCachePATH).c -o $(SDL_FontCache_LOCAL_OBJECT) -DFC_USE_SDL_GPU -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu $(LOCAL_LIBS)
+	gcc -c $(SDL_FontCachePATH).c -o $(SDL_FontCache_LOCAL_OBJECT) -DFC_USE_SDL_GPU -DSDL_DISABLE_IMMINTRIN_H -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu $(LOCAL_LIBS)
 	
 $(SDL_FontCache_WEB_OBJECT):
 	@mkdir -p $(dir $@)
-	$(EMSCRIPTEN)/emcc -c $(SDL_FontCachePATH).c -o $(SDL_FontCache_WEB_OBJECT) -DFC_USE_SDL_GPU -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu $(LOCAL_LIBS)
+	$(EMSCRIPTEN)/emcc -c $(SDL_FontCachePATH).c -o $(SDL_FontCache_WEB_OBJECT) -DFC_USE_SDL_GPU -DSDL_DISABLE_IMMINTRIN_H -I/usr/include/SDL2/ -I/usr/local/include/SDL_gpu $(LOCAL_LIBS)
 
 deploy:
 	rsync -Pav $(SERVER_TARGET) $(CONFIG) $(PROTOTYPES) '$(SSH_CONFIG):$(REMOTE_DEPLOY_PATH)/$(OUT)'

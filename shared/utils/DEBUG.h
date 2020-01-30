@@ -1,4 +1,4 @@
-
+#pragma once
 #include <string>
 #include <SerializationStream.h>
 #include <crc32.h>

@@ -86,32 +86,33 @@ void Game::runBenchmark()
 	
 	auto joined = std::make_unique<InputPlayerJoinedMessage>();
 	joined->login = 102;
-	joined->serverStamp = 500;
+	joined->serverStamp = 100;
 	
 	auto addAI1 = std::make_unique<InputImpulseMessage>();
 	addAI1->impulse = INPUT_IMPULSE::ADD_AI;
 	addAI1->login = 102;
-	addAI1->serverStamp = 1000;
+	addAI1->serverStamp = 200;
 	
 	auto addAI2 = std::make_unique<InputImpulseMessage>();
 	addAI2->impulse = INPUT_IMPULSE::ADD_AI;
 	addAI2->login = 102;
-	addAI2->serverStamp = 1100;
+	addAI2->serverStamp = 300;
 	
 	gu.addNewInput(std::move(joined));
 	gu.addNewInput(std::move(addAI1));
 	gu.addNewInput(std::move(addAI2));
 	
 	int32_t startTime = SDL_GetTicks();
-	int32_t iters = 20;
+	int32_t iters = 500;
 	for(int32_t i = 0; i < iters; i++)
 	{
-		gu.update(i * 10000 + 100);
+		gu.update(i * 1000 + 100);
 		S::log.add("State checksum at: " + std::to_string(i) + " = " + S::crc(*gu.state));
 		S::log.add(std::to_string(i * 100 / iters) + "%");
 	}
+	
 	S::log.add("Finished in " + std::to_string(SDL_GetTicks() - startTime));
-	S::log.add("Performance buffer: " + std::to_string((float)iters * 10000 / (SDL_GetTicks() - startTime)));
+	S::log.add("Performance buffer: " + std::to_string((float)iters * 1000 / (SDL_GetTicks() - startTime)));
 	
 	S::log.add("State checksum: " + S::crc(*gu.state));
 	

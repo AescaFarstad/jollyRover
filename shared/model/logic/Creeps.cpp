@@ -562,7 +562,7 @@ namespace Creeps
 			formation.actualLocation_ = Point();
 			
 			
-			for(auto& id : formation.slots)
+			for(auto id : formation.slots)
 			{
 				if (id < 0)
 					continue;
@@ -655,7 +655,7 @@ namespace Creeps
 						{
 							if (interceptLoc[1].isNaN())
 								nearestInterception = interceptLoc[0];
-							else if ((creep.unit.location - interceptLoc[0]).getLength() < (creep.unit.location - interceptLoc[2]).getLength())
+							else if ((creep.unit.location - interceptLoc[0]).getLength() < (creep.unit.location - interceptLoc[1]).getLength())
 								nearestInterception = interceptLoc[0];
 							else
 								nearestInterception = interceptLoc[1];
