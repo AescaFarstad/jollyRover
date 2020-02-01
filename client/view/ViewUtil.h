@@ -2,6 +2,8 @@
 #include <TextureNames.h>
 #include <SequenceNames.h>
 #include <Point.h>
+#include <NFont.h>
+
 #ifdef __EMSCRIPTEN__
 	#include <SDL.h>
 #else 
@@ -17,10 +19,22 @@ public:
 	SDL_Color tint;
 };
 
+class Fonts
+{
+public:	
+	void initFonts();
+	NFont fontAmaticBold;
+	NFont fontAmaticBoldBig;
+	NFont fontAmaticRegular;
+	NFont fontDebug;
+	NFont fontDebug_m;
+};
+
 namespace S
 {	
 	extern TextureNames textures;
 	extern SequenceNames sequences;	
+	extern Fonts fonts;
 }
 
 namespace ViewUtil

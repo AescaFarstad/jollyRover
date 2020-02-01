@@ -9,10 +9,11 @@ public:
 
 	bool isComplete();
 	virtual void update();
+	virtual void abort();
 	virtual std::string getName();
 
 protected:
-	bool _isComplete;
-	size_t id;
-	static size_t idCounter;
+	bool m_isComplete;
+	size_t m_id;
+	static size_t s_idCounter;
 };

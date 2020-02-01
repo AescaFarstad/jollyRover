@@ -2,52 +2,66 @@
 
 ConsecutiveTask::ConsecutiveTask()
 {
-	currentSubTask = 0;
-	isWaitingForCallback = false;
-	isRunning = false;
-	isStarted = false;
-	isWaitingForRepeatedFunction = false;
+	reset();
 }
 
 ConsecutiveTask::~ConsecutiveTask()
 {
-	if (isRunning)
+	if (m_isRunning)
 		THROW_FATAL_ERROR("DELETING RUNNING TASK");
 }
 
 void ConsecutiveTask::exec()
 {
-	isStarted = true;
+	m_isStarted = true;
+}
+
+void ConsecutiveTask::reset()
+{
+	m_currentSubTask = 0;
+	m_isWaitingForCallback = false;
+	m_isRunning = false;
+	m_isStarted = false;
+	m_isWaitingForRepeatedFunction = false;
+	m_pendingCallback.reset();
+	m_subTasks.clear();
+}
+
+void ConsecutiveTask::abort()
+{
+	S::log.add(getName() + "-> aborting at #" + std::to_string(m_currentSubTask) + ": " + m_subTasks[m_currentSubTask].name, 
+		{ LOG_TAGS::TASK, LOG_TAGS::SUBTASK });
+	reset();
 }
 
 void ConsecutiveTask::update()
 {
-	if (!isStarted || _isComplete)
+	if (!m_isStarted || m_isComplete)
 		return;
-	if (subTasks.size() <= currentSubTask)
+	if (m_subTasks.size() <= m_currentSubTask)
 	{
-		_isComplete = true;
+		m_isComplete = true;
 		return;
 	}
 
-	isRunning = true;
+	m_isRunning = true;
 	while (
-			!isWaitingForCallback && 
-			!isWaitingForRepeatedFunction && 
-			subTasks.size() > currentSubTask
+			!m_isWaitingForCallback && 
+			!m_isWaitingForRepeatedFunction && 
+			m_subTasks.size() > m_currentSubTask
 		)
 	{
-		if (currentSubTask == 0)
-			S::log.add(getName() + "-> starting #" + std::to_string(currentSubTask) + ": " + subTasks[currentSubTask].name, { LOG_TAGS::TASK, LOG_TAGS::SUBTASK });
+		if (m_currentSubTask == 0)
+			S::log.add(getName() + "-> starting #" + std::to_string(m_currentSubTask) + ": " + m_subTasks[m_currentSubTask].name, { LOG_TAGS::TASK, LOG_TAGS::SUBTASK });
 		tryToAdvance();
 	}
-	isWaitingForRepeatedFunction = false;
-	isRunning = false;
+	m_isWaitingForRepeatedFunction = false;
+	m_isRunning = false;
 }
 
 void ConsecutiveTask::tryToAdvance()
 {
-	switch (subTasks[currentSubTask].type)
+	switch (m_subTasks[m_currentSubTask].type)
 	{
 		case SUB_TASK_TYPE::EMPTY:
 		{
@@ -56,33 +70,33 @@ void ConsecutiveTask::tryToAdvance()
 		}
 		case SUB_TASK_TYPE::SYNC:
 		{
-			subTasks[currentSubTask].syncFunction();
+			m_subTasks[m_currentSubTask].syncFunction();
 			onTaskComplete();
 			return;
 		}
 		case SUB_TASK_TYPE::ASYNC:
 		{
 			std::unique_ptr<Callback> callback = std::make_unique<Callback>([this]() { this->onTaskComplete(); });
-			pendingCallback = callback->createPendingCallback();
-			isWaitingForCallback = true;
-			subTasks[currentSubTask].asyncFunction(std::move(callback));
+			m_pendingCallback = callback->createPendingCallback();
+			m_isWaitingForCallback = true;
+			m_subTasks[m_currentSubTask].asyncFunction(std::move(callback));
 			return;
 		}
 		case SUB_TASK_TYPE::REPEATED:
 		{
-			if (subTasks[currentSubTask].repeatedFunction())
+			if (m_subTasks[m_currentSubTask].repeatedFunction())
 				onTaskComplete();
 			else
-				isWaitingForRepeatedFunction = true;
+				m_isWaitingForRepeatedFunction = true;
 			return;
 		}
 		case SUB_TASK_TYPE::SUB_TASK:
 		{
-			subTasks[currentSubTask].subTask->update();
-			if (subTasks[currentSubTask].subTask->isComplete())
+			m_subTasks[m_currentSubTask].subTask->update();
+			if (m_subTasks[m_currentSubTask].subTask->isComplete())
 				onTaskComplete();
 			else
-				isWaitingForRepeatedFunction = true;
+				m_isWaitingForRepeatedFunction = true;
 			return;
 		}
 	}
@@ -90,62 +104,62 @@ void ConsecutiveTask::tryToAdvance()
 
 void ConsecutiveTask::onTaskComplete()
 {
-	isWaitingForCallback = false;
-	currentSubTask++;
-	if (subTasks.size() > currentSubTask)
-		S::log.add(getName() + "-> starting #" + std::to_string(currentSubTask) + ": " + subTasks[currentSubTask].name, { LOG_TAGS::TASK, LOG_TAGS::SUBTASK });
+	m_isWaitingForCallback = false;
+	m_currentSubTask++;
+	if (m_subTasks.size() > m_currentSubTask)
+		S::log.add(getName() + "-> starting #" + std::to_string(m_currentSubTask) + ": " + m_subTasks[m_currentSubTask].name, { LOG_TAGS::TASK, LOG_TAGS::SUBTASK });
 }
 std::string ConsecutiveTask::getName()
 {
-	return"ConsecutiveTask #" + std::to_string(id) + " (" + std::to_string(subTasks.size()) + " elements)";
+	return"ConsecutiveTask #" + std::to_string(m_id) + " (" + std::to_string(m_subTasks.size()) + " elements)";
 }
 
 void ConsecutiveTask::pushSync(std::function<void()> syncFunction, std::string name)
 {
-	if (isStarted)
+	if (m_isStarted)
 		THROW_FATAL_ERROR("Can insert into a running task");
 
 	ConsecutiveSubTask newTask;
 	newTask.name = name;
 	newTask.type = SUB_TASK_TYPE::SYNC;
 	newTask.syncFunction = syncFunction;
-	subTasks.push_back(newTask);
+	m_subTasks.push_back(newTask);
 }
 
 void ConsecutiveTask::pushAsync(std::function<void(std::unique_ptr<Callback>)> asyncFunction, std::string name)
 {
-	if (isStarted)
+	if (m_isStarted)
 		THROW_FATAL_ERROR("Can insert into a running task");
 
 	ConsecutiveSubTask newTask;
 	newTask.name = name;
 	newTask.type = SUB_TASK_TYPE::ASYNC;
 	newTask.asyncFunction = asyncFunction;
-	subTasks.push_back(newTask);
+	m_subTasks.push_back(newTask);
 }
 
 void ConsecutiveTask::pushRepeated(std::function<bool()> repeatedFunction, std::string name)
 {
-	if (isStarted)
+	if (m_isStarted)
 		THROW_FATAL_ERROR("Can insert into a running task");
 
 	ConsecutiveSubTask newTask;
 	newTask.name = name;
 	newTask.type = SUB_TASK_TYPE::REPEATED;
 	newTask.repeatedFunction = repeatedFunction;
-	subTasks.push_back(newTask);
+	m_subTasks.push_back(newTask);
 }
 
 void ConsecutiveTask::pushSubTask(Task* subTask)
 {
-	if (isStarted)
+	if (m_isStarted)
 		THROW_FATAL_ERROR("Can insert into a running task");
 
 	ConsecutiveSubTask newTask;
 	newTask.name = subTask->getName();
 	newTask.type = SUB_TASK_TYPE::SUB_TASK;
 	newTask.subTask = subTask;
-	subTasks.push_back(newTask);
+	m_subTasks.push_back(newTask);
 }
 
 

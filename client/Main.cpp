@@ -103,8 +103,14 @@ int main(int argc, char* args[])
 	printRenderers();
 	printCurrentRenderer();
 	
+	//Temporary setup until config file is parsed
+	Point field{1280, 720};
 	SDL_Window* window = SDL_GetWindowFromID(screen->context->windowID);
-	SDL_SetWindowPosition(window, S::config.window_X, S::config.window_Y);	
+	SDL_SetWindowSize(window, field.x, field.y);
+	GPU_SetWindowResolution(field.x, field.y);
+	SDL_SetWindowPosition(window, -20, 250);
+	GPU_RectangleFilled(screen, 0, 0, field.x, field.y, ViewUtil::colorFromHex(0xffff77, 0xff));
+	GPU_Flip(screen);
 	
 	game.init(screen);
 	game.start();

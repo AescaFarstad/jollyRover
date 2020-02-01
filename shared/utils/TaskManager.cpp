@@ -1,10 +1,16 @@
 #include <TaskManager.h>
 #include <Global.h>
 
-void TaskManager::push(std::unique_ptr<Task> task)
+void TaskManager::push(Task* task)
 {
 	S::log.add("Task [" + task->getName() + "] is added", { LOG_TAGS::TASK });
 	tasks.push_back(std::move(task));
+}
+
+void TaskManager::abort(Task* task)
+{
+	task->abort();
+	tasks.erase(std::remove(tasks.begin(), tasks.end(), task));
 }
 
 void TaskManager::update()

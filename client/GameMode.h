@@ -12,7 +12,7 @@ public:
 	GameMode();
 	virtual ~GameMode() = default;
 	
-	void init(Renderer* renderer, Prototypes* prototypes, Network* network);
+	void init(Renderer* renderer, Prototypes* prototypes);
 	void loadGame(std::unique_ptr<GameState> state, int64_t clientToServerDelta, int32_t login);
 	
 	void addNewInput(std::unique_ptr<InputMessage> input);
@@ -34,7 +34,6 @@ private:
 	int64_t m_clientToServerDelta;
 	int32_t m_login;
 	
-	Network* m_network;
 	Prototypes* m_prototypes;
 	
 	GameUpdater m_gameUpdater;

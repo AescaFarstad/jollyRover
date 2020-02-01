@@ -7,11 +7,10 @@ GameMode::GameMode()
 	m_numRandomClicks = 0;
 }
 
-void GameMode::init(Renderer* renderer, Prototypes* prototypes, Network* network)
+void GameMode::init(Renderer* renderer, Prototypes* prototypes)
 {
 	m_prototypes = prototypes;
 	m_gameView.init(renderer, prototypes);
-	m_network = network;
 }
 
 void GameMode::loadGame(std::unique_ptr<GameState> state, int64_t clientToServerDelta, int32_t login)
@@ -71,18 +70,30 @@ void GameMode::handleRouteInput()
 		}
 		case ROUTE_STATE::E_RANDOM_CLICK:
 		{
-			//ignores the first click, shows notification no more than once evry few seconds.
-			m_numRandomClicks++;
-			if (m_numRandomClicks != 1)
+			auto thisPlayer = GameLogic::playerByLogin(m_gameUpdater.state.get(), m_login);
+			if (thisPlayer->refuelLeft >0 || thisPlayer->repairsLeft > 0 || thisPlayer->activeCars.size() > 0)
 			{
-				auto ticks = SDL_GetTicks();
-				if (m_lastAutodrawNotificationStamp + 5000 < ticks)
+				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
+				loc.y -= 60;
+				m_gameView.addMessage("Not ready yet!", loc, NFont::AlignEnum::CENTER);
+			}
+			else
+			{
+				//ignores the first click, shows notification no more than once evry few seconds.
+				m_numRandomClicks++;
+				if (m_numRandomClicks != 1)
 				{
-					Point loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
-					m_gameView.addMessage("Hold Left Mouse Button and draw!", loc, NFont::AlignEnum::CENTER);
-					m_lastAutodrawNotificationStamp = ticks;
+					auto ticks = SDL_GetTicks();
+					if (m_lastAutodrawNotificationStamp + 5000 < ticks)
+					{
+						Point loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
+						m_gameView.addMessage("Hold Left Mouse Button and draw!", loc, NFont::AlignEnum::CENTER);
+						m_lastAutodrawNotificationStamp = ticks;
+					}
 				}
-			}			
+			}
+			
+			
 			m_routeInput.reset();
 			break;
 		}
@@ -121,7 +132,7 @@ void GameMode::handleRouteInput()
 			{
 				InputRouteMessage nim;
 				nim.route = m_routeInput.getPoints();
-				m_network->send(nim);
+				S::network->send(nim);
 				m_routeInput.reset();
 			}
 			break;
@@ -169,12 +180,12 @@ void GameMode::onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& cont
 {
 	if (!m_isLoaded)
 		return;
-	m_keyboardInput.onKeyDown(scancode, context, *m_network, m_gameUpdater);
+	m_keyboardInput.onKeyDown(scancode, context, m_gameUpdater);
 }
 
 void GameMode::onKeyUp(SDL_Scancode scancode, const KeyboardInputContext& context)
 {
 	if (!m_isLoaded)
 		return;
-	m_keyboardInput.onKeyUp(scancode, context, *m_network, m_gameUpdater);	
+	m_keyboardInput.onKeyUp(scancode, context, m_gameUpdater);	
 }

@@ -10,7 +10,7 @@ LoopBackNetwork::LoopBackNetwork(GameUpdater* gameUpdater)
 
 void LoopBackNetwork::connect()
 {
-	timeSync.addMeasurement(0, 0, 0);
+	timeSync.addMeasurement(SDL_GetTicks(), 0, SDL_GetTicks());
 	GenericRequestMessage grm;
 	grm.request = REQUEST_TYPE::REQUEST_GREETING;
 	addToIncoming(grm);
@@ -82,6 +82,14 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 					pjMsg.serverStamp = tempState.timeStamp;
 					pjMsg.login = genericRequestMsg->login;
 					addToIncoming(pjMsg);
+					
+					InputImpulseMessage msg;
+					msg.impulse = INPUT_IMPULSE::ADD_AI;
+					msg.serverId = idCounter++;
+					msg.serverStamp = tempState.timeStamp + 5000;
+					msg.login = genericRequestMsg->login;
+					addToIncoming(msg);					
+	
 					break;
 				}
 				case REQUEST_TYPE::REQUEST_GAME_STATE:

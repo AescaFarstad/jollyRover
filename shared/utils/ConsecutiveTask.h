@@ -14,7 +14,7 @@ public:
 	ConsecutiveTask();
 	~ConsecutiveTask();
 
-	void exec();
+	void abort() override;
 	void update() override;
 	std::string getName() override;
 
@@ -24,16 +24,18 @@ public:
 	void pushRepeated(std::function<bool()> repeatedFunction, std::string name = "noname");
 	void pushSubTask(Task* subTask);
 	void onTaskComplete();
+	void exec();
+	void reset();
 
 private:
-	bool isStarted;
-	bool isRunning;
-	bool isWaitingForCallback;
-	bool isWaitingForRepeatedFunction;
-	size_t currentSubTask;
+	bool m_isStarted;
+	bool m_isRunning;
+	bool m_isWaitingForCallback;
+	bool m_isWaitingForRepeatedFunction;
+	size_t m_currentSubTask;
 
 	void tryToAdvance();
-	std::unique_ptr<PendingCallback> pendingCallback;
+	std::unique_ptr<PendingCallback> m_pendingCallback;
 
 	enum SUB_TASK_TYPE
 	{
@@ -57,5 +59,5 @@ private:
 		std::function<bool()> repeatedFunction;
 		Task* subTask;
 	}; 
-	std::vector<ConsecutiveSubTask> subTasks;
+	std::vector<ConsecutiveSubTask> m_subTasks;
 };

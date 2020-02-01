@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}",
                 "/usr/include/SDL2/",
+                "/usr/include/",
                 "/usr/local/include/SDL_gpu/",
                 "${workspaceFolder}/client",
                 "${workspaceFolder}/client/thirdParty/NFont",
@@ -29,6 +30,7 @@
 			"browse": {
 				"path": [
                 "${workspaceFolder}",
+                "/usr/include/",
                 "/usr/include/SDL2/",
                 "/usr/local/include/SDL_gpu/",
                 "${workspaceFolder}/client",

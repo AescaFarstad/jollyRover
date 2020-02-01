@@ -21,6 +21,12 @@
 using MessageHandler = std::function<void(std::unique_ptr<NetworkMessage>)>;
 using GenericRequestHandler = std::function<void(std::unique_ptr<GenericRequestMessage>)>;
 
+class Network;
+namespace S
+{
+	extern Network* network;
+}
+
 class Network
 {
 public:

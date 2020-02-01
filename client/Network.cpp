@@ -1,5 +1,10 @@
 #include <Network.h>
 
+namespace S
+{
+	Network* network;
+}
+
 Network::Network()
 {
 	packetReader = std::make_unique<PacketReader>(&socket, getNewPacket, [this]() {

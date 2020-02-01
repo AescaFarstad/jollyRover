@@ -6,9 +6,10 @@
 class TaskManager
 {
 public:
-	void push(std::unique_ptr<Task> task);
+	void push(Task* task);
+	void abort(Task* task);
 	void update();
 
 private:
-	std::vector<std::unique_ptr<Task>> tasks;
+	std::vector<Task*> tasks;
 };

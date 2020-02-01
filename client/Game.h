@@ -9,8 +9,10 @@
 #include <Network.h>
 #include <GameMode.h>
 #include <TextureMode.h>
+#include <LoadingMode.h>
 #include <Keyboard.h>
 #include <TaskManager.h>
+#include <ConsecutiveTask.h>
 #include <Prototypes.h>
 #include <SDL_gpu.h>
 
@@ -29,17 +31,18 @@ public:
 
 private:
 
-	Network* m_network;
 	TaskManager m_taskManager;
 	Prototypes m_prototypes;
 	
 	GPU_Image* m_atlas;	
 	Renderer m_renderer;
 	SDL_Window* m_window;
+	ConsecutiveTask m_loadGameTask;
 	
 	std::vector<Mode*> m_modes;
 	GameMode m_gameMode;
 	TextureMode m_textureMode;
+	LoadingMode m_loadingMode;
 	size_t m_activeMode; 
 
 	KeyboardInputContext m_keyboardContext;
@@ -52,6 +55,8 @@ private:
 	bool handleGlobalKey(SDL_Scancode scancode);
 	void runBenchmark();
 	void startGame();
+	void goOffline();
+	
 
 
 

@@ -39,12 +39,7 @@ void GameView::init(Renderer* renderer, Prototypes* prototypes)
 	m_layer2Image->anchor_y = 0;
 	m_layer3Image = loadImage("out/assets/map layer 3.png"); 
 	m_layer3Image->anchor_x = 0;
-	m_layer3Image->anchor_y = 0;
-	m_fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 32);
-	m_fontAmaticBoldBig.load("out/assets/Amatic-Bold.ttf", 44);
-	m_fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 32);
-	m_fontDebug.load("out/assets/Cousine-Regular.ttf", 18);
-	m_fontDebug_m.load("out/assets/Cousine-Regular.ttf", 12);
+	m_layer3Image->anchor_y = 0;	
 	
 	resolveTextures(prototypes);
 }
@@ -391,12 +386,12 @@ void GameView::drawFormationAgro()
 			case SUB_OBJECTIVE::RETREAT: {state = "R"; if (form.targetFormationId != -1) state += " merging"; break;}
 			default: {state = "?"; break;}
 		}
-		m_fontDebug.draw(m_screen, location.x, location.y, "%s agro: %d, (%d%%)", state.c_str(), form.carAgro, (int32_t)percent);
+		S::fonts.fontDebug.draw(m_screen, location.x, location.y, "%s agro: %d, (%d%%)", state.c_str(), form.carAgro, (int32_t)percent);
 		
 		percent = 100 * hostileThreat / form.agroAt;
-		m_fontDebug_m.draw(m_screen, location.x, location.y + 16, "threat: %d, (%d%%)", (int32_t)hostileThreat, (int32_t)percent);
-		m_fontDebug_m.draw(m_screen, location.x, location.y + 28, "count: %d", totalCreeps);
-		m_fontDebug_m.draw(m_screen, location.x, location.y + 40, "H: %.1f F: %.1f /: %.1f / %.1f", form.hostile_, form.friendly_, form.hostile_ / form.friendly_, form.bravery);
+		S::fonts.fontDebug_m.draw(m_screen, location.x, location.y + 16, "threat: %d, (%d%%)", (int32_t)hostileThreat, (int32_t)percent);
+		S::fonts.fontDebug_m.draw(m_screen, location.x, location.y + 28, "count: %d", totalCreeps);
+		S::fonts.fontDebug_m.draw(m_screen, location.x, location.y + 40, "H: %.1f F: %.1f /: %.1f / %.1f", form.hostile_, form.friendly_, form.hostile_ / form.friendly_, form.bravery);
 	}
 }
 
@@ -605,7 +600,7 @@ void GameView::drawDebugGraphics()
 	
 	for(auto& text : S::visualDebug.texts)
 	{
-		m_fontDebug.draw(m_screen, text.origin.x, text.origin.y, "%s", text.text.c_str());
+		S::fonts.fontDebug.draw(m_screen, text.origin.x, text.origin.y, "%s", text.text.c_str());
 	}
 	
 	auto selectedCreep = m_state->creepById_[VisualDebug::interestingId];
@@ -686,7 +681,7 @@ void GameView::drawHUD()
 					text += "  +  " +  std::to_string(car.score);
 			}
 			
-			m_fontAmaticBold.draw(m_screen, 5.f, 20.f + 30 * i, "%s", text.c_str());
+			S::fonts.fontAmaticBold.draw(m_screen, 5.f, 20.f + 30 * i, "%s", text.c_str());
 			
 			i++;
 		}
@@ -695,7 +690,7 @@ void GameView::drawHUD()
 	auto& vars = m_prototypes->variables;
 	
 	if (S::drawSettings.fps_D)
-		m_fontAmaticBold.draw(m_screen, 5.f, vars.fieldHeight - 50, "fps: %.1f", S::fpsMeter.getfps(500));
+		S::fonts.fontAmaticBold.draw(m_screen, 5.f, vars.fieldHeight - 50, "fps: %.1f", S::fpsMeter.getfps(500));
 		
 	auto player = GameLogic::playerByLogin(m_state, m_login);
 	if (player)
@@ -703,12 +698,12 @@ void GameView::drawHUD()
 		if (player->repairsLeft > 0)
 		{
 			int32_t repairs = (player->repairsTotal - player->repairsLeft) * 100 / player->repairsTotal;
-			m_fontAmaticBoldBig.draw(m_screen, vars.fieldWidth / 2, 30, NFont::AlignEnum::CENTER, "Hull repairs: %d%%", repairs);
+			S::fonts.fontAmaticBoldBig.draw(m_screen, vars.fieldWidth / 2, 30, NFont::AlignEnum::CENTER, "Hull repairs: %d%%", repairs);
 		}
 		else if (player->refuelLeft > 0)
 		{
 			int32_t refuels = (player->refuelTotal - player->refuelLeft) * 100 / player->refuelTotal;
-			m_fontAmaticBoldBig.draw(m_screen, vars.fieldWidth / 2, 30, NFont::AlignEnum::CENTER, "Refueling: %d%%", refuels);
+			S::fonts.fontAmaticBoldBig.draw(m_screen, vars.fieldWidth / 2, 30, NFont::AlignEnum::CENTER, "Refueling: %d%%", refuels);
 		}		
 	}
 }
@@ -716,5 +711,5 @@ void GameView::drawHUD()
 void GameView::drawFlyingMessages()
 {
 	for(auto& msg : m_flyingMessages)
-		msg.render(m_state->time.time, m_fontAmaticBoldBig, m_screen);
+		msg.render(m_state->time.time, S::fonts.fontAmaticBoldBig, m_screen);
 }

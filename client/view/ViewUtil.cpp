@@ -1,10 +1,20 @@
 #include <ViewUtil.h>
 #include <FMath.h>
 
+void Fonts::initFonts()
+{
+	fontAmaticBold.load("out/assets/Amatic-Bold.ttf", 32);
+	fontAmaticBoldBig.load("out/assets/Amatic-Bold.ttf", 44);
+	fontAmaticRegular.load("out/assets/AmaticSC-Regular.ttf", 32);
+	fontDebug.load("out/assets/Cousine-Regular.ttf", 18);
+	fontDebug_m.load("out/assets/Cousine-Regular.ttf", 12);
+}
+
 namespace S
 {	
 	TextureNames textures;
 	SequenceNames sequences(textures);
+	Fonts fonts;
 }
 
 namespace ViewUtil
