@@ -232,6 +232,18 @@ namespace GameLogic
 				else
 					player.refuelLeft -= var.refuelSpeed * timePassed;
 			}
+			
+			if (state->timeStamp > prototypes->variables.reconnectWindow)
+			{
+				auto stamp = state->timeStamp - prototypes->variables.reconnectWindow;
+				state->players.erase(std::remove_if(
+						state->players.begin(),
+						state->players.end(),
+						[stamp](PlayerState& player){ 
+							return player.wentOfflineAt > 0 && player.wentOfflineAt < stamp;
+							}
+				), state->players.end());
+			}
 		}
 
 		void handleActionInput(GameState* state, InputActionMessage* input)
@@ -244,25 +256,18 @@ namespace GameLogic
 
 		void handlePlayerJoinedInput(GameState* state, InputPlayerJoinedMessage* input)
 		{
-			state->players.push_back({
-				.login = input->login, 
-				.score = 0,
-				.isHeadless = false, 
-				.isAI = false,									
-				.repairsTotal = 0,
-				.repairsLeft = 0,
-				.refuelTotal = 0,
-				.refuelLeft = 0				
-				});
+			PlayerState* player = playerByLogin(state, input->login);
+			if (!player)			
+				state->players.emplace_back(input->login);
+			else
+				player->wentOfflineAt = 0;
+			
 		}
 
 		void handlePlayerLeftInput(GameState* state, InputPlayerLeftMessage* input)
 		{
-			state->players.erase(std::remove_if(
-					state->players.begin(),
-					state->players.end(),
-					[login = input->login](PlayerState& player){ return player.login == login;}
-			));
+			PlayerState* player = playerByLogin(state, input->login);
+			player->wentOfflineAt = state->timeStamp;
 		}
 
 		void handleRouteInput(GameState* state, InputRouteMessage* input, Prototypes* prototypes)
@@ -377,16 +382,9 @@ namespace GameLogic
 					int32_t login = std2::minElement(state->players, [](PlayerState& player){return player.login;})->login - 1;
 					if (login > 0)
 						login = -1;
-					state->players.push_back({ 
-						.login = login, 
-						.score = 0,
-						.isHeadless = true, 
-						.isAI = true,						
-						.repairsTotal = 0,
-						.repairsLeft = 0,
-						.refuelTotal = 0,
-						.refuelLeft = 0
-						});
+					auto& aip = state->players.emplace_back(login);
+					aip.isHeadless = true;
+					aip.isAI = true;
 					break;
 				}
 				case INPUT_IMPULSE::CLEAR_AI :

@@ -1,18 +1,23 @@
 #include <Network.h>
+#include <HeartbeatMessage.h>
 
 namespace S
 {
 	Network* network;
 }
 
-Network::Network()
+Network::Network(VariableProto* vars)
 {
+	m_vars = vars;
+	SDLNet_Init();
+	socket = nullptr;
+	
 	packetReader = std::make_unique<PacketReader>(&socket, getNewPacket, [this]() {
 		activeSockets = SDLNet_CheckSockets(socketSet, 0);
 		if (activeSockets == -1)
 		{
 			S::log.add("SDLNet_CheckSockets: " + std::string(SDLNet_GetError()), { LOG_TAGS::NET, LOG_TAGS::ERROR_ });
-			isConnected = false;
+			m_isConnected = false;
 		}
 		if (activeSockets <= 0)
 			return 0;
@@ -22,10 +27,12 @@ Network::Network()
 	//----------------------------------
 
 	auto handleGenericRequest = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message) {
+		GenericRequestMessage* t = dynamic_cast<GenericRequestMessage*>(message.get());
+		auto name = t->getName();
+		auto request = t->request;
 		if (!genericRequestBinder.process(std::move(message)))
 		{
-			GenericRequestMessage* t = dynamic_cast<GenericRequestMessage*>(message.get());
-			S::log.add("GenericRequestMessage is not handled: " + t->getName() + " " + std::to_string((int16_t)t->request), { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
+			S::log.add("GenericRequestMessage is not handled: " + name + " " + std::to_string((int16_t)request), { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
 		}
 	});
 	
@@ -39,9 +46,21 @@ Network::Network()
 	//----------------------------------
 }
 
+Network::~Network()
+{
+	if (socket != nullptr)
+	{
+		SDLNet_TCP_DelSocket(socketSet, socket);
+		SDLNet_TCP_Close(socket);
+	}
+	SDLNet_FreeSocketSet(socketSet);
+}
+
 void Network::connect()
 {
-	SDLNet_Init();
+	if (m_isConnected || socket != nullptr)
+		THROW_FATAL_ERROR("Attempt to connect while connected");
+	
 	IPaddress ip;
 	SDLNet_ResolveHost(&ip, S::config.host, S::config.port);
 	socket = SDLNet_TCP_Open(&ip);
@@ -49,19 +68,30 @@ void Network::connect()
 	S::log.add("connect status: " + std::string(socket == nullptr ? "false" : "true"), {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
 	S::log.add("ip, port: " + std::string(S::config.host) + " " + std::to_string(S::config.port), {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
 
-	SDLNet_TCP_AddSocket(socketSet, socket);
-	isConnected = socket != nullptr;
-	if (isConnected && !S::config.IS_WEB)
+	m_isConnected = socket != nullptr;
+	if (m_isConnected)
 	{
-		char codeMsg[4];
-		Serializer::write(S::config.simpleClientCode, codeMsg);
-		SDLNet_TCP_Send(socket, codeMsg, 4);
+		SDLNet_TCP_AddSocket(socketSet, socket);
+		
+		if (!S::config.IS_WEB)
+		{
+			char codeMsg[4];
+			Serializer::write(S::config.simpleClientCode, codeMsg);
+			SDLNet_TCP_Send(socket, codeMsg, 4);
+		}
+		
+		monitor.begin(SDL_GetTicks(), m_vars->heartbeatInterval, m_vars->heartbeatTimeout);
 	}
+}
+
+bool Network::isConnected()
+{
+	return m_isConnected;
 }
 
 void Network::update()
 {
-	if (!isConnected)
+	if (!m_isConnected)
 		return;
 
 	activeSockets = SDLNet_CheckSockets(socketSet, S::config.networkUpdateInterval);
@@ -69,7 +99,7 @@ void Network::update()
 	if (activeSockets == -1)
 	{
 		S::log.add("SDLNet_CheckSockets: " + std::string(SDLNet_GetError()), { LOG_TAGS::NET, LOG_TAGS::ERROR_ });
-		isConnected = false;
+		m_isConnected = false;
 		return;
 	}
 
@@ -83,6 +113,12 @@ void Network::update()
 		}
 		message = poll();
 	}
+	
+	auto time = SDL_GetTicks();
+	if (monitor.pollHeartbeat(time))
+		send(HeartbeatMessage());
+	if (monitor.isDisconnected(time))
+		handleDisconnect();
 }
 
 void Network::send(const NetworkPacket& packet)
@@ -114,7 +150,7 @@ void Network::send(const NetworkMessage& msg)
 
 std::unique_ptr<NetworkMessage> Network::poll()
 {
-	if (!isConnected || activeSockets <= 0)
+	if (!m_isConnected || activeSockets <= 0)
 		return nullptr;
 
 	packetReader->setDataAvailable(SDLNet_SocketReady(socket));
@@ -125,9 +161,7 @@ std::unique_ptr<NetworkMessage> Network::poll()
 	}
 	else if (packet->isDisconnectNotice)
 	{
-		isConnected = false;
-		S::log.add("disconnected",	{ LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
-		//TODO initiate reconnect
+		handleDisconnect();
 		return nullptr;
 	}
 	
@@ -136,6 +170,15 @@ std::unique_ptr<NetworkMessage> Network::poll()
 	if (result)
 		return result;
 	else return poll();
+}
+
+void Network::handleDisconnect()
+{
+	m_isConnected = false;
+	S::log.add("disconnected",	{ LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
+	SDLNet_TCP_DelSocket(socketSet, socket);
+	SDLNet_TCP_Close(socket);
+	socket = nullptr;
 }
 
 std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<NetworkPacket> packet)
@@ -180,6 +223,10 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 			return resultMessage;
 		}
 	}
+	else if (resultMessage->typeId == MESSAGE_TYPE::TYPE_HEARTBEAT_MSG)
+	{
+		monitor.onHearbeatMessage(ticks);
+	}
 	else
 	{
 		auto handlerIter = interceptors_once.find(resultMessage->typeId);
@@ -211,6 +258,17 @@ void Network::interceptGenericRequestOnce(REQUEST_TYPE requestType, GenericReque
 	if (interceptorsGeneric_once.count(requestType) > 0)
 		THROW_FATAL_ERROR("request type already intercepted");
 	interceptorsGeneric_once[requestType] = handler;
+}
+
+
+void Network::clearInterception(MESSAGE_TYPE messageType)
+{
+	interceptors_once.erase(messageType);
+}
+
+void Network::clearInterception(REQUEST_TYPE requestType)
+{
+	interceptorsGeneric_once.erase(requestType);	
 }
 
 std::unique_ptr<NetworkPacket> Network::getNewPacket()

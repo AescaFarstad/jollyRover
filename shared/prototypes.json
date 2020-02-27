@@ -1,31 +1,36 @@
 {
 	"variables":{
-		"fixedStepDuration": 16,
+		"game":{
+			"fixedStepDuration": 16,
+			"routeStepSize": 20,
+			"minRouteSteps": 5,
+			"maxRouteSteps": 4400,
+			"stepAngleWindow": 3.14,
+			"repairSpeed":10,
+			"refuelSpeed":28,
+			"repairRefuelBase":100000,
+			"carAgroGainPerUnit":1000,
+			"carAgroFadeGainPerSecond":1,
+			"war":{
+				"intensity": 10000,
+				"creepRestitution": 0.3,
+				"additionalSpacing": 5,
+				"baseAgroLevel": 15,
+				"carAgroPerUnit": 1000,
+				"carAgroThresholdPerSlot":150,
+				"carChaseBreakoutDistance":400,
+				"formationMaxBravery":10,
+				"formationMinBravery":2,
+				"retreatSpeedModifier":2,
+				"minCreepsToRetreat":3
+			}			
+		},
+		"reconnectWindow": 10000,
+		"heartbeatInterval":1000,
+		"heartbeatTimeout":3500,
 		"fieldWidth": 1280,
 		"fieldHeight": 720,
-		"routeStepSize": 20,
-		"minRouteSteps": 5,
-		"maxRouteSteps": 4400,
-		"stepAngleWindow": 3.14,
-		"maxEventAnimationTime": 1000,
-		"repairSpeed":10,
-		"refuelSpeed":28,
-		"repairRefuelBase":100000,
-		"carAgroGainPerUnit":1000,
-		"carAgroFadeGainPerSecond":1,
-		"war":{
-			"intensity": 10000,
-			"creepRestitution": 0.3,
-			"additionalSpacing": 5,
-			"baseAgroLevel": 15,
-			"carAgroPerUnit": 1000,
-			"carAgroThresholdPerSlot":150,
-			"carChaseBreakoutDistance":400,
-			"formationMaxBravery":10,
-			"formationMinBravery":2,
-			"retreatSpeedModifier":2,
-			"minCreepsToRetreat":3
-		}
+		"maxEventAnimationTime": 1000
 	},
 	"forces":[
 		{

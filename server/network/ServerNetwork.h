@@ -8,6 +8,7 @@
 #include <NetworkMessageFactory.h>
 #include <ServerConstants.h>
 #include <SeededRandom.h>
+#include <VariableProto.h>
 
 using MessageBuffer = std::array<std::unique_ptr<NetworkMessage>, SERVER_CONST::messageBufferSize + 1>;
 
@@ -18,7 +19,7 @@ public:
 
 	NetworkMessageFactory factory;
 
-	void init();
+	void init(std::function<bool(int32_t)> isLoginAllowedToReconnect, std::function<bool(int32_t)> loginExists, VariableProto* vars);
 	void update(MessageBuffer& externalBuffer);
 	bool hasClients();
 	int32_t getClientCount();
@@ -37,7 +38,10 @@ private:
 	int32_t clientCount;
 	std::function<void(UndeterminedClient* client)> onClientDetermined;
 	std::function<void(NetworkClient& client)> onHandshakeDone;
+	std::function<bool(int32_t)> isLoginAllowedToReconnect;
+	std::function<bool(int32_t)> loginExists;
 	SeededRandom random;
+	VariableProto* m_vars;
 
 	void handleConnections();
 	void handleData(MessageBuffer& externalBuffer);
@@ -45,6 +49,6 @@ private:
 	void addMessageToBuffer(std::unique_ptr<NetworkMessage> msg, MessageBuffer& externalBuffer);
 	void generateNewLogin(int32_t& login);
 	void generateNewPassword(std::vector<int8_t>& password);
-	bool loginExists(int32_t login);
+	bool isLoginAvailable(int32_t login);
 };
 

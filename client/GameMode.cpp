@@ -34,7 +34,7 @@ void GameMode::update(bool isActive)
 		handleRouteInput();
 		m_gameView.render(m_gameUpdater.state.get(), &m_routeInput);
 	}
-	else
+	else if (S::network->isConnected())
 	{
 		int64_t laggingTime = SDL_GetTicks() + m_clientToServerDelta - 1000;
 		laggingTime = std::max((int64_t)0, laggingTime);

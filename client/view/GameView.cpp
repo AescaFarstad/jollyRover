@@ -654,28 +654,34 @@ void GameView::drawHUD()
 {	
 	if (S::drawSettings.scores)
 	{	
-		std::vector<PlayerState> players = m_state->players;
-		std::sort(players.begin(), players.end(), [](PlayerState& a, PlayerState& b){ return a.score > b.score;});
+		std::vector<PlayerState*> players;
+		players.resize(m_state->players.size());
+		std::transform(m_state->players.begin(), m_state->players.end(), players.begin(), [](PlayerState& player){ return &player; });
+		
+		std::sort(players.begin(), players.end(), [](PlayerState* a, PlayerState* b){ return a->score > b->score;});
 		int32_t i = 0;
-		for(auto& p : players)
+		for(auto p : players)
 		{
+			if (p->wentOfflineAt > 0)
+				continue;
+			
 			std::string text = "";
-			if (!p.isHeadless)
+			if (!p->isHeadless)
 			{
-				if (p.login == m_login)
+				if (p->login == m_login)
 					text += "YOU";
 				else
-					text += "player " + std::to_string(p.login);
-				if (p.isAI)
+					text += "player " + std::to_string(p->login);
+				if (p->isAI)
 					text += " (AI)";
 			}
 			else
 			{
-				text += "AI " + std::to_string(-p.login);
+				text += "AI " + std::to_string(-p->login);
 			}
-			text += ":  " +  std::to_string(p.score);
+			text += ":  " +  std::to_string(p->score);
 			
-			for(auto& car : p.activeCars)
+			for(auto& car : p->activeCars)
 			{
 				if (car.score > 0)
 					text += "  +  " +  std::to_string(car.score);

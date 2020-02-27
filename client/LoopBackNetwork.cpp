@@ -2,10 +2,11 @@
 #include <GameStateMessage.h>
 #include <GreetingMessage.h>
 
-LoopBackNetwork::LoopBackNetwork(GameUpdater* gameUpdater)
+LoopBackNetwork::LoopBackNetwork(GameUpdater* gameUpdater) : Network(nullptr) 
 {
 	this->gameUpdater = gameUpdater;
 	idCounter = 0;
+	
 }
 
 void LoopBackNetwork::connect()
@@ -14,6 +15,11 @@ void LoopBackNetwork::connect()
 	GenericRequestMessage grm;
 	grm.request = REQUEST_TYPE::REQUEST_GREETING;
 	addToIncoming(grm);
+}
+
+bool LoopBackNetwork::isConnected()
+{
+	return true;
 }
 
 void LoopBackNetwork::update()

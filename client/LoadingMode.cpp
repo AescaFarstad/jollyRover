@@ -1,4 +1,5 @@
 #include <LoadingMode.h>
+#include <Network.h>
 
 void LoadingMode::init(Renderer* renderer, Prototypes* prototypes, std::function<void()> onGoOffline)
 {
@@ -15,12 +16,13 @@ void LoadingMode::update(bool isActive)
 	{
 		m_ticksPassed++;
 		GPU_RectangleFilled(screen, 0, 0, vars.fieldWidth, vars.fieldHeight, ViewUtil::colorFromHex(0xffff99, 0xff));
-		S::fonts.fontAmaticBoldBig.draw(screen, vars.fieldWidth / 2, vars.fieldHeight / 2, NFont::AlignEnum::CENTER, "Unable to connect   :(");
+		S::fonts.fontAmaticBoldBig.draw(screen, vars.fieldWidth / 2, vars.fieldHeight / 2, NFont::AlignEnum::CENTER, "Connecting...");
 		
 		if (m_ticksPassed > SHOW_OFFLINE_PROMPT_AT)
 			S::fonts.fontAmaticBoldBig.draw(screen, vars.fieldWidth / 2, vars.fieldHeight  - 50, NFont::AlignEnum::CENTER, "Press Enter to play offline");
-			
 	}
+	
+	
 }
 
 	

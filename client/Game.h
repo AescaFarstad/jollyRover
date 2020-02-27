@@ -10,6 +10,7 @@
 #include <GameMode.h>
 #include <TextureMode.h>
 #include <LoadingMode.h>
+#include <ReconnectMode.h>
 #include <Keyboard.h>
 #include <TaskManager.h>
 #include <ConsecutiveTask.h>
@@ -43,6 +44,7 @@ private:
 	GameMode m_gameMode;
 	TextureMode m_textureMode;
 	LoadingMode m_loadingMode;
+	ReconnectMode m_reconnectMode;
 	size_t m_activeMode; 
 
 	KeyboardInputContext m_keyboardContext;

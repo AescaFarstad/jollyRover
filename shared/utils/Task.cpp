@@ -20,7 +20,9 @@ void Task::update()
 
 void Task::abort()
 {
-	m_isComplete = true;
+	m_isComplete = false;
+	if (onAbort)
+		onAbort();
 }
 
 std::string Task::getName()

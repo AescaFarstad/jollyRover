@@ -10,6 +10,8 @@
 #include <ResponseBinder.h>
 #include <AnonymousBinding.h>
 #include <GenericRequestMessage.h>
+#include <ConnectionMonitor.h>
+#include <VariableProto.h>
 
 #ifdef __EMSCRIPTEN__
 	#include <SimplePacket.h>
@@ -30,8 +32,8 @@ namespace S
 class Network
 {
 public:
-	Network();
-	virtual ~Network() = default;
+	Network(VariableProto* vars);
+	virtual ~Network();
 
 	NetworkMessageFactory factory;
 	TimeSync timeSync;
@@ -42,9 +44,12 @@ public:
 	virtual void update();
 	virtual void send(const NetworkPacket& packet);
 	virtual void send(const NetworkMessage& msg);
+	virtual bool isConnected();
 	
 	void interceptOnce(MESSAGE_TYPE messageType, MessageHandler handler);
 	void interceptGenericRequestOnce(REQUEST_TYPE requestType, GenericRequestHandler handler);
+	void clearInterception(MESSAGE_TYPE messageType);
+	void clearInterception(REQUEST_TYPE requestType);
 
 protected:
 
@@ -52,11 +57,13 @@ protected:
 
 private:
 
+	VariableProto* m_vars;
 	TCPsocket socket;
+	ConnectionMonitor monitor;
 	std::unique_ptr<PacketReader> packetReader;
 	SDLNet_SocketSet socketSet = SDLNet_AllocSocketSet(1);
 	int32_t activeSockets = 0;
-	bool isConnected = false;
+	bool m_isConnected = false;
 	std::unordered_map<int32_t, uint32_t> requestTimeByInitiatorId;
 	std::unordered_map<MESSAGE_TYPE, MessageHandler> interceptors_once;
 	std::unordered_map<REQUEST_TYPE, GenericRequestHandler> interceptorsGeneric_once;
@@ -64,6 +71,7 @@ private:
 	static std::unique_ptr<NetworkPacket> getNewPacket();
 	
 	virtual std::unique_ptr<NetworkMessage> poll();
+	void handleDisconnect();
 
 
 

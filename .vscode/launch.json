@@ -65,6 +65,7 @@
 		"program": "${workspaceFolder}/out/local",
 		"args": [],
 		"preLaunchTask": "lc",
+		"postRunCommands": ["process handle SIGPIPE -n true -p true -s false"]
 	},
 	{
 		"name": "lldb s",
@@ -72,7 +73,8 @@
 		"request": "launch",
 		"program": "${workspaceFolder}/out/JRserver",
 		"args": [],
-		"preLaunchTask": "s"
+		"preLaunchTask": "s",
+		"postRunCommands": ["process handle SIGPIPE -n true -p true -s false"]
 	}
   ]
 }

@@ -3,6 +3,7 @@
 #include <NetworkPacket.h>
 #include <NetworkMessage.h>
 #include <PacketReader.h>
+#include <ConnectionMonitor.h>
 
 
 enum class NETWORK_CLIENT_STATE : int8_t {
@@ -24,6 +25,7 @@ public:
 	NETWORK_CLIENT_STATE state;
 	int32_t login;
 	std::vector<int8_t> password;
+	ConnectionMonitor monitor;
 
 	virtual std::unique_ptr<NetworkPacket> poll();
 	virtual void sendMessage(const NetworkMessage& msg) = 0;

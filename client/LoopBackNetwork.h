@@ -14,6 +14,7 @@ public:
 	void update() override;
 	void send(const NetworkPacket& packet) override;
 	void send(const NetworkMessage& msg) override;
+	bool isConnected() override;
 	
 
 private:

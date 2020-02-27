@@ -8,6 +8,11 @@ public:
 
 	int32_t fixedStepDuration;
 	
+	uint32_t reconnectWindow;
+	
+	int32_t heartbeatInterval;
+	int32_t heartbeatTimeout;
+	
 	int32_t fieldWidth;
 	int32_t fieldHeight;
 	

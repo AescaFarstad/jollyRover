@@ -13,6 +13,7 @@
 #include <LoadGameMessage.h>
 #include <ReadOnlySerializationStream.h>
 #include <GameStateMessage.h>
+#include <HeartbeatMessage.h>
 
 std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(const NetworkPacket& packet)
 {
@@ -39,6 +40,7 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::pointerByType(MESSAGE_TYP
 		case MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG: 		return std::make_unique<InputImpulseMessage>();
 		case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG: 		return std::make_unique<InputDebugMessage>();
 		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG: 			return std::make_unique<LoadGameMessage>();
+		case MESSAGE_TYPE::TYPE_HEARTBEAT_MSG: 			return std::make_unique<HeartbeatMessage>();
 		default: THROW_FATAL_ERROR("Unknow Network Message " + std::to_string(type));
 			break;
 	}

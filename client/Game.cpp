@@ -36,17 +36,25 @@ Game::~Game()
 		GPU_FreeImage(m_atlas);
 }
 
+namespace GAME_MODE
+{
+	size_t texture;
+	size_t game;
+	size_t load;
+	size_t reconnect;
+}
+
 void Game::init(GPU_Target* screen)
 {
 	loadConfig();
 	loadPrototypes();
-	//S::persistentStorage.clean();
+	S::persistentStorage.clean();
 	S::persistentStorage.init();
 	
 	if (S::config.loopBack)
 		S::network = new LoopBackNetwork(m_gameMode.getGameUpdater());
 	else
-		S::network = new Network();		
+		S::network = new Network(&m_prototypes.variables);
 	S::network->connect();
 	
 	m_window = SDL_GetWindowFromID(screen->context->windowID);
@@ -64,16 +72,26 @@ void Game::init(GPU_Target* screen)
 	 
 	m_renderer.init(screen, m_atlas);
 	
+	GAME_MODE::texture = m_modes.size();
 	m_modes.push_back(&m_textureMode);
 	m_textureMode.init(&m_renderer, &m_prototypes);
 	
+	
+	GAME_MODE::game = m_modes.size();
 	m_gameMode.init(&m_renderer, &m_prototypes);
 	m_modes.push_back(&m_gameMode);
 	
+	
+	GAME_MODE::load = m_modes.size();
 	m_modes.push_back(&m_loadingMode);
 	m_loadingMode.init(&m_renderer, &m_prototypes, [this](){goOffline();});
 	
-	m_activeMode = 2;
+	
+	GAME_MODE::reconnect = m_modes.size();
+	m_modes.push_back(&m_reconnectMode);
+	m_reconnectMode.init(&m_renderer, &m_prototypes);
+	
+	m_activeMode = GAME_MODE::load;
 }
 
 void Game::start()
@@ -136,24 +154,15 @@ void Game::goOffline()
 }
 
 void Game::startGame()
-{	
+{
 	m_loadGameTask.pushAsync([this](std::unique_ptr<Callback> callback) {
-		auto binding = std::make_unique<AnonymousBinding>("wait for greetings prompt from the server and send it");
-
-		auto handleRequest = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this, cb = callback.release()](std::unique_ptr<NetworkMessage> message) {
-
+		S::network->interceptGenericRequestOnce(REQUEST_TYPE::REQUEST_GREETING, [cb = callback.release()](std::unique_ptr<GenericRequestMessage> message) {
+			
 			S::network->send(GreetingMessage());
-
+			
 			cb->execute();
 			delete cb;
 		});
-		
-		binding->
-			bindByGenericType(REQUEST_TYPE::REQUEST_GREETING)->
-			setCallOnce(true)->
-			setHandler(std::move(handleRequest));
-		
-		S::network->genericRequestBinder.bind(std::move(binding));
 	}, "wait for greetings prompt from the server and send it");
 
 	m_loadGameTask.pushAsync([this](std::unique_ptr<Callback> callback) {
@@ -202,13 +211,19 @@ void Game::startGame()
 			
 			addNetworkBindings();
 			
-			m_activeMode = 1;			
-			m_modes.erase(m_modes.end() -1);
+			m_activeMode = GAME_MODE::game;	
 
 			cb->execute();
 			delete cb;
 		});
 	}, "wait for game state from the server and load the game");
+	
+	m_loadGameTask.onAbort = [](){
+		S::network->clearInterception(MESSAGE_TYPE::TYPE_GAME_STATE_MSG);
+		S::network->clearInterception(REQUEST_TYPE::REQUEST_PONG);
+		S::network->clearInterception(REQUEST_TYPE::REQUEST_GREETING);
+		S::network->clearInterception(MESSAGE_TYPE::TYPE_GREETING_MSG);
+	};
 	
 	m_loadGameTask.exec();
 
@@ -222,6 +237,21 @@ void Game::update()
 	
 	for(auto& mode : m_modes)
 		mode->update(mode == m_modes[m_activeMode]);
+	
+	if (!S::network->isConnected())
+	{
+		if (m_activeMode == GAME_MODE::load)
+			m_taskManager.abort(&m_loadGameTask);
+			
+		if	(m_activeMode == GAME_MODE::game || m_activeMode == GAME_MODE::load)
+			m_activeMode = GAME_MODE::reconnect;
+	}
+	if (m_activeMode == GAME_MODE::reconnect && S::network->isConnected())
+	{
+		m_activeMode = GAME_MODE::load;
+		m_loadGameTask.reset();
+		startGame();
+	}
 }
 
 void Game::handleEvent(const SDL_Event& event)
@@ -282,7 +312,10 @@ bool Game::handleGlobalKey(SDL_Scancode scancode)
 	{
 		case SDL_SCANCODE_F1:
 		{
-			m_activeMode = (m_activeMode + 1) % m_modes.size();
+			if (m_activeMode == GAME_MODE::game)
+				m_activeMode = GAME_MODE::texture;
+			else if (m_activeMode == GAME_MODE::texture)
+				m_activeMode = GAME_MODE::game;
 			return true;			
 		}
 		default: return false;

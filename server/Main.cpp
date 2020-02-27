@@ -167,7 +167,11 @@ int main()
 	loadPrototypes();
 	loadConfig();
 	
-	network.init();
+	network.init(
+		[](int32_t login) -> bool {return GameLogic::playerByLogin(gameUpdater.state.get(), login) != nullptr;},
+		[](int32_t login) -> bool {return GameLogic::playerByLogin(gameUpdater.state.get(), login) != nullptr;},
+		&prototypes.variables
+		);
 
 	gameUpdater.load(std::make_unique<GameState>(), &prototypes, false);
 

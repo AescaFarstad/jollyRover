@@ -22,7 +22,9 @@ void ConsecutiveTask::reset()
 	m_isWaitingForCallback = false;
 	m_isRunning = false;
 	m_isStarted = false;
+	m_isComplete = false;
 	m_isWaitingForRepeatedFunction = false;
+	onAbort = 0;
 	m_pendingCallback.reset();
 	m_subTasks.clear();
 }
@@ -31,6 +33,8 @@ void ConsecutiveTask::abort()
 {
 	S::log.add(getName() + "-> aborting at #" + std::to_string(m_currentSubTask) + ": " + m_subTasks[m_currentSubTask].name, 
 		{ LOG_TAGS::TASK, LOG_TAGS::SUBTASK });
+	if (onAbort)
+		onAbort();
 	reset();
 }
 
