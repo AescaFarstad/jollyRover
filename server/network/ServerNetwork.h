@@ -31,16 +31,16 @@ public:
 
 private:
 
-	TCPsocket serverSocketRaw;
-	TCPsocket serverSocketWeb;
-	std::vector<std::unique_ptr<NetworkClient>> clients;
-	SDLNet_SocketSet socketSet;
-	int32_t clientCount;
-	std::function<void(UndeterminedClient* client)> onClientDetermined;
-	std::function<void(NetworkClient& client)> onHandshakeDone;
-	std::function<bool(int32_t)> isLoginAllowedToReconnect;
-	std::function<bool(int32_t)> loginExists;
-	SeededRandom random;
+	TCPsocket m_serverSocketRaw;
+	TCPsocket m_serverSocketWeb;
+	std::vector<std::unique_ptr<NetworkClient>> m_clients;
+	SDLNet_SocketSet m_socketSet;
+	int32_t m_clientCount;
+	std::function<void(UndeterminedClient* client)> m_onClientDetermined;
+	std::function<void(NetworkClient& client)> m_onHandshakeDone;
+	std::function<bool(int32_t)> m_isLoginAllowedToReconnect;
+	std::function<bool(int32_t)> m_loginExists;
+	SeededRandom m_random;
 	VariableProto* m_vars;
 
 	void handleConnections();

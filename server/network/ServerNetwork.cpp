@@ -9,9 +9,9 @@
 
 ServerNetwork::ServerNetwork()
 {
-	clientCount = 0;
+	m_clientCount = 0;
 
-	onHandshakeDone = [](NetworkClient& client) {
+	m_onHandshakeDone = [](NetworkClient& client) {
 		client.state = NETWORK_CLIENT_STATE::GREETING;
 		GenericRequestMessage grm;
 		grm.request = REQUEST_TYPE::REQUEST_GREETING;
@@ -19,27 +19,27 @@ ServerNetwork::ServerNetwork()
 	};
 }
 
-void ServerNetwork::init(std::function<bool(int32_t)> isLoginAllowedToReconnect, std::function<bool(int32_t)> loginExists, VariableProto* vars)
+void ServerNetwork::init(std::function<bool(int32_t)> m_isLoginAllowedToReconnect, std::function<bool(int32_t)> m_loginExists, VariableProto* vars)
 {
 	m_vars = vars;
 	
 	IPaddress ip;
 	SDLNet_ResolveHost(&ip, NULL, S::config.port);
-	serverSocketRaw = SDLNet_TCP_Open(&ip);
+	m_serverSocketRaw = SDLNet_TCP_Open(&ip);
 
 	SDLNet_ResolveHost(&ip, NULL, S::config.webPort);
-	serverSocketWeb = SDLNet_TCP_Open(&ip);
+	m_serverSocketWeb = SDLNet_TCP_Open(&ip);
 
-	socketSet = SDLNet_AllocSocketSet(SERVER_CONST::maxNumberOfConnections);
+	m_socketSet = SDLNet_AllocSocketSet(SERVER_CONST::maxNumberOfConnections);
 	
-	this->isLoginAllowedToReconnect = isLoginAllowedToReconnect;
-	this->loginExists = loginExists;
+	this->m_isLoginAllowedToReconnect = m_isLoginAllowedToReconnect;
+	this->m_loginExists = m_loginExists;
 	
-	onClientDetermined = [this, &clients = clients](UndeterminedClient* client) {
+	m_onClientDetermined = [this, &clients = m_clients](UndeterminedClient* client) {
 		if (client->isSimpleClient)
 		{
 			auto newSimpleClient = std::make_unique<SimpleClient>([this]() {
-				return SDLNet_CheckSockets(socketSet, 0);
+				return SDLNet_CheckSockets(m_socketSet, 0);
 			});
 			auto index = std::find_if(clients.begin(), clients.end(), [client](auto& c){ return c.get() == client;});
 			newSimpleClient->socket = client->socket;			
@@ -67,34 +67,34 @@ void ServerNetwork::update(MessageBuffer& externalBuffer)
 
 bool ServerNetwork::hasClients()
 {
-	return clientCount > 0;
+	return m_clientCount > 0;
 }
 
 int32_t ServerNetwork::getClientCount()
 {
-	return clientCount;
+	return m_clientCount;
 }
 
 void ServerNetwork::sendToAllPlaying(const NetworkMessage& message)
 {
-	for (size_t i = 0; i < clients.size(); i++)
+	for (size_t i = 0; i < m_clients.size(); i++)
 	{
-		if (clients[i] == nullptr)
+		if (m_clients[i] == nullptr)
 			continue;
-		if (clients[i]->state == NETWORK_CLIENT_STATE::PLAYING)
-			clients[i]->sendMessage(message);
+		if (m_clients[i]->state == NETWORK_CLIENT_STATE::PLAYING)
+			m_clients[i]->sendMessage(message);
 	}
 }
 
 void ServerNetwork::addPlayer(int32_t login)
 {
-	for (size_t i = 0; i < clients.size(); i++)
+	for (size_t i = 0; i < m_clients.size(); i++)
 	{
-		if (clients[i] == nullptr)
+		if (m_clients[i] == nullptr)
 			continue;
-		if (clients[i]->login == login)
+		if (m_clients[i]->login == login)
 		{
-			clients[i]->state = NETWORK_CLIENT_STATE::PLAYING;
+			m_clients[i]->state = NETWORK_CLIENT_STATE::PLAYING;
 			break;
 		}
 	}
@@ -102,28 +102,28 @@ void ServerNetwork::addPlayer(int32_t login)
 
 void ServerNetwork::send(NetworkMessage& message, int32_t login)
 {
-	for (size_t i = 0; i < clients.size(); i++)
+	for (size_t i = 0; i < m_clients.size(); i++)
 	{
-		if (clients[i] == nullptr)
+		if (m_clients[i] == nullptr)
 			continue;
-		if (clients[i]->login == login)
+		if (m_clients[i]->login == login)
 		{
 			message.stamp = SDL_GetTicks();
-			clients[i]->sendMessage(message);
+			m_clients[i]->sendMessage(message);
 			return;
 		}
 	}
 }
 
-void ServerNetwork::send(const char * payload, size_t size, int32_t login)
+void ServerNetwork::send(const char* payload, size_t size, int32_t login)
 {
-	for (size_t i = 0; i < clients.size(); i++)
+	for (size_t i = 0; i < m_clients.size(); i++)
 	{
-		if (clients[i] == nullptr)
+		if (m_clients[i] == nullptr)
 			continue;
-		if (clients[i]->login == login)
+		if (m_clients[i]->login == login)
 		{
-			clients[i]->sendMessage(payload, size);
+			m_clients[i]->sendMessage(payload, size);
 			return;
 		}
 	}
@@ -131,53 +131,53 @@ void ServerNetwork::send(const char * payload, size_t size, int32_t login)
 
 void ServerNetwork::handleConnections()
 {
-	TCPsocket clientSocket = SDLNet_TCP_Accept(serverSocketRaw);
-	if (clientSocket)
+	TCPsocket m_clientsocket = SDLNet_TCP_Accept(m_serverSocketRaw);
+	if (m_clientsocket)
 	{
 		S::log.add("Client connected R", {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
-		auto uclient = std::make_unique<UndeterminedClient>(onClientDetermined, [this]() {
-			return SDLNet_CheckSockets(socketSet, 0);
+		auto uclient = std::make_unique<UndeterminedClient>(m_onClientDetermined, [this]() {
+			return SDLNet_CheckSockets(m_socketSet, 0);
 		});
-		uclient->socket = clientSocket;
-		clients.push_back(std::move(uclient));
-		SDLNet_TCP_AddSocket(socketSet, clientSocket);
-		clientCount++;
+		uclient->socket = m_clientsocket;
+		m_clients.push_back(std::move(uclient));
+		SDLNet_TCP_AddSocket(m_socketSet, m_clientsocket);
+		m_clientCount++;
 	}
 
-	clientSocket = SDLNet_TCP_Accept(serverSocketWeb);
-	if (clientSocket)
+	m_clientsocket = SDLNet_TCP_Accept(m_serverSocketWeb);
+	if (m_clientsocket)
 	{
 		S::log.add("Client connected W", { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
-		auto wclient = std::make_unique<WebClient>(onHandshakeDone, [this]() {
-			return SDLNet_CheckSockets(socketSet, 0);
+		auto wclient = std::make_unique<WebClient>(m_onHandshakeDone, [this]() {
+			return SDLNet_CheckSockets(m_socketSet, 0);
 		});
-		wclient->socket = clientSocket;
+		wclient->socket = m_clientsocket;
 		wclient->monitor.begin(SDL_GetTicks(), m_vars->heartbeatInterval, m_vars->heartbeatTimeout);
-		clients.push_back(std::move(wclient));
-		SDLNet_TCP_AddSocket(socketSet, clientSocket);
-		clientCount++;
+		m_clients.push_back(std::move(wclient));
+		SDLNet_TCP_AddSocket(m_socketSet, m_clientsocket);
+		m_clientCount++;
 	}
 }
 
 void ServerNetwork::handleData(MessageBuffer& externalBuffer)
 {
-	int32_t active = SDLNet_CheckSockets(socketSet, 1);
+	int32_t active = SDLNet_CheckSockets(m_socketSet, 1);
 		
 	auto time = SDL_GetTicks();
 
-	for (size_t i = 0; i < clients.size(); ++i)
+	for (size_t i = 0; i < m_clients.size(); ++i)
 	{
-		if (clients[i] == nullptr)
+		if (m_clients[i] == nullptr)
 			continue;
 		if (active > 0)
 		{
 			while (true)
 			{
-				std::unique_ptr<NetworkPacket> packet = clients[i]->poll();
+				std::unique_ptr<NetworkPacket> packet = m_clients[i]->poll();
 				if (packet)
 				{
 					S::log.add("> incoming " + std::to_string(packet->payloadSize) + ":\n\t" + Serializer::toHex(packet->payload, packet->payloadSize), { LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
-					handlePacket(std::move(packet), *clients[i], externalBuffer);
+					handlePacket(std::move(packet), *m_clients[i], externalBuffer);
 				}
 				else
 				{
@@ -185,28 +185,28 @@ void ServerNetwork::handleData(MessageBuffer& externalBuffer)
 				}
 			}
 		}
-		if (clients[i]->wasDisconnected || clients[i]->monitor.isDisconnected(time))
+		if (m_clients[i]->wasDisconnected || m_clients[i]->monitor.isDisconnected(time))
 		{
-			SDLNet_TCP_DelSocket(socketSet, clients[i]->socket);
-			SDLNet_TCP_Close(clients[i]->socket);
+			SDLNet_TCP_DelSocket(m_socketSet, m_clients[i]->socket);
+			SDLNet_TCP_Close(m_clients[i]->socket);
 
-			if (clients[i]->state == NETWORK_CLIENT_STATE::PLAYING)
+			if (m_clients[i]->state == NETWORK_CLIENT_STATE::PLAYING)
 			{
 				std::unique_ptr<InputPlayerLeftMessage> disconnectedMessage = std::make_unique<InputPlayerLeftMessage>();
-				disconnectedMessage->login = clients[i]->login;
+				disconnectedMessage->login = m_clients[i]->login;
 				addMessageToBuffer(std::move(disconnectedMessage), externalBuffer);
 			}
 			
-			std::string reason = clients[i]->wasDisconnected ? " (DC)" : " (missing heartbeat)";
+			std::string reason = m_clients[i]->wasDisconnected ? " (DC)" : " (missing heartbeat)";
 
-			S::log.add("Client disconnected " + std::to_string(clients[i]->login) + reason, { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
+			S::log.add("Client disconnected " + std::to_string(m_clients[i]->login) + reason, { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
 
-			clients[i] = nullptr;
-			clientCount--;
+			m_clients[i] = nullptr;
+			m_clientCount--;
 		}
-		else if (clients[i]->monitor.pollHeartbeat(time))
+		else if (m_clients[i]->monitor.pollHeartbeat(time))
 		{
-			clients[i]->sendMessage(HeartbeatMessage());
+			m_clients[i]->sendMessage(HeartbeatMessage());
 		}
 	}
 }
@@ -235,7 +235,7 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 		{
 			GreetingMessage* gMsg = dynamic_cast<GreetingMessage*>(msg.get());
 			//TODO check login, password
-			if (!isLoginAllowedToReconnect(gMsg->login))			
+			if (!m_isLoginAllowedToReconnect(gMsg->login))			
 				generateNewLogin(gMsg->login);
 			generateNewPassword(gMsg->password);
 			client.login = gMsg->login;
@@ -276,7 +276,7 @@ void ServerNetwork::generateNewLogin(int32_t& login)
 {
 	do
 	{
-		login = random.get(100, 1000);
+		login = m_random.get(100, 1000);
 	} 
 	while (!isLoginAvailable(login));
 }
@@ -286,20 +286,20 @@ void ServerNetwork::generateNewPassword(std::vector<int8_t>& password)
 	password.clear();
 	for (size_t i = 0; i < 12; i++)
 	{
-		password.push_back((int8_t)random.get(1, 0xff));
+		password.push_back((int8_t)m_random.get(1, 0xff));
 	}
 }
 
 bool ServerNetwork::isLoginAvailable(int32_t login)
 {
-	for (size_t i = 0; i < clients.size(); i++)
+	for (size_t i = 0; i < m_clients.size(); i++)
 	{
-		if (clients[i] == nullptr)
+		if (m_clients[i] == nullptr)
 			continue;
-		if (clients[i]->login == login)
+		if (m_clients[i]->login == login)
 			return false;
 	}
-	return !loginExists(login);
+	return !m_loginExists(login);
 }
 
 

@@ -10,18 +10,18 @@ Network::Network(VariableProto* vars)
 {
 	m_vars = vars;
 	SDLNet_Init();
-	socket = nullptr;
+	m_socket = nullptr;
 	
-	packetReader = std::make_unique<PacketReader>(&socket, getNewPacket, [this]() {
-		activeSockets = SDLNet_CheckSockets(socketSet, 0);
-		if (activeSockets == -1)
+	m_packetReader = std::make_unique<PacketReader>(&m_socket, getNewPacket, [this]() {
+		m_activeSockets = SDLNet_CheckSockets(m_socketSet, 0);
+		if (m_activeSockets == -1)
 		{
 			S::log.add("SDLNet_CheckSockets: " + std::string(SDLNet_GetError()), { LOG_TAGS::NET, LOG_TAGS::ERROR_ });
 			m_isConnected = false;
 		}
-		if (activeSockets <= 0)
+		if (m_activeSockets <= 0)
 			return 0;
-		return SDLNet_SocketReady(socket); 
+		return SDLNet_SocketReady(m_socket); 
 	});
 
 	//----------------------------------
@@ -48,39 +48,39 @@ Network::Network(VariableProto* vars)
 
 Network::~Network()
 {
-	if (socket != nullptr)
+	if (m_socket != nullptr)
 	{
-		SDLNet_TCP_DelSocket(socketSet, socket);
-		SDLNet_TCP_Close(socket);
+		SDLNet_TCP_DelSocket(m_socketSet, m_socket);
+		SDLNet_TCP_Close(m_socket);
 	}
-	SDLNet_FreeSocketSet(socketSet);
+	SDLNet_FreeSocketSet(m_socketSet);
 }
 
 void Network::connect()
 {
-	if (m_isConnected || socket != nullptr)
+	if (m_isConnected || m_socket != nullptr)
 		THROW_FATAL_ERROR("Attempt to connect while connected");
 	
 	IPaddress ip;
 	SDLNet_ResolveHost(&ip, S::config.host, S::config.port);
-	socket = SDLNet_TCP_Open(&ip);
+	m_socket = SDLNet_TCP_Open(&ip);
 
-	S::log.add("connect status: " + std::string(socket == nullptr ? "false" : "true"), {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
+	S::log.add("connect status: " + std::string(m_socket == nullptr ? "false" : "true"), {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
 	S::log.add("ip, port: " + std::string(S::config.host) + " " + std::to_string(S::config.port), {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
 
-	m_isConnected = socket != nullptr;
+	m_isConnected = m_socket != nullptr;
 	if (m_isConnected)
 	{
-		SDLNet_TCP_AddSocket(socketSet, socket);
+		SDLNet_TCP_AddSocket(m_socketSet, m_socket);
 		
 		if (!S::config.IS_WEB)
 		{
 			char codeMsg[4];
 			Serializer::write(S::config.simpleClientCode, codeMsg);
-			SDLNet_TCP_Send(socket, codeMsg, 4);
+			SDLNet_TCP_Send(m_socket, codeMsg, 4);
 		}
 		
-		monitor.begin(SDL_GetTicks(), m_vars->heartbeatInterval, m_vars->heartbeatTimeout);
+		m_monitor.begin(SDL_GetTicks(), m_vars->heartbeatInterval, m_vars->heartbeatTimeout);
 	}
 }
 
@@ -94,9 +94,9 @@ void Network::update()
 	if (!m_isConnected)
 		return;
 
-	activeSockets = SDLNet_CheckSockets(socketSet, S::config.networkUpdateInterval);
+	m_activeSockets = SDLNet_CheckSockets(m_socketSet, S::config.networkUpdateInterval);
 
-	if (activeSockets == -1)
+	if (m_activeSockets == -1)
 	{
 		S::log.add("SDLNet_CheckSockets: " + std::string(SDLNet_GetError()), { LOG_TAGS::NET, LOG_TAGS::ERROR_ });
 		m_isConnected = false;
@@ -115,21 +115,21 @@ void Network::update()
 	}
 	
 	auto time = SDL_GetTicks();
-	if (monitor.pollHeartbeat(time))
+	if (m_monitor.pollHeartbeat(time))
 		send(HeartbeatMessage());
-	if (monitor.isDisconnected(time))
+	if (m_monitor.isDisconnected(time))
 		handleDisconnect();
 }
 
 void Network::send(const NetworkPacket& packet)
 {
-	if (socket == nullptr)
+	if (m_socket == nullptr)
 	{
 		S::log.add("Message will not be sent, not connected.", { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF, LOG_TAGS::ERROR_ });
 	}
 	else
 	{
-		SDLNet_TCP_Send(socket, packet.rawData, packet.rawSize);
+		SDLNet_TCP_Send(m_socket, packet.rawData, packet.rawSize);
 	}
 }
 
@@ -144,17 +144,17 @@ void Network::send(const NetworkMessage& msg)
 	S::log.add("SEND " + msg.getName() + "[" + std::to_string(packet->payloadSize) + "]",
 		{ LOG_TAGS::NET_BRIEF });
 
-	requestTimeByInitiatorId[msg.initiator_id] = SDL_GetTicks();
+	m_requestTimeByInitiatorId[msg.initiator_id] = SDL_GetTicks();
 	send(*packet);
 }
 
 std::unique_ptr<NetworkMessage> Network::poll()
 {
-	if (!m_isConnected || activeSockets <= 0)
+	if (!m_isConnected || m_activeSockets <= 0)
 		return nullptr;
 
-	packetReader->setDataAvailable(SDLNet_SocketReady(socket));
-	std::unique_ptr<NetworkPacket> packet = packetReader->poll();
+	m_packetReader->setDataAvailable(SDLNet_SocketReady(m_socket));
+	std::unique_ptr<NetworkPacket> packet = m_packetReader->poll();
 	if (!packet)
 	{
 		return nullptr;
@@ -175,10 +175,10 @@ std::unique_ptr<NetworkMessage> Network::poll()
 void Network::handleDisconnect()
 {
 	m_isConnected = false;
-	S::log.add("disconnected",	{ LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
-	SDLNet_TCP_DelSocket(socketSet, socket);
-	SDLNet_TCP_Close(socket);
-	socket = nullptr;
+	S::log.add("dm_isConnected",	{ LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
+	SDLNet_TCP_DelSocket(m_socketSet, m_socket);
+	SDLNet_TCP_Close(m_socket);
+	m_socket = nullptr;
 }
 
 std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<NetworkPacket> packet)
@@ -189,14 +189,14 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 
 	std::unique_ptr<NetworkMessage> resultMessage = factory.parse(*packet);
 
-	//auto t = requestTimeByInitiatorId[resultMessage->inResponseTo];
+	//auto t = m_requestTimeByInitiatorId[resultMessage->inResponseTo];
 	int32_t ticks = SDL_GetTicks();
 	if (resultMessage->inResponseTo > 0 &&
-		requestTimeByInitiatorId[resultMessage->inResponseTo] &&
+		m_requestTimeByInitiatorId[resultMessage->inResponseTo] &&
 		resultMessage->stamp != 0)
 	{
 		int32_t uncertaintyBefore = timeSync.getUncertainty();
-		timeSync.addMeasurement(requestTimeByInitiatorId[resultMessage->inResponseTo], resultMessage->stamp, ticks);
+		timeSync.addMeasurement(m_requestTimeByInitiatorId[resultMessage->inResponseTo], resultMessage->stamp, ticks);
 		int32_t uncertaintyAfter = timeSync.getUncertainty();
 
 		if (uncertaintyAfter < uncertaintyBefore || true)
@@ -208,14 +208,14 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 	if (resultMessage->typeId == MESSAGE_TYPE::TYPE_REQUEST_MSG)
 	{
 		GenericRequestMessage* grM = static_cast<GenericRequestMessage*>(resultMessage.get());
-		auto handlerIter = interceptorsGeneric_once.find(grM->request);
-		if (handlerIter != interceptorsGeneric_once.end())
+		auto handlerIter = m_interceptorsGeneric_once.find(grM->request);
+		if (handlerIter != m_interceptorsGeneric_once.end())
 		{
 			resultMessage.release();
 			std::unique_ptr<GenericRequestMessage> resultGRMessage = std::unique_ptr<GenericRequestMessage>(grM);
 
 			auto handler = handlerIter->second;
-			interceptorsGeneric_once.erase(handlerIter);
+			m_interceptorsGeneric_once.erase(handlerIter);
 			handler(std::move(resultGRMessage));
 		}
 		else
@@ -225,15 +225,15 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 	}
 	else if (resultMessage->typeId == MESSAGE_TYPE::TYPE_HEARTBEAT_MSG)
 	{
-		monitor.onHearbeatMessage(ticks);
+		m_monitor.onHearbeatMessage(ticks);
 	}
 	else
 	{
-		auto handlerIter = interceptors_once.find(resultMessage->typeId);
-		if (handlerIter != interceptors_once.end())
+		auto handlerIter = m_interceptors_once.find(resultMessage->typeId);
+		if (handlerIter != m_interceptors_once.end())
 		{
 			auto handler = handlerIter->second;
-			interceptors_once.erase(handlerIter);
+			m_interceptors_once.erase(handlerIter);
 			handler(std::move(resultMessage));
 		}
 		else
@@ -246,29 +246,29 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 
 void Network::interceptOnce(MESSAGE_TYPE messageType, MessageHandler handler)
 {
-	if (interceptors_once.count(messageType) > 0)
+	if (m_interceptors_once.count(messageType) > 0)
 		THROW_FATAL_ERROR("message type already intercepted");
 	if (messageType == MESSAGE_TYPE::TYPE_REQUEST_MSG)
 		THROW_FATAL_ERROR("can't intercept generic requests");
-	interceptors_once[messageType] = handler;
+	m_interceptors_once[messageType] = handler;
 }
 
 void Network::interceptGenericRequestOnce(REQUEST_TYPE requestType, GenericRequestHandler handler)
 {
-	if (interceptorsGeneric_once.count(requestType) > 0)
+	if (m_interceptorsGeneric_once.count(requestType) > 0)
 		THROW_FATAL_ERROR("request type already intercepted");
-	interceptorsGeneric_once[requestType] = handler;
+	m_interceptorsGeneric_once[requestType] = handler;
 }
 
 
 void Network::clearInterception(MESSAGE_TYPE messageType)
 {
-	interceptors_once.erase(messageType);
+	m_interceptors_once.erase(messageType);
 }
 
 void Network::clearInterception(REQUEST_TYPE requestType)
 {
-	interceptorsGeneric_once.erase(requestType);	
+	m_interceptorsGeneric_once.erase(requestType);	
 }
 
 std::unique_ptr<NetworkPacket> Network::getNewPacket()

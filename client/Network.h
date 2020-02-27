@@ -58,15 +58,15 @@ protected:
 private:
 
 	VariableProto* m_vars;
-	TCPsocket socket;
-	ConnectionMonitor monitor;
-	std::unique_ptr<PacketReader> packetReader;
-	SDLNet_SocketSet socketSet = SDLNet_AllocSocketSet(1);
-	int32_t activeSockets = 0;
+	TCPsocket m_socket;
+	ConnectionMonitor m_monitor;
+	std::unique_ptr<PacketReader> m_packetReader;
+	SDLNet_SocketSet m_socketSet = SDLNet_AllocSocketSet(1);
+	int32_t m_activeSockets = 0;
 	bool m_isConnected = false;
-	std::unordered_map<int32_t, uint32_t> requestTimeByInitiatorId;
-	std::unordered_map<MESSAGE_TYPE, MessageHandler> interceptors_once;
-	std::unordered_map<REQUEST_TYPE, GenericRequestHandler> interceptorsGeneric_once;
+	std::unordered_map<int32_t, uint32_t> m_requestTimeByInitiatorId;
+	std::unordered_map<MESSAGE_TYPE, MessageHandler> m_interceptors_once;
+	std::unordered_map<REQUEST_TYPE, GenericRequestHandler> m_interceptorsGeneric_once;
 	
 	static std::unique_ptr<NetworkPacket> getNewPacket();
 	
