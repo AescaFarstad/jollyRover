@@ -10,13 +10,6 @@
 ServerNetwork::ServerNetwork()
 {
 	m_clientCount = 0;
-
-	m_onHandshakeDone = [](NetworkClient& client) {
-		client.state = NETWORK_CLIENT_STATE::GREETING;
-		GenericRequestMessage grm;
-		grm.request = REQUEST_TYPE::REQUEST_GREETING;
-		client.sendMessage(grm);
-	};
 }
 
 void ServerNetwork::init(std::function<bool(int32_t)> m_isLoginAllowedToReconnect, std::function<bool(int32_t)> m_loginExists, VariableProto* vars)
@@ -34,28 +27,15 @@ void ServerNetwork::init(std::function<bool(int32_t)> m_isLoginAllowedToReconnec
 	
 	this->m_isLoginAllowedToReconnect = m_isLoginAllowedToReconnect;
 	this->m_loginExists = m_loginExists;
-	
-	m_onClientDetermined = [this, &clients = m_clients](UndeterminedClient* client) {
-		if (client->isSimpleClient)
-		{
-			auto newSimpleClient = std::make_unique<SimpleClient>([this]() {
-				return SDLNet_CheckSockets(m_socketSet, 0);
-			});
-			auto index = std::find_if(clients.begin(), clients.end(), [client](auto& c){ return c.get() == client;});
-			newSimpleClient->socket = client->socket;			
-			newSimpleClient->state = NETWORK_CLIENT_STATE::GREETING;
-			newSimpleClient->monitor.begin(SDL_GetTicks(), m_vars->heartbeatInterval, m_vars->heartbeatTimeout);
-			*index = std::move(newSimpleClient); //deletes 'client'
-			
-			GenericRequestMessage grm;
-			grm.request = REQUEST_TYPE::REQUEST_GREETING;
-			static_cast<SimpleClient*>(index->get())->sendMessage(grm);
-			
-		}
-		else
-		{
-			client->monitor.begin(SDL_GetTicks(), m_vars->heartbeatInterval, m_vars->heartbeatTimeout);			
-		}
+
+	m_onHandshakeDone = [this](NetworkClient& client) {
+		
+		client.monitor.begin(SDL_GetTicks(), m_vars->heartbeatInterval, m_vars->heartbeatTimeout); //TODO handle timeout before first message
+		client.state = NETWORK_CLIENT_STATE::GREETING;
+		GenericRequestMessage grm;
+		grm.request = REQUEST_TYPE::REQUEST_GREETING;
+		client.sendMessage(grm);
+		
 	};
 }
 
@@ -131,32 +111,35 @@ void ServerNetwork::send(const char* payload, size_t size, int32_t login)
 
 void ServerNetwork::handleConnections()
 {
-	TCPsocket m_clientsocket = SDLNet_TCP_Accept(m_serverSocketRaw);
-	if (m_clientsocket)
+	TCPsocket clientSocket = SDLNet_TCP_Accept(m_serverSocketRaw);
+	if (clientSocket)
 	{
 		S::log.add("Client connected R", {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
-		auto uclient = std::make_unique<UndeterminedClient>(m_onClientDetermined, [this]() {
-			return SDLNet_CheckSockets(m_socketSet, 0);
-		});
-		uclient->socket = m_clientsocket;
-		m_clients.push_back(std::move(uclient));
-		SDLNet_TCP_AddSocket(m_socketSet, m_clientsocket);
-		m_clientCount++;
+		addClient(std::make_unique<SimpleClient>(m_onHandshakeDone, [this]() {
+				return SDLNet_CheckSockets(m_socketSet, 0);
+			}),
+			clientSocket
+		);
 	}
 
-	m_clientsocket = SDLNet_TCP_Accept(m_serverSocketWeb);
-	if (m_clientsocket)
+	clientSocket = SDLNet_TCP_Accept(m_serverSocketWeb);
+	if (clientSocket)
 	{
 		S::log.add("Client connected W", { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
-		auto wclient = std::make_unique<WebClient>(m_onHandshakeDone, [this]() {
-			return SDLNet_CheckSockets(m_socketSet, 0);
-		});
-		wclient->socket = m_clientsocket;
-		wclient->monitor.begin(SDL_GetTicks(), m_vars->heartbeatInterval, m_vars->heartbeatTimeout);
-		m_clients.push_back(std::move(wclient));
-		SDLNet_TCP_AddSocket(m_socketSet, m_clientsocket);
-		m_clientCount++;
+		addClient(std::make_unique<WebClient>(m_onHandshakeDone, [this]() {
+				return SDLNet_CheckSockets(m_socketSet, 0);
+			}),
+			clientSocket
+		);
 	}
+}
+
+void ServerNetwork::addClient(std::unique_ptr<NetworkClient> client, TCPsocket& clientSocket)
+{
+	client->socket = clientSocket;				
+	m_clients.push_back(std::move(client));
+	SDLNet_TCP_AddSocket(m_socketSet, clientSocket);
+	m_clientCount++;
 }
 
 void ServerNetwork::handleData(MessageBuffer& externalBuffer)

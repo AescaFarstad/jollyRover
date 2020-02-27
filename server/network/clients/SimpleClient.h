@@ -8,10 +8,18 @@ class SimpleClient :
 	public NetworkClient
 {
 public:
-	SimpleClient(std::function< int32_t() > globalSocketNudgeFunction);
+	SimpleClient(
+		std::function<void(NetworkClient& client)> onHandshakeDone,
+		std::function< int32_t() > globalSocketNudgeFunction);
 
-	virtual void sendMessage(const NetworkMessage& msg);
-	virtual void sendMessage(const char* payload, size_t size);
+	std::unique_ptr<NetworkPacket> poll() override;
+	void sendMessage(const NetworkMessage& msg) override;
+	void sendMessage(const char* payload, size_t size) override;
+
+private:
+
+	bool m_isHandshakeDone;
+	std::function<void(NetworkClient& client)> m_onHandshakeDone;
 
 };
 

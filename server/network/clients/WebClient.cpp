@@ -13,8 +13,8 @@ WebClient::WebClient(
 	std::function<void(NetworkClient& client)> onHttpHandshakeDone, 
 	std::function< int32_t() > globalSocketNudgeFunction) : NetworkClient(globalSocketNudgeFunction)
 {
-	this->onHttpHandshakeDone = onHttpHandshakeDone;
-	isHandshakeDone = false;
+	m_onHttpHandshakeDone = onHttpHandshakeDone;
+	m_isHandshakeDone = false;
 }
 
 
@@ -42,7 +42,7 @@ static inline void trim(std::string& s)
 
 std::unique_ptr<NetworkPacket> WebClient::poll()
 {
-	if (isHandshakeDone)
+	if (m_isHandshakeDone)
 	{
 		return NetworkClient::poll();
 	}
@@ -81,10 +81,10 @@ std::unique_ptr<NetworkPacket> WebClient::poll()
 
 			SDLNet_TCP_Send(socket, response.c_str(), response.size());
 
-			isHandshakeDone = true;
+			m_isHandshakeDone = true;
 
 			delete[] responseHash;
-			onHttpHandshakeDone(*this);
+			m_onHttpHandshakeDone(*this);
 		}
 		return nullptr;
 	}

@@ -4,7 +4,6 @@
 #include <NetworkClient.h>
 #include <SimpleClient.h>
 #include <NetworkPacket.h>
-#include <UndeterminedClient.h>
 #include <NetworkMessageFactory.h>
 #include <ServerConstants.h>
 #include <SeededRandom.h>
@@ -36,7 +35,6 @@ private:
 	std::vector<std::unique_ptr<NetworkClient>> m_clients;
 	SDLNet_SocketSet m_socketSet;
 	int32_t m_clientCount;
-	std::function<void(UndeterminedClient* client)> m_onClientDetermined;
 	std::function<void(NetworkClient& client)> m_onHandshakeDone;
 	std::function<bool(int32_t)> m_isLoginAllowedToReconnect;
 	std::function<bool(int32_t)> m_loginExists;
@@ -44,6 +42,7 @@ private:
 	VariableProto* m_vars;
 
 	void handleConnections();
+	void addClient(std::unique_ptr<NetworkClient> client, TCPsocket& clientSocket);
 	void handleData(MessageBuffer& externalBuffer);
 	void handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkClient& client, MessageBuffer& externalBuffer);
 	void addMessageToBuffer(std::unique_ptr<NetworkMessage> msg, MessageBuffer& externalBuffer);

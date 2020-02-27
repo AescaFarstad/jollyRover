@@ -12,18 +12,18 @@ public:
 		std::function< int32_t() > globalSocketNudgeFunction);
 	virtual ~WebClient() = default;
 
-	bool isHandshakeDone;
-
-	virtual std::unique_ptr<NetworkPacket> poll();
-	virtual void sendMessage(const NetworkMessage& msg);
-	virtual void sendMessage(const char* payload, size_t size);
-	virtual void init() override;
+	std::unique_ptr<NetworkPacket> poll() override;
+	void sendMessage(const NetworkMessage& msg) override;
+	void sendMessage(const char* payload, size_t size) override;
+	void init() override;
 
 protected:
 
 	static std::unique_ptr<NetworkPacket> getPacket();
 
 private:
-	std::function<void(NetworkClient& client)> onHttpHandshakeDone;
+
+	bool m_isHandshakeDone;
+	std::function<void(NetworkClient& client)> m_onHttpHandshakeDone;
 };
 
