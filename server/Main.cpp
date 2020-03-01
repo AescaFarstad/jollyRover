@@ -27,7 +27,7 @@ namespace MainInternal
 	GameUpdater gameUpdater;
 	int32_t inputIdCounter = 0;
 	Prototypes prototypes;
-	bool hasClients = false;
+	bool hadClients = false;
 }
 
 using namespace MainInternal;
@@ -134,6 +134,17 @@ void mainLoop()
 
 
 	network.update(messageBuffer);
+	
+	bool newHasClients = network.hasClients();
+	if (!hadClients && newHasClients)
+	{
+		auto state = std::make_unique<GameState>();
+		state->timeStamp = SDL_GetTicks();
+		//S::log.add("Assign new timestamp " + std::to_string(state->timeStamp));
+		gameUpdater.load(std::move(state), &prototypes, false);
+	}
+	hadClients = newHasClients;
+	
 	int32_t i = 0;
 	while (messageBuffer[i] != nullptr)
 	{
@@ -142,19 +153,18 @@ void mainLoop()
 		i++;
 	}
 	
-	bool newHasClients = network.hasClients();
-	if (hasClients && !newHasClients)
-		gameUpdater.load(std::make_unique<GameState>(), &prototypes, false);
-	hasClients = newHasClients;
-
-	int32_t ticks = SDL_GetTicks();
-	int32_t delta = ticks - lastTicks;
-	if (delta >= MIN_TIME_PER_FRAME)
+	if (hadClients)
 	{
-		lastTicks = ticks;
-		if (hasClients)
+		int32_t ticks = SDL_GetTicks();
+		int32_t delta = ticks - lastTicks;
+		if (delta >= MIN_TIME_PER_FRAME)
+		{
+			lastTicks = ticks;
 			gameUpdater.update(ticks);
+		}
 	}
+
+	
 }
 
 int main()
@@ -171,9 +181,7 @@ int main()
 		[](int32_t login) -> bool {return GameLogic::playerByLogin(gameUpdater.state.get(), login) != nullptr;},
 		[](int32_t login) -> bool {return GameLogic::playerByLogin(gameUpdater.state.get(), login) != nullptr;},
 		&prototypes.variables
-		);
-
-	gameUpdater.load(std::make_unique<GameState>(), &prototypes, false);
+		);	
 
 	while (!isFinished)
 		mainLoop();

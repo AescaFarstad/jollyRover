@@ -9,6 +9,7 @@ public:
 	int32_t fixedStepDuration;
 	
 	uint32_t reconnectWindow;
+	int32_t maxLogicUpdatesPerFrame;
 	
 	int32_t heartbeatInterval;
 	int32_t heartbeatTimeout;

@@ -26,6 +26,7 @@
 			}			
 		},
 		"reconnectWindow": 10000,
+		"maxLogicUpdatesPerFrame": 25,
 		"heartbeatInterval":1000,
 		"heartbeatTimeout":3500,
 		"fieldWidth": 1280,

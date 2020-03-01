@@ -16,14 +16,15 @@ void GameUpdater::update(uint32_t time)
 {
 	if (lastValidTimeStamp < state->timeStamp)
 		rewindToPrecedingState(lastValidTimeStamp);
-
-	while (state->timeStamp + prototypes->variables.fixedStepDuration < time)
+	int32_t iters = 0;
+	while (state->timeStamp + prototypes->variables.fixedStepDuration < time && iters < prototypes->variables.maxLogicUpdatesPerFrame)
 	{		
 		std::vector<InputMessage*> inputs = getThisFrameInputs(state->timeStamp, state->timeStamp + prototypes->variables.fixedStepDuration);
 		GameLogic::update(state.get(), prototypes->variables.fixedStepDuration, inputs, prototypes);
 		lastValidTimeStamp = state->timeStamp;
 		if (lastSavedSteps != state->time.performedSteps && state->time.performedSteps % S::config.saveStateInterval == 0)
 			saveState(state.get());
+		iters++;
 	}
 }
 

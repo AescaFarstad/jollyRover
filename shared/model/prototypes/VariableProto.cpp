@@ -5,6 +5,7 @@ void VariableProto::load(nlohmann::json& source)
 	fixedStepDuration = source.at("game").at("fixedStepDuration");
 	
 	reconnectWindow = source.at("reconnectWindow");
+	maxLogicUpdatesPerFrame = source.at("maxLogicUpdatesPerFrame");
 	heartbeatInterval = source.at("heartbeatInterval");
 	heartbeatTimeout = source.at("heartbeatTimeout");
 	
