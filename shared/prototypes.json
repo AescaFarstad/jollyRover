@@ -25,7 +25,7 @@
 				"minCreepsToRetreat":3
 			}			
 		},
-		"reconnectWindow": 10000,
+		"reconnectWindow": 20000,
 		"maxLogicUpdatesPerFrame": 25,
 		"heartbeatInterval":1000,
 		"heartbeatTimeout":3500,

@@ -28,6 +28,8 @@ namespace MainInternal
 	int32_t inputIdCounter = 0;
 	Prototypes prototypes;
 	bool hadClients = false;
+	int32_t timeWithoutClients = 0;
+	bool idle = false;
 }
 
 using namespace MainInternal;
@@ -65,6 +67,8 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
 					gsMsg.state = Serializer::copyThroughSerialization(*gameUpdater.state);
+					
+					S::log.add("Send state, stamp=" + std::to_string(gameUpdater.state->timeStamp) + " players=" + std::to_string(gameUpdater.state->players.size()));
 					network.send(gsMsg, genericRequestMsg->login);
 
 					std::unique_ptr<InputPlayerJoinedMessage> pjMsg = std::make_unique<InputPlayerJoinedMessage>();
@@ -119,6 +123,55 @@ void loadConfig()
 	S::config.saveStateInterval = -1; //Server never needs to save states
 }
 
+void activeLoop()
+{
+	int32_t ticks = SDL_GetTicks();
+	int32_t delta = ticks - lastTicks;
+	
+	int32_t i = 0;
+	while (messageBuffer[i] != nullptr)
+	{
+		handleNetworkMessage(std::move(messageBuffer[i]));
+		messageBuffer[i] = nullptr;
+		i++;
+	}
+	
+	if (delta >= MIN_TIME_PER_FRAME)
+	{
+		lastTicks = ticks;
+		gameUpdater.update(ticks);
+	}
+	
+	if (!network.hasClients())
+		timeWithoutClients += delta;
+	else
+		timeWithoutClients = 0;
+	
+	if (timeWithoutClients > prototypes.variables.reconnectWindow * 2)
+	{
+		idle = true;
+		S::log.add("Went idle");
+	}
+}
+
+void idleLoop()
+{
+	if (network.hasClients())
+	{
+		idle = false;
+		
+		
+		int32_t ticks = SDL_GetTicks() - prototypes.variables.fixedStepDuration;
+		auto state = std::make_unique<GameState>();
+		state->timeStamp = ticks;
+		lastTicks = ticks;
+		gameUpdater.load(std::move(state), &prototypes, false);
+		S::log.add("state reset");
+		
+		activeLoop();
+	}
+}
+
 void mainLoop()
 {
 	SDL_Event e;
@@ -131,40 +184,12 @@ void mainLoop()
 			break;
 		}
 	}
-
-
+	
 	network.update(messageBuffer);
-	
-	bool newHasClients = network.hasClients();
-	if (!hadClients && newHasClients)
-	{
-		auto state = std::make_unique<GameState>();
-		state->timeStamp = SDL_GetTicks();
-		//S::log.add("Assign new timestamp " + std::to_string(state->timeStamp));
-		gameUpdater.load(std::move(state), &prototypes, false);
-	}
-	hadClients = newHasClients;
-	
-	int32_t i = 0;
-	while (messageBuffer[i] != nullptr)
-	{
-		handleNetworkMessage(std::move(messageBuffer[i]));
-		messageBuffer[i] = nullptr;
-		i++;
-	}
-	
-	if (hadClients)
-	{
-		int32_t ticks = SDL_GetTicks();
-		int32_t delta = ticks - lastTicks;
-		if (delta >= MIN_TIME_PER_FRAME)
-		{
-			lastTicks = ticks;
-			gameUpdater.update(ticks);
-		}
-	}
-
-	
+	if (idle)
+		idleLoop();
+	else
+		activeLoop();
 }
 
 int main()
@@ -182,6 +207,8 @@ int main()
 		[](int32_t login) -> bool {return GameLogic::playerByLogin(gameUpdater.state.get(), login) != nullptr;},
 		&prototypes.variables
 		);	
+		
+	gameUpdater.load(std::make_unique<GameState>(), &prototypes, false);
 
 	while (!isFinished)
 		mainLoop();

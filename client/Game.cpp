@@ -26,6 +26,7 @@ Game::Game()
 {
 	S::network = nullptr;
 	m_atlas = nullptr;
+	m_login = 0;
 }
 
 Game::~Game()
@@ -156,9 +157,12 @@ void Game::goOffline()
 void Game::startGame()
 {
 	m_loadGameTask.pushAsync([this](std::unique_ptr<Callback> callback) {
-		S::network->interceptGenericRequestOnce(REQUEST_TYPE::REQUEST_GREETING, [cb = callback.release()](std::unique_ptr<GenericRequestMessage> message) {
+		S::network->interceptGenericRequestOnce(REQUEST_TYPE::REQUEST_GREETING, [cb = callback.release(), login = m_login](std::unique_ptr<GenericRequestMessage> message) {
 			
-			S::network->send(GreetingMessage());
+			auto msg = GreetingMessage();
+			msg.login = login;
+			
+			S::network->send(msg);
 			
 			cb->execute();
 			delete cb;
