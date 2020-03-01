@@ -30,7 +30,7 @@ void NetworkPacket::loadFromRawData(const char* rawData, int32_t bytesAvailable)
 	if (bytesLoaded < bufferSize)
 	{
 		auto newBytes = std::min(bytesAvailable, bufferSize - bytesLoaded);
-		memcpy(tempBuffer + bytesLoaded, rawData, newBytes);
+		std::memcpy(tempBuffer + bytesLoaded, rawData, newBytes);
 		bytesLoaded += newBytes;
 
 		rawData += newBytes;
@@ -62,7 +62,7 @@ void NetworkPacket::loadFromRawData(const char* rawData, int32_t bytesAvailable)
 		rawSize = payloadSize + bufferSize;
 
 		this->rawData = new char[rawSize];
-		memcpy(this->rawData, tempBuffer, bufferSize);
+		std::memcpy(this->rawData, tempBuffer, bufferSize);
 
 		payload = this->rawData + sizeof(int16_t) * 2;
 	}
@@ -70,7 +70,7 @@ void NetworkPacket::loadFromRawData(const char* rawData, int32_t bytesAvailable)
 	if (bytesLoaded >= bufferSize)
 	{		
 		uint16_t bytesToRead = std::min(bytesAvailable, rawSize - bytesLoaded);
-		memcpy(this->rawData + bytesLoaded, rawData, bytesToRead);
+		std::memcpy(this->rawData + bytesLoaded, rawData, bytesToRead);
 		bytesLoaded += bytesToRead;
 	}
 	
@@ -95,7 +95,7 @@ void NetworkPacket::setPayloadFromRawData(const char* newRawData, size_t size)
 	rawSize = (uint16_t)size + sizeof(uint16_t) * 2;
 	rawData = new char[rawSize];
 	payload = rawData + sizeof(uint16_t) * 2;
-	memcpy(payload, newRawData, size);
+	std::memcpy(payload, newRawData, size);
 	Serializer::write((int16_t)SUGAR, rawData);
 	Serializer::write((uint16_t)size, rawData + 2);
 

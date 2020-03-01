@@ -23,7 +23,7 @@ void GameConfig::load(nlohmann::json& j)
 	S::config.networkUpdateInterval = jconfig.at("networkUpdateInterval");
 	S::config.maxMessageSize = jconfig.at("maxMessageSize");
 	std::string host = jconfig.at("host");
-	memcpy(S::config.host, host.c_str(), host.length() + 1);
+	std::memcpy(S::config.host, host.c_str(), host.length() + 1);
 	S::config.loopBack = jconfig.at("loopBack");
 	S::config.runBenchmark = jconfig.at("runBenchmark");
 	S::config.window_X = jconfig.at("windowLocation").at("x");

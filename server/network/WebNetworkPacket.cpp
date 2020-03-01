@@ -26,7 +26,7 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAv
 	if (bytesLoaded < bufferSize1)
 	{
 		auto newBytes = std::min(bytesAvailable, bufferSize1 - bytesLoaded);
-		memcpy(tempBuffer1 + bytesLoaded, incomingData, newBytes);
+		std::memcpy(tempBuffer1 + bytesLoaded, incomingData, newBytes);
 		bytesLoaded += newBytes;
 
 		incomingData += newBytes;
@@ -74,7 +74,7 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAv
 	if (bytesLoaded < bufferSize1 + bufferSize2)
 	{
 		auto newBytes = std::min(bytesAvailable, bufferSize1 + bufferSize2 - bytesLoaded);
-		memcpy(tempBuffer2 + bytesLoaded - bufferSize1, incomingData, newBytes);
+		std::memcpy(tempBuffer2 + bytesLoaded - bufferSize1, incomingData, newBytes);
 		bytesLoaded += newBytes;
 
 		incomingData += newBytes;
@@ -113,7 +113,7 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAv
 	if (bytesLoaded >= bufferSize1 + bufferSize2)
 	{
 		uint16_t bytesToRead = std::min(bytesAvailable, rawSize - bytesLoaded);
-		memcpy(this->payload + bytesLoaded - bufferSize1 - bufferSize2, incomingData, bytesToRead);
+		std::memcpy(this->payload + bytesLoaded - bufferSize1 - bufferSize2, incomingData, bytesToRead);
 		bytesLoaded += bytesToRead;
 	}
 
@@ -145,7 +145,7 @@ void WebNetworkPacket::setPayloadFromRawData(const char* newRawData, size_t size
 	
 	payload = rawData + rawSize - payloadSize;
 
-	memcpy(payload, newRawData, size);
+	std::memcpy(payload, newRawData, size);
 	
 	int32_t cursor = 0;
 	rawData[cursor] = (unsigned char)130; //Binary, unmasked

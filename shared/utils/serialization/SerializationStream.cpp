@@ -63,7 +63,7 @@ char * SerializationStream::readAll()
 	size_t m_cursor = 0;
 	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
-		memcpy(result + m_cursor, m_blocks[i]->block, m_blocks[i]->occupied);
+		std::memcpy(result + m_cursor, m_blocks[i]->block, m_blocks[i]->occupied);
 		m_cursor += m_blocks[i]->occupied;
 	}
 	return result;
@@ -75,7 +75,7 @@ char * SerializationStream::c_str()
 	size_t m_cursor = 0;
 	for (size_t i = 0; i < m_blocks.size(); i++)
 	{
-		memcpy(result + m_cursor, m_blocks[i]->block, m_blocks[i]->occupied);
+		std::memcpy(result + m_cursor, m_blocks[i]->block, m_blocks[i]->occupied);
 		m_cursor += m_blocks[i]->occupied;
 	}
 	result[m_totalLength] = '\0';
@@ -113,7 +113,7 @@ char* SerializationStream::readAllAsBase64()
 char* SerializationStream::nullTerminate(char* source, size_t length)
 {
 	char* result = new char[length + 1];
-	memcpy(result, source, length);
+	std::memcpy(result, source, length);
 	result[length] = '\0';
 	delete[] source;
 	return result;
@@ -253,8 +253,8 @@ void SerializationStream::write(const char* data, size_t length)
 					cutFromBeginningAmount = m_cursor.block->occupied;
 				}
 
-				memcpy(newBlock->block, data, length);
-				memcpy(newBlock->block + length, nextBlock->block + cutFromBeginningAmount, nextBlock->occupied - cutFromBeginningAmount);
+				std::memcpy(newBlock->block, data, length);
+				std::memcpy(newBlock->block + length, nextBlock->block + cutFromBeginningAmount, nextBlock->occupied - cutFromBeginningAmount);
 				m_cursor.block = newBlock;
 				m_cursor.index = length;
 

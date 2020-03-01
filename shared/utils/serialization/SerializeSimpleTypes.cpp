@@ -1,4 +1,5 @@
 #include <SerializeSimpleTypes.h>
+#include <cstring>
 
 #ifdef __EMSCRIPTEN__
 void Serializer::write(const size_t& value, char buffer[])
@@ -73,13 +74,13 @@ void Serializer::write(const float& value, char buffer[])
 {
 	//TODO endianess
 	char* converted = (char*)& value;
-	memcpy(buffer, converted, 4);
+	std::memcpy(buffer, converted, 4);
 }
 
 void Serializer::write(const std::string& value, char buffer[])
 {
 	write((int16_t)value.size(), buffer);
-	memcpy(buffer+sizeof(int16_t), value.c_str(), value.size());
+	std::memcpy(buffer+sizeof(int16_t), value.c_str(), value.size());
 }
 
 void Serializer::read(std::string& out, const char* value)

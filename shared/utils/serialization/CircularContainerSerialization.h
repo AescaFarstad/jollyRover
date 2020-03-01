@@ -1,6 +1,7 @@
 #pragma once
 #include <CircularContainer.h>
 #include <ISerializable.h>
+#include <cstring>
 
 template <typename T, uint32_t arraySize>
 void read(CircularContainer<T, arraySize>& out, SerializationStream& stream)
@@ -9,7 +10,7 @@ void read(CircularContainer<T, arraySize>& out, SerializationStream& stream)
 	read(out.total, stream);
 	read(out.size, stream);
 	int32_t readLength = std::min(sizeof(out.array), (long unsigned int)out.total);
-	memcpy(&out.array, stream.read(out.array, readLength), readLength);		
+	std::memcpy(&out.array, stream.read(out.array, readLength), readLength);		
 }
 
 template <typename T, uint32_t arraySize>
