@@ -2,7 +2,6 @@
 #include <iostream>
 #include <vector>
 #include <sstream>
-#include <base64_2.h>
 #include <iomanip>
 #include <SerializeSimpleTypes.h>
 

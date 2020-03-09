@@ -1,6 +1,5 @@
 #include <WebClient.h>
 #include <libwshandshake.hpp>
-#include <base64_2.h>
 #include <regex>
 #include <algorithm> 
 #include <cctype>

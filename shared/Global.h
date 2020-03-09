@@ -6,6 +6,8 @@
 
 #define THROW_FATAL_ERROR(ERROR_MSG) {printf( "FATAL ERROR: \n%s @ %d \n%s \n", __FILE__, __LINE__, #ERROR_MSG); abort();}
 
+using size_t=std::size_t;
+
 class GameConfig
 {
 public:

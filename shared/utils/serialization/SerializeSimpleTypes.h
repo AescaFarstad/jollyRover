@@ -17,6 +17,7 @@ namespace Serializer {
 	void write(const bool& value, char buffer[]);
 	void write(const float& value, char buffer[]);
 	void write(const std::string& value, char buffer[]);
+	size_t sizeOfString(const std::string& value);
 	
 	#ifdef __EMSCRIPTEN__
 	void read(size_t& out, const char* value);

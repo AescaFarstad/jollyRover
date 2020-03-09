@@ -77,6 +77,11 @@ void Serializer::write(const float& value, char buffer[])
 	std::memcpy(buffer, converted, 4);
 }
 
+size_t Serializer::sizeOfString(const std::string& value)
+{
+	return sizeof(int16_t) + value.size();
+}
+
 void Serializer::write(const std::string& value, char buffer[])
 {
 	write((int16_t)value.size(), buffer);
