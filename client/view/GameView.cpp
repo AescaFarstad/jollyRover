@@ -698,7 +698,7 @@ void GameView::drawHUD()
 	if (S::drawSettings.fps_D)
 		S::fonts.fontAmaticBold.draw(m_screen, 5.f, vars.fieldHeight - 50, "fps: %.1f", S::fpsMeter.getfps(500));
 		
-	auto player = GameLogic::playerByLogin(m_state, m_login);
+	const auto player = GameLogic::playerByLogin(m_state, m_login);
 	if (player)
 	{
 		if (player->repairsLeft > 0)

@@ -1,6 +1,7 @@
 #pragma once
 #include <stdint.h>
 #include <iterator>
+#include <iostream>
 
 template<typename T, uint32_t arraySize>
 class FixedCircularIterator : public std::iterator<std::random_access_iterator_tag, T>
@@ -135,9 +136,9 @@ public:
     iterator begin()
 	{
 		if (total >= arraySize)
-			return leftEdge() + (cursor + 1); //skip one element to avoid begin() == end() 
+			return leftEdge() + (cursor + 1 + m_skipFirst + m_skipLast); //skip one element to avoid begin() == end() 
 		else
-			return leftEdge();
+			return leftEdge() + m_skipFirst;
 	}
 	
     iterator end()
@@ -149,23 +150,62 @@ public:
 	
 	template <class... Args>
 	void add(Args&&... args);
+	void skipFirst(uint32_t count);
+	void skipLast(uint32_t count);
+	
+private:
+	uint32_t m_skipFirst;
+	uint32_t m_skipLast;
 };
+
 
 template <typename T, uint32_t arraySize>
 CircularContainer<T, arraySize>::CircularContainer()
 {
 	cursor = 0;
 	total = 0;
-	size = arraySize;	
+	size = arraySize;
+	m_skipFirst = 0;
+	m_skipLast = 0;
 }
 
 template <typename T, uint32_t arraySize>
 template <class... Args>
 void CircularContainer<T, arraySize>::add(Args&&... args)
 {
+	
 	array[cursor] = T(std::forward<Args>(args)...);
 	cursor = (cursor + 1) % arraySize;
 	total++;
+	if (m_skipLast > 0)
+		m_skipLast--;
+	else if (total > arraySize && m_skipFirst > 0)
+		m_skipFirst--;
+}
+
+template <typename T, uint32_t arraySize>
+void CircularContainer<T, arraySize>::skipFirst(uint32_t count)
+{
+	m_skipFirst += count;
+	
+	if (total < count || m_skipFirst + m_skipLast >= arraySize)
+	{
+		std::cout << "Removing too many elements.\n";
+		abort();
+	}
+}
+
+template <typename T, uint32_t arraySize>
+void CircularContainer<T, arraySize>::skipLast(uint32_t count)
+{
+	m_skipLast += count;
+	cursor = (cursor - count + arraySize) % arraySize;
+	
+	if (total < count || m_skipFirst + m_skipLast >= arraySize)
+	{
+		std::cout << "Removing too many elements.\n";
+		abort();
+	}
 }
 
 template <typename T, uint32_t arraySize>
@@ -175,4 +215,37 @@ uint32_t CircularContainer<T, arraySize>::diff(const iterator& a, const iterator
 		return (a.getConstPtr() - b.getConstPtr());
 	else
 		return (a.getConstPtr() - b.getConstPtr()) + arraySize;
+}
+
+template <uint32_t arraySize>
+std::string traceCircularContainer(CircularContainer<int32_t, arraySize>& cc)
+{
+	std::string result = "|";
+	
+	for(auto i = 0; i < arraySize; i++)
+	{
+		std::string cell = "";
+		cell += " " + std::to_string(cc.array[i]);
+		if (&*cc.begin() == &cc.array[i])
+			cell+= "b";			
+		else if (&*cc.end() == &cc.array[i])
+			cell+= "e";
+		else
+			cell += " ";
+		
+		bool iterable = false;
+		for(auto& item : cc)
+		{
+			if (&item == &cc.array[i])
+			{
+				iterable = true;
+				break;
+			}
+		}
+		if (iterable)
+			result += " " + cell + " ";
+		else
+			result += "[" + cell + "]";
+	}
+	return result;
 }

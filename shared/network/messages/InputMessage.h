@@ -9,7 +9,9 @@ class InputMessage :
 public:
 	InputMessage() = default;
 	
+	///Execute this input at
 	int32_t serverStamp;
+	
 	int16_t localId;
 	int16_t serverId;
 

@@ -15,19 +15,19 @@ namespace AI
 		{
 			if (p.isAI && Cars::canLaunchCar(p))
 			{
-				Cars::launchCar(state, &p, getRandomWalk(state, prototypes), prototypes);
+				Cars::launchCar(state, &p, getRandomWalk(state->random, prototypes), prototypes);
 			}
 		}
 	}
 	
 	
-	std::vector<Point> getRandomWalk(GameState* state, Prototypes* prototypes)
+	std::vector<Point> getRandomWalk(SeededRandom& random, Prototypes* prototypes)
 	{
 		AIInternal::RouteStruct data;
 		
 		while(!GameLogic::testRouteIsValid(data.route, prototypes))
 		{
-			Point start{ (float)state->random.get(0, prototypes->variables.fieldWidth), (float)prototypes->variables.fieldHeight };
+			Point start{ (float)random.get(0, prototypes->variables.fieldWidth), (float)prototypes->variables.fieldHeight };
 			Point firstStep{ start.x, start.y - prototypes->variables.routeStepSize };
 			data = {
 				.route = { start, firstStep },
@@ -37,7 +37,7 @@ namespace AI
 				.isFinished = false
 			};
 			while (!data.isFinished && data.stepCount < 10000)
-				AIInternal::makeStep(data, state->random, prototypes);
+				AIInternal::makeStep(data, random, prototypes);
 		}
 		data.route.erase(data.route.begin() + data.index + 1, data.route.end());
 		

@@ -38,6 +38,7 @@ public:
 	void seekRelative(size_t position);
 	void seekEnd();
 	size_t getLength();
+	std::string crc();
 
 	virtual void write(const char* data, size_t length);
 	

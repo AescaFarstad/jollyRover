@@ -70,7 +70,7 @@ void GameMode::handleRouteInput()
 		}
 		case ROUTE_STATE::E_RANDOM_CLICK:
 		{
-			auto thisPlayer = GameLogic::playerByLogin(m_gameUpdater.state.get(), m_login);
+			const auto thisPlayer = GameLogic::playerByLogin(m_gameUpdater.state.get(), m_login);
 			if (thisPlayer->refuelLeft >0 || thisPlayer->repairsLeft > 0 || thisPlayer->activeCars.size() > 0)
 			{
 				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
@@ -120,7 +120,7 @@ void GameMode::handleRouteInput()
 		}
 		case ROUTE_STATE::VALID:
 		{
-			auto thisPlayer = GameLogic::playerByLogin(m_gameUpdater.state.get(), m_login);
+			const auto thisPlayer = GameLogic::playerByLogin(m_gameUpdater.state.get(), m_login);
 			if (thisPlayer->refuelLeft >0 || thisPlayer->repairsLeft > 0 || thisPlayer->activeCars.size() > 0)
 			{
 				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);

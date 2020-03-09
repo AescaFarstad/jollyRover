@@ -1,6 +1,7 @@
 #include <SerializationStream.h>
 #include <Serializer.h>
 #include <Global.h>
+#include <crc32.h>
 
 SerializationStream::SerializationStream(std::unique_ptr<StreamGrower> grower)
 {
@@ -57,7 +58,7 @@ const char* SerializationStream::read(size_t length)
 	return result;
 }
 
-char * SerializationStream::readAll()
+char* SerializationStream::readAll()
 {
 	char* result = new char[m_totalLength];
 	size_t m_cursor = 0;
@@ -69,7 +70,7 @@ char * SerializationStream::readAll()
 	return result;
 }
 
-char * SerializationStream::c_str()
+char* SerializationStream::c_str()
 {
 	char* result = new char[m_totalLength + 1];
 	size_t m_cursor = 0;
@@ -100,7 +101,7 @@ char* SerializationStream::readAllAsHex()
 	return result;
 }
 
-char * SerializationStream::readAllAsHex_c()
+char* SerializationStream::readAllAsHex_c()
 {
 	return nullTerminate(readAllAsHex(), m_totalLength * 3);
 }
@@ -177,6 +178,15 @@ void SerializationStream::seekEnd()
 size_t SerializationStream::getLength()
 {
 	return m_totalLength;
+}
+
+std::string SerializationStream::crc()
+{
+	CRC32  digestCrc32;
+	char* data = readAll();
+	digestCrc32.add(data, getLength());
+	delete[] data;
+	return digestCrc32.getHash();
 }
 
 void SerializationStream::writeSimple(const char* data, size_t length)

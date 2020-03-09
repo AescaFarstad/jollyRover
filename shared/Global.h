@@ -15,6 +15,12 @@ public:
 	const bool IS_WEB = false;
 #endif
 
+#ifdef IS_SERVER
+	const bool IS_CLIENT = false;
+#else
+	const bool IS_CLIENT = true;
+#endif
+
 	const int32_t simpleClientCode = 0xfcaceb;
 	
 	int32_t port;

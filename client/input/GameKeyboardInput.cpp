@@ -303,7 +303,8 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		case GAME_KEYBOARD_ACTIONS::ACT_AI :
 		{
 			InputRouteMessage msg;
-			msg.route = AI::getRandomWalk(gameUpdater.state.get(), gameUpdater.prototypes);
+			auto rnd = Serializer::copyThroughSerialization(gameUpdater.state->random);
+			msg.route = AI::getRandomWalk(*rnd, gameUpdater.prototypes);
 			S::network->send(msg);
 			break;
 		}

@@ -133,8 +133,7 @@ void Game::runBenchmark()
 	for(int32_t i = 0; i < iters; i++)
 	{
 		gu.update(i * 1000 + 100);
-		S::log.add("State checksum at: " + std::to_string(i) + " = " + S::crc(*gu.state));
-		S::log.add(std::to_string(i * 100 / iters) + "%");
+		S::log.add(std::to_string(i * 100 / iters) + "%" + " State checksum at: " + std::to_string(i) + " = " + S::crc(*gu.state));
 	}
 	
 	S::log.add("Finished in " + std::to_string(SDL_GetTicks() - startTime));
@@ -182,7 +181,7 @@ void Game::startGame()
 		});
 	}, "wait for greetings response from the server");
 
-	auto ping = [this](std::unique_ptr<Callback> callback) {
+	auto ping = [](std::unique_ptr<Callback> callback) {
 		S::network->interceptGenericRequestOnce(REQUEST_TYPE::REQUEST_PONG, [cb = callback.release()](std::unique_ptr<GenericRequestMessage> message) {
 			
 			cb->execute();
@@ -198,7 +197,7 @@ void Game::startGame()
 	m_loadGameTask.pushAsync(ping, "ping2");
 	m_loadGameTask.pushAsync(ping, "ping3");
 
-	m_loadGameTask.pushSync([this]() {
+	m_loadGameTask.pushSync([]() {
 		GenericRequestMessage grMsg;
 		grMsg.request = REQUEST_TYPE::REQUEST_JOIN_GAME;
 		S::network->send(grMsg);

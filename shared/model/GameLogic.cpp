@@ -173,6 +173,10 @@ namespace GameLogic
 		{
 			for (size_t i = 0; i < inputs.size(); i++)
 			{
+				S::log.add("exec  input: " + 
+					std::to_string((int16_t)inputs[i]->typeId) + 
+					"(" + std::to_string(inputs[i]->serverStamp % 100000) + ")"+
+					" at " + std::to_string(state->timeStamp % 100000), {LOG_TAGS::INPUT_, LOG_TAGS::GAME});
 				switch (inputs[i]->typeId)
 				{
 				case MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG:
@@ -233,7 +237,7 @@ namespace GameLogic
 					player.refuelLeft -= var.refuelSpeed * timePassed;
 			}
 			
-			if (state->timeStamp > prototypes->variables.reconnectWindow)
+			if ((int32_t)state->timeStamp > prototypes->variables.reconnectWindow)
 			{
 				auto stamp = state->timeStamp - prototypes->variables.reconnectWindow;
 				state->players.erase(std::remove_if(
@@ -373,7 +377,7 @@ namespace GameLogic
 			{
 				case INPUT_IMPULSE::ACT_AI :
 				{
-					auto route = AI::getRandomWalk(state, prototypes);
+					auto route = AI::getRandomWalk(state->random, prototypes);
 					Cars::launchCar(state, playerByLogin(state, input->login), route, prototypes);
 					break;
 				}

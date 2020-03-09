@@ -37,12 +37,12 @@ namespace Creeps
 		removeDeadFormations(state);
 	}
 		
-	Point getCurrentSlotLocation(FormationState& formation, int32_t slot)
+	Point getCurrentSlotLocation(const FormationState& formation, int32_t slot)
 	{
 		return formation.location + formation.formationPrototype_->slots[slot].offset.rotate(formation.orientation);			
 	}
 	
-	Point getTargetSlotLocation(FormationState& formation, int32_t slot)
+	Point getTargetSlotLocation(const FormationState& formation, int32_t slot)
 	{
 		return formation.targetLocation + formation.formationPrototype_->slots[slot].offset.rotate(formation.targetOrientation);			
 	}

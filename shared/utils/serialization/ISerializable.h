@@ -77,5 +77,13 @@ namespace Serializer {
 		
 		return std::move(result);
 	}
+	
+	template <typename T>
+	std::string crc(const T& that)
+	{
+		auto s = SerializationStream::createExp();
+		Serializer::write(that, s);
+		return s.crc();
+	}
 }
 
