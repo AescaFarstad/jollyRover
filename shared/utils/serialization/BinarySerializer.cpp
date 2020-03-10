@@ -5,19 +5,19 @@
 
 BinarySerializer::BinarySerializer()
 {
-	stream.init(1024*8, BinaryStream::exponentialGrow);
+	m_stream.init(1024*8, BinaryStream::exponentialGrow);
 }
 
 #define WRITE(type) 																\
 void BinarySerializer::write(const type& value, const std::string& fieldName)		\
 {																					\
-	Serializer::write(value, stream.allocate(sizeof(value)));						\
+	Serializer::write(value, m_stream.allocate(sizeof(value)));						\
 }
 
 #define READ(type) 														  			\
 void BinarySerializer::read(type& out, const std::string& fieldName)				\
 {																					\
-	Serializer::read(out, stream.read(sizeof(out)));								\
+	Serializer::read(out, m_stream.read(sizeof(out)));								\
 }
 
 WRITE(int64_t)
@@ -42,26 +42,26 @@ READ(float)
 
 void BinarySerializer::write(const std::string& value, const std::string& fieldName)
 {
-	Serializer::write(value, stream.allocate(Serializer::sizeOfString(value)));
+	Serializer::write(value, m_stream.allocate(Serializer::sizeOfString(value)));
 }
 
 void BinarySerializer::read(std::string& out, const std::string& fieldName)
 {
 	int16_t length;
-	Serializer::read(length, stream.read(sizeof(length)));
-	out.assign(stream.read(length), length);
+	Serializer::read(length, m_stream.read(sizeof(length)));
+	out.assign(m_stream.read(length), length);
 }
 
 std::string BinarySerializer::crc()
 {
-	return stream.crc();
+	return m_stream.crc();
 }
 
 std::string BinarySerializer::base16()
 {
 	std::stringstream  stringstream;
 	stringstream << std::hex;
-	auto data = stream.readAll();
+	auto data = m_stream.readAll();
 	for (size_t i = 0; i < data.size(); i++)
 		stringstream << std::setfill('0') << std::setw(2) << (int)(unsigned char)data[i] << " ";
 	return stringstream.str();

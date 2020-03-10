@@ -115,7 +115,7 @@ namespace Serialization
 	template <typename T>
 	void write(const ENTTITY_TYPE& object, T& serializer)
 	{
-		serializer.write((int8_t)object);
+		serializer.write((int8_t)object, "ENTTITY_TYPE");
 	}
 	
 	template <typename T>

@@ -23,7 +23,6 @@ class BinarySerializer
 {
 public:
 	BinarySerializer();
-	BinaryStream stream;
 	
 	std::string crc();
 	std::string base16();
@@ -96,4 +95,7 @@ public:
 		
 		return result;
 	}
+	
+private:	
+	BinaryStream m_stream;
 };
