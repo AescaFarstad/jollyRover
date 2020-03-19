@@ -1,24 +1,23 @@
 #include <InputMessage.h>
 
 
-void InputMessage::deserialize(SerializationStream& stream)
-{
-	NetworkMessage::deserialize(stream);
-	Serializer::read(localId, stream);
-	Serializer::read(serverId, stream);
-	Serializer::read(serverStamp, stream);
-
-}
-
-void InputMessage::serialize(SerializationStream& stream) const
-{
-	NetworkMessage::serialize(stream);
-	Serializer::write(localId, stream);
-	Serializer::write(serverId, stream);
-	Serializer::write(serverStamp, stream);
-}
-
 std::string InputMessage::getName() const
 {
 	return "I-abst";
+}
+
+void InputMessage::serialize(BinarySerializer& serializer) const
+{
+	NetworkMessage::serialize(serializer);
+	WRITE_FIELD((*this), serializer, serverStamp);
+	WRITE_FIELD((*this), serializer, localId);
+	WRITE_FIELD((*this), serializer, serverId);
+}
+
+void InputMessage::deserialize(BinarySerializer& serializer)
+{
+	NetworkMessage::deserialize(serializer);
+	READ__FIELD((*this), serializer, serverStamp);
+	READ__FIELD((*this), serializer, localId);
+	READ__FIELD((*this), serializer, serverId);
 }

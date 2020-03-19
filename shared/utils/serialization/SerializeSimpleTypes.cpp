@@ -1,5 +1,8 @@
 #include <SerializeSimpleTypes.h>
 #include <cstring>
+#include <iostream>
+#include <sstream>
+#include <iomanip>
 
 #ifdef __EMSCRIPTEN__
 void Serializer::write(const size_t& value, char buffer[])
@@ -176,4 +179,22 @@ void Serializer::read(float& out, const char* value)
 	outFloat[1] = value[1];
 	outFloat[2] = value[2];
 	outFloat[3] = value[3];
+}
+
+std::string Serializer::toHex(const char* source, size_t size)
+{
+	std::stringstream  stream;
+	stream << std::hex;
+	for (size_t i = 0; i < size; i++)
+		stream << std::setfill('0') << std::setw(2) << (int)(unsigned char)source[i] << " ";
+	return stream.str();
+}
+
+std::string Serializer::toDec(const char* source, size_t size)
+{
+	std::stringstream  stream;
+	stream << std::dec;
+	for (size_t i = 0; i < size; i++)
+		stream << std::setfill(' ') << std::setw(3) << (int)(unsigned char)source[i] << " ";
+	return stream.str();
 }

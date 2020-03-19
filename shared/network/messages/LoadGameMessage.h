@@ -6,9 +6,10 @@ class LoadGameMessage :
 public:
 	LoadGameMessage();
 
-	SerializationStream state;
-
-	void deserialize(SerializationStream& stream) override;
-	void serialize(SerializationStream& stream) const override;
+	std::vector<char> state;
+	
 	std::string getName() const override;
+	
+	void serialize(BinarySerializer& serializer) const override;
+	void deserialize(BinarySerializer& serializer) override;
 };

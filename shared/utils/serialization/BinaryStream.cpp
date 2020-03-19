@@ -25,6 +25,11 @@ void BinaryStream::init(size_t startingSize, GrowStrategy growStrategy)
 	resetCursors();
 }
 
+void BinaryStream::reset(size_t startingSize)
+{
+	init(startingSize, m_growStrategy);
+}
+
 
 char* BinaryStream::allocate(size_t size)
 {
@@ -50,6 +55,7 @@ const char* BinaryStream::read(size_t size)
 	if (m_readCursor.block == nullptr || m_readCursor.block->occupied < m_readCursor.position + size)
 		THROW_FATAL_ERROR("wrong stream read.");
 	
+	auto tmpCursor = m_readCursor;
 	m_readCursor.position += size;
 	if (m_readCursor.position == m_readCursor.block->occupied)
 	{
@@ -60,7 +66,7 @@ const char* BinaryStream::read(size_t size)
 		
 		m_readCursor.position = 0;		
 	}
-	return &m_readCursor.block->array[m_readCursor.position];	
+	return &tmpCursor.block->array[tmpCursor.position];	
 }
 
 void BinaryStream::resetCursors()

@@ -1,4 +1,5 @@
 #include <JSONSerializer.h>
+#include <base64_2.h>
 
 using json=nlohmann::json;
 
@@ -9,16 +10,16 @@ JSONSerializer::JSONSerializer()
 
 std::string JSONSerializer::toString()
 {
-	return m_stream.dump(4);
+	return m_stream.dump(1);
 }
 
 #define WRITE(type) 															\
 void JSONSerializer::write(const type& value, const std::string& fieldName)		\
 {																				\
-	if (fieldName == anonymous)													\
+	if (fieldName == anonymous || m_stack.back()->is_array())					\
 		*m_stack.back() += value;												\
 	else																		\
-		*m_stack.back() += {fieldName, value};									\
+		(*m_stack.back())[fieldName] = value;									\
 }
 
 #define READ(type) 																\
@@ -111,4 +112,16 @@ void JSONSerializer::startArray(std::string fieldName)
 void JSONSerializer::endArray()
 {
 	m_stack.pop_back();
+}
+
+void JSONSerializer::write(const std::vector<char>& vec, const std::string& fieldName)
+{
+	auto data = base64_encode((const unsigned char*)&vec[0], vec.size());
+	write(data, fieldName);
+}
+
+
+void JSONSerializer::read(std::vector<char>& vec, const std::string& fieldName)
+{
+	//TODO
 }

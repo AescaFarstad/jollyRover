@@ -6,19 +6,19 @@ InputRouteMessage::InputRouteMessage()
 	typeId = MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG;
 }
 
-inline void InputRouteMessage::deserialize(SerializationStream &stream)
-{
-	InputMessage::deserialize(stream);
-	Serializer::readVector(route, stream);
-}
-
-inline void InputRouteMessage::serialize(SerializationStream &stream) const
-{
-	InputMessage::serialize(stream);
-	Serializer::writeVector(route, stream); 
-}
-
 inline std::string InputRouteMessage::getName() const
 {
 	return "I-rout";
+}
+
+void InputRouteMessage::serialize(BinarySerializer& serializer) const
+{
+	InputMessage::serialize(serializer);
+	WRITE_FIELD((*this), serializer, route);
+}
+
+void InputRouteMessage::deserialize(BinarySerializer& serializer)
+{
+	InputMessage::deserialize(serializer);
+	READ__FIELD((*this), serializer, route);
 }

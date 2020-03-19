@@ -2,6 +2,7 @@
 #include <SerializeSimpleTypes.h>
 #include <sstream>
 #include <iomanip>
+#include <cstring>
 
 BinarySerializer::BinarySerializer()
 {
@@ -52,6 +53,23 @@ void BinarySerializer::read(std::string& out, const std::string& fieldName)
 	out.assign(m_stream.read(length), length);
 }
 
+void BinarySerializer::write(const std::vector<char>& vec, const std::string& fieldName)
+{
+	int32_t size = (int32_t)vec.size();
+	write(size);
+	auto target = m_stream.allocate(size);
+	std::memcpy(target, &vec[0], size);
+}
+
+void BinarySerializer::read(std::vector<char>& vec, const std::string& fieldName)
+{
+	int32_t size;
+	read(size);
+	vec.clear();
+	vec.resize(size);
+	std::memcpy(&vec[0], m_stream.read(size), size);
+}
+
 std::string BinarySerializer::crc()
 {
 	return m_stream.crc();
@@ -65,4 +83,28 @@ std::string BinarySerializer::base16()
 	for (size_t i = 0; i < data.size(); i++)
 		stringstream << std::setfill('0') << std::setw(2) << (int)(unsigned char)data[i] << " ";
 	return stringstream.str();
+}
+
+std::vector<char> BinarySerializer::dumpAll()
+{
+	return m_stream.readAll();
+}
+
+void BinarySerializer::assign(std::vector<char>& data)
+{
+	m_stream.reset(data.size());
+	auto array = m_stream.allocate(data.size());
+	std::memcpy(array, &data[0], data.size());
+}
+
+void BinarySerializer::assign(char* data, int32_t size)
+{
+	m_stream.reset(size);
+	auto array = m_stream.allocate(size);
+	std::memcpy(array, data, size);
+}
+
+void BinarySerializer::resetCursors()
+{
+	m_stream.resetCursors();
 }

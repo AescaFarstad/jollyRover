@@ -7,19 +7,19 @@ InputPlayerJoinedMessage::InputPlayerJoinedMessage()
 	typeId = MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG;
 }
 
-void InputPlayerJoinedMessage::deserialize(SerializationStream& stream)
-{
-	InputMessage::deserialize(stream);
-	Serializer::read(login, stream);
-}
-
-void InputPlayerJoinedMessage::serialize(SerializationStream& stream) const
-{
-	InputMessage::serialize(stream);
-	Serializer::write(login, stream);
-}
-
 std::string InputPlayerJoinedMessage::getName() const
 {
 	return "I-join";
+}
+
+void InputPlayerJoinedMessage::serialize(BinarySerializer& serializer) const
+{
+	InputMessage::serialize(serializer);
+	WRITE_FIELD((*this), serializer, login);
+}
+
+void InputPlayerJoinedMessage::deserialize(BinarySerializer& serializer)
+{
+	InputMessage::deserialize(serializer);
+	READ__FIELD((*this), serializer, login);
 }

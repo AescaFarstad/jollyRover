@@ -2,7 +2,7 @@
 #include <Serialization.h>
 #include <json.hpp>
 
-const std::string not_anonymous;
+const std::string not_anonymous = "na";
 
 class JSONSerializer;
 namespace Serialization
@@ -37,12 +37,13 @@ public:
 	void write(const bool& value, const std::string& fieldName = anonymous);
 	void write(const float& value, const std::string& fieldName = anonymous);
 	void write(const std::string& value, const std::string& fieldName = anonymous);
+	void write(const std::vector<char>& vec, const std::string& fieldName = anonymous);
 	
 	template <typename T>
 	void write(const std::vector<T>& vec, const std::string& fieldName = anonymous)
 	{
 		startArray(DEBUG_MODE ? fieldName : anonymous);
-		for (int16_t i = 0; i < vec.size(); i++)
+		for (size_t i = 0; i < vec.size(); i++)
 		{
 			write(vec[i], fieldName == anonymous ? anonymous : not_anonymous);
 		}
@@ -57,6 +58,16 @@ public:
 		endObject();
 	}
 	
+	template <typename T>
+	void writeArray(const T& object, std::size_t size, const std::string& fieldName = anonymous)
+	{
+		startArray(DEBUG_MODE ? fieldName : anonymous);
+		for (size_t i = 0; i < size; i++)
+		{
+			write(object[i], fieldName == anonymous ? anonymous : not_anonymous);
+		}
+		endArray();
+	}
 	
 	void read(int64_t& out, const std::string& fieldName = anonymous);
 	void read(uint64_t& out, const std::string& fieldName = anonymous);
@@ -68,6 +79,7 @@ public:
 	void read(bool& out, const std::string& fieldName = anonymous);
 	void read(float& out, const std::string& fieldName = anonymous);
 	void read(std::string& out, const std::string& fieldName = anonymous);
+	void read(std::vector<char>& vec, const std::string& fieldName = anonymous);
 	
 	
 	template <typename T>
@@ -81,6 +93,13 @@ public:
 	{
 		//TODO	
 	}
+	
+	template <typename T>
+	void readArray(T& object, size_t size, const std::string& fieldName = anonymous)
+	{
+		//TODO	
+	}
+	
 private:
 	nlohmann::json m_stream;
 	std::vector<nlohmann::json*> m_stack;

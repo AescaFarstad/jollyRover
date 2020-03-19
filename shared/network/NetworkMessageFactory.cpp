@@ -11,38 +11,56 @@
 #include <InputImpulseMessage.h>
 #include <InputDebugMessage.h>
 #include <LoadGameMessage.h>
-#include <ReadOnlySerializationStream.h>
 #include <GameStateMessage.h>
 #include <HeartbeatMessage.h>
+#include <SerializeSimpleTypes.h>
 
 std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(const NetworkPacket& packet)
 {
 	int16_t type;
-	Serializer::read(type, packet.payload);
-	ReadOnlySerializationStream rstream(packet.payload, packet.payloadSize);
-	std::unique_ptr<NetworkMessage> p = pointerByType((MESSAGE_TYPE)type);
-	p->deserialize(rstream);
-	return p;
-}
-
-std::unique_ptr<NetworkMessage> NetworkMessageFactory::pointerByType(MESSAGE_TYPE type)
-{
-	switch (type)
+	Serializer::read(type, packet.payload);	
+	BinarySerializer serializer;
+	serializer.assign(packet.payload, packet.payloadSize);
+	
+	switch ((MESSAGE_TYPE)type)
 	{
-		case MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG:		return std::make_unique<InputActionMessage>();
-		case MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG:		return std::make_unique<InputPlayerJoinedMessage>();
-		case MESSAGE_TYPE::TYPE_INPUT_LEFT_MSG: 		return std::make_unique<InputPlayerLeftMessage>();
-		case MESSAGE_TYPE::TYPE_REQUEST_MSG: 			return std::make_unique<GenericRequestMessage>();
-		case MESSAGE_TYPE::TYPE_GREETING_MSG: 			return std::make_unique<GreetingMessage>();
-		case MESSAGE_TYPE::TYPE_GAME_STATE_MSG: 		return std::make_unique<GameStateMessage>();
-		case MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG: 		return std::make_unique<InputRouteMessage>();
-		case MESSAGE_TYPE::TYPE_INPUT_TIME_MSG: 		return std::make_unique<InputTimeMessage>();
-		case MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG: 		return std::make_unique<InputImpulseMessage>();
-		case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG: 		return std::make_unique<InputDebugMessage>();
-		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG: 			return std::make_unique<LoadGameMessage>();
-		case MESSAGE_TYPE::TYPE_HEARTBEAT_MSG: 			return std::make_unique<HeartbeatMessage>();
+		case MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG:	{auto result =std::make_unique<InputActionMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG:	{auto result =std::make_unique<InputPlayerJoinedMessage>(); result->deserialize(serializer); return result;}case MESSAGE_TYPE::TYPE_INPUT_LEFT_MSG: 	{auto result =std::make_unique<InputPlayerLeftMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_REQUEST_MSG: 		{auto result =std::make_unique<GenericRequestMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_GREETING_MSG: 		{auto result =std::make_unique<GreetingMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_GAME_STATE_MSG: 	{auto result =std::make_unique<GameStateMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG: 	{auto result =std::make_unique<InputRouteMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_INPUT_TIME_MSG: 	{auto result =std::make_unique<InputTimeMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG: 	{auto result =std::make_unique<InputImpulseMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG: 	{auto result =std::make_unique<InputDebugMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG: 		{auto result =std::make_unique<LoadGameMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_HEARTBEAT_MSG: 		{auto result =std::make_unique<HeartbeatMessage>(); result->deserialize(serializer); return result;}
 		default: THROW_FATAL_ERROR("Unknow Network Message " + std::to_string(type));
 			break;
 	}
-	return nullptr;
 }
+/*
+template <>
+void Serialization::write<>(const InputActionMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const InputPlayerJoinedMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const InputPlayerLeftMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const GenericRequestMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const GreetingMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const GameStateMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const InputRouteMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const InputTimeMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const InputImpulseMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const InputDebugMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const LoadGameMessage& object, BinaryStream& serializer);
+template <>
+void Serialization::write<>(const HeartbeatMessage& object, BinaryStream& serializer);*/

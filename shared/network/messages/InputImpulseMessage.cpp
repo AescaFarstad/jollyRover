@@ -7,19 +7,19 @@ InputImpulseMessage::InputImpulseMessage()
 	impulse = INPUT_IMPULSE::NONE;
 }
 
-void InputImpulseMessage::deserialize(SerializationStream& stream)
-{
-	InputMessage::deserialize(stream);
-	Serializer::read(impulse, stream);
-}
-
-void InputImpulseMessage::serialize(SerializationStream& stream) const
-{
-	InputMessage::serialize(stream);
-	Serializer::write(impulse, stream);
-}
-
 std::string InputImpulseMessage::getName() const
 {
 	return "I-impl";
+}
+
+void InputImpulseMessage::serialize(BinarySerializer& serializer) const
+{
+	InputMessage::serialize(serializer);
+	WRITE_FIELD((*this), serializer, impulse);
+}
+
+void InputImpulseMessage::deserialize(BinarySerializer& serializer)
+{
+	InputMessage::deserialize(serializer);
+	READ__FIELD((*this), serializer, impulse);
 }

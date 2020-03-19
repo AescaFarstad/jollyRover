@@ -1,7 +1,8 @@
 #pragma once
 
 #include <Global.h>
-#include <CircularContainerSerialization.h>
+#include <BinarySerializer.h>
+#include <CircularContainer.h>
 
 class CRCAccumulator
 {
@@ -10,7 +11,7 @@ public:
 	void init(int32_t step);
 	void add(int32_t stamp, std::string crc);
 	int32_t getNumNewEntries();
-	std::unique_ptr<SerializationStream> extract(int32_t count);
+	std::unique_ptr<BinarySerializer> extract(int32_t count);
 	
 private:
 	int32_t m_numEntries;

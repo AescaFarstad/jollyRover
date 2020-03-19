@@ -1,4 +1,5 @@
 #include <WebNetworkPacket.h>
+#include <SerializeSimpleTypes.h>
 #include <Global.h>
 #include <SystemInfo.h>
 

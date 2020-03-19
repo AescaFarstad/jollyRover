@@ -1,5 +1,4 @@
 #pragma once
-#include <ISerializable.h>
 #include <BaseEntities.h>
 #include <CreepProto.h>
 #include <Point.h>
@@ -30,8 +29,6 @@ public:
 	Point impact_;
 	Point formationAttraction_;
 
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
 	void propagatePrototypes(std::vector<CreepProto>& creepProtos, std::vector<WeaponProto>& weaponProtos);
 	
 	const Point& getLocation();
@@ -40,3 +37,41 @@ public:
 private:
 
 };
+
+#include <Serialization.h>
+
+namespace Serialization
+{
+	
+	//CreepState-------------------------------------------------------
+	
+	template <typename T>
+	void write(const CreepState& object, T& serializer)
+	{
+		WRITE_FIELD(object, serializer, unit);
+		WRITE_FIELD(object, serializer, weapon);
+		WRITE_FIELD(object, serializer, numWhiskers);
+		WRITE_FIELD(object, serializer, formationId);
+		WRITE_FIELD(object, serializer, formationsSlot);
+		WRITE_FIELD(object, serializer, sensedAnObstacle);
+		WRITE_FIELD(object, serializer, velocity);
+		WRITE_FIELD(object, serializer, orientation);
+		serializer.writeArray(object.whiskers, object.numWhiskers, FIELD_NAME(whiskers));
+	}
+	
+	template <typename T>
+	void read(CreepState& object, T& serializer)
+	{
+		READ__FIELD(object, serializer, unit);
+		READ__FIELD(object, serializer, weapon);
+		READ__FIELD(object, serializer, numWhiskers);
+		READ__FIELD(object, serializer, formationId);
+		READ__FIELD(object, serializer, formationsSlot);
+		READ__FIELD(object, serializer, sensedAnObstacle);
+		READ__FIELD(object, serializer, velocity);
+		READ__FIELD(object, serializer, orientation);
+		serializer.readArray(object.whiskers, object.numWhiskers, FIELD_NAME(whiskers));
+		object.creepProto_ = nullptr;
+		object.weaponProto_ = nullptr;
+	}
+}

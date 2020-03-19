@@ -1,5 +1,4 @@
 #pragma once
-#include <ISerializable.h>
 #include <CarState.h>
 
 class PlayerState
@@ -21,8 +20,42 @@ public:
 	uint32_t wentOfflineAt;
 
 	std::vector<CarState> activeCars;
-
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
 };
 
+#include <Serialization.h>
+
+namespace Serialization
+{
+	
+	//PlayerState-------------------------------------------------------
+	
+	template <typename T>
+	void write(const PlayerState& object, T& serializer)
+	{
+		WRITE_FIELD(object, serializer, login);
+		WRITE_FIELD(object, serializer, score);
+		WRITE_FIELD(object, serializer, isHeadless);
+		WRITE_FIELD(object, serializer, isAI);
+		WRITE_FIELD(object, serializer, repairsTotal);
+		WRITE_FIELD(object, serializer, repairsLeft);
+		WRITE_FIELD(object, serializer, refuelTotal);
+		WRITE_FIELD(object, serializer, refuelLeft);
+		WRITE_FIELD(object, serializer, wentOfflineAt);
+		WRITE_FIELD(object, serializer, activeCars);
+	}
+	
+	template <typename T>
+	void read(PlayerState& object, T& serializer)
+	{
+		READ__FIELD(object, serializer, login);
+		READ__FIELD(object, serializer, score);
+		READ__FIELD(object, serializer, isHeadless);
+		READ__FIELD(object, serializer, isAI);
+		READ__FIELD(object, serializer, repairsTotal);
+		READ__FIELD(object, serializer, repairsLeft);
+		READ__FIELD(object, serializer, refuelTotal);
+		READ__FIELD(object, serializer, refuelLeft);
+		READ__FIELD(object, serializer, wentOfflineAt);
+		READ__FIELD(object, serializer, activeCars);
+	}
+}

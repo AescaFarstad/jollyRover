@@ -8,6 +8,7 @@
 #include <DrawSettings.h>
 #include <Network.h>
 #include <AI.h>
+#include <BinarySerializer.h>
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL_scancode.h>
@@ -193,7 +194,9 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 1));
 			if (!state)
 				return;
-			state->serialize(loadMsg.state);
+			BinarySerializer bs;
+			bs.write(*state);
+			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
 		};
@@ -203,7 +206,9 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 5));
 			if (!state)
 				return;
-			state->serialize(loadMsg.state);
+			BinarySerializer bs;
+			bs.write(*state);
+			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
 		};
@@ -213,7 +218,9 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 25));
 			if (!state)
 				return;
-			state->serialize(loadMsg.state);
+			BinarySerializer bs;
+			bs.write(*state);
+			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
 		};
@@ -223,7 +230,9 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 125));
 			if (!state)
 				return;
-			state->serialize(loadMsg.state);
+			BinarySerializer bs;
+			bs.write(*state);
+			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
 		};
@@ -231,7 +240,9 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		{
 			LoadGameMessage loadMsg;
 			auto state = gameUpdater.getFirstState();
-			state->serialize(loadMsg.state);
+			BinarySerializer bs;
+			bs.write(*state);
+			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
 		};
@@ -254,7 +265,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 				return;
 			}
 				
-			S::persistentStorage.savedState = Serializer::copyThroughSerialization(*gameUpdater.state.get());
+			S::persistentStorage.savedState = BinarySerializer::copyThroughSerialization(*gameUpdater.state.get());
 			S::persistentStorage.commit();
 			S::log.add("Saved", {LOG_TAGS::UNIQUE});
 			break;
@@ -275,7 +286,10 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			
 			LoadGameMessage loadMsg;
 			auto state = gameUpdater.getFirstState();
-			S::persistentStorage.savedState->serialize(loadMsg.state);
+			
+			BinarySerializer bs;
+			bs.write(*S::persistentStorage.savedState);
+			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
 		}
@@ -303,7 +317,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		case GAME_KEYBOARD_ACTIONS::ACT_AI :
 		{
 			InputRouteMessage msg;
-			auto rnd = Serializer::copyThroughSerialization(gameUpdater.state->random);
+			auto rnd = BinarySerializer::copyThroughSerialization(gameUpdater.state->random);
 			msg.route = AI::getRandomWalk(*rnd, gameUpdater.prototypes);
 			S::network->send(msg);
 			break;

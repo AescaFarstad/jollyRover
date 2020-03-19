@@ -14,9 +14,9 @@ public:
 	
 	int16_t localId;
 	int16_t serverId;
-
-	void deserialize(SerializationStream& stream) override;
-	void serialize(SerializationStream& stream) const override;
+	
 	std::string getName() const override;
+	
+	void serialize(BinarySerializer& serializer) const override;
+	void deserialize(BinarySerializer& serializer) override;
 };
-

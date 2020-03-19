@@ -11,7 +11,6 @@ GameUpdater::GameUpdater()
 	lastSavedSteps = -1;
 }
 
-
 void GameUpdater::update(uint32_t time)
 {
 	if (lastValidTimeStamp < state->timeStamp)
@@ -51,8 +50,9 @@ void GameUpdater::addNewInput(std::unique_ptr<InputMessage> input)
 std::unique_ptr<GameState> GameUpdater::getNewStateByStamp(uint32_t stamp)
 {
 	auto result = std::make_unique<GameState>();
-	SerializationStream* s = statesByStamps.lower_bound(stamp)->second.get();
-	result->deserialize(*s);
+	BinarySerializer* s = statesByStamps.lower_bound(stamp)->second.get();
+	s->read(*result);
+	s->resetCursors();
 	result->propagatePrototypes(prototypes);
 
 	while (result->timeStamp < stamp - prototypes->variables.fixedStepDuration)
@@ -72,9 +72,9 @@ std::unique_ptr<GameState> GameUpdater::getNewStateBySteps(int32_t steps)
 	auto streamRef = statesByStamps.find(stamp);
 	if (streamRef == statesByStamps.end())
 		return std::unique_ptr<GameState>(nullptr);
-	SerializationStream* s = streamRef->second.get();
-	result->deserialize(*s);
-	s->seekAbsolute(0);
+	BinarySerializer* s = streamRef->second.get();
+	s->read(*result);
+	s->resetCursors();
 	result->propagatePrototypes(prototypes);
 
 	while (result->time.performedSteps < steps && result->timeStamp < state->timeStamp)
@@ -90,9 +90,9 @@ std::unique_ptr<GameState> GameUpdater::getFirstState()
 {
 	auto result = std::make_unique<GameState>();
 	 
-	SerializationStream* s = std::min_element(statesByStamps.begin(), statesByStamps.end())->second.get();
-	result->deserialize(*s);
-	s->seekAbsolute(0);
+	BinarySerializer* s = std::min_element(statesByStamps.begin(), statesByStamps.end())->second.get();
+	s->read(*result);
+	s->resetCursors();
 	result->propagatePrototypes(prototypes);
 
 	return result;
@@ -121,20 +121,19 @@ std::vector<InputMessage*> GameUpdater::getThisFrameInputs(uint32_t fromInclusiv
 
 void GameUpdater::rewindToPrecedingState(uint32_t stamp)
 {
-	SerializationStream* s = statesByStamps.lower_bound(stamp)->second.get();
+	BinarySerializer* s = statesByStamps.lower_bound(stamp)->second.get();
 	if (s == nullptr)
 		THROW_FATAL_ERROR("Unable to rewind game state");
-	state->deserialize(*s);
+	s->read(*state);
+	s->resetCursors();
 	state->propagatePrototypes(prototypes);
-	s->seekAbsolute(0);
 }
 
 void GameUpdater::saveState(GameState* state)
 {
-	auto stream = std::make_unique<SerializationStream>();
-	*stream = SerializationStream::createExp();
-	state->serialize(*stream);
-	stream->seekAbsolute(0);
+	auto stream = std::make_unique<BinarySerializer>();
+	stream->write(*state);
+	stream->resetCursors();
 	statesByStamps[state->timeStamp] = std::move(stream);
 	stampsBySteps[state->time.performedSteps] = state->timeStamp;
 	lastSavedSteps = state->time.performedSteps;

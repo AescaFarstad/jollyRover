@@ -5,19 +5,19 @@ GenericRequestMessage::GenericRequestMessage()
 	typeId = MESSAGE_TYPE::TYPE_REQUEST_MSG;
 }
 
-void GenericRequestMessage::deserialize(SerializationStream& stream)
-{
-	NetworkMessage::deserialize(stream);
-	Serializer::read(request, stream);
-}
-
-void GenericRequestMessage::serialize(SerializationStream& stream) const
-{
-	NetworkMessage::serialize(stream);
-	Serializer::write(request, stream);
-}
-
 std::string GenericRequestMessage::getName() const
 {
 	return "GenReq";
+}
+
+void GenericRequestMessage::serialize(BinarySerializer& serializer) const
+{
+	NetworkMessage::serialize(serializer);
+	WRITE_FIELD((*this), serializer, request);
+}
+
+void GenericRequestMessage::deserialize(BinarySerializer& serializer)
+{
+	NetworkMessage::deserialize(serializer);
+	READ__FIELD((*this), serializer, request);
 }

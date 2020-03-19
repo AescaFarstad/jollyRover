@@ -6,21 +6,21 @@ InputDebugMessage::InputDebugMessage()
 	action = DEBUG_ACTION::NONE;
 }
 
-void InputDebugMessage::deserialize(SerializationStream& stream)
-{
-	InputMessage::deserialize(stream);
-	Serializer::read(action, stream);
-	Serializer::read(coords, stream);
-}
-
-void InputDebugMessage::serialize(SerializationStream& stream) const
-{
-	InputMessage::serialize(stream);
-	Serializer::write(action, stream);
-	Serializer::write(coords, stream);
-}
-
 std::string InputDebugMessage::getName() const
 {
 	return "I-dbga";
+}
+
+void InputDebugMessage::serialize(BinarySerializer& serializer) const
+{
+	InputMessage::serialize(serializer);
+	WRITE_FIELD((*this), serializer, action);
+	WRITE_FIELD((*this), serializer, coords);
+}
+
+void InputDebugMessage::deserialize(BinarySerializer& serializer)
+{
+	InputMessage::deserialize(serializer);
+	READ__FIELD((*this), serializer, action);
+	READ__FIELD((*this), serializer, coords);
 }

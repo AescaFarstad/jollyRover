@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
-#include <SerializationStream.h>
+#include <BinarySerializer.h>
+
 #include <crc32.h>
 #ifndef __EMSCRIPTEN__
 
@@ -16,12 +17,11 @@ namespace S
 	template <typename T>
 	std::string crc(const T& target)
 	{
-		SerializationStream s = SerializationStream::createExp();
-		target.serialize(s);
+		BinarySerializer bs;
+		Serialization::write(target, bs);
 		CRC32  digestCrc32;
-		char* data = s.readAll();
-		digestCrc32.add(data, s.getLength());
-		delete[] data;
+		auto data = bs.dumpAll();
+		digestCrc32.add(&data[0], data.size());
 		return digestCrc32.getHash();		
 	}
 }

@@ -1,10 +1,10 @@
 #pragma once
 #include <memory>
-#include <ISerializable.h>
 #include <MessageTypes.h>
 
-class NetworkMessage :
-	public ISerializable
+#include <BinarySerializer.h>
+
+class NetworkMessage
 {
 public:
 	NetworkMessage();
@@ -15,12 +15,15 @@ public:
 	uint32_t stamp;
 	int32_t inResponseTo;
 
-	virtual void deserialize(SerializationStream& stream);
-	virtual void serialize(SerializationStream& stream) const;
-	virtual std::string getName() const;
+	virtual std::string getName() const;	
+	
+	virtual void serialize(BinarySerializer& serializer) const;
+	virtual void deserialize(BinarySerializer& serializer);
 
 	static int32_t getMessageId();
 private: 
 	static int32_t idCounter;
 };
+
+
 

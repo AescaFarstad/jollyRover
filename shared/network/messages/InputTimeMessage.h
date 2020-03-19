@@ -16,8 +16,9 @@ public:
 	bool modifyStepsAtOnce;
 	int32_t forcedStepsAtOnce;
 	bool modifyForcedStepsAtOnce;
-
-	void deserialize(SerializationStream& stream) override;
-	void serialize(SerializationStream& stream) const override;
+	
 	std::string getName() const override;
+	
+	void serialize(BinarySerializer& serializer) const override;
+	void deserialize(BinarySerializer& serializer) override;
 };

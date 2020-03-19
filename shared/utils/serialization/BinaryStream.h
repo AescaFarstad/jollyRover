@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <vector>
 #include <memory>
 #include <functional>
 
@@ -51,6 +52,7 @@ public:
 	char* allocate(size_t size);
 	const char* read(size_t size);
 	void resetCursors();
+	void reset(size_t startingSize);
 	std::vector<char> readAll();
 	size_t getLength();	
 	

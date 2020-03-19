@@ -1,5 +1,6 @@
 #pragma once
-#include <ISerializable.h>
+#include <BinarySerializer.h>
+#include <NetworkMessage.h>
 
 class NetworkPacket
 {
@@ -20,14 +21,22 @@ public:
 
 	virtual void setPayloadFromString(std::string str);
 	virtual void setPayloadFromRawData(const char* newRawData, size_t size);
-	virtual void setPayloadFromSerializable(const ISerializable& serializable, size_t expectedSize = 2048);
+	
+	template <typename T>
+	void setPayloadFromSerializable(const T& serializable, size_t expectedSize = 2048)
+	{
+		BinarySerializer bs;
+		bs.write(serializable);
+		auto data = bs.dumpAll();
+		setPayloadFromRawData(&data[0], data.size());
+	}
+	
+	
 
 	virtual void loadFromRawData(const char* rawData, int32_t bytesAvailable = 4096);
 
 	void tracePayload();
 	bool isFullyLoaded();
-
-
 
 private:
 	static const int16_t SUGAR = 1934;
@@ -35,3 +44,6 @@ private:
 	char tempBuffer[bufferSize];
 
 };
+
+template <>
+void NetworkPacket::setPayloadFromSerializable<>(const NetworkMessage& serializable, size_t expectedSize);

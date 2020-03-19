@@ -1,5 +1,6 @@
 #include <Network.h>
 #include <HeartbeatMessage.h>
+#include <SerializeSimpleTypes.h>
 
 namespace S
 {

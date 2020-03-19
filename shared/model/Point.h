@@ -1,6 +1,5 @@
 #pragma once
 #include <Global.h>
-#include <ISerializable.h>
 #include <json.hpp>
 #include <math.h>
 #include <string>
@@ -51,9 +50,6 @@ public:
 	void operator/=(const float& p);
 
 
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
-
 };
 
 void from_json(const nlohmann::json& j, Point& point);
@@ -65,3 +61,25 @@ float operator*(const Point& x, const Point& y);
 Point operator*(const Point& x, const float& y);
 Point operator*(const float& x, const Point& y);
 Point operator/(const Point& x, const float& y);
+
+#include <Serialization.h>
+
+namespace Serialization
+{
+	
+	//Point-------------------------------------------------------
+	
+	template <typename T>
+	void write(const Point& object, T& serializer)
+	{
+		WRITE_FIELD(object, serializer, x);
+		WRITE_FIELD(object, serializer, y);
+	}
+	
+	template <typename T>
+	void read(Point& object, T& serializer)
+	{
+		READ__FIELD(object, serializer, x);
+		READ__FIELD(object, serializer, y);
+	}
+}

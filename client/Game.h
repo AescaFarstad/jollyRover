@@ -6,8 +6,8 @@
 	#include <SDL.h>
 #endif
 
-#include <Network.h>
 #include <GameMode.h>
+#include <Network.h>
 #include <TextureMode.h>
 #include <LoadingMode.h>
 #include <ReconnectMode.h>

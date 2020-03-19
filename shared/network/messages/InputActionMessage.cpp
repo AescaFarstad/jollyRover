@@ -5,23 +5,23 @@ InputActionMessage::InputActionMessage()
 	typeId = MESSAGE_TYPE::TYPE_INPUT_ACTION_MSG;
 }
 
-void InputActionMessage::deserialize(SerializationStream& stream)
-{
-	InputMessage::deserialize(stream);
-	Serializer::read(angle, stream);
-	Serializer::readVector(downedButtons, stream);
-	Serializer::readVector(uppedButtons, stream);
-}
-
-void InputActionMessage::serialize(SerializationStream& stream) const
-{
-	InputMessage::serialize(stream);
-	Serializer::write(angle, stream);
-	Serializer::writeVector(downedButtons, stream);
-	Serializer::writeVector(uppedButtons, stream);
-}
-
 std::string InputActionMessage::getName() const
 {
 	return "I-actn";
+}
+
+void InputActionMessage::serialize(BinarySerializer& serializer) const
+{
+	InputMessage::serialize(serializer);
+	WRITE_FIELD((*this), serializer, angle);
+	WRITE_FIELD((*this), serializer, downedButtons);
+	WRITE_FIELD((*this), serializer, uppedButtons);
+}
+
+void InputActionMessage::deserialize(BinarySerializer& serializer)
+{
+	InputMessage::deserialize(serializer);
+	READ__FIELD((*this), serializer, angle);
+	READ__FIELD((*this), serializer, downedButtons);
+	READ__FIELD((*this), serializer, uppedButtons);
 }

@@ -2,7 +2,7 @@
 #include <InputTimeMessage.h>
 #include <LoopBackNetwork.h>
 #include <NetworkMessageFactory.h>
-#include <SerializationStream.h>
+
 #include <GreetingMessage.h>
 #include <GenericRequestMessage.h>
 #include <ConsecutiveTask.h>
@@ -418,7 +418,7 @@ void Game::addNetworkBindings()
 
 
 	auto handleGameState = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message) {
-
+		/*
 		GameStateMessage* gameStateMsg = dynamic_cast<GameStateMessage*>(message.get());
 
 		SerializationStream stream1 = SerializationStream::createExp();
@@ -434,11 +434,11 @@ void Game::addNetworkBindings()
 		Serializer::write(*gameStateMsg->state, stream2);
 
 		if (stream1.getLength() != stream2.getLength() ||
-			memcmp(stream1.readAll(), stream2.readAll(), stream1.getLength()) != 0)
+			std::memcmp(stream1.readAll(), stream2.readAll(), stream1.getLength()) != 0)
 		{
 			S::log.add("BUT MY STATE (" + std::to_string(myState->timeStamp) + ")\n\t" +
 				Serializer::toHex(stream2.readAll(), stream2.getLength()), { LOG_TAGS::UNIQUE });
-		}
+		}*/
 		/*
 		Serializer::write(gameUpdater->state.get(), stream3);
 		S::log.add("CURRENT STATE (" + std::to_string(gameUpdater->state->timeStamp) + ")\n\t" +

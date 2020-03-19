@@ -1,5 +1,4 @@
 #pragma once
-#include <NetworkPacket.h>
 #include <TimeSync.h>
 #include <NetworkMessageFactory.h>
 #include <PacketReader.h>
@@ -12,6 +11,7 @@
 #include <GenericRequestMessage.h>
 #include <ConnectionMonitor.h>
 #include <VariableProto.h>
+#include <NetworkPacket.h>
 
 #ifdef __EMSCRIPTEN__
 	#include <SimplePacket.h>

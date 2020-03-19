@@ -33,4 +33,18 @@ namespace Serializer {
 	void read(float& out, const char* value);
 	void read(std::string& out, const char* value);
 	
+	
+	std::string toHex(const char* source, size_t size);
+	std::string toDec(const char* source, size_t size);
+	
+	template <typename T>
+	void swapBytes(T* target)
+	{
+		T tmp = *target;
+		unsigned char* ptmp = (unsigned char*)&tmp;
+		unsigned char* ttmp = (unsigned char*)target;
+		for(size_t i = 0; i < sizeof(T); i++)
+			ttmp[i] = ptmp[sizeof(T) - 1 - i];
+	}
+	
 }

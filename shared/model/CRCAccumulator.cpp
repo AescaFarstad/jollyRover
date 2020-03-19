@@ -40,16 +40,15 @@ int32_t CRCAccumulator::getNumNewEntries()
 	return m_numEntries;
 }
 
-std::unique_ptr<SerializationStream> CRCAccumulator::extract(int32_t count)
+std::unique_ptr<BinarySerializer> CRCAccumulator::extract(int32_t count)
 {
-	auto result = std::make_unique<SerializationStream>();
+	auto result = std::make_unique<BinarySerializer>();
 	
 	for(auto i = 0; i < count; i++)
 	{
 		auto& pair = *(crcs.begin() + i);
-		
-		Serializer::write(pair.first, *result);
-		Serializer::write(pair.second, *result);
+		result->write(pair.first);
+		result->write(pair.second);
 	}
 	
 	crcs.skipFirst(count);	

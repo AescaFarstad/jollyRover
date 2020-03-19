@@ -4,6 +4,7 @@
 #include <Cars.h>
 #include <AI.h>
 #include <std2.h>
+#include <BinarySerializer.h>
 
 
 namespace GameLogic
@@ -342,8 +343,9 @@ namespace GameLogic
 			int32_t loadCount = state->loadCount;
 			auto players = state->players;
 			
-			input->state.seekAbsolute(0);
-			state->deserialize(input->state);
+			BinarySerializer bs;
+			bs.assign(input->state);
+			bs.read(*state);
 			
 			state->timeStamp = stamp;
 			if (time.allowedSteps > 0)

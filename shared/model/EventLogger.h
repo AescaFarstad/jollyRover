@@ -17,9 +17,6 @@ public:
 	Point location;	
 	
 	int32_t getId();
-	
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
 };
 
 class UnitDeathEvent
@@ -30,9 +27,6 @@ public:
 	Point location;
 	float rotation;
 	Point impact;
-	
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
 };
 
 class CreepDeathEvent
@@ -47,9 +41,6 @@ public:
 	UnitDeathEvent unitDeath;
 	
 	int32_t getId();
-	
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
 };
 
 class CarDeathEvent
@@ -64,9 +55,6 @@ public:
 	UnitDeathEvent unitDeath;
 	
 	int32_t getId();
-	
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
 };
 
 
@@ -96,10 +84,29 @@ public:
 		carDeaths.add(idCounter++, stamp, car, player, impact);
 	}
 	
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
-	
 };
+
+#include <Serialization.h>
+
+namespace Serialization
+{
+	
+	//EventLogger-------------------------------------------------------
+	
+	template <typename T>
+	void write(const EventLogger& object, T& serializer)
+	{
+		WRITE_FIELD(object, serializer, idCounter);
+		//TODO
+	}
+	
+	template <typename T>
+	void read(EventLogger& object, T& serializer)
+	{		
+		READ__FIELD(object, serializer, idCounter);
+		//TODO
+	}
+}
 
 
 

@@ -1,4 +1,5 @@
 #include <SimpleClient.h>
+#include <SerializeSimpleTypes.h>
 #include <NetworkPacket.h>
 
 SimpleClient::SimpleClient(

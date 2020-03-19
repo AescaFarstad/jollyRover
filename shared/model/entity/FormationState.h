@@ -1,4 +1,3 @@
-#include <ISerializable.h>
 #include <BaseEntities.h>
 #include <FormationProto.h>
 #include <ObjectiveProto.h>
@@ -49,17 +48,75 @@ public:
 	float friendly_;
 	FormationProto* formationPrototype_;
 	
-
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
-	
 	void propagatePrototypes(std::vector<FormationProto>& formations);
 
 };
+
+#include <Serialization.h>
+
+namespace Serialization
+{
 	
-
-namespace Serializer {
-
-	void write(const SUB_OBJECTIVE& value, SerializationStream& stream);
-	void read(SUB_OBJECTIVE& value, SerializationStream& stream);
+	//FormationState-------------------------------------------------------
+	
+	template <typename T>
+	void write(const FormationState& object, T& serializer)
+	{
+		WRITE_FIELD(object, serializer, id);
+		WRITE_FIELD(object, serializer, prototypeId);
+		WRITE_FIELD(object, serializer, objectiveID);
+		WRITE_FIELD(object, serializer, force);
+		WRITE_FIELD(object, serializer, slots);
+		WRITE_FIELD(object, serializer, speed);
+		WRITE_FIELD(object, serializer, angularSpeed);
+		WRITE_FIELD(object, serializer, location);
+		WRITE_FIELD(object, serializer, targetLocation);
+		WRITE_FIELD(object, serializer, spawnedAt);
+		WRITE_FIELD(object, serializer, objectiveChangedAt);
+		WRITE_FIELD(object, serializer, subObjective);
+		WRITE_FIELD(object, serializer, agroAt);
+		WRITE_FIELD(object, serializer, bravery);
+		WRITE_FIELD(object, serializer, carAgro);
+		WRITE_FIELD(object, serializer, targetFormationId);
+	}
+	
+	template <typename T>
+	void read(FormationState& object, T& serializer)
+	{
+		READ__FIELD(object, serializer, id);
+		READ__FIELD(object, serializer, prototypeId);
+		READ__FIELD(object, serializer, objectiveID);
+		READ__FIELD(object, serializer, force);
+		READ__FIELD(object, serializer, slots);
+		READ__FIELD(object, serializer, speed);
+		READ__FIELD(object, serializer, angularSpeed);
+		READ__FIELD(object, serializer, location);
+		READ__FIELD(object, serializer, targetLocation);
+		READ__FIELD(object, serializer, spawnedAt);
+		READ__FIELD(object, serializer, objectiveChangedAt);
+		READ__FIELD(object, serializer, subObjective);
+		READ__FIELD(object, serializer, agroAt);
+		READ__FIELD(object, serializer, bravery);
+		READ__FIELD(object, serializer, carAgro);
+		READ__FIELD(object, serializer, targetFormationId);
+	
+		object.formationPrototype_ = nullptr;
+		object.isDisposed_ = false;
+	}
+	
+	//SUB_OBJECTIVE-------------------------------------------------------
+	
+	template <typename T>
+	void write(const SUB_OBJECTIVE& object, T& serializer)
+	{
+		serializer.write((int8_t)object, FIELD_NAME(SUB_OBJECTIVE));
+	}
+	
+	template <typename T>
+	void read(SUB_OBJECTIVE& object, T& serializer)
+	{		
+		int8_t tmp;
+		serializer.read(tmp, FIELD_NAME(SUB_OBJECTIVE));
+		object = (SUB_OBJECTIVE)tmp;
+	}
 }

@@ -249,3 +249,31 @@ std::string traceCircularContainer(CircularContainer<int32_t, arraySize>& cc)
 	}
 	return result;
 }
+
+#include <Serialization.h>
+
+namespace Serialization
+{
+	
+	//CircularContainer-------------------------------------------------------
+	
+	template <typename C, int32_t N, typename T>
+	void write(const CircularContainer<C, N>& object, T& serializer)
+	{
+		WRITE_FIELD(object, serializer, cursor);
+		WRITE_FIELD(object, serializer, total);
+		WRITE_FIELD(object, serializer, size);
+		int32_t writeLength = std::min(sizeof(object.array), (long unsigned int)object.total);
+		serializer.writeArray(object.array, writeLength, FIELD_NAME(array));
+	}
+	
+	template <typename C, int32_t N, typename T>
+	void read(CircularContainer<C, N>& object, T& serializer)
+	{
+		READ__FIELD(object, serializer, cursor);
+		READ__FIELD(object, serializer, total);
+		READ__FIELD(object, serializer, size);
+		int32_t readLength = std::min(sizeof(object.array), (long unsigned int)object.total);
+		serializer.readArray(object.array, readLength, FIELD_NAME(array));
+	}
+}

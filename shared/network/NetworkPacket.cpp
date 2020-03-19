@@ -1,7 +1,7 @@
 #include <NetworkPacket.h>
 #include <string>
 #include <iostream>
-#include <SerializationStream.h>
+#include <SerializeSimpleTypes.h>
 #include <Global.h>
 
 NetworkPacket::NetworkPacket()
@@ -102,9 +102,11 @@ void NetworkPacket::setPayloadFromRawData(const char* newRawData, size_t size)
 	bytesLoaded = rawSize;
 }
 
-void NetworkPacket::setPayloadFromSerializable(const ISerializable& serializable, size_t expectedSize)
+template <>
+void NetworkPacket::setPayloadFromSerializable<>(const NetworkMessage& serializable, size_t expectedSize)
 {
-	SerializationStream stream = SerializationStream::createExp(expectedSize, 2);
-	serializable.serialize(stream); 
-	setPayloadFromRawData(stream.readAll(), stream.getLength());
+	BinarySerializer bs;
+	serializable.serialize(bs);
+	auto data = bs.dumpAll();
+	setPayloadFromRawData(&data[0], data.size());
 }

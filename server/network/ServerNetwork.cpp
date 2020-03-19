@@ -1,4 +1,5 @@
 #include <ServerNetwork.h>
+#include <SerializeSimpleTypes.h>
 #include <GenericRequestMessage.h>
 #include <GreetingMessage.h>
 #include <WebClient.h>

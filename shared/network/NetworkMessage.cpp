@@ -12,24 +12,6 @@ NetworkMessage::NetworkMessage()
 	inResponseTo = -1;
 }
 
-void NetworkMessage::deserialize(SerializationStream& stream)
-{
-	Serializer::read(typeId, stream);
-	Serializer::read(initiator_id, stream);
-	Serializer::read(login, stream);
-	Serializer::read(stamp, stream);
-	Serializer::read(inResponseTo, stream);
-}
-
-void NetworkMessage::serialize(SerializationStream& stream) const
-{
-	Serializer::write(typeId, stream);
-	Serializer::write(initiator_id, stream);
-	Serializer::write(login, stream);
-	Serializer::write(stamp, stream);
-	Serializer::write(inResponseTo, stream);
-}
-
 std::string NetworkMessage::getName() const
 {
 	return "NetMsg";
@@ -38,4 +20,22 @@ std::string NetworkMessage::getName() const
 int32_t NetworkMessage::getMessageId()
 {
 	return idCounter++;
+}
+
+void NetworkMessage::serialize(BinarySerializer& serializer) const
+{
+	WRITE_FIELD((*this), serializer, typeId);
+	WRITE_FIELD((*this), serializer, initiator_id);
+	WRITE_FIELD((*this), serializer, login);
+	WRITE_FIELD((*this), serializer, stamp);
+	WRITE_FIELD((*this), serializer, inResponseTo);
+}
+
+void NetworkMessage::deserialize(BinarySerializer& serializer)
+{
+	READ__FIELD((*this), serializer, typeId);
+	READ__FIELD((*this), serializer, initiator_id);
+	READ__FIELD((*this), serializer, login);
+	READ__FIELD((*this), serializer, stamp);
+	READ__FIELD((*this), serializer, inResponseTo);
 }

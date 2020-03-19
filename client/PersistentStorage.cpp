@@ -1,4 +1,5 @@
 #include <PersistentStorage.h>
+#include <BinarySerializer.h>
 #include <fstream>
 
 namespace S 
@@ -25,17 +26,16 @@ void PersistentStorage::p_init()
 	char* buffer = new char [length];
 	file.read(buffer, length);
 	
-	auto s = SerializationStream::createExp();
-	s.write(buffer, length);
-	s.seekAbsolute(0);
+	BinarySerializer bs;
+	bs.assign(buffer, length);
 	
 	bool hasSavedState;
-	Serializer::read(hasSavedState, s);
+	bs.read(hasSavedState);
 	
 	if (hasSavedState)
 	{
 		savedState = std::make_unique<GameState>();
-		savedState->deserialize(s);			
+		bs.read(*savedState);	
 	}
 	
 	file.close();
@@ -44,18 +44,18 @@ void PersistentStorage::p_init()
 
 void PersistentStorage::p_commit()
 {
-	auto s = SerializationStream::createExp();
-	Serializer::write(savedState != nullptr, s);
+	BinarySerializer bs;
+	bs.write(savedState != nullptr);
+	
 	if (savedState != nullptr)
-		savedState->serialize(s);
+		bs.write(*savedState);
 		
 	std::ofstream file("out/save/save.data");
 
     if(file.is_open())
     {
-		auto data = s.readAll();
-		auto length = s.getLength();
-		file.write(data, length);
+		auto data = bs.dumpAll();
+		file.write(&data[0], data.size());
 		file.close();
     }
 	else

@@ -1,4 +1,5 @@
 #include <NetworkClient.h>
+#include <SerializeSimpleTypes.h>
 #include <Global.h>
 
 NetworkClient::NetworkClient(std::function< int32_t() > globalSocketNudgeFunction)

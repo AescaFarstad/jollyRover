@@ -1,12 +1,12 @@
 #include <LoopBackNetwork.h>
 #include <GameStateMessage.h>
 #include <GreetingMessage.h>
+#include <BinarySerializer.h>
 
 LoopBackNetwork::LoopBackNetwork(GameUpdater* gameUpdater) : Network(nullptr) 
 {
 	this->gameUpdater = gameUpdater;
-	idCounter = 0;
-	
+	idCounter = 0;	
 }
 
 void LoopBackNetwork::connect()
@@ -80,7 +80,7 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 					GameStateMessage gsMsg;
 					GameState tempState(1934);
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = Serializer::copyThroughSerialization(tempState);
+					gsMsg.state = BinarySerializer::copyThroughSerialization(tempState);
 					addToIncoming(gsMsg);
 
 					InputPlayerJoinedMessage pjMsg;
@@ -102,7 +102,7 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 				{
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = Serializer::copyThroughSerialization(*gameUpdater->state); 
+					gsMsg.state = BinarySerializer::copyThroughSerialization(*gameUpdater->state); 
 					addToIncoming(gsMsg);
 					break;
 				}
@@ -138,7 +138,6 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 	}
 }
 
-
 void LoopBackNetwork::addToIncoming(NetworkMessage& message)
 {
 	message.login = LOGIN;
@@ -148,3 +147,5 @@ void LoopBackNetwork::addToIncoming(NetworkMessage& message)
 	buffer.push_back(newPacket);
 	newPacket->setPayloadFromSerializable(message);
 }
+
+

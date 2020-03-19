@@ -4,6 +4,7 @@
 #include <InputMessage.h>
 #include <LoadGameMessage.h>
 #include <Prototypes.h>
+#include <BinarySerializer.h>
 #include <memory>
 #include <vector>
 #include <map>
@@ -31,7 +32,7 @@ private:
 	uint32_t lastValidTimeStamp;
 	uint32_t getExecutionStamp(InputMessage* input);
 	std::vector<InputMessage*> getThisFrameInputs(uint32_t fromInclusive, uint32_t toExclusive);
-	std::map<uint32_t, std::unique_ptr<SerializationStream>, std::greater<uint32_t>> statesByStamps;
+	std::map<uint32_t, std::unique_ptr<BinarySerializer>, std::greater<uint32_t>> statesByStamps;
 	std::map<uint32_t, uint32_t, std::greater<uint32_t>> stampsBySteps;
 	void rewindToPrecedingState(uint32_t stamp);
 	void saveState(GameState* state);

@@ -52,12 +52,7 @@ float SeededRandom::peekNext()
 	return result;
 }
 
-void SeededRandom::deserialize(SerializationStream & stream)
+uint32_t SeededRandom::getSeed() const
 {
-	Serializer::read(m_seed, stream);
-}
-
-void SeededRandom::serialize(SerializationStream & stream) const
-{
-	Serializer::write(m_seed, stream);
+	return m_seed;
 }

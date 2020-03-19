@@ -1,7 +1,7 @@
 #pragma once
-#include <Network.h>
+
 #include <GameUpdater.h>
-#include <MessageTypes.h>
+#include <Network.h>
 #include <vector>
 
 class LoopBackNetwork : public Network
@@ -22,7 +22,7 @@ private:
 	GameUpdater* gameUpdater;
 	int16_t idCounter;
 	
-	void addToIncoming(NetworkMessage& msg);
+	void addToIncoming(NetworkMessage& message);
 	
 	const int16_t LOGIN = 102;
 };

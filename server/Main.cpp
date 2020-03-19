@@ -4,16 +4,16 @@
 #include <stdio.h>
 #include <fstream>
 #include <vector>
-#include <NetworkPacket.h>
-#include <ServerNetwork.h>
+#include <chrono>
+#include <thread>
 #include <GameUpdater.h>
+#include <Prototypes.h>
 #include <GameStateMessage.h>
 #include <InputPlayerJoinedMessage.h>
 #include <InputPlayerLeftMessage.h>
 #include <GenericRequestMessage.h>
-#include <chrono>
-#include <thread>
-#include <Prototypes.h>
+#include <NetworkPacket.h>
+#include <ServerNetwork.h>
 #undef main
 
 namespace MainInternal 
@@ -46,7 +46,6 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
 		{
 			InputMessage* t = dynamic_cast<InputMessage*>(message.release());
-			//std::unique_ptr<InputMessage> iMsg = network.factory.pointerByType2<std::unique_ptr<NetworkMessage>>(message->typeId, *t);
 			std::unique_ptr<InputMessage> iMsg = std::unique_ptr<InputMessage>(t);
 			iMsg->serverId = inputIdCounter++;
 			iMsg->serverStamp = gameUpdater.state->timeStamp;
@@ -66,7 +65,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = Serializer::copyThroughSerialization(*gameUpdater.state);
+					gsMsg.state = BinarySerializer::copyThroughSerialization(*gameUpdater.state);
 					
 					S::log.add("Send state, stamp=" + std::to_string(gameUpdater.state->timeStamp) + " players=" + std::to_string(gameUpdater.state->players.size()));
 					network.send(gsMsg, genericRequestMsg->login);
@@ -84,7 +83,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 				{
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = Serializer::copyThroughSerialization(*gameUpdater.state); 
+					gsMsg.state = BinarySerializer::copyThroughSerialization(*gameUpdater.state); 
 					network.send(gsMsg, genericRequestMsg->login);
 					break;
 				}

@@ -1,5 +1,6 @@
 #pragma once
 #include <NetworkMessage.h>
+#include <vector>
 
 class GreetingMessage :
 	public NetworkMessage
@@ -9,9 +10,9 @@ public:
 
 	int32_t login;
 	std::vector<int8_t> password;
-
-	void deserialize(SerializationStream& stream) override;
-	void serialize(SerializationStream& stream) const override;
+	
 	std::string getName() const override;
+	
+	void serialize(BinarySerializer& serializer) const override;
+	void deserialize(BinarySerializer& serializer) override;
 };
-

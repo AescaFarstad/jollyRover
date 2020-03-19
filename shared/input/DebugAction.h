@@ -1,6 +1,5 @@
 #pragma once
 #include <cstdint>
-#include <ISerializable.h>
 
 
 enum class DEBUG_ACTION : int8_t
@@ -12,8 +11,24 @@ enum class DEBUG_ACTION : int8_t
 	RETREAT
 };
 
-namespace Serializer {
+#include <Serialization.h>
 
-	void write(const DEBUG_ACTION& value, SerializationStream& stream);
-	void read(DEBUG_ACTION& value, SerializationStream& stream);
+namespace Serialization
+{
+	
+	//DEBUG_ACTION---------------------------------------------------
+	
+	template <typename T>
+	void write(const DEBUG_ACTION& object, T& serializer)
+	{
+		serializer.write((int8_t)object, FIELD_NAME(DEBUG_ACTION));
+	}
+	
+	template <typename T>
+	void read(DEBUG_ACTION& object, T& serializer)
+	{
+		int8_t tmp;
+		serializer.read(tmp, FIELD_NAME(DEBUG_ACTION));
+		object = (DEBUG_ACTION)tmp;
+	}
 }

@@ -1,7 +1,6 @@
 #pragma once
 #include <random>
 #include <cstdint>
-#include <ISerializable.h>
 
 class SeededRandom
 {
@@ -16,6 +15,7 @@ public:
 	float get();
 	float getAngle();
 	float peekNext();
+	uint32_t getSeed() const;
 	
 	template <typename T>
 	T& getFromVector(std::vector<T>& vec)
@@ -23,11 +23,29 @@ public:
 		return vec[std::floor(get() * vec.size())];
 	}
 
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
-
 private:
 	uint32_t m_seed;
 
 };
 
+#include <Serialization.h>
+
+namespace Serialization
+{
+	
+	//SeededRandom-------------------------------------------------------
+	
+	template <typename T>
+	void write(const SeededRandom& object, T& serializer)
+	{
+		serializer.write(object.getSeed(), FIELD_NAME(seed));
+	}
+	
+	template <typename T>
+	void read(SeededRandom& object, T& serializer)
+	{
+		uint32_t seed;
+		serializer.read(seed, FIELD_NAME(seed));
+		object.initFromSeed(seed);
+	}
+}

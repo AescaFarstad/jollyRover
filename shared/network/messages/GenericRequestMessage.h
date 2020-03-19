@@ -8,9 +8,9 @@ public:
 	GenericRequestMessage();
 
 	REQUEST_TYPE request;
-
-	void deserialize(SerializationStream& stream) override;
-	void serialize(SerializationStream& stream) const override;
-	std::string getName() const override;
+	
+	std::string getName() const override;	
+	
+	void serialize(BinarySerializer& serializer) const override;
+	void deserialize(BinarySerializer& serializer) override;
 };
-

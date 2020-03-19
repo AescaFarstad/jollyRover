@@ -26,6 +26,10 @@ public:
 	
 	std::string crc();
 	std::string base16();
+	std::vector<char> dumpAll();
+	void assign(std::vector<char>& data);
+	void assign(char* data, int32_t size);
+	void resetCursors();
 	
 	void write(const int64_t& value, const std::string& fieldName = anonymous);
 	void write(const uint64_t& vavalue, const std::string& fieldName = anonymous);
@@ -37,6 +41,7 @@ public:
 	void write(const bool& value, const std::string& fieldName = anonymous);
 	void write(const float& value, const std::string& fieldName = anonymous);
 	void write(const std::string& value, const std::string& fieldName = anonymous);
+	void write(const std::vector<char>& vec, const std::string& fieldName = anonymous);
 	
 	template <typename T>
 	void write(const std::vector<T>& vec, const std::string& fieldName = anonymous)
@@ -55,6 +60,12 @@ public:
 		Serialization::write(object, *this);
 	}
 	
+	template <typename T>
+	void writeArray(const T& object, std::size_t size, const std::string& fieldName = anonymous)
+	{
+		for (size_t i = 0; i < size; i++)
+			write(object[i]);
+	}
 	
 	void read(int64_t& out, const std::string& fieldName = anonymous);
 	void read(uint64_t& out, const std::string& fieldName = anonymous);
@@ -66,6 +77,7 @@ public:
 	void read(bool& out, const std::string& fieldName = anonymous);
 	void read(float& out, const std::string& fieldName = anonymous);
 	void read(std::string& out, const std::string& fieldName = anonymous);
+	void read(std::vector<char>& vec, const std::string& fieldName = anonymous);
 	
 	
 	template <typename T>
@@ -82,6 +94,13 @@ public:
 	void read(T& object, const std::string& fieldName = anonymous)
 	{
 		Serialization::read(object, *this);
+	}	
+	
+	template <typename T>
+	void readArray(T& object, size_t size, const std::string& fieldName = anonymous)
+	{
+		for (size_t i = 0; i < size; i++)
+			read(object[i]);
 	}
 	
 	template <typename T>
@@ -90,8 +109,8 @@ public:
 		auto result = std::make_unique<T>();
 		
 		BinarySerializer s;
-		s.write(object, s);		
-		s.read(*result, s);
+		s.write(object);		
+		s.read(*result);
 		
 		return result;
 	}

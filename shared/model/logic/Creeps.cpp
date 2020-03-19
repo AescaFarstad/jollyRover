@@ -1350,7 +1350,7 @@ namespace Creeps
 		void spawnProjectile(const Point& from, const Point& to, const WeaponProto* prototype, int16_t force, GameState* state)
 		{
 			state->projectiles.emplace_back();
-			Projectile& projectile = state->projectiles.back();
+			ProjectileState& projectile = state->projectiles.back();
 			
 			auto distance = from.distanceTo(to);
 					
@@ -1429,7 +1429,7 @@ namespace Creeps
 			}
 			
 			state->projectiles.erase(std::remove_if(state->projectiles.begin(), state->projectiles.end(), 
-			[](Projectile& proj){
+			[](ProjectileState& proj){
 				return proj.damage == -1;
 				}
 			),  state->projectiles.end());

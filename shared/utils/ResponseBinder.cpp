@@ -46,7 +46,7 @@ bool ResponseBinder::process(std::unique_ptr<NetworkMessage> msg)
 			return true;
 		}
 	}
-	traceBindings("Failed to process NetworkMessage");
+	traceBindings("\"Failed to process NetworkMessage\"");
 	return false;
 }
 

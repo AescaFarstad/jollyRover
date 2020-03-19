@@ -298,7 +298,7 @@ void GameView::drawProjectiles()
 	SDL_Color color = ViewUtil::colorFromHex(0x333333);
 	int32_t rectSize = 2;
 	
-	for (Projectile &projectile : m_state->projectiles)
+	for (ProjectileState &projectile : m_state->projectiles)
 	{
 		TextureDef* texture = m_prototypes->weapons[projectile.weapon].projectileTexture[projectile.force];
 		if (!texture)

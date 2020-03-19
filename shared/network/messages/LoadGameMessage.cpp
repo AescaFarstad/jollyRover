@@ -3,22 +3,21 @@
 LoadGameMessage::LoadGameMessage()
 {
 	typeId = MESSAGE_TYPE::TYPE_LOAD_GAME_MSG;
-	state = SerializationStream::createExp();
-}
-
-void LoadGameMessage::deserialize(SerializationStream& stream)
-{
-	InputMessage::deserialize(stream);
-	Serializer::read(state, stream);
-}
-
-void LoadGameMessage::serialize(SerializationStream& stream) const
-{
-	InputMessage::serialize(stream);
-	Serializer::write(state, stream);
 }
 
 std::string LoadGameMessage::getName() const
 {
 	return "I-Load";
+}
+
+void LoadGameMessage::serialize(BinarySerializer& serializer) const
+{
+	InputMessage::serialize(serializer);
+	WRITE_FIELD((*this), serializer, state);
+}
+
+void LoadGameMessage::deserialize(BinarySerializer& serializer)
+{
+	InputMessage::deserialize(serializer);
+	READ__FIELD((*this), serializer, state);
 }

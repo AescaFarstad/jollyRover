@@ -1,5 +1,4 @@
 #pragma once
-#include <ISerializable.h>
 #include <Point.h>
 
 enum class ENTTITY_TYPE : int8_t
@@ -28,30 +27,15 @@ public:
 	Host host_;
 	
 
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
-
 private:
 
 };
-
-namespace Serializer {
-
-	void write(const ENTTITY_TYPE& value, SerializationStream& stream);
-	void read(ENTTITY_TYPE& value, SerializationStream& stream);
-}
 
 class Target
 {
 public:
 	int32_t id;
 	ENTTITY_TYPE type;
-
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
-
-private:
-
 };
 
 
@@ -61,18 +45,34 @@ public:
 	int16_t prototypeId;
 	int32_t attackCooldown;
 	Target target;
-
-	void deserialize(SerializationStream& stream);
-	void serialize(SerializationStream& stream) const;
-
-private:
-
 };
 
 #include <Serialization.h>
 
 namespace Serialization
 {
+	
+	//Unit-------------------------------------------------------
+	
+	template <typename T>
+	void write(const Unit& object, T& serializer)
+	{
+		WRITE_FIELD(object, serializer, id);
+		WRITE_FIELD(object, serializer, prototypeId);
+		WRITE_FIELD(object, serializer, force);
+		WRITE_FIELD(object, serializer, location);
+		WRITE_FIELD(object, serializer, voluntaryMovement);
+	}
+	
+	template <typename T>
+	void read(Unit& object, T& serializer)
+	{
+		READ__FIELD(object, serializer, id);
+		READ__FIELD(object, serializer, prototypeId);
+		READ__FIELD(object, serializer, force);
+		READ__FIELD(object, serializer, location);
+		READ__FIELD(object, serializer, voluntaryMovement);
+	}
 	
 	//Weapon-------------------------------------------------------
 	
@@ -115,14 +115,14 @@ namespace Serialization
 	template <typename T>
 	void write(const ENTTITY_TYPE& object, T& serializer)
 	{
-		serializer.write((int8_t)object, "ENTTITY_TYPE");
+		serializer.write((int8_t)object, FIELD_NAME(ENTTITY_TYPE));
 	}
 	
 	template <typename T>
 	void read(ENTTITY_TYPE& object, T& serializer)
 	{
 		int8_t tmp;
-		serializer.read(tmp);
+		serializer.read(tmp, FIELD_NAME(ENTTITY_TYPE));
 		object = (ENTTITY_TYPE)tmp;
 	}
 }

@@ -202,18 +202,6 @@ void Point::operator/=(const float& p)
 	y /= p;
 }
 
-void Point::deserialize(SerializationStream& stream)
-{
-	Serializer::read(x, stream);
-	Serializer::read(y, stream);
-}
-
-void Point::serialize(SerializationStream& stream) const
-{
-	Serializer::write(x, stream);
-	Serializer::write(y, stream);
-}
-
 void from_json(const nlohmann::json& j, Point& point)
 {
 	point.x = j.at("x");
