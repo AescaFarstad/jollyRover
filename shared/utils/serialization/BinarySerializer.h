@@ -104,15 +104,32 @@ public:
 	}
 	
 	template <typename T>
-	static std::unique_ptr<T> copyThroughSerialization(T& object)
+	static T copyThroughSerialization(const T& object)
 	{
-		auto result = std::make_unique<T>();
+		T result;
 		
 		BinarySerializer s;
 		s.write(object);		
 		s.read(*result);
 		
 		return result;
+	}
+	
+	template <typename T>
+	static void copyThroughSerialization(const T& from, T&to)
+	{
+		BinarySerializer s;
+		s.write(from);		
+		s.read(to);
+	}
+	
+	template <typename T>
+	static std::string crc(const T& object)
+	{
+		//printf("crc()\n");
+		BinarySerializer s;
+		s.write(object);
+		return s.crc();
 	}
 	
 private:	

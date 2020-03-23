@@ -16,7 +16,7 @@ std::string JSONSerializer::toString()
 #define WRITE(type) 															\
 void JSONSerializer::write(const type& value, const std::string& fieldName)		\
 {																				\
-	if (fieldName == anonymous || m_stack.back()->is_array())					\
+	if (&fieldName == &anonymous || m_stack.back()->is_array())					\
 		*m_stack.back() += value;												\
 	else																		\
 		(*m_stack.back())[fieldName] = value;									\
@@ -54,19 +54,19 @@ void JSONSerializer::startObject(std::string fieldName)
 {
 	if (m_stack.back()->is_null())
 	{
-		if (fieldName != anonymous)
+		if (&fieldName != &anonymous)
 			*m_stack.back() = json::object();
 		else
 			*m_stack.back() = json::array();
 	}
 	else
 	{
-		if (fieldName != anonymous && m_stack.back()->is_object())
+		if (&fieldName != &anonymous && m_stack.back()->is_object())
 		{
 			*m_stack.back() += {fieldName, json::object()};
 			m_stack.push_back(&m_stack.back()->at(fieldName));
 		}
-		else if (m_stack.back()->is_array() && fieldName != anonymous)
+		else if (m_stack.back()->is_array() && &fieldName != &anonymous)
 		{
 			*m_stack.back() += json::object();
 			m_stack.push_back(&m_stack.back()->back());
@@ -88,14 +88,14 @@ void JSONSerializer::startArray(std::string fieldName)
 {
 	if (m_stack.back()->is_null())
 	{
-		if (fieldName != anonymous)
+		if (&fieldName != &anonymous)
 			*m_stack.back() = json::object();
 		else
 			*m_stack.back() = json::array();
 	}
 	else
 	{
-		if (fieldName != anonymous && m_stack.back()->is_object())
+		if (&fieldName != &anonymous && m_stack.back()->is_object())
 		{
 			*m_stack.back() += {fieldName, json::array()};
 			m_stack.push_back(&m_stack.back()->at(fieldName));

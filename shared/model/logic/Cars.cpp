@@ -216,10 +216,17 @@ namespace Cars
 		
 		Point locationFromRouteProgress(CarState& car)
 		{
-			Point result = car.route[car.routeIndex + 1] - car.route[car.routeIndex];
-			result.scaleBy(car.progress);
-			result += car.route[car.routeIndex];
-			return result;
+			if ((int32_t)car.route.size() <= car.routeIndex + 1)
+			{
+				return car.route[car.routeIndex];
+			}
+			else
+			{
+				Point result = car.route[car.routeIndex + 1] - car.route[car.routeIndex];
+				result.scaleBy(car.progress);
+				result += car.route[car.routeIndex];
+				return result;
+			}			
 		}
 	}
 }

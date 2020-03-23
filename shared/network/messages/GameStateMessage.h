@@ -8,7 +8,7 @@ class GameStateMessage :
 public:
 	GameStateMessage();
 
-	std::unique_ptr<GameState> state;
+	std::vector<GameState> states;
 	
 	std::string getName() const override;
 	

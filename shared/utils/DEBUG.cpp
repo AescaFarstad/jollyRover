@@ -11,4 +11,12 @@
 			std::cout << glob_result.gl_pathv[i] << std::endl;
 		}*/
 	}
+	
+	
+	void dump(std::string data, std::string name)
+	{
+		std::ofstream file("out/" + name + ".txt");
+		file << data;
+		file.close();
+	}
 #endif

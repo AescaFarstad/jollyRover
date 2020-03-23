@@ -21,6 +21,7 @@
 #include <GreetingMessage.h>
 #include <DEBUG.h>
 #include <Network.h>
+#include <JSONSerializer.h>
 
 Game::Game()
 {
@@ -106,9 +107,9 @@ void Game::start()
 void Game::runBenchmark()
 {
 	GameUpdater gu;
-	auto state = std::make_unique<GameState>(892422);
-	S::log.add("State checksum: " + S::crc(*state));
-	gu.load(std::move(state), &m_prototypes, true);
+	GameState state(892422);
+	S::log.add("State checksum: " + BinarySerializer::crc(state));
+	gu.load(state, &m_prototypes, true);
 	
 	auto joined = std::make_unique<InputPlayerJoinedMessage>();
 	joined->login = 102;
@@ -133,13 +134,13 @@ void Game::runBenchmark()
 	for(int32_t i = 0; i < iters; i++)
 	{
 		gu.update(i * 1000 + 100);
-		S::log.add(std::to_string(i * 100 / iters) + "%" + " State checksum at: " + std::to_string(i) + " = " + S::crc(*gu.state));
+		S::log.add(std::to_string(i * 100 / iters) + "%" + " State checksum at: " + std::to_string(i) + " = " + BinarySerializer::crc(gu.state));
 	}
 	
 	S::log.add("Finished in " + std::to_string(SDL_GetTicks() - startTime));
 	S::log.add("Performance buffer: " + std::to_string((float)iters * 1000 / (SDL_GetTicks() - startTime)));
 	
-	S::log.add("State checksum: " + S::crc(*gu.state));
+	S::log.add("State checksum: " + BinarySerializer::crc(gu.state));
 	
 	startGame();
 }
@@ -210,7 +211,14 @@ void Game::startGame()
 			int64_t clientToServerDelta = S::network->timeSync.localToServerUpperBound(0);			
 			S::log.add("server time delta: " + std::to_string(clientToServerDelta) + 
 					" uncertainty: " + std::to_string(S::network->timeSync.getUncertainty()), { LOG_TAGS::NET });
-			m_gameMode.loadGame(std::move(gameStateMsg->state), clientToServerDelta, m_login);
+					
+			S::log.add("received game state from server, crc=" + BinarySerializer::crc(gameStateMsg->states[0]), { LOG_TAGS::SUBTASK });
+			
+			JSONSerializer j;
+			j.write(gameStateMsg->states[0], "dumpС");
+			dump(j.toString(), "dumpC");
+			
+			m_gameMode.loadGame(gameStateMsg->states[0], clientToServerDelta, m_login);
 			
 			addNetworkBindings();
 			

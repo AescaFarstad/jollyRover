@@ -13,9 +13,9 @@ void GameMode::init(Renderer* renderer, Prototypes* prototypes)
 	m_gameView.init(renderer, prototypes);
 }
 
-void GameMode::loadGame(std::unique_ptr<GameState> state, int64_t clientToServerDelta, int32_t login)
+void GameMode::loadGame(const GameState& state, int64_t clientToServerDelta, int32_t login)
 {
-	m_gameUpdater.load(std::move(state), m_prototypes, true);
+	m_gameUpdater.load(state, m_prototypes, true);
 	m_clientToServerDelta = clientToServerDelta;
 	m_routeInput.load(m_prototypes);
 	m_gameView.setLogin(login);
@@ -32,7 +32,7 @@ void GameMode::update(bool isActive)
 	{
 		m_gameUpdater.update(SDL_GetTicks() + m_clientToServerDelta);
 		handleRouteInput();
-		m_gameView.render(m_gameUpdater.state.get(), &m_routeInput);
+		m_gameView.render(&m_gameUpdater.state, &m_routeInput);
 	}
 	else if (S::network->isConnected())
 	{
@@ -70,7 +70,7 @@ void GameMode::handleRouteInput()
 		}
 		case ROUTE_STATE::E_RANDOM_CLICK:
 		{
-			const auto thisPlayer = GameLogic::playerByLogin(m_gameUpdater.state.get(), m_login);
+			const auto thisPlayer = GameLogic::playerByLogin(&m_gameUpdater.state, m_login);
 			if (thisPlayer->refuelLeft >0 || thisPlayer->repairsLeft > 0 || thisPlayer->activeCars.size() > 0)
 			{
 				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
@@ -120,7 +120,7 @@ void GameMode::handleRouteInput()
 		}
 		case ROUTE_STATE::VALID:
 		{
-			const auto thisPlayer = GameLogic::playerByLogin(m_gameUpdater.state.get(), m_login);
+			const auto thisPlayer = GameLogic::playerByLogin(&m_gameUpdater.state, m_login);
 			if (thisPlayer->refuelLeft >0 || thisPlayer->repairsLeft > 0 || thisPlayer->activeCars.size() > 0)
 			{
 				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);

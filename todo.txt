@@ -66,3 +66,11 @@ final touches
 	спаун за пределами карты
 	больше формаций
 	оптимизация
+
+
+--
+	new ?
+	extern const -> constexpr
+	static const
+	virtual get location -> namespace::getLoc(obj)
+	SDL_SCANCODE_NUMBER в прочих местах

@@ -16,9 +16,11 @@ PROTOTYPES := $(OUT)/prototypes.json
 SSH_CONFIG := JollyRover
 REMOTE_DEPLOY_PATH := ~/JollyRover
 
+SANITIZATION= -fsanitize=address
+
 AUTODEPS = -MMD -MF $(subst .bc,.d,$@)
-COMPILE_FLAGS := -g -O0 -Wall -c -std=c++17 -D_REENTRANT -DSDL_DISABLE_IMMINTRIN_H -DFC_USE_SDL_GPU $(CXXFLAGS)
-LINK_FLAGS := -g -O0 -std=c++17  $(LDFLAGS)
+COMPILE_FLAGS := -g -O0 -Wall -c -std=c++17 $(SANITIZATION) -D_REENTRANT -DSDL_DISABLE_IMMINTRIN_H -DFC_USE_SDL_GPU $(CXXFLAGS)
+LINK_FLAGS := -g -O0 -std=c++17 $(SANITIZATION)  $(LDFLAGS)
 
 LOCAL_LIBS := -lSDL2_gpu -lSDL2 -lSDL2_net -lSDL2_image -lSDL2_ttf -lutil
 SERVER_LIBS := -lSDL2 -lSDL2_net -lutil

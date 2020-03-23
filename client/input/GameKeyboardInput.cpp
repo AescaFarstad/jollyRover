@@ -183,7 +183,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		case GAME_KEYBOARD_ACTIONS::TIME_TOGGLE_PAUSE :
 		{
 			InputTimeMessage timeMsg;
-			timeMsg.allowSteps = gameUpdater.state->time.allowedSteps > 0 ? -1 : 0;
+			timeMsg.allowSteps = gameUpdater.state.time.allowedSteps > 0 ? -1 : 0;
 			timeMsg.modifyAllowSteps = true;
 			S::network->send(timeMsg);
 			break;
@@ -191,11 +191,11 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		case GAME_KEYBOARD_ACTIONS::REVERT1 :
 		{
 			LoadGameMessage loadMsg;
-			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 1));
-			if (!state)
+			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state.time.performedSteps - 1));
+			if (!state.isValid_)
 				return;
 			BinarySerializer bs;
-			bs.write(*state);
+			bs.write(state);
 			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
@@ -203,11 +203,11 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		case GAME_KEYBOARD_ACTIONS::REVERT5 :
 		{
 			LoadGameMessage loadMsg;
-			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 5));
-			if (!state)
+			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state.time.performedSteps - 5));
+			if (!state.isValid_)
 				return;
 			BinarySerializer bs;
-			bs.write(*state);
+			bs.write(state);
 			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
@@ -215,11 +215,11 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		case GAME_KEYBOARD_ACTIONS::REVERT25 :
 		{
 			LoadGameMessage loadMsg;
-			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 25));
-			if (!state)
+			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state.time.performedSteps - 25));
+			if (!state.isValid_)
 				return;
 			BinarySerializer bs;
-			bs.write(*state);
+			bs.write(state);
 			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
@@ -227,11 +227,11 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		case GAME_KEYBOARD_ACTIONS::REVERT125 :
 		{
 			LoadGameMessage loadMsg;
-			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state->time.performedSteps - 125));
-			if (!state)
+			auto state = gameUpdater.getNewStateBySteps(std::max(0, gameUpdater.state.time.performedSteps - 125));
+			if (!state.isValid_)
 				return;
 			BinarySerializer bs;
-			bs.write(*state);
+			bs.write(state);
 			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
@@ -241,7 +241,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			LoadGameMessage loadMsg;
 			auto state = gameUpdater.getFirstState();
 			BinarySerializer bs;
-			bs.write(*state);
+			bs.write(state);
 			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
@@ -265,7 +265,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 				return;
 			}
 				
-			S::persistentStorage.savedState = BinarySerializer::copyThroughSerialization(*gameUpdater.state.get());
+			BinarySerializer::copyThroughSerialization(gameUpdater.state, S::persistentStorage.savedState);
 			S::persistentStorage.commit();
 			S::log.add("Saved", {LOG_TAGS::UNIQUE});
 			break;
@@ -278,7 +278,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 				return;
 			}
 			
-			if (!S::persistentStorage.savedState)
+			if (S::persistentStorage.savedState.isValid_)
 			{
 				S::log.add("Nothing to load", {LOG_TAGS::ERROR_});
 				return;
@@ -288,7 +288,7 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			auto state = gameUpdater.getFirstState();
 			
 			BinarySerializer bs;
-			bs.write(*S::persistentStorage.savedState);
+			bs.write(S::persistentStorage.savedState);
 			loadMsg.state = bs.dumpAll();
 			S::network->send(loadMsg);
 			break;
@@ -317,8 +317,10 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		case GAME_KEYBOARD_ACTIONS::ACT_AI :
 		{
 			InputRouteMessage msg;
-			auto rnd = BinarySerializer::copyThroughSerialization(gameUpdater.state->random);
-			msg.route = AI::getRandomWalk(*rnd, gameUpdater.prototypes);
+			auto rnd = gameUpdater.state.random;
+			auto tmp1 = rnd.get();
+			auto tmp2 = gameUpdater.state.random.get();
+			msg.route = AI::getRandomWalk(rnd, gameUpdater.prototypes);
 			S::network->send(msg);
 			break;
 		}

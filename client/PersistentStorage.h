@@ -11,7 +11,7 @@ public:
 	void commit();
 	void clean();
 	
-	std::unique_ptr<GameState> savedState;
+	GameState savedState;
 	
 private: 
 	bool m_isReady;

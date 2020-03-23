@@ -7,6 +7,7 @@ GameState::GameState()
 	loadCount = 0;
 	isEventLoggerEnabled = false;
 	creeps.reserve(MAX_CREEPS);
+	isValid_ = true;
 }
 
 GameState::GameState(uint32_t randomSeed) : GameState()

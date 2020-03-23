@@ -39,28 +39,3 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(const NetworkPacket
 			break;
 	}
 }
-/*
-template <>
-void Serialization::write<>(const InputActionMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const InputPlayerJoinedMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const InputPlayerLeftMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const GenericRequestMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const GreetingMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const GameStateMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const InputRouteMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const InputTimeMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const InputImpulseMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const InputDebugMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const LoadGameMessage& object, BinaryStream& serializer);
-template <>
-void Serialization::write<>(const HeartbeatMessage& object, BinaryStream& serializer);*/

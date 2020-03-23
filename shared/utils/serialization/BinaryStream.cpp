@@ -18,9 +18,9 @@ BinaryStream::BinaryStream(size_t startingSize, GrowStrategy growStrategy)
 void BinaryStream::init(size_t startingSize, GrowStrategy growStrategy)
 {
 	m_blocks.clear();
-	auto& newBlock = m_blocks.emplace_back();
-	newBlock.size = startingSize;
-	newBlock.array = new char[startingSize];
+	m_blocks.emplace_back(startingSize);
+	
+	m_growStrategy = growStrategy;
 	
 	resetCursors();
 }
@@ -35,11 +35,11 @@ char* BinaryStream::allocate(size_t size)
 {
 	if (size > (m_writeCursor.block->size - m_writeCursor.block->occupied))
 	{
-		auto& newBlock = m_blocks.emplace_back();
-		newBlock.size = m_growStrategy(m_writeCursor.block->size, size);
-		newBlock.array = new char[newBlock.size];
+		auto newSize = m_growStrategy(m_writeCursor.block->size, size);
+		auto& newBlock = m_blocks.emplace_back(newSize);
 		
 		m_writeCursor.block = &newBlock;
+		m_writeCursor.position = 0;
 		m_readCursor.block = &m_blocks[0];
 		m_readCursor.position = 0;
 	}
@@ -119,14 +119,26 @@ std::size_t BinaryStream::noGrow(size_t previousSize, size_t  allocation)
 	THROW_FATAL_ERROR("Not supposed to grow.");
 }
 
-BinaryStreamInternal::Block::Block()
+BinaryStreamInternal::Block::Block(size_t size)
 {
 	occupied = 0;
-	array = nullptr;
-	size = 0;
+	array = new char[size];
+	this->size = size;
+	//printf("Block()\n");
 }
+
 BinaryStreamInternal::Block::~Block()
 {
+	//printf("~Block\n");
 	if (array != nullptr)
 		delete[] array;
+}
+
+BinaryStreamInternal::Block::Block(Block&& that)
+{
+	array = that.array;
+	size = that.size;
+	occupied = that.occupied;
+	
+	that.array = nullptr;
 }

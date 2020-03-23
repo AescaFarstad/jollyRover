@@ -2,7 +2,7 @@
 #include <Serialization.h>
 #include <json.hpp>
 
-const std::string not_anonymous = "na";
+const std::string not_anonymous;
 
 class JSONSerializer;
 namespace Serialization
@@ -45,7 +45,7 @@ public:
 		startArray(DEBUG_MODE ? fieldName : anonymous);
 		for (size_t i = 0; i < vec.size(); i++)
 		{
-			write(vec[i], fieldName == anonymous ? anonymous : not_anonymous);
+			write(vec[i], &fieldName == &anonymous ? anonymous : not_anonymous);
 		}
 		endArray();
 	}
@@ -64,7 +64,7 @@ public:
 		startArray(DEBUG_MODE ? fieldName : anonymous);
 		for (size_t i = 0; i < size; i++)
 		{
-			write(object[i], fieldName == anonymous ? anonymous : not_anonymous);
+			write(object[i], &fieldName == &anonymous ? anonymous : not_anonymous);
 		}
 		endArray();
 	}

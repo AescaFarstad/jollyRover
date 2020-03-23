@@ -7,21 +7,9 @@
 
 	//#include <glob.h>
 	#include <iostream>
+	#include <fstream>
 
 	void traceFiles(std::string path);
+	void dump(std::string data, std::string name = "dump");
 
 #endif
-
-namespace S 
-{
-	template <typename T>
-	std::string crc(const T& target)
-	{
-		BinarySerializer bs;
-		Serialization::write(target, bs);
-		CRC32  digestCrc32;
-		auto data = bs.dumpAll();
-		digestCrc32.add(&data[0], data.size());
-		return digestCrc32.getHash();		
-	}
-}

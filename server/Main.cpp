@@ -14,6 +14,8 @@
 #include <GenericRequestMessage.h>
 #include <NetworkPacket.h>
 #include <ServerNetwork.h>
+#include <JSONSerializer.h>
+#include <DEBUG.h>
 #undef main
 
 namespace MainInternal 
@@ -43,12 +45,14 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 		case MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG:
 		case MESSAGE_TYPE::TYPE_INPUT_JOINED_MSG:
 		case MESSAGE_TYPE::TYPE_INPUT_TIME_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_IMPULSE_MSG:
+		case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG:
 		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
 		{
 			InputMessage* t = dynamic_cast<InputMessage*>(message.release());
 			std::unique_ptr<InputMessage> iMsg = std::unique_ptr<InputMessage>(t);
 			iMsg->serverId = inputIdCounter++;
-			iMsg->serverStamp = gameUpdater.state->timeStamp;
+			iMsg->serverStamp = gameUpdater.state.timeStamp;
 			network.sendToAllPlaying(*iMsg);
 			gameUpdater.addNewInput(std::move(iMsg));
 			break;
@@ -65,14 +69,17 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = BinarySerializer::copyThroughSerialization(*gameUpdater.state);
+					JSONSerializer j;
+					j.write(gameUpdater.state, "dump");
+					dump(j.toString());
+					BinarySerializer::copyThroughSerialization(gameUpdater.state, gsMsg.states.emplace_back());
 					
-					S::log.add("Send state, stamp=" + std::to_string(gameUpdater.state->timeStamp) + " players=" + std::to_string(gameUpdater.state->players.size()));
+					S::log.add("Send state, stamp=" + std::to_string(gameUpdater.state.timeStamp) + " players=" + std::to_string(gameUpdater.state.players.size()) + " crc=" + BinarySerializer::crc(gsMsg.states[0]), {LOG_TAGS::SUBTASK});
 					network.send(gsMsg, genericRequestMsg->login);
 
 					std::unique_ptr<InputPlayerJoinedMessage> pjMsg = std::make_unique<InputPlayerJoinedMessage>();
 					pjMsg->serverId = inputIdCounter++;
-					pjMsg->serverStamp = gameUpdater.state->timeStamp;
+					pjMsg->serverStamp = gameUpdater.state.timeStamp;
 					pjMsg->login = genericRequestMsg->login;
 					//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 					network.sendToAllPlaying(*pjMsg);
@@ -83,7 +90,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 				{
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = BinarySerializer::copyThroughSerialization(*gameUpdater.state); 
+					BinarySerializer::copyThroughSerialization(gameUpdater.state, gsMsg.states.emplace_back()); 
 					network.send(gsMsg, genericRequestMsg->login);
 					break;
 				}
@@ -121,6 +128,26 @@ void loadConfig()
 	S::config.load(j);
 	S::config.saveStateInterval = -1; //Server never needs to save states
 }
+#include <AI.h>
+#include <Cars.h>
+SeededRandom rnd(5254534);
+int32_t cooldown = 20000;
+void tryToFakeInput()
+{
+	cooldown--;
+	if (cooldown < 0 && gameUpdater.state.players.size() > 0 && rnd.get() > 0.9996)
+	{
+		auto& player = rnd.getFromVector(gameUpdater.state.players);
+		if (!Cars::canLaunchCar(player))
+			return;
+		auto inmsg = std::make_unique<InputRouteMessage>();
+		inmsg->login = player.login;
+		auto rnd = gameUpdater.state.random;
+		inmsg->route = AI::getRandomWalk(rnd, &prototypes);
+		handleNetworkMessage(std::move(inmsg));
+		cooldown = 1000;
+	}
+}
 
 void activeLoop()
 {
@@ -134,6 +161,8 @@ void activeLoop()
 		messageBuffer[i] = nullptr;
 		i++;
 	}
+	
+	//tryToFakeInput();
 	
 	if (delta >= MIN_TIME_PER_FRAME)
 	{
@@ -161,10 +190,10 @@ void idleLoop()
 		
 		
 		int32_t ticks = SDL_GetTicks() - prototypes.variables.fixedStepDuration;
-		auto state = std::make_unique<GameState>();
-		state->timeStamp = ticks;
+		GameState state;
+		state.timeStamp = ticks;
 		lastTicks = ticks;
-		gameUpdater.load(std::move(state), &prototypes, false);
+		gameUpdater.load(state, &prototypes, false);
 		S::log.add("state reset");
 		
 		activeLoop();
@@ -202,12 +231,12 @@ int main()
 	loadConfig();
 	
 	network.init(
-		[](int32_t login) -> bool {return GameLogic::playerByLogin(gameUpdater.state.get(), login) != nullptr;},
-		[](int32_t login) -> bool {return GameLogic::playerByLogin(gameUpdater.state.get(), login) != nullptr;},
+		[](int32_t login) -> bool {return GameLogic::playerByLogin(&gameUpdater.state, login) != nullptr;},
+		[](int32_t login) -> bool {return GameLogic::playerByLogin(&gameUpdater.state, login) != nullptr;},
 		&prototypes.variables
 		);	
 		
-	gameUpdater.load(std::make_unique<GameState>(), &prototypes, false);
+	gameUpdater.load(GameState(), &prototypes, false);
 
 	while (!isFinished)
 		mainLoop();

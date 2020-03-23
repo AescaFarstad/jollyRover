@@ -24,14 +24,14 @@ class SpatialMap
 public:
 	SpatialMap<T>();
 	SpatialMap<T>(int32_t cellSize, bool useLayeredMap, Point AA, Point BB);
-	SpatialMap<T>& operator=(SpatialMap<T>&& that);	
+	SpatialMap<T>& operator=(SpatialMap<T>&& that);
+	SpatialMap<T>(SpatialMap<T>&& that);
 	SpatialMap<T>& operator=(const SpatialMap<T>& that) = delete;
-	SpatialMap<T>(SpatialMap<T>&& that) = delete;
-	SpatialMap<T>(const SpatialMap<T>& that) = delete;
+	SpatialMap<T>(const SpatialMap<T>& that) = delete;/**/
 	
 	void reset(int32_t expectedCount);
 	void addUnique(std::vector<T>& data); //Добавить данные, которые могут оказаться только в одной ячейке
-	void addNonUnique(std::vector<T>& data); //Добавить даннеы, которые могут присутствовать сразу в нескольких ячейках
+	void addNonUnique(std::vector<T>& data); //Добавить данные, которые могут присутствовать сразу в нескольких ячейках
 	std::vector<T*> getInRadius(const Point& origin, int32_t radius);
 	std::vector<T*>& getInCell(const Point& origin);
 	std::vector<T*> getInCellsIntersectingRect(const Point& AA, const Point& BB);
@@ -91,6 +91,12 @@ SpatialMap<T>& SpatialMap<T>::operator=(SpatialMap<T>&& that)
 	m_useLayeredMap = std::move(that.m_useLayeredMap);
 	
 	return *this;
+}
+
+template <typename T>
+SpatialMap<T>::SpatialMap(SpatialMap<T>&& that)
+{
+	*this = std::move(that);
 }
 
 template <typename T>

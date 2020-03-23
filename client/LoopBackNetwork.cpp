@@ -65,7 +65,7 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
 		{
 			InputMessage* iMsg = dynamic_cast<InputMessage*>(copy.get());
-			iMsg->serverStamp = gameUpdater->state->timeStamp;
+			iMsg->serverStamp = gameUpdater->state.timeStamp;
 			iMsg->serverId = idCounter++;
 			addToIncoming(*copy);
 			break;
@@ -80,7 +80,7 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 					GameStateMessage gsMsg;
 					GameState tempState(1934);
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = BinarySerializer::copyThroughSerialization(tempState);
+					BinarySerializer::copyThroughSerialization(tempState, gsMsg.states.emplace_back());
 					addToIncoming(gsMsg);
 
 					InputPlayerJoinedMessage pjMsg;
@@ -102,7 +102,7 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 				{
 					GameStateMessage gsMsg;
 					gsMsg.inResponseTo = genericRequestMsg->initiator_id;
-					gsMsg.state = BinarySerializer::copyThroughSerialization(*gameUpdater->state); 
+					BinarySerializer::copyThroughSerialization(gameUpdater->state, gsMsg.states.emplace_back());
 					addToIncoming(gsMsg);
 					break;
 				}

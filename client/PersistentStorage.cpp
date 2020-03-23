@@ -11,6 +11,7 @@ PersistentStorage::PersistentStorage()
 {
 	m_isReady = false;
 	m_isInitialized = false;
+	savedState.isValid_ = false;
 }
 
 void PersistentStorage::p_init()
@@ -34,8 +35,7 @@ void PersistentStorage::p_init()
 	
 	if (hasSavedState)
 	{
-		savedState = std::make_unique<GameState>();
-		bs.read(*savedState);	
+		bs.read(savedState);
 	}
 	
 	file.close();
@@ -45,10 +45,10 @@ void PersistentStorage::p_init()
 void PersistentStorage::p_commit()
 {
 	BinarySerializer bs;
-	bs.write(savedState != nullptr);
+	bs.write(savedState.isValid_);
 	
-	if (savedState != nullptr)
-		bs.write(*savedState);
+	if (savedState.isValid_)
+		bs.write(savedState);
 		
 	std::ofstream file("out/save/save.data");
 
@@ -139,6 +139,6 @@ bool PersistentStorage::isReady()
 
 void PersistentStorage::clean()
 {
-	savedState = nullptr;
+	savedState.isValid_ = false;
 	commit();
 }

@@ -13,7 +13,7 @@ public:
 	virtual ~GameMode() = default;
 	
 	void init(Renderer* renderer, Prototypes* prototypes);
-	void loadGame(std::unique_ptr<GameState> state, int64_t clientToServerDelta, int32_t login);
+	void loadGame(const GameState& state, int64_t clientToServerDelta, int32_t login);
 	
 	void addNewInput(std::unique_ptr<InputMessage> input);
 	GameUpdater* getGameUpdater();

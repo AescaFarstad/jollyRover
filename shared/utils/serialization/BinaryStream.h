@@ -26,8 +26,11 @@ namespace BinaryStreamInternal
 	class Block
 	{
 	public:
-		Block();
+		Block(size_t size);
 		~Block();
+		
+		Block(Block&& that);
+		
 		char* array;
 		size_t size;
 		size_t occupied;

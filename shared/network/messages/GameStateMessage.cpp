@@ -13,12 +13,11 @@ std::string GameStateMessage::getName() const
 void GameStateMessage::serialize(BinarySerializer& serializer) const
 {
 	NetworkMessage::serialize(serializer);
-	serializer.write(*state, FIELD_NAME(state));
+	WRITE_FIELD((*this), serializer, states);
 }
 
 void GameStateMessage::deserialize(BinarySerializer& serializer)
 {
 	NetworkMessage::deserialize(serializer);
-	state = std::make_unique<GameState>();
-	serializer.read(*state, FIELD_NAME(state));
+	READ__FIELD((*this), serializer, states);
 }

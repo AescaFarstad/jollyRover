@@ -9,32 +9,33 @@
 #include <vector>
 #include <map>
 #include <functional>
+#include <CRCAccumulator.h>
 
 class GameUpdater
 {
 public:
 	GameUpdater();
 
-	std::unique_ptr<GameState> state;
+	GameState state;
 	Prototypes* prototypes;
 
 	bool isLoaded;
 
 	void update(uint32_t time);
-	void load(std::unique_ptr<GameState> state, Prototypes* prototypes, bool enableEventLogger);
+	void load(const GameState& state, Prototypes* prototypes, bool enableEventLogger);
 	void addNewInput(std::unique_ptr<InputMessage> input);
-	std::unique_ptr<GameState> getNewStateByStamp(uint32_t stamp);
-	std::unique_ptr<GameState> getNewStateBySteps(int32_t steps);
-	std::unique_ptr<GameState> getFirstState();
+	GameState getNewStateByStamp(uint32_t stamp);
+	GameState getNewStateBySteps(int32_t steps);
+	GameState getFirstState();
 
 private:
 	std::vector<std::unique_ptr<InputMessage>> inputs;
 	uint32_t lastValidTimeStamp;
-	uint32_t getExecutionStamp(InputMessage* input);
 	std::vector<InputMessage*> getThisFrameInputs(uint32_t fromInclusive, uint32_t toExclusive);
 	std::map<uint32_t, std::unique_ptr<BinarySerializer>, std::greater<uint32_t>> statesByStamps;
 	std::map<uint32_t, uint32_t, std::greater<uint32_t>> stampsBySteps;
 	void rewindToPrecedingState(uint32_t stamp);
-	void saveState(GameState* state);
+	void saveState(const GameState& state, bool skipCrc = false);
 	int32_t lastSavedSteps;
+	CRCAccumulator crcs;
 }; 
