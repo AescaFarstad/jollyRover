@@ -1,5 +1,7 @@
 #include <LoopBackNetwork.h>
 #include <GameStateMessage.h>
+#include <ChecksumMessage.h>
+#include <StateRequestMessage.h>
 #include <GreetingMessage.h>
 #include <BinarySerializer.h>
 
@@ -128,6 +130,10 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 			gMsg->login = LOGIN;
 			gMsg->password = {1, 2, 3, 4, 5};
 			addToIncoming(*copy);
+			break;
+		}
+		case MESSAGE_TYPE::TYPE_CHECKSUM_MSG:
+		{
 			break;
 		}
 		default:

@@ -318,8 +318,6 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 		{
 			InputRouteMessage msg;
 			auto rnd = gameUpdater.state.random;
-			auto tmp1 = rnd.get();
-			auto tmp2 = gameUpdater.state.random.get();
 			msg.route = AI::getRandomWalk(rnd, gameUpdater.prototypes);
 			S::network->send(msg);
 			break;

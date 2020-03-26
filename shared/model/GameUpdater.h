@@ -18,6 +18,7 @@ public:
 
 	GameState state;
 	Prototypes* prototypes;
+	CRCAccumulator crcs;
 
 	bool isLoaded;
 
@@ -26,6 +27,7 @@ public:
 	void addNewInput(std::unique_ptr<InputMessage> input);
 	GameState getNewStateByStamp(uint32_t stamp);
 	GameState getNewStateBySteps(int32_t steps);
+	std::optional<GameState> getSavedStateByStamp(uint32_t stamp);
 	GameState getFirstState();
 
 private:
@@ -35,7 +37,6 @@ private:
 	std::map<uint32_t, std::unique_ptr<BinarySerializer>, std::greater<uint32_t>> statesByStamps;
 	std::map<uint32_t, uint32_t, std::greater<uint32_t>> stampsBySteps;
 	void rewindToPrecedingState(uint32_t stamp);
-	void saveState(const GameState& state, bool skipCrc = false);
+	void saveState(GameState& state, bool skipCrc = false);
 	int32_t lastSavedSteps;
-	CRCAccumulator crcs;
 }; 

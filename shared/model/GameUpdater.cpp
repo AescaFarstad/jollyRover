@@ -11,39 +11,30 @@ GameUpdater::GameUpdater()
 	lastSavedSteps = -1;
 }
 
-int nextToo = 0;
 void GameUpdater::update(uint32_t time)
 {
 	if (lastValidTimeStamp < state.timeStamp)
+	{
 		rewindToPrecedingState(lastValidTimeStamp);
+		lastSavedSteps = state.time.performedSteps;
+	}
 	int32_t iters = 0;
 	while (state.timeStamp + prototypes->variables.fixedStepDuration < time && iters < prototypes->variables.maxLogicUpdatesPerFrame)
 	{
 		std::vector<InputMessage*> inputs = getThisFrameInputs(state.timeStamp, state.timeStamp + prototypes->variables.fixedStepDuration);
-		auto debugCRC = nextToo > 0 || inputs.size() > 0;
-		if (debugCRC)
-		{
-			state.isEventLoggerEnabled = false;
-			S::log.add("crc before input: " + BinarySerializer::crc(state) + " at " + std::to_string(state.timeStamp));
-			state.isEventLoggerEnabled = true;
-		}
-		
+				
 		GameLogic::update(&state, prototypes->variables.fixedStepDuration, inputs, prototypes);
-		if (debugCRC)
-		{
-			state.isEventLoggerEnabled = false;
-			S::log.add("crc after  input: " + BinarySerializer::crc(state) + " at " + std::to_string(state.timeStamp));
-			state.isEventLoggerEnabled = true;
-			nextToo = nextToo == 0 ? 10 : nextToo - 1;
-		}
+		
 		
 		lastValidTimeStamp = state.timeStamp;
 		if (lastSavedSteps != state.time.performedSteps && state.time.performedSteps % S::config.saveStateInterval == 0)
 			saveState(state);
 		iters++;
 		
-		if (state.timeStamp % (16*100) == 0)
+		if (state.timeStamp % (prototypes->variables.fixedStepDuration*500) == 0)
+		{
 			S::log.add("crc               " + BinarySerializer::crc(state) + " at " + std::to_string(state.timeStamp));
+		}
 	}
 }
 
@@ -160,13 +151,13 @@ void GameUpdater::rewindToPrecedingState(uint32_t stamp)
 			" to " + std::to_string(state.timeStamp % 100000) + "\n");
 }
 
-void GameUpdater::saveState(const GameState& state, bool skipCrc)
+void GameUpdater::saveState(GameState& state, bool skipCrc)
 {
 	auto stream = std::make_unique<BinarySerializer>();
 	stream->write(state);
 	stream->resetCursors();
 	
-	if (skipCrc)
+	if (!skipCrc)
 		crcs.add(state.timeStamp, stream->crc());
 	
 	statesByStamps[state.timeStamp] = std::move(stream);
@@ -185,4 +176,19 @@ void GameUpdater::saveState(const GameState& state, bool skipCrc)
 		}
 		statesByStamps = std::move(newStatesByStamps);
 	}
+}
+
+std::optional<GameState> GameUpdater::getSavedStateByStamp(uint32_t stamp)
+{
+	auto streamRef = statesByStamps.find(stamp);
+	if (streamRef == statesByStamps.end())
+		return {};
+		
+	std::optional<GameState> result = GameState();
+	
+	BinarySerializer* s = streamRef->second.get();
+	s->read(result.value());
+	s->resetCursors();
+
+	return result;
 }

@@ -60,6 +60,7 @@ namespace Serialization
 		WRITE_FIELD(object, serializer, id);
 		WRITE_FIELD(object, serializer, prototypeId);
 		WRITE_FIELD(object, serializer, force);
+		WRITE_FIELD(object, serializer, health);
 		WRITE_FIELD(object, serializer, location);
 		WRITE_FIELD(object, serializer, voluntaryMovement);
 	}
@@ -70,6 +71,7 @@ namespace Serialization
 		READ__FIELD(object, serializer, id);
 		READ__FIELD(object, serializer, prototypeId);
 		READ__FIELD(object, serializer, force);
+		READ__FIELD(object, serializer, health);
 		READ__FIELD(object, serializer, location);
 		READ__FIELD(object, serializer, voluntaryMovement);
 	}

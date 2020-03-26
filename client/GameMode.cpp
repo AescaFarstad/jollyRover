@@ -1,4 +1,7 @@
 #include <GameMode.h>
+#include <GameStateMessage.h>
+#include <StateRequestMessage.h>
+#include <ChecksumMessage.h>
 
 GameMode::GameMode()
 {
@@ -11,6 +14,29 @@ void GameMode::init(Renderer* renderer, Prototypes* prototypes)
 {
 	m_prototypes = prototypes;
 	m_gameView.init(renderer, prototypes);
+	
+	auto binding = std::make_unique<AnonymousBinding>("TYPE_STATE_REQUEST_MSG");
+	
+	binding->
+	bindByMsgType(MESSAGE_TYPE::TYPE_STATE_REQUEST_MSG)->
+	setCallOnce(false)->
+	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>(
+		[this](std::unique_ptr<NetworkMessage> message){
+			StateRequestMessage* t = dynamic_cast<StateRequestMessage*>(message.release());
+			std::unique_ptr<StateRequestMessage> request = std::unique_ptr<StateRequestMessage>(t);
+			
+			GameStateMessage response;
+			
+			for(auto& stamp : request->states)
+			{
+				auto state = m_gameUpdater.getSavedStateByStamp(stamp);
+				if (state.has_value())
+					response.states.push_back(std::move(state.value()));
+			}
+			S::network->send(response);
+		}
+	));
+	S::network->binder.bind(std::move(binding));
 }
 
 void GameMode::loadGame(const GameState& state, int64_t clientToServerDelta, int32_t login)
@@ -33,6 +59,12 @@ void GameMode::update(bool isActive)
 		m_gameUpdater.update(SDL_GetTicks() + m_clientToServerDelta);
 		handleRouteInput();
 		m_gameView.render(&m_gameUpdater.state, &m_routeInput);
+		if (m_gameUpdater.crcs.getCapacity() - m_gameUpdater.crcs.getNumNewEntries() < m_gameUpdater.crcs.getCapacity() / 3)
+		{
+			ChecksumMessage msg;
+			msg.checksums = m_gameUpdater.crcs.extract(m_gameUpdater.crcs.getCapacity() / 3);			
+			S::network->send(msg);
+		}
 	}
 	else if (S::network->isConnected())
 	{

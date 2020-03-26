@@ -12,11 +12,25 @@
 		}*/
 	}
 	
-	
-	void dump(std::string data, std::string name)
+	void dump(const std::string data, const std::string name)
 	{
-		std::ofstream file("out/" + name + ".txt");
+		std::ofstream file("../dumps/" + name + ".txt");
 		file << data;
 		file.close();
+	}
+	
+	void writeBinary(std::vector<char> data, std::string name = "dump")
+	{
+		auto file = std::fstream("../dumps/" + name + ".binary", std::ios::out | std::ios::binary);
+		file.write((char*)&data[0], data.size());
+		file.close();
+	}
+	
+	std::vector<char> readBinary(std::string name = "dump")
+	{
+		auto file = std::fstream("../dumps/" + name + ".binary", std::ios::in | std::ios::binary);
+		std::vector<char> result (std::istreambuf_iterator<char>(file), {});
+		file.close();
+		return result;
 	}
 #endif

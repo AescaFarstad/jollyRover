@@ -44,14 +44,6 @@ namespace Cars
 				{
 					if (car.unit.health <= 0)
 					{
-						auto base = prototypes->variables.repairRefuelBase;
-						
-						player.score += car.score;
-						player.refuelTotal = base;
-						player.refuelLeft = player.refuelTotal;
-						player.repairsTotal = base;
-						player.repairsLeft = player.repairsTotal;
-					
 						state->eventLogger.addCarDeath(
 							state->time.time, 
 							car, 
@@ -77,6 +69,15 @@ namespace Cars
 					player.refuelTotal = base;
 					player.refuelLeft = player.refuelTotal;
 					player.repairsTotal = FMath::lerp(fullHealth, 0.f, 0, base, car.unit.health);
+					player.repairsLeft = player.repairsTotal;
+				}
+				else if (car.unit.health <= 0)
+				{
+					auto base = prototypes->variables.repairRefuelBase;
+						
+					player.refuelTotal = base;
+					player.refuelLeft = player.refuelTotal;
+					player.repairsTotal = base;
 					player.repairsLeft = player.repairsTotal;
 				}
 					
@@ -151,6 +152,7 @@ namespace Cars
 					if (!creep->creepProto_->rolloverable)
 					{
 						car.unit.health = 0;
+						//S::log.add("Car crashed into creep " + std::to_string(creep->unit.id));
 					}
 					else
 					{
@@ -161,6 +163,7 @@ namespace Cars
 						car.speed *= creep->creepProto_->slowOnRollOver;
 						car.timeSinceRollover = 0;
 						car.agro += prototypes->variables.carAgroGainPerUnit;
+						//S::log.add("Car smashed " + std::to_string(creep->unit.id));
 					}				
 				}
 			}

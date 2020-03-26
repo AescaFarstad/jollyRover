@@ -22,6 +22,7 @@ public:
 	void update(MessageBuffer& externalBuffer);
 	bool hasClients();
 	int32_t getClientCount();
+	NetworkClient* clientByLogin(int32_t login);
 	void sendToAllPlaying(const NetworkMessage& message);
 	void addPlayer(int32_t login);
 	void send(NetworkMessage& message, int32_t login);

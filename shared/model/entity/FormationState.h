@@ -71,6 +71,8 @@ namespace Serialization
 		WRITE_FIELD(object, serializer, angularSpeed);
 		WRITE_FIELD(object, serializer, location);
 		WRITE_FIELD(object, serializer, targetLocation);
+		WRITE_FIELD(object, serializer, orientation);
+		WRITE_FIELD(object, serializer, targetOrientation);
 		WRITE_FIELD(object, serializer, spawnedAt);
 		WRITE_FIELD(object, serializer, objectiveChangedAt);
 		WRITE_FIELD(object, serializer, subObjective);
@@ -92,6 +94,8 @@ namespace Serialization
 		READ__FIELD(object, serializer, angularSpeed);
 		READ__FIELD(object, serializer, location);
 		READ__FIELD(object, serializer, targetLocation);
+		READ__FIELD(object, serializer, orientation);
+		READ__FIELD(object, serializer, targetOrientation);
 		READ__FIELD(object, serializer, spawnedAt);
 		READ__FIELD(object, serializer, objectiveChangedAt);
 		READ__FIELD(object, serializer, subObjective);

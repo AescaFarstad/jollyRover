@@ -12,6 +12,8 @@
 #include <InputDebugMessage.h>
 #include <LoadGameMessage.h>
 #include <GameStateMessage.h>
+#include <ChecksumMessage.h>
+#include <StateRequestMessage.h>
 #include <HeartbeatMessage.h>
 #include <SerializeSimpleTypes.h>
 
@@ -35,6 +37,8 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(const NetworkPacket
 		case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG: 	{auto result =std::make_unique<InputDebugMessage>(); result->deserialize(serializer); return result;}
 		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG: 		{auto result =std::make_unique<LoadGameMessage>(); result->deserialize(serializer); return result;}
 		case MESSAGE_TYPE::TYPE_HEARTBEAT_MSG: 		{auto result =std::make_unique<HeartbeatMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_CHECKSUM_MSG: 		{auto result =std::make_unique<ChecksumMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_STATE_REQUEST_MSG:	{auto result =std::make_unique<StateRequestMessage>(); result->deserialize(serializer); return result;}
 		default: THROW_FATAL_ERROR("Unknow Network Message " + std::to_string(type));
 			break;
 	}

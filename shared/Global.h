@@ -17,7 +17,7 @@ public:
 	const bool IS_WEB = false;
 #endif
 
-#ifdef IS_SERVER
+#if IS_SERVER
 	const bool IS_CLIENT = false;
 #else
 	const bool IS_CLIENT = true;
@@ -51,4 +51,5 @@ namespace S
 	int32_t getId();
 	extern int32_t idCounter;
 	extern GameConfig config;
+	extern int debug;
 };

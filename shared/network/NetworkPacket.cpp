@@ -30,6 +30,8 @@ void NetworkPacket::loadFromRawData(const char* rawData, int32_t bytesAvailable)
 	if (bytesLoaded < bufferSize)
 	{
 		auto newBytes = std::min(bytesAvailable, bufferSize - bytesLoaded);
+		if (newBytes <= 0)
+			printf("trouble: %d, %d, %d", bytesAvailable, bufferSize, bytesLoaded);
 		std::memcpy(tempBuffer + bytesLoaded, rawData, newBytes);
 		bytesLoaded += newBytes;
 

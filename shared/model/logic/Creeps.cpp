@@ -109,7 +109,7 @@ namespace Creeps
 						formation = state->random.getFromVector(prototypes->formations);	
 					while(!formation.enabled || std::find(formation.forces.begin(), formation.forces.end(), force.id) == formation.forces.end());
 					if (state->creeps.size() + formation.slots.size() < GameState::MAX_CREEPS)
-					{
+					{						
 						spawnFormation(state, prototypes, force, prototypes->formations[formation.id]);
 						state->forceStrength_[force.id] += formation.strength;
 					}

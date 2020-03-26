@@ -126,10 +126,17 @@ public:
 	template <typename T>
 	static std::string crc(const T& object)
 	{
-		//printf("crc()\n");
 		BinarySerializer s;
 		s.write(object);
 		return s.crc();
+	}
+	
+	template <typename T>
+	static size_t size(const T& object)
+	{
+		BinarySerializer s;
+		s.write(object);
+		return s.m_stream.getLength();
 	}
 	
 private:	

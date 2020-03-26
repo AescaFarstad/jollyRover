@@ -19,7 +19,6 @@
 #include <InputImpulseMessage.h>
 #include <GameStateMessage.h>
 #include <GreetingMessage.h>
-#include <DEBUG.h>
 #include <Network.h>
 #include <JSONSerializer.h>
 
@@ -160,7 +159,7 @@ void Game::startGame()
 		S::network->interceptGenericRequestOnce(REQUEST_TYPE::REQUEST_GREETING, [cb = callback.release(), login = m_login](std::unique_ptr<GenericRequestMessage> message) {
 			
 			auto msg = GreetingMessage();
-			msg.login = login;
+			msg.login = login;			
 			
 			S::network->send(msg);
 			
@@ -173,9 +172,11 @@ void Game::startGame()
 		S::network->interceptOnce(MESSAGE_TYPE::TYPE_GREETING_MSG, [this, cb = callback.release()](std::unique_ptr<NetworkMessage> message) {
 
 			GreetingMessage* gMsg = dynamic_cast<GreetingMessage*>(message.release());
-			m_login = gMsg->login;
-			m_password = gMsg->password;
+			m_login = gMsg->login;			
+			m_password = gMsg->password;			
 			delete gMsg;
+			
+			S::log.add("I am " + std::to_string(m_login));
 
 			cb->execute();
 			delete cb;
@@ -213,11 +214,7 @@ void Game::startGame()
 					" uncertainty: " + std::to_string(S::network->timeSync.getUncertainty()), { LOG_TAGS::NET });
 					
 			S::log.add("received game state from server, crc=" + BinarySerializer::crc(gameStateMsg->states[0]), { LOG_TAGS::SUBTASK });
-			
-			JSONSerializer j;
-			j.write(gameStateMsg->states[0], "dumpС");
-			dump(j.toString(), "dumpC");
-			
+						
 			m_gameMode.loadGame(gameStateMsg->states[0], clientToServerDelta, m_login);
 			
 			addNetworkBindings();

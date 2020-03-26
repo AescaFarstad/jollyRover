@@ -26,6 +26,7 @@ public:
 	int32_t login;
 	std::vector<int8_t> password;
 	ConnectionMonitor monitor;
+	std::vector<uint32_t> requestedStates;
 
 	virtual std::unique_ptr<NetworkPacket> poll();
 	virtual void sendMessage(const NetworkMessage& msg) = 0;

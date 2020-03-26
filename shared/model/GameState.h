@@ -71,9 +71,10 @@ namespace Serialization
 		WRITE_FIELD(object, serializer, projectiles);
 		WRITE_FIELD(object, serializer, players);
 		WRITE_FIELD(object, serializer, formations);
+		/*
 		WRITE_FIELD(object, serializer, isEventLoggerEnabled);
 		if (object.isEventLoggerEnabled)
-			WRITE_FIELD(object, serializer, eventLogger);
+			WRITE_FIELD(object, serializer, eventLogger);*/
 	}
 	
 	template <typename T>
@@ -88,9 +89,11 @@ namespace Serialization
 		READ__FIELD(object, serializer, projectiles);
 		READ__FIELD(object, serializer, players);
 		READ__FIELD(object, serializer, formations);
+		/*
 		READ__FIELD(object, serializer, isEventLoggerEnabled);
 		if (object.isEventLoggerEnabled)
-			READ__FIELD(object, serializer, eventLogger);		
+			READ__FIELD(object, serializer, eventLogger);	*/	
+		object.creepById_.clear();
 		for(auto& creep : object.creeps)
 			object.creepById_[creep.unit.id] = &creep;
 	}

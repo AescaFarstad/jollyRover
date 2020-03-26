@@ -56,6 +56,18 @@ int32_t ServerNetwork::getClientCount()
 	return m_clientCount;
 }
 
+NetworkClient* ServerNetwork::clientByLogin(int32_t login)
+{
+	for (size_t i = 0; i < m_clients.size(); i++)
+	{
+		if (m_clients[i] == nullptr)
+			continue;
+		if (m_clients[i]->login == login)
+			return m_clients[i].get();
+	}
+	return nullptr;
+}
+
 void ServerNetwork::sendToAllPlaying(const NetworkMessage& message)
 {
 	for (size_t i = 0; i < m_clients.size(); i++)
@@ -211,6 +223,8 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 		case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG:
 		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
 		case MESSAGE_TYPE::TYPE_REQUEST_MSG:
+		case MESSAGE_TYPE::TYPE_CHECKSUM_MSG:
+		case MESSAGE_TYPE::TYPE_GAME_STATE_MSG:
 		{
 			addMessageToBuffer(std::move(msg), externalBuffer);
 			break;

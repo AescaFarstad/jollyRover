@@ -74,3 +74,11 @@ final touches
 	static const
 	virtual get location -> namespace::getLoc(obj)
 	SDL_SCANCODE_NUMBER в прочих местах
+	при дисконнекте сервера иногда происходит  negative-size-param: (size=-1)
+		в ответ на ConsecutiveTask #1000 (7 elements)-> starting #0: wait for greetings prompt from the server and send it
+		#1 0x5555557ec660 in NetworkPacket::loadFromRawData(char const*, int) shared/network/NetworkPacket.cpp:35
+		#2 0x5555557f03f6 iт PacketReader::tryToRead()
+	state.isValid_ => std::optional?
+	кейс CRCAccumulator с большими нет задержками не проверен
+	вернуть сохранение эвентов
+	возможно ложное сообщение о рассинхроне, если клиент подвис, а в это время случился пользовательский ввод в пределах 25 итераций

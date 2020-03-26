@@ -12,7 +12,7 @@
 			"carAgroGainPerUnit":1000,
 			"carAgroFadeGainPerSecond":1,
 			"war":{
-				"intensity": 10000,
+				"intensity": 3000,
 				"creepRestitution": 0.3,
 				"additionalSpacing": 5,
 				"baseAgroLevel": 15,
@@ -25,10 +25,10 @@
 				"minCreepsToRetreat":3
 			}			
 		},
-		"reconnectWindow": 20000,
+		"reconnectWindow": 30000,
 		"maxLogicUpdatesPerFrame": 25,
-		"heartbeatInterval":1000,
-		"heartbeatTimeout":3500,
+		"heartbeatInterval":6000,
+		"heartbeatTimeout":15000,
 		"fieldWidth": 1280,
 		"fieldHeight": 720,
 		"maxEventAnimationTime": 1000

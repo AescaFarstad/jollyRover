@@ -8,6 +8,7 @@ namespace S
 		return idCounter++;
 	}
 	GameConfig config;
+	int debug = 0;
 }
 
 
