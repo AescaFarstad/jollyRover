@@ -33,6 +33,7 @@ namespace MainInternal
 	bool hadClients = false;
 	int32_t timeWithoutClients = 0;
 	bool idle = false;
+	int32_t filesWritten = 0;
 }
 
 using namespace MainInternal;
@@ -66,6 +67,7 @@ void saveJSON(const T& object, const std::string name)
 	file << j.toString();
 	file.close();
 	S::log.add("Write file " + fileName);
+	filesWritten++;
 }
 
 template <typename T>
@@ -291,6 +293,8 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 				}
 			}
 			client->requestedStates.clear();
+			/*if (filesWritten > 12)
+				abort();*/
 			break;
 		}
 		case MESSAGE_TYPE::TYPE_REQUEST_MSG:

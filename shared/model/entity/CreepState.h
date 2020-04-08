@@ -71,6 +71,8 @@ namespace Serialization
 		READ__FIELD(object, serializer, velocity);
 		READ__FIELD(object, serializer, orientation);
 		serializer.readArray(object.whiskers, object.numWhiskers, FIELD_NAME(whiskers));
+		for(int8_t i = object.numWhiskers; i < CreepState::MAX_WHISKER_COUNT; i++)
+			object.whiskers[i] = -1;
 		object.creepProto_ = nullptr;
 		object.weaponProto_ = nullptr;
 	}

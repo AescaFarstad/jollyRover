@@ -10,6 +10,7 @@ Obstacle::Obstacle(const Obstacle& other)
 	AA = other.AA;
 	BB = other.BB;
 	centroid = other.centroid;
+	id = other.id;
 
 	//The important bit:
 	for (size_t i = 1; i < vertices.size(); i++)
@@ -81,6 +82,7 @@ bool Obstacle::hitTest(Edge& e)
 	
 void from_json(const nlohmann::json& j, Obstacle& obstacle)
 {
+	obstacle.id = j.at("id");
 	obstacle.vertices = j.at("vertices").get<std::vector<Point>>();
 	
 

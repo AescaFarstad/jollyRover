@@ -5,7 +5,6 @@ EMSCRIPTEN ?= ../../emsdk/upstream/emscripten
 WEB_COMPILER := $(EMSCRIPTEN)/em++
 LOCAL_COMPILER := $(CXX)
 
-DEBUG_MODE :=1
 OUT := out
 WEB_TARGET := $(OUT)/web
 LOCAL_TARGET := $(OUT)/local
@@ -16,11 +15,18 @@ PROTOTYPES := $(OUT)/prototypes.json
 SSH_CONFIG := JollyRover
 REMOTE_DEPLOY_PATH := ~/JollyRover
 
-SANITIZATION= -fsanitize=address
 
 AUTODEPS = -MMD -MF $(subst .bc,.d,$@)
-COMPILE_FLAGS := -g -O0 -Wall -c -std=c++17 $(SANITIZATION) -D_REENTRANT -DSDL_DISABLE_IMMINTRIN_H -DFC_USE_SDL_GPU $(CXXFLAGS)
-LINK_FLAGS := -g -O0 -std=c++17 $(SANITIZATION)  $(LDFLAGS)
+
+SANITIZATION= -fsanitize=address
+OPTIMIZATION_SERVER= -g -O0
+OPTIMIZATION_LOCAL= -g -O0
+OPTIMIZATION_WEB= -g -O0
+
+DEBUG_MODE :=1
+
+COMPILE_FLAGS := -Wall -c -std=c++17 -D_REENTRANT -DSDL_DISABLE_IMMINTRIN_H -DFC_USE_SDL_GPU $(CXXFLAGS)
+LINK_FLAGS := -std=c++17 $(LDFLAGS)
 
 LOCAL_LIBS := -lSDL2_gpu -lSDL2 -lSDL2_net -lSDL2_image -lSDL2_ttf -lutil
 SERVER_LIBS := -lSDL2 -lSDL2_net -lutil
@@ -77,7 +83,7 @@ SDL_FontCache_LOCAL_OBJECT = $(OBJDIR_CLIENT_LOCAL)/$(SDL_FontCachePATH).bc
 SDL_FontCache_WEB_OBJECT = $(OBJDIR_CLIENT_WEB)/$(SDL_FontCachePATH).bc
 
 local: $(SUBOBJ_LOCAL) $(SDL_FontCache_LOCAL_OBJECT)
-	$(LOCAL_COMPILER) $(LINK_FLAGS) -o $(LOCAL_TARGET) $(SUBOBJ_LOCAL) $(SDL_FontCache_LOCAL_OBJECT) $(LOCAL_LIBS)
+	$(LOCAL_COMPILER) $(OPTIMIZATION_LOCAL) $(SANITIZATION) $(LINK_FLAGS) -o $(LOCAL_TARGET) $(SUBOBJ_LOCAL) $(SDL_FontCache_LOCAL_OBJECT) $(LOCAL_LIBS)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
@@ -87,7 +93,7 @@ web: $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT)
 	rsync -r assets/ out/assets/
 	rsync -r web/ out/
 	$(WEB_COMPILER) \
-		-g3 -O0 -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
+		$(OPTIMIZATION_WEB) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
 		-s WASM=1 -s TOTAL_MEMORY=268435456 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=1 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
 		--use-preload-plugins -v -o $(WEB_TARGET).html \
 		lib/renderer_GLES_2.o lib/SDL_gpu_matrix.o lib/SDL_gpu_renderer.o lib/SDL_gpu_shapes.o lib/SDL_gpu.o lib/stb_image_write.o lib/stb_image.o \
@@ -98,7 +104,7 @@ web: $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT)
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
 server: $(SUBOBJ_SERVER)
-	$(LOCAL_COMPILER) $(LINK_FLAGS) -o $(SERVER_TARGET) $(SUBOBJ_SERVER) $(SERVER_LIBS)
+	$(LOCAL_COMPILER) $(OPTIMIZATION_SERVER) $(SANITIZATION) $(LINK_FLAGS) -o $(SERVER_TARGET) $(SUBOBJ_SERVER) $(SERVER_LIBS)
 	cp shared/prototypes.json out/prototypes.json
 	rsync -r assets/ out/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
@@ -120,16 +126,16 @@ deploy:
 
 $(OBJDIR_CLIENT_LOCAL)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
-	$(LOCAL_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) $(LOCAL_FLAGS) -DIS_SERVER=0 -DDEBUG_MODE=$(DEBUG_MODE) -c -o $@ $<
+	$(LOCAL_COMPILER) $(OPTIMIZATION_LOCAL) $(SANITIZATION) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) $(LOCAL_FLAGS) -DIS_SERVER=0 -DDEBUG_MODE=$(DEBUG_MODE) -c -o $@ $<
 	
 $(OBJDIR_CLIENT_WEB)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
-	$(WEB_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -DIS_SERVER=0 -DDEBUG_MODE=$(DEBUG_MODE) \
+	$(WEB_COMPILER) $(OPTIMIZATION_WEB) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_CLIENT) -DIS_SERVER=0 -DDEBUG_MODE=$(DEBUG_MODE) \
 	-s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3  -c -o $@ $<
 	
 $(OBJDIR_CLIENT_SERVER)/%.bc : %.cpp
 	@mkdir -p $(dir $@)
-	$(LOCAL_COMPILER) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_SERVER) $(LOCAL_FLAGS) -DIS_SERVER=1 -DDEBUG_MODE=$(DEBUG_MODE) -c -o $@ $<
+	$(LOCAL_COMPILER) $(OPTIMIZATION_SERVER) $(SANITIZATION) $(COMPILE_FLAGS) $(AUTODEPS) $(INC_PARAMS_SERVER) $(LOCAL_FLAGS) -DIS_SERVER=1 -DDEBUG_MODE=$(DEBUG_MODE) -c -o $@ $<
 
 -include $(SUBOBJ_LOCAL:.bc=.d)
 -include $(SUBOBJ_WEB:.bc=.d)

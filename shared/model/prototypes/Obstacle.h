@@ -10,6 +10,7 @@ public:
 	Obstacle() = default;
 	Obstacle(const Obstacle& other);
 
+	int32_t id;
 	std::vector<Point> vertices;
 	std::vector<Point> extendedVertices[2];
 	std::vector<Edge> edges;

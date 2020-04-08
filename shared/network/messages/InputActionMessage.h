@@ -7,8 +7,8 @@ public:
 	InputActionMessage();
 
 	float angle = 0;
-	std::vector<int8_t> downedButtons;
-	std::vector<int8_t> uppedButtons;
+	std::vector<int16_t> downedButtons;
+	std::vector<int16_t> uppedButtons;
 
 	std::string getName() const override;
 	
