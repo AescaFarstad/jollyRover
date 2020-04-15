@@ -19,8 +19,13 @@ void GameConfig::load(nlohmann::json& j)
 		S::config.port = jconfig.at("webPort");
 	else
 		S::config.port = jconfig.at("desktopPort");
+	S::config.desyncMode = jconfig.at("desyncMode");
+	S::config.enableHardLog = jconfig.at("enableHardLog");
+	S::config.hardLogPath = jconfig.at("hardLogPath");
 	S::config.webPort = jconfig.at("webPort");
 	S::config.saveStateInterval = jconfig.at("saveStateInterval");
+	if (S::config.desyncMode)
+		S::config.saveStateInterval = 1;
 	S::config.networkUpdateInterval = jconfig.at("networkUpdateInterval");
 	S::config.maxMessageSize = jconfig.at("maxMessageSize");
 	std::string host = jconfig.at("host");

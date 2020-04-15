@@ -7,6 +7,8 @@ NetworkClient::NetworkClient(std::function< int32_t() > globalSocketNudgeFunctio
 	wasConnected = false;
 	wasDisconnected = false;
 	isInitialized = false;
+	hasDesynced = false;
+	connectionStamp = 0;
 	this->globalSocketNudgeFunction = globalSocketNudgeFunction;
 }
 

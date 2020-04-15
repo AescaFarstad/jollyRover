@@ -15,26 +15,23 @@ void CRCAccumulator::init(int32_t step)
 
 void CRCAccumulator::add(uint32_t stamp, std::string crc)
 {
-	if (m_numEntries == 0 || (crcs.end() -1)->first == stamp - m_step)
+	if (m_numEntries == 0 || (crcs.end() -1)->first < stamp)
 	{
 		crcs.add(std::pair<int32_t, std::string>(stamp, crc));
 		m_numEntries = std::min(m_numEntries + 1, (int32_t)crcs.size - 1);
 	}
 	else
 	{
+		auto last = (crcs.end() -1)->first;
 		int32_t numSteps = ((crcs.end() -1)->first - stamp) / m_step + 1;
 		if (numSteps > m_numEntries)
 		{
 			S::log.add("new crc for an old(?) entry: " + std::to_string(stamp) + " = " + crc, {LOG_TAGS::ERROR_});
 			return;
 		}
-		//S::log.add("OVERWRITE:" + std::to_string(stamp) + " = " + crc, {LOG_TAGS::ERROR_});
-		//S::log.add("before:\n" + trace());
 		crcs.skipLast(numSteps);
 		m_numEntries -= numSteps;
-		//S::log.add("amidst:\n" + trace());
 		add(stamp, crc);
-		//S::log.add("after :\n" + trace());
 	}
 }
 

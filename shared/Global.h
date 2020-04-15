@@ -33,6 +33,9 @@ public:
 	uint32_t saveStateInterval;
 	int32_t networkUpdateInterval;
 	bool loopBack;
+	bool desyncMode;
+	bool enableHardLog;
+	std::string hardLogPath;
 	bool runBenchmark;
 	int32_t window_X;
 	int32_t window_Y;

@@ -96,6 +96,18 @@
                 "panel": "new",
 				"revealProblems": "onProblem"
             }
+        },
+        {
+            "label": "null logs",
+            "type": "shell",
+            "command": "rm -rf ../logs/*",
+            "args": [],
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "new",
+				"revealProblems": "onProblem"
+            }
         }
     ]
 }

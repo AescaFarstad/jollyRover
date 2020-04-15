@@ -15,11 +15,11 @@ std::string InputPlayerLeftMessage::getName() const
 void InputPlayerLeftMessage::serialize(BinarySerializer& serializer) const
 {
 	InputMessage::serialize(serializer);
-	WRITE_FIELD((*this), serializer, login);
+	WRITE_FIELD((*this), serializer, playerLogin);
 }
 
 void InputPlayerLeftMessage::deserialize(BinarySerializer& serializer)
 {
 	InputMessage::deserialize(serializer);
-	READ__FIELD((*this), serializer, login);
+	READ__FIELD((*this), serializer, playerLogin);
 }

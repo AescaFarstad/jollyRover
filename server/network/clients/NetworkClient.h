@@ -22,8 +22,10 @@ public:
 	TCPsocket socket;
 	bool wasConnected;
 	bool wasDisconnected;
+	bool hasDesynced;
 	NETWORK_CLIENT_STATE state;
 	int32_t login;
+	uint32_t connectionStamp;
 	std::vector<int8_t> password;
 	ConnectionMonitor monitor;
 	std::vector<uint32_t> requestedStates;

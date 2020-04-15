@@ -26,7 +26,8 @@ extern "C" {
 			case 7: globalLog.toggleTag(LOG_TAGS::NET_MESSAGE); break;
 			case 8: globalLog.toggleTag(LOG_TAGS::SUBTASK); break;
 			case 9: globalLog.toggleTag(LOG_TAGS::FILE_SYSTEM); break;
-			case 10: globalLog.toggleTag(LOG_TAGS::Z); break;
+			case 10: globalLog.toggleTag(LOG_TAGS::HARD_LOG); break;
+			case 11: globalLog.toggleTag(LOG_TAGS::Z); break;
 			
 			default:
 				globalLog.add("Wrong log type index: " + std::to_string(index), {LOG_TAGS::ERROR_});
@@ -48,7 +49,8 @@ extern "C" {
 		result[7] = globalLog.isEnabled(LOG_TAGS::NET_MESSAGE) ? 1 : 0;
 		result[8] = globalLog.isEnabled(LOG_TAGS::SUBTASK) ? 1 : 0;
 		result[9] = globalLog.isEnabled(LOG_TAGS::FILE_SYSTEM) ? 1 : 0;
-		result[10] = globalLog.isEnabled(LOG_TAGS::Z) ? 1 : 0;
+		result[10] = globalLog.isEnabled(LOG_TAGS::HARD_LOG) ? 1 : 0;
+		result[11] = globalLog.isEnabled(LOG_TAGS::Z) ? 1 : 0;
 		
 		globalLog.add("getLogSettings " + 
 				std::to_string(result[0]) + "," +
@@ -61,7 +63,8 @@ extern "C" {
 				std::to_string(result[7]) + "," +
 				std::to_string(result[8]) + "," +
 				std::to_string(result[9]) + "," +
-				std::to_string(result[10]) + ",", 
+				std::to_string(result[10]) + "," + 
+				std::to_string(result[11]) + ",", 
 				{LOG_TAGS::UNIQUE});
 		
 		return &result[0]; //This is OK

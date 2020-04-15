@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
+#include <functional>
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL.h>
@@ -19,6 +20,7 @@ enum class LOG_TAGS : int8_t
 	TASK,
 	INPUT_,
 	FILE_SYSTEM,
+	HARD_LOG,
 
 
 	NET_BRIEF,
@@ -28,30 +30,24 @@ enum class LOG_TAGS : int8_t
 	Z
 };
 
-struct LogMessage
-{
-	const uint32_t stamp;
-	const std::string message;
-};
-
 class Logger
 {
 public:
 	Logger() = default;
-	Logger(std::initializer_list<LOG_TAGS> m_enabledTags, std::initializer_list<LOG_TAGS> m_disabledTags);
+	Logger(std::vector<LOG_TAGS> enabledTags, std::vector<LOG_TAGS> disabledTags, std::function<void(uint32_t, const std::string)> handleHardLog);
 
 	void add(const std::string& message, std::initializer_list<LOG_TAGS> tags);
 	void add(const std::string& message);
-	void enableTags(std::initializer_list<LOG_TAGS> m_enabledTags);
-	void disableTags(std::initializer_list<LOG_TAGS> disabledtags);
+	void enableTags(std::vector<LOG_TAGS> enabledTags);
+	void disableTags(std::vector<LOG_TAGS> disabledtags);
 	void toggleTag(LOG_TAGS tag);
 	bool isEnabled(LOG_TAGS tag);
+	std::vector<LOG_TAGS> enabledTags;
+	std::vector<LOG_TAGS> disabledTags;
 
 private:
-	std::vector<LogMessage> m_messages;
-	std::vector<LOG_TAGS> m_enabledTags;
-	std::vector<LOG_TAGS> m_disabledTags;
+	std::function<void(uint32_t, const std::string)> m_handleHardLog;
 
 	bool isReportable(const std::initializer_list<LOG_TAGS>& tags);
-	void report(LogMessage& msg);
+	void report(uint32_t ticks, std::string message);
 };

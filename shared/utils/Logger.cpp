@@ -3,18 +3,20 @@
 #include <iostream>
 #include <iomanip>
 
-Logger::Logger(std::initializer_list<LOG_TAGS> enabledTags, std::initializer_list<LOG_TAGS> disabledTags)
+Logger::Logger(std::vector<LOG_TAGS> enabledTags, std::vector<LOG_TAGS> disabledTags, std::function<void(uint32_t, const std::string)> handleHardLog)
 {
 	enableTags(enabledTags);
 	disableTags(disabledTags);
+	m_handleHardLog = handleHardLog;
 }
 
 void Logger::add(const std::string& message, std::initializer_list<LOG_TAGS> tags)
 {
-	m_messages.push_back(LogMessage{SDL_GetTicks(), message});
-
+	auto ticks = SDL_GetTicks();
 	if (isReportable(tags))
-		report(m_messages.back());
+		report(ticks, message);
+	if (m_handleHardLog && std::find(tags.begin(), tags.end(), LOG_TAGS::HARD_LOG) != tags.end())
+		m_handleHardLog(ticks, message);
 }
 
 void Logger::add(const std::string& message)
@@ -22,25 +24,25 @@ void Logger::add(const std::string& message)
 	add(message, { LOG_TAGS::ANONYMOS });
 }
 
-void Logger::enableTags(std::initializer_list<LOG_TAGS> enabledTags)
+void Logger::enableTags(std::vector<LOG_TAGS> enabledTags)
 {
-	this->m_enabledTags.insert(this->m_enabledTags.end(), enabledTags.begin(), enabledTags.end());
-	for (LOG_TAGS i : m_enabledTags)
+	this->enabledTags.insert(this->enabledTags.end(), enabledTags.begin(), enabledTags.end());
+	for (LOG_TAGS i : enabledTags)
 	{
-		auto toDelete = std::find(m_disabledTags.begin(), m_disabledTags.end(), i);
-		if (toDelete != m_disabledTags.end())
-			this->m_disabledTags.erase(toDelete);
+		auto toDelete = std::find(disabledTags.begin(), disabledTags.end(), i);
+		if (toDelete != disabledTags.end())
+			this->disabledTags.erase(toDelete);
 	}
 }
 
-void Logger::disableTags(std::initializer_list<LOG_TAGS> disabledTags)
+void Logger::disableTags(std::vector<LOG_TAGS> disabledTags)
 {
-	this->m_disabledTags.insert(this->m_disabledTags.end(), disabledTags.begin(), disabledTags.end());
-	for (LOG_TAGS i : m_disabledTags)
+	this->disabledTags.insert(this->disabledTags.end(), disabledTags.begin(), disabledTags.end());
+	for (LOG_TAGS i : disabledTags)
 	{
-		auto toDelete = std::find(m_enabledTags.begin(), m_enabledTags.end(), i);
-		if (toDelete != m_enabledTags.end())
-			this->m_enabledTags.erase(toDelete);
+		auto toDelete = std::find(enabledTags.begin(), enabledTags.end(), i);
+		if (toDelete != enabledTags.end())
+			this->enabledTags.erase(toDelete);
 	}
 }
 
@@ -51,17 +53,17 @@ bool Logger::isReportable(const std::initializer_list<LOG_TAGS>& tags)
 
 	for (LOG_TAGS i : tags)
 	{
-		if (!accept && std::find(m_enabledTags.begin(), m_enabledTags.end(), i) != m_enabledTags.end())
+		if (!accept && std::find(enabledTags.begin(), enabledTags.end(), i) != enabledTags.end())
 			accept = true;
-		if (!reject && std::find(m_disabledTags.begin(), m_disabledTags.end(), i) != m_disabledTags.end())
+		if (!reject && std::find(disabledTags.begin(), disabledTags.end(), i) != disabledTags.end())
 			reject = true;
 	}
 	return accept || !reject;
 }
 
-void Logger::report(LogMessage& msg)
+void Logger::report(uint32_t ticks, std::string message)
 {
-	std::cout << std::setfill(' ') << std::setw(6) << msg.stamp << " " << msg.message << std::endl;
+	std::cout << std::setfill(' ') << std::setw(6) << ticks << " " << message << std::endl;
 }
 
 void Logger::toggleTag(LOG_TAGS tag)

@@ -55,7 +55,7 @@ void NetworkPacket::loadFromRawData(const char* rawData, int32_t bytesAvailable)
 			errorMessage += std::to_string((int)tempBuffer[0]);
 			errorMessage += " ";
 			errorMessage += std::to_string((int)tempBuffer[1]);
-			S::log.add(errorMessage, { LOG_TAGS::NET, LOG_TAGS::ERROR_ });
+			S::log.add(errorMessage, { LOG_TAGS::NET, LOG_TAGS::ERROR_, LOG_TAGS::HARD_LOG });
 			THROW_FATAL_ERROR("Invalid network message");
 			return;
 		}

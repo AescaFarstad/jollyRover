@@ -271,7 +271,7 @@ namespace GameLogic
 
 		void handlePlayerLeftInput(GameState* state, InputPlayerLeftMessage* input)
 		{
-			PlayerState* player = playerByLogin(state, input->login);
+			PlayerState* player = playerByLogin(state, input->playerLogin);
 			player->wentOfflineAt = state->timeStamp;
 		}
 
@@ -420,7 +420,7 @@ namespace GameLogic
 				}
 				default:
 				{
-					S::log.add("Unknown input impulse: " + std::to_string((int8_t)input->impulse), {LOG_TAGS::ERROR_});
+					S::log.add("Unknown input impulse: " + std::to_string((int8_t)input->impulse), {LOG_TAGS::ERROR_, LOG_TAGS::HARD_LOG});
 					break;
 				}
 			}
@@ -464,7 +464,7 @@ namespace GameLogic
 				}
 				default:
 				{
-					S::log.add("Unknown input debug: " + std::to_string((int8_t)input->action), {LOG_TAGS::ERROR_});
+					S::log.add("Unknown input debug: " + std::to_string((int8_t)input->action), {LOG_TAGS::ERROR_, LOG_TAGS::HARD_LOG});
 					break;
 				}
 			}

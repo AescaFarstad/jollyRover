@@ -30,11 +30,6 @@ void GameUpdater::update(uint32_t time)
 		if (lastSavedSteps != state.time.performedSteps && state.time.performedSteps % S::config.saveStateInterval == 0)
 			saveState(state);
 		iters++;
-		
-		if (state.timeStamp % (prototypes->variables.fixedStepDuration*500) == 0)
-		{
-			S::log.add("crc               " + BinarySerializer::crc(state) + " at " + std::to_string(state.timeStamp));
-		}
 	}
 }
 
@@ -56,10 +51,6 @@ void GameUpdater::load(const GameState& state, Prototypes* prototypes, bool enab
 
 void GameUpdater::addNewInput(std::unique_ptr<InputMessage> input)
 {
-	S::log.add("\naddNewInput: " + 
-			std::to_string((int16_t)input->typeId) + 
-			"(" + std::to_string(input->serverStamp % 100000) + ")"+
-			" at " + std::to_string(state.timeStamp % 100000));
 	lastValidTimeStamp = std::min(lastValidTimeStamp, (uint32_t)input.get()->serverStamp);
 	inputs.push_back(std::move(input));
 }

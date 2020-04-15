@@ -127,7 +127,7 @@ void ServerNetwork::handleConnections()
 	TCPsocket clientSocket = SDLNet_TCP_Accept(m_serverSocketRaw);
 	if (clientSocket)
 	{
-		S::log.add("Client connected R", {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
+		S::log.add("Client connected R", {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF, LOG_TAGS::HARD_LOG});
 		addClient(std::make_unique<SimpleClient>(m_onHandshakeDone, [this]() {
 				return SDLNet_CheckSockets(m_socketSet, 0);
 			}),
@@ -138,7 +138,7 @@ void ServerNetwork::handleConnections()
 	clientSocket = SDLNet_TCP_Accept(m_serverSocketWeb);
 	if (clientSocket)
 	{
-		S::log.add("Client connected W", { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
+		S::log.add("Client connected W", { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF, LOG_TAGS::HARD_LOG });
 		addClient(std::make_unique<WebClient>(m_onHandshakeDone, [this]() {
 				return SDLNet_CheckSockets(m_socketSet, 0);
 			}),
@@ -149,7 +149,8 @@ void ServerNetwork::handleConnections()
 
 void ServerNetwork::addClient(std::unique_ptr<NetworkClient> client, TCPsocket& clientSocket)
 {
-	client->socket = clientSocket;				
+	client->socket = clientSocket;
+	client->connectionStamp = SDL_GetTicks();
 	m_clients.push_back(std::move(client));
 	SDLNet_TCP_AddSocket(m_socketSet, clientSocket);
 	m_clientCount++;
@@ -189,13 +190,15 @@ void ServerNetwork::handleData(MessageBuffer& externalBuffer)
 			if (m_clients[i]->state == NETWORK_CLIENT_STATE::PLAYING)
 			{
 				std::unique_ptr<InputPlayerLeftMessage> disconnectedMessage = std::make_unique<InputPlayerLeftMessage>();
+				disconnectedMessage->playerLogin = m_clients[i]->login;
 				disconnectedMessage->login = m_clients[i]->login;
 				addMessageToBuffer(std::move(disconnectedMessage), externalBuffer);
 			}
 			
 			std::string reason = m_clients[i]->wasDisconnected ? " (DC)" : " (missing heartbeat)";
-
-			S::log.add("Client disconnected " + std::to_string(m_clients[i]->login) + reason, { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
+			
+			S::log.add("Client disconnected " + std::to_string(m_clients[i]->login) + reason + 
+					"\nIt has been active for " + std::to_string((SDL_GetTicks() - m_clients[i]->connectionStamp)/1000) + " sec", { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF, LOG_TAGS::HARD_LOG });
 
 			m_clients[i] = nullptr;
 			m_clientCount--;
@@ -252,7 +255,7 @@ void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkC
 		}
 		default:
 		{	
-			S::log.add("Message type not handled: " + std::to_string((int16_t)msg->typeId), { LOG_TAGS::ERROR_ });
+			S::log.add("Message type not handled: " + std::to_string((int16_t)msg->typeId), { LOG_TAGS::ERROR_, LOG_TAGS::HARD_LOG });
 			break;
 		}
 	}

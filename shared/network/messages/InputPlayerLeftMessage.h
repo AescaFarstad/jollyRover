@@ -7,7 +7,7 @@ class InputPlayerLeftMessage :
 public:
 	InputPlayerLeftMessage();
 
-	int32_t login;
+	int32_t playerLogin;
 	
 	std::string getName() const override;
 	

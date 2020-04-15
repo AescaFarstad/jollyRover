@@ -6,6 +6,7 @@
 #include <vector>
 #include <chrono>
 #include <thread>
+#include <std2.h>
 #include <GameUpdater.h>
 #include <Prototypes.h>
 #include <GameStateMessage.h>
@@ -82,7 +83,7 @@ void saveBinary(const T& object, const std::string name)
 	file.close();
 	S::log.add("Write file " + fileName + "(" + b.crc() + ")");
 }
-
+/*
 #include <AI.h>
 #include <Cars.h>
 SeededRandom rnd(5254534);
@@ -102,7 +103,7 @@ void tryToFakeInput()
 		handleNetworkMessage(std::move(inmsg));
 		cooldown = 1000;
 	}
-}
+}*/
 
 void activeLoop()
 {
@@ -117,7 +118,7 @@ void activeLoop()
 		i++;
 	}
 	
-	tryToFakeInput();
+	//tryToFakeInput();
 	
 	if (delta >= MIN_TIME_PER_FRAME)
 	{
@@ -133,7 +134,7 @@ void activeLoop()
 	if (timeWithoutClients > prototypes.variables.reconnectWindow * 2)
 	{
 		idle = true;
-		S::log.add("Went idle");
+		S::log.add("Went idle", {LOG_TAGS::HARD_LOG});
 	}
 }
 
@@ -149,8 +150,8 @@ void idleLoop()
 		state.timeStamp = ticks;
 		lastTicks = ticks;
 		gameUpdater.load(state, &prototypes, false);
-		S::log.add("state reset");
 		
+		S::log.add("Went active", {LOG_TAGS::HARD_LOG});
 		activeLoop();
 	}
 }
@@ -175,29 +176,61 @@ void mainLoop()
 		activeLoop();
 }
 
-int main()
+void initSystems()
 {
-	printf(".\n");
-
 	SDL_Init(SDL_INIT_EVERYTHING);
 	SDLNet_Init();
 
 	loadPrototypes();
 	loadConfig();
 	
+	if (S::config.enableHardLog)
+	{
+		auto currentStamp = [](){
+			auto t = std::time(nullptr);
+			auto tm = *std::localtime(&t);
+
+			std::ostringstream oss;
+			oss << std::put_time(&tm, "%S-%M-%H [%d-%m]");
+			return oss.str();
+		};
+		
+		auto logName = S::config.hardLogPath + currentStamp() + ".txt";
+		S::log = Logger(S::log.enabledTags, S::log.disabledTags, [currentStamp, logName](uint32_t stamp, const std::string& message){
+						
+			std::ofstream log(logName, std::ios_base::app | std::ios_base::out);
+			auto tabbedMessage = message;
+			std2::replaceAll(tabbedMessage, "\n", "\n\t");
+			log << currentStamp() << "\t" << stamp  << "\n\t" << tabbedMessage << "\n";
+		});	
+		
+	}
+	S::log.add("Start", {LOG_TAGS::HARD_LOG});
+	
 	network.init(
 		[](int32_t login) -> bool {return GameLogic::playerByLogin(&gameUpdater.state, login) != nullptr;},
 		[](int32_t login) -> bool {return GameLogic::playerByLogin(&gameUpdater.state, login) != nullptr;},
 		&prototypes.variables
-		);	
-		
+		);
+}
+
+void quitSystems()
+{
+	S::log.add("End", {LOG_TAGS::HARD_LOG});
+	SDLNet_Quit();
+	SDL_Quit();
+}
+
+int main()
+{	
+	initSystems();
+	
 	gameUpdater.load(GameState(), &prototypes, false);
 
 	while (!isFinished)
 		mainLoop();
 
-	SDLNet_Quit();
-	SDL_Quit();
+	quitSystems();
 
 	return 0;
 }
@@ -215,36 +248,41 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 		case MESSAGE_TYPE::TYPE_INPUT_DEBUG_MSG:
 		case MESSAGE_TYPE::TYPE_LOAD_GAME_MSG:
 		{
+			
+			S::log.add("Client input " + message->getName() + " from " + std::to_string(message->login), {LOG_TAGS::HARD_LOG});
 			InputMessage* t = dynamic_cast<InputMessage*>(message.release());
 			std::unique_ptr<InputMessage> iMsg = std::unique_ptr<InputMessage>(t);
 			iMsg->serverId = inputIdCounter++;
 			iMsg->serverStamp = gameUpdater.state.timeStamp;
 			network.sendToAllPlaying(*iMsg);
 			gameUpdater.addNewInput(std::move(iMsg));
+			
 			break;
 		}
 		case MESSAGE_TYPE::TYPE_CHECKSUM_MSG:
 		{
 			ChecksumMessage* t = dynamic_cast<ChecksumMessage*>(message.release());
 			std::unique_ptr<ChecksumMessage> crcMsg = std::unique_ptr<ChecksumMessage>(t);
-			//S::log.add("Analyzing checksums. count=" + std::to_string(crcMsg->checksums.size()), {LOG_TAGS::ERROR_});
+			auto client = network.clientByLogin(crcMsg->login);
+			if (client->hasDesynced)
+				break;
 			auto mismatch = gameUpdater.crcs.getMismatch(crcMsg->checksums);
 			if (mismatch.has_value())
 			{
-				S::log.add("Desync detected for client " + std::to_string(crcMsg->login) + " at stamp " + std::to_string(mismatch.value()), {LOG_TAGS::ERROR_});
+				client->hasDesynced = true;
+				S::log.add("Desync detected for client " + std::to_string(crcMsg->login) + " at stamp " + std::to_string(mismatch.value()), {LOG_TAGS::ERROR_, LOG_TAGS::HARD_LOG});
 				
 				StateRequestMessage srMsg;
 				srMsg.states.push_back(mismatch.value() - prototypes.variables.fixedStepDuration);
 				srMsg.states.push_back(mismatch.value());
 				
-				auto client = network.clientByLogin(crcMsg->login);
 				if (client->requestedStates.size() > 0)
 				{
-					S::log.add("Client " + std::to_string(crcMsg->login) + " is already in desync, awaiting requested states", {LOG_TAGS::ERROR_});
+					S::log.add("Client " + std::to_string(crcMsg->login) + " is already in desync, awaiting requested states", {LOG_TAGS::ERROR_, LOG_TAGS::HARD_LOG});
 					break;
 				}
 				
-				client->requestedStates = srMsg.states;
+				client->requestedStates = srMsg.states;								
 				
 				network.send(srMsg, crcMsg->login);
 			}
@@ -258,7 +296,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 			auto client = network.clientByLogin(msg->login);
 			if (client->requestedStates.size() != 2)
 			{
-				S::log.add("Client " + std::to_string(msg->login) + " has sent states without a proper request", {LOG_TAGS::ERROR_});
+				S::log.add("Client " + std::to_string(msg->login) + " has sent states without a proper request", {LOG_TAGS::ERROR_, LOG_TAGS::HARD_LOG});
 				break;
 			}
 			
@@ -275,7 +313,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					auto serverState = gameUpdater.getSavedStateByStamp(state.timeStamp);
 					if (!serverState.has_value())
 					{
-						S::log.add("Failed to fetch server state to check desync at " + std::to_string(state.timeStamp), {LOG_TAGS::ERROR_});
+						S::log.add("Failed to fetch server state to check desync at " + std::to_string(state.timeStamp), {LOG_TAGS::ERROR_, LOG_TAGS::HARD_LOG});
 					}
 					std::string fileName = "desync_c-" + std::to_string(msg->login) + "_t-" + std::to_string(state.timeStamp);
 					
@@ -289,12 +327,10 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 				}
 				else
 				{
-					S::log.add("Client " + std::to_string(msg->login) + " has sent state at " + std::to_string(state.timeStamp) + " though it wasn't among the requested", {LOG_TAGS::ERROR_});
+					S::log.add("Client " + std::to_string(msg->login) + " has sent state at " + std::to_string(state.timeStamp) + " though it wasn't among the requested", {LOG_TAGS::ERROR_, LOG_TAGS::HARD_LOG});
 				}
 			}
 			client->requestedStates.clear();
-			/*if (filesWritten > 12)
-				abort();*/
 			break;
 		}
 		case MESSAGE_TYPE::TYPE_REQUEST_MSG:
