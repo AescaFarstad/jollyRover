@@ -212,7 +212,7 @@ void ServerNetwork::handleData(MessageBuffer& externalBuffer)
 
 void ServerNetwork::handlePacket(std::unique_ptr<NetworkPacket> packet, NetworkClient& client, MessageBuffer& externalBuffer)
 {
-	std::unique_ptr<NetworkMessage> msg = factory.parse(*packet);
+	std::unique_ptr<NetworkMessage> msg = NetworkMessageFactory::parse(*packet);
 	S::log.add("> RCVD " + msg->getName() + "[" + std::to_string(packet->payloadSize) + "] from " + std::to_string(client.login), {LOG_TAGS::NET_BRIEF});
 	msg->login = client.login;
 	switch (msg->typeId)

@@ -16,8 +16,6 @@ class ServerNetwork
 public:
 	ServerNetwork();
 
-	NetworkMessageFactory factory;
-
 	void init(std::function<bool(int32_t)> isLoginAllowedToReconnect, std::function<bool(int32_t)> loginExists, VariableProto* vars);
 	void update(MessageBuffer& externalBuffer);
 	bool hasClients();

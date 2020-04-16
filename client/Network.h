@@ -35,7 +35,6 @@ public:
 	Network(VariableProto* vars);
 	virtual ~Network();
 
-	NetworkMessageFactory factory;
 	TimeSync timeSync;
 	ResponseBinder binder;
 	GenericRequestBinder genericRequestBinder;

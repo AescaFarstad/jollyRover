@@ -15,11 +15,11 @@ public:
 
 private:
 
-	static const int16_t CYPHER_KEY_SIZE = 4;
-	static const int16_t bufferSize1 = sizeof(uint8_t) * 2;
-	char tempBuffer1[bufferSize1];
-	int16_t bufferSize2;
-	char* tempBuffer2;
+	static constexpr int16_t CYPHER_KEY_SIZE = 4;
+	static constexpr int16_t bufferSize_p1 = sizeof(uint8_t) * 2;
+	char headerBuffer_p1[bufferSize_p1];
+	int16_t bufferSize_p2;
+	char* headerBuffer_p2;
 };
 
 

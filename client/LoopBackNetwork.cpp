@@ -44,7 +44,7 @@ void LoopBackNetwork::update()
 
 void LoopBackNetwork::send(const NetworkPacket& packet)
 {
-	std::unique_ptr<NetworkMessage> msg = factory.parse(packet);
+	std::unique_ptr<NetworkMessage> msg = NetworkMessageFactory::parse(packet);
 	send(*msg);
 }
 
@@ -52,7 +52,7 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 {
 	NetworkPacket tmpPacket;
 	tmpPacket.setPayloadFromSerializable(message);
-	auto copy = factory.parse(tmpPacket);
+	auto copy = NetworkMessageFactory::parse(tmpPacket);
 	
 	copy->login = LOGIN;
 	switch (copy->typeId)

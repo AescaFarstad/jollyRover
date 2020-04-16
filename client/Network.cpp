@@ -188,7 +188,7 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 		Serializer::toHex(packet->payload, packet->payloadSize),
 		{ LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
 
-	std::unique_ptr<NetworkMessage> resultMessage = factory.parse(*packet);
+	std::unique_ptr<NetworkMessage> resultMessage = NetworkMessageFactory::parse(*packet);
 
 	//auto t = m_requestTimeByInitiatorId[resultMessage->inResponseTo];
 	int32_t ticks = SDL_GetTicks();

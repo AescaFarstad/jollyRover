@@ -7,7 +7,7 @@
 
 WebNetworkPacket::WebNetworkPacket()
 {
-	bufferSize2 = 0;
+	bufferSize_p2 = 0;
 	rawSize = 0;
 }
 
@@ -16,18 +16,18 @@ WebNetworkPacket::~WebNetworkPacket()
 {
 	if (rawSize > 0 && rawData == nullptr)
 		delete[] payload;
-	if (bufferSize2 != 0)
-		delete[] tempBuffer2;
+	if (bufferSize_p2 != 0)
+		delete[] headerBuffer_p2;
 }
 
 
 void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAvailable)
 {
 	//Load size of the packet size
-	if (bytesLoaded < bufferSize1)
+	if (bytesLoaded < bufferSize_p1)
 	{
-		auto newBytes = std::min(bytesAvailable, bufferSize1 - bytesLoaded);
-		std::memcpy(tempBuffer1 + bytesLoaded, incomingData, newBytes);
+		auto newBytes = std::min(bytesAvailable, bufferSize_p1 - bytesLoaded);
+		std::memcpy(headerBuffer_p1 + bytesLoaded, incomingData, newBytes);
 		bytesLoaded += newBytes;
 
 		incomingData += newBytes;
@@ -35,13 +35,13 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAv
 	}
 
 	//Not enough info about size of the packet size -> return
-	if (bytesLoaded < bufferSize1)
+	if (bytesLoaded < bufferSize_p1)
 		return;
 
 	//Packet size size (sic!) is loaded for the first time
-	if (bytesLoaded == bufferSize1 && bufferSize2 == 0)
+	if (bytesLoaded == bufferSize_p1 && bufferSize_p2 == 0)
 	{
-		unsigned char opcode = (unsigned char)tempBuffer1[0];
+		unsigned char opcode = (unsigned char)headerBuffer_p1[0];
 		if (opcode != 130)
 		{
 			if (opcode == 136)
@@ -56,26 +56,26 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAv
 			}
 		}
 
-		if ((unsigned char)tempBuffer1[1] - 128 < 126)
+		if ((unsigned char)headerBuffer_p1[1] - 128 < 126)
 		{
-			bufferSize2 = CYPHER_KEY_SIZE;
+			bufferSize_p2 = CYPHER_KEY_SIZE;
 		}
-		else if ((unsigned char)tempBuffer1[1] - 128 == 126)
+		else if ((unsigned char)headerBuffer_p1[1] - 128 == 126)
 		{
-			bufferSize2 = 2 + CYPHER_KEY_SIZE; //actuall size as uint16_t + cypher key
+			bufferSize_p2 = 2 + CYPHER_KEY_SIZE; //actuall size as uint16_t + cypher key
 		}
 		else
 		{
 			THROW_FATAL_ERROR("int64-sized packets are not implemented yet");
 		}
-		tempBuffer2 = new char[bufferSize2];
+		headerBuffer_p2 = new char[bufferSize_p2];
 	}
 
 	//Loading packet size + keys
-	if (bytesLoaded < bufferSize1 + bufferSize2)
+	if (bytesLoaded < bufferSize_p1 + bufferSize_p2)
 	{
-		auto newBytes = std::min(bytesAvailable, bufferSize1 + bufferSize2 - bytesLoaded);
-		std::memcpy(tempBuffer2 + bytesLoaded - bufferSize1, incomingData, newBytes);
+		auto newBytes = std::min(bytesAvailable, bufferSize_p1 + bufferSize_p2 - bytesLoaded);
+		std::memcpy(headerBuffer_p2 + bytesLoaded - bufferSize_p1, incomingData, newBytes);
 		bytesLoaded += newBytes;
 
 		incomingData += newBytes;
@@ -83,13 +83,13 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAv
 	}
 
 	//When packet size + keys are fully loaded and can be parsed
-	if (bytesLoaded == bufferSize1 + bufferSize2 && rawSize == 0)
+	if (bytesLoaded == bufferSize_p1 + bufferSize_p2 && rawSize == 0)
 	{
 		int32_t rawPayloadLength = 0;
-		if (bufferSize2 == 4)
+		if (bufferSize_p2 == 4)
 		{
 			int8_t tmp;
-			char* readable = static_cast<char*>(tempBuffer1) + 1;
+			char* readable = static_cast<char*>(headerBuffer_p1) + 1;
 			
 			Serializer::read(tmp, readable);
 			tmp -= 128;
@@ -98,7 +98,7 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAv
 		else
 		{
 			uint16_t tmp;
-			char* readable = static_cast<char*>(tempBuffer2);
+			char* readable = static_cast<char*>(headerBuffer_p2);
 			
 			Serializer::read(tmp, readable);
 			if (!SystemInfo::isBigEndian)
@@ -107,14 +107,14 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAv
 		}
 		this->payload = new char[rawPayloadLength];
 		this->payloadSize = rawPayloadLength;
-		rawSize = bufferSize1 + bufferSize2 + this->payloadSize;
+		rawSize = bufferSize_p1 + bufferSize_p2 + this->payloadSize;
 	}
 
 	//Loading payload
-	if (bytesLoaded >= bufferSize1 + bufferSize2)
+	if (bytesLoaded >= bufferSize_p1 + bufferSize_p2)
 	{
 		uint16_t bytesToRead = std::min(bytesAvailable, rawSize - bytesLoaded);
-		std::memcpy(this->payload + bytesLoaded - bufferSize1 - bufferSize2, incomingData, bytesToRead);
+		std::memcpy(this->payload + bytesLoaded - bufferSize_p1 - bufferSize_p2, incomingData, bytesToRead);
 		bytesLoaded += bytesToRead;
 	}
 
@@ -122,13 +122,13 @@ void WebNetworkPacket::loadFromRawData(const char* incomingData, int32_t bytesAv
 	//When all data is loaded -> decypher payload and clear temporaries
 	if (rawSize > 0 && rawSize == bytesLoaded)
 	{
-		char* key = tempBuffer2 + bufferSize2 - CYPHER_KEY_SIZE;
+		char* key = headerBuffer_p2 + bufferSize_p2 - CYPHER_KEY_SIZE;
 		for (int32_t i = 0; i < this->payloadSize; i++)
 		{
 			this->payload[i] = (this->payload[i] ^ key[i % CYPHER_KEY_SIZE]);
 		}
-		bufferSize2 = 0;
-		delete[] tempBuffer2;
+		bufferSize_p2 = 0;
+		delete[] headerBuffer_p2;
 	}
 }
 

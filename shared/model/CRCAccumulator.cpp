@@ -22,7 +22,7 @@ void CRCAccumulator::add(uint32_t stamp, std::string crc)
 	}
 	else
 	{
-		auto last = (crcs.end() -1)->first;
+		//auto last = (crcs.end() -1)->first;
 		int32_t numSteps = ((crcs.end() -1)->first - stamp) / m_step + 1;
 		if (numSteps > m_numEntries)
 		{
@@ -82,17 +82,15 @@ std::optional<uint32_t> CRCAccumulator::getMismatch(const std::vector<std::pair<
 	auto iter = crcs.end() - numSteps;
 	for(auto& datum : data)
 	{
-		if (iter->first != datum.first)
-		{
-			S::log.add("crcs aren't aligned", {LOG_TAGS::ERROR_});
-			return {};
-		}
+		while(iter != crcs.end() &&  iter->first != datum.first)
+			iter++;
+		if (iter == crcs.end())
+			break;
 		if (iter->second != datum.second)
 		{
 			S::log.add("Desync details. At " + std::to_string(iter->first) + ": " + iter->second + " while clients says " + datum.second, {LOG_TAGS::ERROR_});
 			return {iter->first};
 		}
-		iter++;
 	}
 	return {};
 }
