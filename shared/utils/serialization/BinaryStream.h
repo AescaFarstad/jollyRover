@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <BinaryReader.h>
 
 
 /*
@@ -43,7 +44,7 @@ namespace BinaryStreamInternal
 	};	
 }
 
-class BinaryStream
+class BinaryStream : public BinaryReader
 {
 public:
 	BinaryStream();
@@ -53,13 +54,17 @@ public:
 
 	///Resets reading cursor.
 	char* allocate(size_t size);
-	const char* read(size_t size);
-	void resetCursors();
+	const char* read(size_t size) override;
+	const char* peek(size_t size) override;
+	void resetCursors() override;
 	void reset(size_t startingSize);
-	std::vector<char> readAll();
-	size_t getLength();	
+	std::vector<char> readAll() const override;
+	size_t getLength() const override;
+	size_t getDataLeft() const override;
 	
-	std::string crc();
+	size_t loc();
+	
+	std::string crc() override;
 	
 	
 	static constexpr float growExponent = 2;

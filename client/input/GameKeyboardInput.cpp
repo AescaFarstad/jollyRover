@@ -3,6 +3,7 @@
 #include <LoadGameMessage.h>
 #include <InputActionMessage.h>
 #include <InputImpulseMessage.h>
+#include <DemoRequestMessage.h>
 #include <PersistentStorage.h>
 #include <GameKeyboardActions.h>
 #include <DrawSettings.h>
@@ -68,6 +69,8 @@ GameKeyboardInput::GameKeyboardInput()
 	actionByButton[SDL_SCANCODE_6] = GAME_KEYBOARD_ACTIONS::TOGGLE_FORMATION_DRAW;
 	actionByButton[SDL_SCANCODE_7] = GAME_KEYBOARD_ACTIONS::TOGGLE_AGRO_DRAW;
 	actionByButton[SDL_SCANCODE_8] = GAME_KEYBOARD_ACTIONS::TRACE_BACKGROUND_DRAW;
+	
+	actionByButton[SDL_SCANCODE_9] = GAME_KEYBOARD_ACTIONS::REQUEST_DEMO;
 	
 	for(uint16_t i = 0; i < 128; i++)
 		buttonByAction[(int)actionByButton[i]] = i;
@@ -383,6 +386,13 @@ void GameKeyboardInput::onKeyDown(SDL_Scancode scancode, const KeyboardInputCont
 			S::drawSettings.explosions = value;
 			S::drawSettings.obstacles_D = !value;
 			S::drawSettings.debug_D = !value;
+			break;
+		}
+		case GAME_KEYBOARD_ACTIONS::REQUEST_DEMO :
+		{
+			DemoRequestMessage msg;		
+			msg.demoName = "16-29-09 [28-05]";			
+			S::network->send(msg);			
 			break;
 		}
 		default:

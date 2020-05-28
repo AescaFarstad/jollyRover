@@ -22,7 +22,7 @@
 	void writeBinary(std::vector<char> data, std::string name = "dump")
 	{
 		auto file = std::fstream("../dumps/" + name + ".binary", std::ios::out | std::ios::binary);
-		file.write((char*)&data[0], data.size());
+		file.write(data.data(), data.size());
 		file.close();
 	}
 	

@@ -69,6 +69,14 @@ const char* BinaryStream::read(size_t size)
 	return &tmpCursor.block->array[tmpCursor.position];	
 }
 
+const char* BinaryStream::peek(size_t size)
+{
+	if (m_readCursor.block == nullptr || m_readCursor.block->occupied < m_readCursor.position + size)
+		THROW_FATAL_ERROR("wrong stream read.");
+		
+	return &m_readCursor.block->array[m_readCursor.position];	
+}
+
 void BinaryStream::resetCursors()
 {
 	m_readCursor.block = &m_blocks[0];
@@ -77,7 +85,7 @@ void BinaryStream::resetCursors()
 	m_writeCursor.position = 0;
 }
 
-std::vector<char> BinaryStream::readAll()
+std::vector<char> BinaryStream::readAll() const
 {
 	std::vector<char> result;
 	auto length = getLength();
@@ -86,26 +94,60 @@ std::vector<char> BinaryStream::readAll()
 	size_t cursor = 0;
 	for(auto& block : m_blocks)
 	{
-		std::memcpy(&result[cursor], block.array, block.occupied);
+		std::memcpy(result.data() + cursor, block.array, block.occupied);
 		cursor += block.occupied;
 	}
 	return result;
 }
 
-size_t BinaryStream::getLength()
+size_t BinaryStream::getLength() const
 {
 	size_t result = 0;
 	for(auto& block : m_blocks)
 		result += block.occupied;
 	return result;
 }
+
+size_t BinaryStream::getDataLeft() const
+{
+	size_t result = 0;
+	bool startCounting = false;
+	for(auto& block : m_blocks)
+	{
+		if (&block == m_readCursor.block)
+		{
+			result += block.occupied - m_readCursor.position;
+			startCounting = true;
+		}
+		else if (startCounting)
+		{
+			result += block.occupied;
+		}			
+	}
+	return result;
+}
+
+
+size_t BinaryStream::loc()
+{
+	size_t result = 0;
+	for(auto& block : m_blocks)
+	{
+		if (&block != m_writeCursor.block)
+			result += block.occupied;
+		else{
+			result+= m_writeCursor.position;
+			break;}
+	}
 	
+	return result;
+}
 
 std::string BinaryStream::crc()
 {
 	CRC32  digestCrc32;
 	auto data = readAll();
-	digestCrc32.add(&data[0], data.size());
+	digestCrc32.add(data.data(), data.size());
 	return digestCrc32.getHash();
 }
 
@@ -124,12 +166,10 @@ BinaryStreamInternal::Block::Block(size_t size)
 	occupied = 0;
 	array = new char[size];
 	this->size = size;
-	//printf("Block()\n");
 }
 
 BinaryStreamInternal::Block::~Block()
 {
-	//printf("~Block\n");
 	if (array != nullptr)
 		delete[] array;
 }

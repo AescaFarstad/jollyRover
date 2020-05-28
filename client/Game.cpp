@@ -17,10 +17,12 @@
 #include <GameState.h>
 #include <PersistentStorage.h>
 #include <InputImpulseMessage.h>
+#include <DemoDataMessage.h>
 #include <GameStateMessage.h>
 #include <GreetingMessage.h>
 #include <Network.h>
 #include <JSONSerializer.h>
+#include <std2.h>
 
 Game::Game()
 {
@@ -43,6 +45,7 @@ namespace GAME_MODE
 	size_t game;
 	size_t load;
 	size_t reconnect;
+	size_t demo;
 }
 
 void Game::init(GPU_Target* screen)
@@ -91,6 +94,10 @@ void Game::init(GPU_Target* screen)
 	GAME_MODE::reconnect = m_modes.size();
 	m_modes.push_back(&m_reconnectMode);
 	m_reconnectMode.init(&m_renderer, &m_prototypes);
+	
+	GAME_MODE::demo = m_modes.size();
+	m_demoMode.init(&m_renderer, &m_prototypes);
+	m_modes.push_back(&m_demoMode);
 	
 	m_activeMode = GAME_MODE::load;
 }
@@ -350,8 +357,7 @@ void Game::loadConfig()
 
 void Game::handleGameInput(std::unique_ptr<NetworkMessage> message)
 {
-	InputMessage* t = dynamic_cast<InputMessage*>(message.release());
-	m_gameMode.addNewInput(std::unique_ptr<InputMessage>(t));
+	m_gameMode.addNewInput(std2::unique_ptr_cast<InputMessage>(std::move(message)));
 }
 
 void Game::addNetworkBindings()
@@ -458,6 +464,20 @@ void Game::addNetworkBindings()
 	S::network->binder.bind(std::move(binding));
 
 	//-------------------------------------------------------------------------------
+	
+	
+	auto handleIncomingDemo = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message) {
+		auto demoDataMsg = std2::unique_ptr_cast<DemoDataMessage>(std::move(message));
+		m_demoMode.loadGame(demoDataMsg->data);
+		m_activeMode = GAME_MODE::demo;
+	});
+
+	binding = std::make_unique<AnonymousBinding>("TYPE_DEMO_DATA");
+	binding->
+	bindByMsgType(MESSAGE_TYPE::TYPE_DEMO_DATA)->
+	setCallOnce(false)->
+	setHandler(std::move(handleIncomingDemo));
+	S::network->binder.bind(std::move(binding));
 
 }
 

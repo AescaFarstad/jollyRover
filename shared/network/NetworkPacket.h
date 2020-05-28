@@ -28,7 +28,7 @@ public:
 		BinarySerializer bs;
 		bs.write(serializable);
 		auto data = bs.dumpAll();
-		setPayloadFromRawData(&data[0], data.size());
+		setPayloadFromRawData(data.data(), data.size());
 	}
 	
 	

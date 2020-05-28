@@ -8,11 +8,15 @@
 #include <thread>
 #include <std2.h>
 #include <GameUpdater.h>
+#include <DemoWriter.h>
 #include <Prototypes.h>
 #include <GameStateMessage.h>
 #include <InputPlayerJoinedMessage.h>
 #include <InputPlayerLeftMessage.h>
 #include <GenericRequestMessage.h>
+#include <DemoDataMessage.h>
+#include <DemoListMessage.h>
+#include <DemoRequestMessage.h>
 #include <NetworkPacket.h>
 #include <ServerNetwork.h>
 #include <ChecksumMessage.h>
@@ -35,6 +39,7 @@ namespace MainInternal
 	int32_t timeWithoutClients = 0;
 	bool idle = false;
 	int32_t filesWritten = 0;
+	DemoWriter demoWriter;
 }
 
 using namespace MainInternal;
@@ -79,31 +84,20 @@ void saveBinary(const T& object, const std::string name)
 	b.write(object);
 	auto data = b.dumpAll();
 	auto file = std::fstream(fileName, std::ios::out | std::ios::binary);
-	file.write((char*)&data[0], data.size());
+	file.write(data.data(), data.size());
 	file.close();
 	S::log.add("Write file " + fileName + "(" + b.crc() + ")");
 }
-/*
-#include <AI.h>
-#include <Cars.h>
-SeededRandom rnd(5254534);
-int32_t cooldown = 4000;
-void tryToFakeInput()
+
+std::string getCurrentTimeString()
 {
-	cooldown--;
-	if (cooldown < 0 && gameUpdater.state.players.size() > 0 && rnd.get() > 0.9996)
-	{
-		auto& player = rnd.getFromVector(gameUpdater.state.players);
-		if (!Cars::canLaunchCar(player))
-			return;
-		auto inmsg = std::make_unique<InputRouteMessage>();
-		inmsg->login = player.login;
-		auto rnd = gameUpdater.state.random;
-		inmsg->route = AI::getRandomWalk(rnd, &prototypes);
-		handleNetworkMessage(std::move(inmsg));
-		cooldown = 1000;
-	}
-}*/
+	auto t = std::time(nullptr);
+	auto tm = *std::localtime(&t);
+
+	std::ostringstream oss;
+	oss << std::put_time(&tm, "%S-%M-%H [%d-%m]");
+	return oss.str();
+};
 
 void activeLoop()
 {
@@ -118,13 +112,11 @@ void activeLoop()
 		i++;
 	}
 	
-	//tryToFakeInput();
+	if (delta < MIN_TIME_PER_FRAME)
+		return;
 	
-	if (delta >= MIN_TIME_PER_FRAME)
-	{
-		lastTicks = ticks;
-		gameUpdater.update(ticks);
-	}
+	lastTicks = ticks;
+	gameUpdater.update(ticks);
 	
 	if (!network.hasClients())
 		timeWithoutClients += delta;
@@ -134,8 +126,9 @@ void activeLoop()
 	if (timeWithoutClients > prototypes.variables.reconnectWindow * 2)
 	{
 		idle = true;
+		demoWriter.end();
 		S::log.add("Went idle", {LOG_TAGS::HARD_LOG});
-	}
+	}	
 }
 
 void idleLoop()
@@ -151,6 +144,8 @@ void idleLoop()
 		lastTicks = ticks;
 		gameUpdater.load(state, &prototypes, false);
 		
+		demoWriter.start(getCurrentTimeString());
+		demoWriter.write(state);
 		S::log.add("Went active", {LOG_TAGS::HARD_LOG});
 		activeLoop();
 	}
@@ -186,32 +181,25 @@ void initSystems()
 	
 	if (S::config.enableHardLog)
 	{
-		auto currentStamp = [](){
-			auto t = std::time(nullptr);
-			auto tm = *std::localtime(&t);
-
-			std::ostringstream oss;
-			oss << std::put_time(&tm, "%S-%M-%H [%d-%m]");
-			return oss.str();
-		};
-		
-		auto logName = S::config.hardLogPath + currentStamp() + ".txt";
-		S::log = Logger(S::log.enabledTags, S::log.disabledTags, [currentStamp, logName](uint32_t stamp, const std::string& message){
+		auto logName = S::config.hardLogPath + getCurrentTimeString() + ".txt";
+		S::log = Logger(S::log.enabledTags, S::log.disabledTags, [logName](uint32_t stamp, const std::string& message){
 						
 			std::ofstream log(logName, std::ios_base::app | std::ios_base::out);
 			auto tabbedMessage = message;
 			std2::replaceAll(tabbedMessage, "\n", "\n\t");
-			log << currentStamp() << "\t" << stamp  << "\n\t" << tabbedMessage << "\n";
+			log << getCurrentTimeString() << "\t" << stamp  << "\n\t" << tabbedMessage << "\n";
 		});	
 		
 	}
-	S::log.add("Start", {LOG_TAGS::HARD_LOG});
+	S::log.add("Server started", {LOG_TAGS::HARD_LOG});
 	
 	network.init(
 		[](int32_t login) -> bool {return GameLogic::playerByLogin(&gameUpdater.state, login) != nullptr;},
 		[](int32_t login) -> bool {return GameLogic::playerByLogin(&gameUpdater.state, login) != nullptr;},
 		&prototypes.variables
 		);
+		
+	demoWriter.start("default");
 }
 
 void quitSystems()
@@ -250,19 +238,18 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 		{
 			
 			S::log.add("Client input " + message->getName() + " from " + std::to_string(message->login), {LOG_TAGS::HARD_LOG});
-			InputMessage* t = dynamic_cast<InputMessage*>(message.release());
-			std::unique_ptr<InputMessage> iMsg = std::unique_ptr<InputMessage>(t);
+			
+			auto iMsg = std2::unique_ptr_cast<InputMessage>(std::move(message));
 			iMsg->serverId = inputIdCounter++;
 			iMsg->serverStamp = gameUpdater.state.timeStamp;
 			network.sendToAllPlaying(*iMsg);
+			demoWriter.write(*iMsg);
 			gameUpdater.addNewInput(std::move(iMsg));
-			
 			break;
 		}
 		case MESSAGE_TYPE::TYPE_CHECKSUM_MSG:
 		{
-			ChecksumMessage* t = dynamic_cast<ChecksumMessage*>(message.release());
-			std::unique_ptr<ChecksumMessage> crcMsg = std::unique_ptr<ChecksumMessage>(t);
+			auto crcMsg = std2::unique_ptr_cast<ChecksumMessage>(std::move(message));
 			auto client = network.clientByLogin(crcMsg->login);
 			if (client->hasDesynced)
 				break;
@@ -290,8 +277,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 		}
 		case MESSAGE_TYPE::TYPE_GAME_STATE_MSG:
 		{
-			GameStateMessage* t = dynamic_cast<GameStateMessage*>(message.release());
-			std::unique_ptr<GameStateMessage> msg = std::unique_ptr<GameStateMessage>(t);
+			auto msg = std2::unique_ptr_cast<GameStateMessage>(std::move(message));
 			
 			auto client = network.clientByLogin(msg->login);
 			if (client->requestedStates.size() != 2)
@@ -333,10 +319,22 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 			client->requestedStates.clear();
 			break;
 		}
+		case MESSAGE_TYPE::TYPE_DEMO_REQUEST:
+		{
+			auto demoRequest = std2::unique_ptr_cast<DemoRequestMessage>(std::move(message));
+			
+			DemoDataMessage ddm;
+			ddm.data = demoWriter.getDemo(demoRequest->demoName);
+			ddm.inResponseTo = demoRequest->initiator_id;
+			BinarySerializer bs;
+			ddm.serialize(bs);
+			network.send(ddm, demoRequest->login);
+			break;
+		}
 		case MESSAGE_TYPE::TYPE_REQUEST_MSG:
 		{
-			GenericRequestMessage* t = dynamic_cast<GenericRequestMessage*>(message.get());
-			std::unique_ptr<GenericRequestMessage> genericRequestMsg = std::make_unique<GenericRequestMessage>(*t);
+			auto genericRequestMsg = std2::unique_ptr_cast<GenericRequestMessage>(std::move(message));
+			
 			switch (genericRequestMsg->request)
 			{
 				case REQUEST_TYPE::REQUEST_JOIN_GAME:
@@ -348,7 +346,6 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					
 					BinarySerializer::copyThroughSerialization(gameUpdater.state, gsMsg.states.emplace_back());
 										
-					//S::log.add("Send state, stamp=" + std::to_string(gameUpdater.state.timeStamp) + " players=" + std::to_string(gameUpdater.state.players.size()) + " crc=" + BinarySerializer::crc(gsMsg.states[0]), {LOG_TAGS::SUBTASK});
 					network.send(gsMsg, genericRequestMsg->login);
 
 					std::unique_ptr<InputPlayerJoinedMessage> pjMsg = std::make_unique<InputPlayerJoinedMessage>();
@@ -357,6 +354,7 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					pjMsg->login = genericRequestMsg->login;
 					//std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 					network.sendToAllPlaying(*pjMsg);
+					demoWriter.write(*pjMsg);
 					gameUpdater.addNewInput(std::move(pjMsg));
 					break;
 				}
@@ -374,6 +372,14 @@ void handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 					grMsg.request = REQUEST_TYPE::REQUEST_PONG;
 					grMsg.inResponseTo = genericRequestMsg->initiator_id;
 					network.send(grMsg, genericRequestMsg->login);
+					break;
+				}
+				case REQUEST_TYPE::REQUEST_DEMO_LIST:
+				{
+					DemoListMessage dlm;
+					dlm.list = demoWriter.getList();
+					dlm.inResponseTo = genericRequestMsg->initiator_id;
+					network.send(dlm, genericRequestMsg->login);
 					break;
 				}
 				default:

@@ -22,6 +22,8 @@ void GameConfig::load(nlohmann::json& j)
 	S::config.desyncMode = jconfig.at("desyncMode");
 	S::config.enableHardLog = jconfig.at("enableHardLog");
 	S::config.hardLogPath = jconfig.at("hardLogPath");
+	S::config.demoPath = jconfig.at("demoPath");
+	S::config.sendFailedInput = jconfig.at("sendFailedInput");
 	S::config.webPort = jconfig.at("webPort");
 	S::config.saveStateInterval = jconfig.at("saveStateInterval");
 	if (S::config.desyncMode)

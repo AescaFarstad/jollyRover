@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <algorithm>
+#include <memory>
 
 namespace std2
 {
@@ -105,4 +106,11 @@ namespace std2
 	}
 	
 	void replaceAll(std::string& str, const std::string& from, const std::string& to);
+	//, typename = typename std::enable_if<std::is_base_of<FROM, TO>::value, TO>::type
+	template <typename TO, typename FROM>
+	std::unique_ptr<TO> unique_ptr_cast(std::unique_ptr<FROM> target)
+	{
+		TO* temp = dynamic_cast<TO*>(target.release());
+		return std::unique_ptr<TO>(temp);
+	}
 }

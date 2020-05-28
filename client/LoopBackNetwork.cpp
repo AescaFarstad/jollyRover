@@ -44,7 +44,7 @@ void LoopBackNetwork::update()
 
 void LoopBackNetwork::send(const NetworkPacket& packet)
 {
-	std::unique_ptr<NetworkMessage> msg = NetworkMessageFactory::parse(packet);
+	std::unique_ptr<NetworkMessage> msg = NetworkMessageFactory::parse(packet.payload, packet.payloadSize);
 	send(*msg);
 }
 
@@ -52,7 +52,7 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 {
 	NetworkPacket tmpPacket;
 	tmpPacket.setPayloadFromSerializable(message);
-	auto copy = NetworkMessageFactory::parse(tmpPacket);
+	auto copy = NetworkMessageFactory::parse(tmpPacket.payload, tmpPacket.payloadSize);
 	
 	copy->login = LOGIN;
 	switch (copy->typeId)
@@ -133,6 +133,9 @@ void LoopBackNetwork::send(const NetworkMessage& message)
 			break;
 		}
 		case MESSAGE_TYPE::TYPE_CHECKSUM_MSG:
+		case MESSAGE_TYPE::TYPE_DEMO_DATA:
+		case MESSAGE_TYPE::TYPE_DEMO_LIST:
+		case MESSAGE_TYPE::TYPE_DEMO_REQUEST:
 		{
 			break;
 		}

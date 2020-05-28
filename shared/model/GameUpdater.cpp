@@ -22,7 +22,7 @@ void GameUpdater::update(uint32_t time)
 	while (state.timeStamp + prototypes->variables.fixedStepDuration < time && iters < prototypes->variables.maxLogicUpdatesPerFrame)
 	{
 		std::vector<InputMessage*> inputs = getThisFrameInputs(state.timeStamp, state.timeStamp + prototypes->variables.fixedStepDuration);
-				
+		
 		GameLogic::update(&state, prototypes->variables.fixedStepDuration, inputs, prototypes);
 		
 		

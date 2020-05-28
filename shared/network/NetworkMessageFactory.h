@@ -1,7 +1,8 @@
 #pragma once
-#include <NetworkPacket.h>
+#include <NetworkMessage.h>
 
 namespace NetworkMessageFactory
 {
-	std::unique_ptr<NetworkMessage> parse(const NetworkPacket& packet);
+	std::unique_ptr<NetworkMessage> parse(const char* data, size_t size);	
+	std::unique_ptr<NetworkMessage> parse(BinarySerializer& serializer);
 };

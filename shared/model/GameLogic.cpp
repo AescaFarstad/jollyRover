@@ -19,7 +19,7 @@ namespace GameLogic
 		
 		TimeState& time = state->time;
 		float timeScale = time.forcedTimeScale > 0 ? time.forcedTimeScale : time.timeScale;
-		int32_t ingameTimePassed = timePassed * timeScale;
+		int32_t ingameTimePassed = std::max(1.f, timePassed * timeScale);
 		bool isPaused = (time.allowedSteps >= 0 && time.allowedSteps <= time.performedSteps) && time.forcedTimeScale <= 0;
 		
 		if (isPaused)
@@ -343,8 +343,7 @@ namespace GameLogic
 			int32_t loadCount = state->loadCount;
 			auto players = state->players;
 			
-			BinarySerializer bs;
-			bs.assign(input->state);
+			BinarySerializer bs(input->state);
 			bs.read(*state);
 			
 			state->timeStamp = stamp;

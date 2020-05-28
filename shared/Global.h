@@ -35,7 +35,9 @@ public:
 	bool loopBack;
 	bool desyncMode;
 	bool enableHardLog;
+	bool sendFailedInput;
 	std::string hardLogPath;
+	std::string demoPath;
 	bool runBenchmark;
 	int32_t window_X;
 	int32_t window_Y;

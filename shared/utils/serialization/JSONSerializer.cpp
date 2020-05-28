@@ -116,7 +116,7 @@ void JSONSerializer::endArray()
 
 void JSONSerializer::write(const std::vector<char>& vec, const std::string& fieldName)
 {
-	auto data = base64_encode((const unsigned char*)&vec[0], vec.size());
+	auto data = base64_encode((const unsigned char*)vec.data(), vec.size());
 	write(data, fieldName);
 }
 

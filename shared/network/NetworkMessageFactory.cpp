@@ -11,18 +11,26 @@
 #include <InputImpulseMessage.h>
 #include <InputDebugMessage.h>
 #include <LoadGameMessage.h>
+#include <DemoDataMessage.h>
+#include <DemoListMessage.h>
+#include <DemoRequestMessage.h>
 #include <GameStateMessage.h>
 #include <ChecksumMessage.h>
 #include <StateRequestMessage.h>
 #include <HeartbeatMessage.h>
 #include <SerializeSimpleTypes.h>
 
-std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(const NetworkPacket& packet)
+std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(const char* data, size_t size)
+{
+	BinarySerializer bs(data, size);
+	return parse(bs);
+}
+
+std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(BinarySerializer& serializer)
 {
 	int16_t type;
-	Serializer::read(type, packet.payload);	
-	BinarySerializer serializer;
-	serializer.assign(packet.payload, packet.payloadSize);
+	serializer.peek(type);
+	serializer.peek(type);
 	
 	switch ((MESSAGE_TYPE)type)
 	{
@@ -39,6 +47,9 @@ std::unique_ptr<NetworkMessage> NetworkMessageFactory::parse(const NetworkPacket
 		case MESSAGE_TYPE::TYPE_HEARTBEAT_MSG: 		{auto result =std::make_unique<HeartbeatMessage>(); result->deserialize(serializer); return result;}
 		case MESSAGE_TYPE::TYPE_CHECKSUM_MSG: 		{auto result =std::make_unique<ChecksumMessage>(); result->deserialize(serializer); return result;}
 		case MESSAGE_TYPE::TYPE_STATE_REQUEST_MSG:	{auto result =std::make_unique<StateRequestMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_DEMO_LIST:			{auto result =std::make_unique<DemoListMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_DEMO_REQUEST:		{auto result =std::make_unique<DemoRequestMessage>(); result->deserialize(serializer); return result;}
+		case MESSAGE_TYPE::TYPE_DEMO_DATA:			{auto result =std::make_unique<DemoDataMessage>(); result->deserialize(serializer); return result;}
 		default: THROW_FATAL_ERROR("Unknow Network Message " + std::to_string(type));
 			break;
 	}

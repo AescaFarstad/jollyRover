@@ -57,7 +57,9 @@
 		"memory_resource": "cpp",
 		"random": "cpp",
 		"regex": "cpp",
-		"new": "cpp"
+		"new": "cpp",
+		"codecvt": "cpp",
+		"filesystem": "cpp"
 	},
 	"window.title": "CLIENT"
 }

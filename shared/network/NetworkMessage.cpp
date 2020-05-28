@@ -24,7 +24,7 @@ int32_t NetworkMessage::getMessageId()
 
 void NetworkMessage::serialize(BinarySerializer& serializer) const
 {
-	WRITE_FIELD((*this), serializer, typeId);
+	WRITE_FIELD((*this), serializer, typeId);//Must be read first (NetworkMessageFactory dependency)
 	WRITE_FIELD((*this), serializer, initiator_id);
 	WRITE_FIELD((*this), serializer, login);
 	WRITE_FIELD((*this), serializer, stamp);

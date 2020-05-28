@@ -110,5 +110,5 @@ void NetworkPacket::setPayloadFromSerializable<>(const NetworkMessage& serializa
 	BinarySerializer bs;
 	serializable.serialize(bs);
 	auto data = bs.dumpAll();
-	setPayloadFromRawData(&data[0], data.size());
+	setPayloadFromRawData(data.data(), data.size());
 }

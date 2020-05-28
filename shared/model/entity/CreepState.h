@@ -14,13 +14,13 @@ public:
 	Unit unit;
 	Weapon weapon;
 	std::array<int16_t, MAX_WHISKER_COUNT> whiskers;
-	int8_t numWhiskers;
 	int32_t formationId;
 	int8_t formationsSlot;
+	int8_t numWhiskers;
 	bool sensedAnObstacle;
 	
-	Point velocity;
-	float orientation;	
+	float orientation;
+	Point velocity;	
 	
 	CreepProto* creepProto_;
 	WeaponProto* weaponProto_;

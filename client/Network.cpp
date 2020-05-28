@@ -28,9 +28,9 @@ Network::Network(VariableProto* vars)
 	//----------------------------------
 
 	auto handleGenericRequest = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message) {
-		GenericRequestMessage* t = dynamic_cast<GenericRequestMessage*>(message.get());
-		auto name = t->getName();
-		auto request = t->request;
+		GenericRequestMessage* temp = dynamic_cast<GenericRequestMessage*>(message.get());
+		auto name = temp->getName();
+		auto request = temp->request;
 		if (!genericRequestBinder.process(std::move(message)))
 		{
 			S::log.add("GenericRequestMessage is not handled: " + name + " " + std::to_string((int16_t)request), { LOG_TAGS::NET, LOG_TAGS::NET_BRIEF });
@@ -188,7 +188,7 @@ std::unique_ptr<NetworkMessage> Network::processIncomingPacket(std::unique_ptr<N
 		Serializer::toHex(packet->payload, packet->payloadSize),
 		{ LOG_TAGS::NET, LOG_TAGS::NET_MESSAGE });
 
-	std::unique_ptr<NetworkMessage> resultMessage = NetworkMessageFactory::parse(*packet);
+	std::unique_ptr<NetworkMessage> resultMessage = NetworkMessageFactory::parse(packet->payload, packet->payloadSize);
 
 	//auto t = m_requestTimeByInitiatorId[resultMessage->inResponseTo];
 	int32_t ticks = SDL_GetTicks();

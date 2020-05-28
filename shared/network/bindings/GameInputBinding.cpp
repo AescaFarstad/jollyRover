@@ -1,4 +1,5 @@
 #include <GameInputBinding.h>
+#include <std2.h>
 
 
 GameInputBinding::GameInputBinding(GameUpdater* gameUpdater, std::string name) : ResponseBinding(name)
@@ -8,6 +9,5 @@ GameInputBinding::GameInputBinding(GameUpdater* gameUpdater, std::string name) :
 
 void GameInputBinding::handle(std::unique_ptr<NetworkMessage> message)
 {
-	InputMessage* t = dynamic_cast<InputMessage*>(message.release());
-	gameUpdater->addNewInput(std::unique_ptr<InputMessage>(t));
+	gameUpdater->addNewInput(std2::unique_ptr_cast<InputMessage>(std::move(message)));
 }

@@ -27,8 +27,7 @@ void PersistentStorage::p_init()
 	char* buffer = new char [length];
 	file.read(buffer, length);
 	
-	BinarySerializer bs;
-	bs.assign(buffer, length);
+	BinarySerializer bs(buffer, length);
 	
 	bool hasSavedState;
 	bs.read(hasSavedState);
@@ -55,7 +54,7 @@ void PersistentStorage::p_commit()
     if(file.is_open())
     {
 		auto data = bs.dumpAll();
-		file.write(&data[0], data.size());
+		file.write(data.data(), data.size());
 		file.close();
     }
 	else

@@ -2,6 +2,7 @@
 #include <GameStateMessage.h>
 #include <StateRequestMessage.h>
 #include <ChecksumMessage.h>
+#include <std2.h>
 
 GameMode::GameMode()
 {
@@ -22,8 +23,7 @@ void GameMode::init(Renderer* renderer, Prototypes* prototypes)
 	setCallOnce(false)->
 	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>(
 		[this](std::unique_ptr<NetworkMessage> message){
-			StateRequestMessage* t = dynamic_cast<StateRequestMessage*>(message.release());
-			std::unique_ptr<StateRequestMessage> request = std::unique_ptr<StateRequestMessage>(t);
+			auto request = std2::unique_ptr_cast<StateRequestMessage>(std::move(message));
 			
 			GameStateMessage response;
 			
@@ -84,6 +84,13 @@ Point GameMode::normalizeMessageLocation(Point location)
 
 void GameMode::handleRouteInput()
 {
+	auto sendInput = [](std::vector<Point> points){
+		InputRouteMessage nim;
+		nim.route = points;
+		S::network->send(nim);
+	};
+	
+	
 	switch (m_routeInput.getState())
 	{
 		case ROUTE_STATE::E_COLLIDES:
@@ -97,6 +104,8 @@ void GameMode::handleRouteInput()
 					break;
 				}
 			}
+			if (S::config.sendFailedInput)
+				sendInput(m_routeInput.getPoints());
 			m_routeInput.reset();
 			break;
 		}
@@ -124,6 +133,8 @@ void GameMode::handleRouteInput()
 					}
 				}
 			}
+			if (S::config.sendFailedInput)
+				sendInput(m_routeInput.getPoints());
 			
 			
 			m_routeInput.reset();
@@ -133,6 +144,8 @@ void GameMode::handleRouteInput()
 		{
 			Point loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
 			m_gameView.addMessage("The route must end at the bottom edge!", loc, NFont::AlignEnum::CENTER);
+			if (S::config.sendFailedInput)
+				sendInput(m_routeInput.getPoints());
 			m_routeInput.reset();
 			break;
 		}		
@@ -140,6 +153,8 @@ void GameMode::handleRouteInput()
 		{
 			Point loc(m_prototypes->variables.fieldWidth / 2, m_prototypes->variables.fieldHeight / 2);
 			m_gameView.addMessage("The route is too short!", loc, NFont::AlignEnum::CENTER);
+			if (S::config.sendFailedInput)
+				sendInput(m_routeInput.getPoints());
 			m_routeInput.reset();
 			break;
 		}				
@@ -147,6 +162,8 @@ void GameMode::handleRouteInput()
 		{
 			Point loc(m_prototypes->variables.fieldWidth / 2, m_prototypes->variables.fieldHeight / 2);
 			m_gameView.addMessage("The route is too long!", loc, NFont::AlignEnum::CENTER);
+			if (S::config.sendFailedInput)
+				sendInput(m_routeInput.getPoints());
 			m_routeInput.reset();
 			break;
 		}
@@ -158,13 +175,13 @@ void GameMode::handleRouteInput()
 				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
 				loc.y -= 60;
 				m_gameView.addMessage("Not ready yet!", loc, NFont::AlignEnum::CENTER);
+				if (S::config.sendFailedInput)
+					sendInput(m_routeInput.getPoints());
 				m_routeInput.reset();
 			}
 			else
 			{
-				InputRouteMessage nim;
-				nim.route = m_routeInput.getPoints();
-				S::network->send(nim);
+				sendInput(m_routeInput.getPoints());
 				m_routeInput.reset();
 			}
 			break;

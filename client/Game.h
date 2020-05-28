@@ -7,6 +7,7 @@
 #endif
 
 #include <GameMode.h>
+#include <DemoMode.h>
 #include <Network.h>
 #include <TextureMode.h>
 #include <LoadingMode.h>
@@ -42,6 +43,7 @@ private:
 	
 	std::vector<Mode*> m_modes;
 	GameMode m_gameMode;
+	DemoMode m_demoMode;
 	TextureMode m_textureMode;
 	LoadingMode m_loadingMode;
 	ReconnectMode m_reconnectMode;
