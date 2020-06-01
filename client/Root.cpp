@@ -9,8 +9,8 @@ void Root::init()
 	std::cout << "endiness: " << (SystemInfo::isBigEndian ? "big" : "little") << std::endl;
 	
 	GPU_SetPreInitFlags(GPU_INIT_DISABLE_VSYNC);
-	screen = GPU_InitRenderer(GPU_RENDERER_GLES_2, SCREEN_WIDTH, SCREEN_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
-	if (screen == NULL)
+	m_screen = GPU_InitRenderer(GPU_RENDERER_GLES_2, SCREEN_WIDTH, SCREEN_HEIGHT, GPU_DEFAULT_INIT_FLAGS);
+	if (m_screen == NULL)
 	{
 		std::cout << "Failed to create window " << SDL_GetError() << std::endl;
 		return;
@@ -21,15 +21,15 @@ void Root::init()
 	
 	//Temporary setup until config file is parsed
 	Point field{1280, 720};
-	SDL_Window* window = SDL_GetWindowFromID(screen->context->windowID);
+	SDL_Window* window = SDL_GetWindowFromID(m_screen->context->windowID);
 	SDL_SetWindowSize(window, field.x, field.y);
 	GPU_SetWindowResolution(field.x, field.y);
 	SDL_SetWindowPosition(window, -20, 250);
-	GPU_RectangleFilled(screen, 0, 0, field.x, field.y, ViewUtil::colorFromHex(0xffff77, 0xff));
-	GPU_Flip(screen);
+	GPU_RectangleFilled(m_screen, 0, 0, field.x, field.y, ViewUtil::colorFromHex(0xffff77, 0xff));
+	GPU_Flip(m_screen);
 	
-	game.init(screen);
-	game.start();
+	m_game.init(m_screen);
+	m_game.start();
 	
 	root = this;
 }
@@ -53,22 +53,22 @@ bool Root::mainLoop()
 		}
 		else
 		{
-			game.handleEvent(e);
+			m_game.handleEvent(e);
 		}
 	}
 	
 	int32_t ticks = SDL_GetTicks();
-	int32_t delta = ticks - lastTicks > MAX_TIME_PER_FRAME ? MAX_TIME_PER_FRAME : ticks - lastTicks;
+	int32_t delta = ticks - m_lastTicks > MAX_TIME_PER_FRAME ? MAX_TIME_PER_FRAME : ticks - m_lastTicks;
 	
 	if (!isFinished && delta >= MIN_TIME_PER_FRAME)
 	{
 		//GPU_Clear(screen);
 
-		lastTicks = ticks;
-		game.update();
+		m_lastTicks = ticks;
+		m_game.update();
 		S::fpsMeter.registerFrame(ticks);
 
-		GPU_Flip(screen);
+		GPU_Flip(m_screen);
 	}
 	return isFinished;
 }

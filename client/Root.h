@@ -19,9 +19,9 @@ private:
 	constexpr static int32_t MAX_TIME_PER_FRAME = 100;
 	constexpr static int32_t MIN_TIME_PER_FRAME = 5;
 
-	GPU_Target* screen;	
-	Game game;
-	int32_t lastTicks = 0;	
+	GPU_Target* m_screen;	
+	Game m_game;
+	int32_t m_lastTicks = 0;	
 	
 	void printRenderers();
 	void printCurrentRenderer();
