@@ -143,6 +143,7 @@ void GameView::render(GameState* state, RouteInput* routeInput)
 		drawHUD();
 	if (S::drawSettings.flyingMessage)		
 		drawFlyingMessages();
+	drawPhantomRoutes();
 	
 	m_lastTime = state->time.time;
 }
@@ -151,6 +152,12 @@ void GameView::addMessage(std::string message, Point location, NFont::AlignEnum 
 {
 	m_flyingMessages.add(message, location, m_state->time.time, aligment);
 }
+
+void GameView::addPhantomRoute(std::vector<RoutePoint> route)
+{
+	m_phantomRoutes.add(route, m_state->time.time);
+}
+	
 
 void GameView::setLogin(int32_t login)
 {
@@ -230,18 +237,21 @@ void GameView::drawCars()
 		{
 			if ((size_t)car.routeIndex >= car.route.size() - 1)
 				continue;
+				
+			//Dotted line
 			size_t upperLimit = FMath::lerp(0, 0, 1000, 80, m_state->time.time - car.startStamp);
 			if (player.login == m_login)
 				upperLimit = car.route.size();
 			upperLimit = std::min(car.route.size(), upperLimit);
 			for (size_t i = car.routeIndex + 2; i < upperLimit; i++)
 			{
-				SeededRandom rnd(car.unit.id + i);				
 				auto ratio = (i == (size_t)car.routeIndex + 2) ? car.progress : 0;
 				auto& dashSeq = player.login == m_login ? S::sequences.greenPathDash : S::sequences.grayPathDash;
 				auto& dotSeq = player.login == m_login ? S::sequences.greenPathDot : S::sequences.grayPathDot;
 				renderPathStep(car.route[i - 1], car.route[i], dashSeq, dotSeq, player.login + i, ratio);
 			}
+			
+			//Car
 			auto& proto = m_prototypes->cars[car.unit.prototypeId];			
 			auto& carTexture = player.login == m_login ? 
 				proto.playerCarHullTexture : 
@@ -718,4 +728,23 @@ void GameView::drawFlyingMessages()
 {
 	for(auto& msg : m_flyingMessages)
 		msg.render(m_state->time.time, S::fonts.fontAmaticBoldBig, m_screen);
+}
+
+void GameView::drawPhantomRoutes()
+{
+	auto stamp = m_state->time.time;
+	for(auto& r : m_phantomRoutes)
+	{
+		if (stamp > r.stamp + PhantomRoute::LIFETIME)
+			continue;
+			
+		
+		float alpha = 1;
+		float fadeRatio = (float)(stamp - r.stamp) / PhantomRoute::LIFETIME;
+		if (fadeRatio > PhantomRoute::FADE_POINT)
+			alpha = FMath::lerp(PhantomRoute::FADE_POINT, 1.f, 1.f, 0.f, fadeRatio);
+		alpha = FMath::lerp(1.f, 0.f, 0.f, 0.5f, alpha);
+		for (size_t i = 1; i < r.route.size(); i++)
+			renderPathStep(r.route[i - 1].location, r.route[i].location, S::sequences.grayPathDash, S::sequences.grayPathDot, r.stamp, alpha);
+	}
 }

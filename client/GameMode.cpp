@@ -74,10 +74,10 @@ void GameMode::update(bool isActive)
 	}
 }
 
-Point GameMode::normalizeMessageLocation(Point location)
+Point GameMode::normalizeMessageLocation(Point location, Prototypes* prototypes)
 {
 	return Point(
-		std::max(200, std::min((int32_t)location.x, m_prototypes->variables.fieldWidth - 200)),
+		std::max(200, std::min((int32_t)location.x, prototypes->variables.fieldWidth - 200)),
 		std::max((int32_t)location.y, 150)
 	);
 }
@@ -100,7 +100,7 @@ void GameMode::handleRouteInput()
 			{
 				if (!p.isValid_)
 				{
-					m_gameView.addMessage("The route collides with an obstacle!", normalizeMessageLocation(p.location), NFont::AlignEnum::CENTER);
+					m_gameView.addMessage("The route collides with an obstacle!", normalizeMessageLocation(p.location, m_prototypes), NFont::AlignEnum::CENTER);
 					break;
 				}
 			}
@@ -114,7 +114,7 @@ void GameMode::handleRouteInput()
 			const auto thisPlayer = GameLogic::playerByLogin(&m_gameUpdater.state, m_login);
 			if (thisPlayer->refuelLeft >0 || thisPlayer->repairsLeft > 0 || thisPlayer->activeCars.size() > 0)
 			{
-				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
+				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location, m_prototypes);
 				loc.y -= 60;
 				m_gameView.addMessage("Not ready yet!", loc, NFont::AlignEnum::CENTER);
 			}
@@ -127,7 +127,7 @@ void GameMode::handleRouteInput()
 					auto ticks = SDL_GetTicks();
 					if (m_lastAutodrawNotificationStamp + 5000 < ticks)
 					{
-						Point loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
+						Point loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location, m_prototypes);
 						m_gameView.addMessage("Hold Left Mouse Button and draw!", loc, NFont::AlignEnum::CENTER);
 						m_lastAutodrawNotificationStamp = ticks;
 					}
@@ -142,7 +142,7 @@ void GameMode::handleRouteInput()
 		}
 		case ROUTE_STATE::E_GOES_UP:
 		{
-			Point loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
+			Point loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location, m_prototypes);
 			m_gameView.addMessage("The route must end at the bottom edge!", loc, NFont::AlignEnum::CENTER);
 			if (S::config.sendFailedInput)
 				sendInput(m_routeInput.getPoints());
@@ -172,7 +172,7 @@ void GameMode::handleRouteInput()
 			const auto thisPlayer = GameLogic::playerByLogin(&m_gameUpdater.state, m_login);
 			if (thisPlayer->refuelLeft >0 || thisPlayer->repairsLeft > 0 || thisPlayer->activeCars.size() > 0)
 			{
-				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location);
+				auto loc = normalizeMessageLocation(m_routeInput.getRoutePoints().back().location, m_prototypes);
 				loc.y -= 60;
 				m_gameView.addMessage("Not ready yet!", loc, NFont::AlignEnum::CENTER);
 				if (S::config.sendFailedInput)

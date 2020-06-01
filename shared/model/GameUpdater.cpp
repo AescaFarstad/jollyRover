@@ -6,28 +6,31 @@
 
 GameUpdater::GameUpdater()
 {
-	lastValidTimeStamp = 0;
-	isLoaded = false;
-	lastSavedSteps = -1;
+	m_lastValidTimeStamp = 0;
+	m_isLoaded = false;
+	m_lastSavedSteps = -1;
 }
 
 void GameUpdater::update(uint32_t time)
 {
-	if (lastValidTimeStamp < state.timeStamp)
+	m_lastFrameInputs.clear();
+	if (m_lastValidTimeStamp < state.timeStamp)
 	{
-		rewindToPrecedingState(lastValidTimeStamp);
-		lastSavedSteps = state.time.performedSteps;
+		rewindToPrecedingState(m_lastValidTimeStamp);
+		m_lastSavedSteps = state.time.performedSteps;
 	}
 	int32_t iters = 0;
 	while (state.timeStamp + prototypes->variables.fixedStepDuration < time && iters < prototypes->variables.maxLogicUpdatesPerFrame)
 	{
 		std::vector<InputMessage*> inputs = getThisFrameInputs(state.timeStamp, state.timeStamp + prototypes->variables.fixedStepDuration);
+		for(auto& i : inputs)
+			m_lastFrameInputs.push_back(i);
 		
 		GameLogic::update(&state, prototypes->variables.fixedStepDuration, inputs, prototypes);
 		
 		
-		lastValidTimeStamp = state.timeStamp;
-		if (lastSavedSteps != state.time.performedSteps && state.time.performedSteps % S::config.saveStateInterval == 0)
+		m_lastValidTimeStamp = state.timeStamp;
+		if (m_lastSavedSteps != state.time.performedSteps && state.time.performedSteps % S::config.saveStateInterval == 0)
 			saveState(state);
 		iters++;
 	}
@@ -38,27 +41,27 @@ void GameUpdater::load(const GameState& state, Prototypes* prototypes, bool enab
 	crcs.init(prototypes->variables.fixedStepDuration * S::config.saveStateInterval);
 	
 	BinarySerializer::copyThroughSerialization(state, this->state);
-	lastValidTimeStamp = this->state.timeStamp;
+	m_lastValidTimeStamp = this->state.timeStamp;
 	saveState(this->state, true);
 	this->state.isEventLoggerEnabled = enableEventLogger;
 	
 	this->state.propagatePrototypes(prototypes);
 
 	this->prototypes = prototypes;
-	isLoaded = true;	
+	m_isLoaded = true;	
 	
 }
 
 void GameUpdater::addNewInput(std::unique_ptr<InputMessage> input)
 {
-	lastValidTimeStamp = std::min(lastValidTimeStamp, (uint32_t)input.get()->serverStamp);
-	inputs.push_back(std::move(input));
+	m_lastValidTimeStamp = std::min(m_lastValidTimeStamp, (uint32_t)input.get()->serverStamp);
+	m_inputs.push_back(std::move(input));
 }
 
 GameState GameUpdater::getNewStateByStamp(uint32_t stamp)
 {
 	GameState result;
-	BinarySerializer* s = statesByStamps.lower_bound(stamp)->second.get();
+	BinarySerializer* s = m_statesByStamps.lower_bound(stamp)->second.get();
 	s->read(result);
 	s->resetCursors();
 	result.propagatePrototypes(prototypes);
@@ -76,9 +79,9 @@ GameState GameUpdater::getNewStateBySteps(int32_t steps)
 {
 	GameState result;
 	
-	uint32_t stamp = stampsBySteps.lower_bound(steps)->second;
-	auto streamRef = statesByStamps.find(stamp);
-	if (streamRef == statesByStamps.end())
+	uint32_t stamp = m_stampsBySteps.lower_bound(steps)->second;
+	auto streamRef = m_statesByStamps.find(stamp);
+	if (streamRef == m_statesByStamps.end())
 	{
 		result = false;
 	}
@@ -103,7 +106,7 @@ GameState GameUpdater::getFirstState()
 {
 	GameState result;
 	 
-	BinarySerializer* s = std::min_element(statesByStamps.begin(), statesByStamps.end())->second.get();
+	BinarySerializer* s = std::min_element(m_statesByStamps.begin(), m_statesByStamps.end())->second.get();
 	s->read(result);
 	s->resetCursors();
 	result.propagatePrototypes(prototypes);
@@ -115,13 +118,13 @@ std::vector<InputMessage*> GameUpdater::getThisFrameInputs(uint32_t fromInclusiv
 {
 	std::vector<InputMessage*> result;
 
-	for (size_t i = 0; i < inputs.size(); i++)
+	for (size_t i = 0; i < m_inputs.size(); i++)
 	{
-		uint32_t execTime = inputs[i].get()->serverStamp;
+		uint32_t execTime = m_inputs[i].get()->serverStamp;
 		if (execTime >= fromInclusive && execTime < toExclusive)
 		{
 			//S::log.add("this frame inputs: " + S::crc(*state));
-			result.push_back(inputs[i].get());
+			result.push_back(m_inputs[i].get());
 		}
 	}
 	return result;
@@ -131,7 +134,7 @@ void GameUpdater::rewindToPrecedingState(uint32_t stamp)
 {
 	auto from = state.timeStamp;
 	
-	BinarySerializer* s = statesByStamps.lower_bound(stamp)->second.get();
+	BinarySerializer* s = m_statesByStamps.lower_bound(stamp)->second.get();
 	
 	if (s == nullptr)
 		THROW_FATAL_ERROR("Unable to rewind game state");
@@ -151,28 +154,28 @@ void GameUpdater::saveState(GameState& state, bool skipCrc)
 	if (!skipCrc)
 		crcs.add(state.timeStamp, stream->crc());
 	
-	statesByStamps[state.timeStamp] = std::move(stream);
-	stampsBySteps[state.time.performedSteps] = state.timeStamp;
-	lastSavedSteps = state.time.performedSteps;
+	m_statesByStamps[state.timeStamp] = std::move(stream);
+	m_stampsBySteps[state.time.performedSteps] = state.timeStamp;
+	m_lastSavedSteps = state.time.performedSteps;
 	
-	if (statesByStamps.size() > S::config.maxSaveStates * 2)
+	if (m_statesByStamps.size() > S::config.maxSaveStates * 2)
 	{
-		auto min = std::min_element(statesByStamps.begin(), statesByStamps.end());
+		auto min = std::min_element(m_statesByStamps.begin(), m_statesByStamps.end());
 		auto cutOffPoint = state.timeStamp - S::config.maxSaveStates * S::config.saveStateInterval * prototypes->variables.fixedStepDuration;
-		decltype(statesByStamps) newStatesByStamps;
-		for(auto i = statesByStamps.begin(); i != statesByStamps.end(); i++)
+		decltype(m_statesByStamps) newStatesByStamps;
+		for(auto i = m_statesByStamps.begin(); i != m_statesByStamps.end(); i++)
 		{
 			if (i->first > cutOffPoint || i == min)
 				newStatesByStamps[i->first] = std::move(i->second);
 		}
-		statesByStamps = std::move(newStatesByStamps);
+		m_statesByStamps = std::move(newStatesByStamps);
 	}
 }
 
 std::optional<GameState> GameUpdater::getSavedStateByStamp(uint32_t stamp)
 {
-	auto streamRef = statesByStamps.find(stamp);
-	if (streamRef == statesByStamps.end())
+	auto streamRef = m_statesByStamps.find(stamp);
+	if (streamRef == m_statesByStamps.end())
 		return {};
 		
 	std::optional<GameState> result = GameState();
@@ -182,4 +185,9 @@ std::optional<GameState> GameUpdater::getSavedStateByStamp(uint32_t stamp)
 	s->resetCursors();
 
 	return result;
+}
+
+std::vector<InputMessage*> GameUpdater::getLastFrameInputs()
+{
+	return m_lastFrameInputs;
 }

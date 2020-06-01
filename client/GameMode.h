@@ -27,6 +27,7 @@ public:
 	virtual	void onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& context) override;
 	virtual	void onKeyUp(SDL_Scancode scancode, const KeyboardInputContext& context) override;
 	
+	static Point normalizeMessageLocation(Point location, Prototypes* prototypes);	
 
 private:
 
@@ -45,6 +46,5 @@ private:
 	uint32_t m_numRandomClicks;
 	
 	void handleRouteInput();
-	Point normalizeMessageLocation(Point location);
 
 };

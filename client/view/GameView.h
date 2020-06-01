@@ -10,6 +10,7 @@
 #include <ViewController.h>
 #include <FlyingMessage.h>
 #include <NFont.h>
+#include <PhantomRoute.h>
 
 #ifdef __EMSCRIPTEN__
 	#include <SDL_image.h>
@@ -28,6 +29,7 @@ public:
 	void init(Renderer* renderer, Prototypes* prototypes);
 	void render(GameState* state, RouteInput* routeInput);
 	void addMessage(std::string message, Point location, NFont::AlignEnum aligment = NFont::AlignEnum::LEFT);
+	void addPhantomRoute(std::vector<RoutePoint> route);
 	
 	void onMouseMove(const SDL_MouseMotionEvent& event);
 	
@@ -47,6 +49,7 @@ private:
 	ViewController<CreepView> m_creeps;
 	int32_t m_lastTime;	
 	CircularContainer<FlyingMessage, 5> m_flyingMessages;
+	CircularContainer<PhantomRoute, 5> m_phantomRoutes;
 	
 	GPU_Image* m_layer1Image;
 	GPU_Image* m_layer2Image;
@@ -69,6 +72,7 @@ private:
 	void drawThreatMap();
 	void drawHUD();
 	void drawFlyingMessages();
+	void drawPhantomRoutes();
 	
 	void renderPathStep(Point from, Point to, SequenceDef& dash, SequenceDef& dot, uint32_t rndSeed, float ratio);
 	

@@ -39,6 +39,7 @@ public:
 	void onMouseDown(const SDL_MouseButtonEvent& event);
 	void onMouseUp(const SDL_MouseButtonEvent& event);
 	void onMouseMove(const SDL_MouseMotionEvent& event);
+	
 
 private:
 

@@ -1,3 +1,4 @@
+#pragma once
 #include <string>
 #include <Point.h>
 #include <NFont.h>

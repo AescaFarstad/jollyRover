@@ -23,6 +23,9 @@ public:
 	virtual	void onKeyDown(SDL_Scancode scancode, const KeyboardInputContext& context) override;
 	virtual	void onKeyUp(SDL_Scancode scancode, const KeyboardInputContext& context) override;
 	
+	
+	void visualizeInputs(std::vector<InputMessage*> inputs);
+	
 
 private:
 

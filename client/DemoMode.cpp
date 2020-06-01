@@ -3,6 +3,7 @@
 #include <std2.h>
 #include <BinarySerializer.h>
 #include <NetworkMessageFactory.h>
+#include <GameMode.h>
 
 DemoMode::DemoMode()
 {
@@ -51,7 +52,61 @@ void DemoMode::update(bool isActive)
 	if (isActive)
 	{
 		m_gameUpdater.update(SDL_GetTicks() - m_startTime + m_startStateStamp);
+		visualizeInputs(m_gameUpdater.getLastFrameInputs());
 		m_gameView.render(&m_gameUpdater.state, &m_routeInput);
+	}
+}
+void DemoMode::visualizeInputs(std::vector<InputMessage*> inputs)
+{
+	for(auto i : inputs)
+	{
+		if (i->typeId == MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG)
+		{
+			auto rInput = dynamic_cast<InputRouteMessage*>(i);
+			std::vector<RoutePoint> routePoints;
+			for(auto p : rInput->route)
+			{
+				RoutePoint newPoint;
+				newPoint.location = p;
+				routePoints.push_back(newPoint);
+			}
+			
+			if (routePoints.size() < (size_t)m_prototypes->variables.minRouteSteps)
+			{
+				Point loc(m_prototypes->variables.fieldWidth / 2, m_prototypes->variables.fieldHeight / 2);
+				m_gameView.addMessage("The route is too short!", loc, NFont::AlignEnum::CENTER);
+				m_gameView.addPhantomRoute(routePoints);
+				continue;
+			}
+			
+			RoutePoint finish{Point(routePoints.back().location.x, m_prototypes->variables.fieldHeight + 1), true};
+			if (!GameLogic::isRouteAnglePositive(routePoints, finish.location, m_prototypes))
+			{
+				Point loc = GameMode::normalizeMessageLocation(routePoints.back().location, m_prototypes);
+				m_gameView.addMessage("The route must end at the bottom edge!", loc, NFont::AlignEnum::CENTER);
+				m_gameView.addPhantomRoute(routePoints);
+				continue;
+			}
+			
+			if (routePoints.size() > (size_t)m_prototypes->variables.maxRouteSteps)
+			{
+				Point loc(m_prototypes->variables.fieldWidth / 2, m_prototypes->variables.fieldHeight / 2);
+				m_gameView.addMessage("The route is too long!", loc, NFont::AlignEnum::CENTER);
+				m_gameView.addPhantomRoute(routePoints);
+				continue;
+			}
+			
+			for (size_t i = 0; i < routePoints.size() - 1; i++)
+			{
+				if (!GameLogic::testEdgeIsValid(routePoints[i].location, routePoints[i + 1].location, m_prototypes))
+				{
+					Point loc = GameMode::normalizeMessageLocation(routePoints[i].location, m_prototypes);
+					m_gameView.addMessage("The route collides with an obstacle!", loc, NFont::AlignEnum::CENTER);
+					m_gameView.addPhantomRoute(routePoints);
+					break;
+				}
+			}
+		}
 	}
 }
 	
