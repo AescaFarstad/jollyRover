@@ -6,7 +6,7 @@ InputRouteMessage::InputRouteMessage()
 	typeId = MESSAGE_TYPE::TYPE_INPUT_ROUTE_MSG;
 }
 
-inline std::string InputRouteMessage::getName() const
+std::string InputRouteMessage::getName() const
 {
 	return "I-rout";
 }

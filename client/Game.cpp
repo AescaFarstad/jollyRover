@@ -183,7 +183,7 @@ void Game::startGame()
 			m_password = gMsg->password;			
 			delete gMsg;
 			
-			S::log.add("I am " + std::to_string(m_login));
+			S::log.add("I am " + std::to_string(m_login), {LOG_TAGS::GAME);
 
 			cb->execute();
 			delete cb;
@@ -419,48 +419,6 @@ void Game::addNetworkBindings()
 	bindByMsgType(MESSAGE_TYPE::TYPE_LOAD_GAME_MSG)->
 	setCallOnce(false)->
 	setHandler(std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message){handleGameInput(std::move(message));}));
-	S::network->binder.bind(std::move(binding));
-
-	//-------------------------------------------------------------------------------
-
-	
-
-	//-------------------------------------------------------------------------------
-
-
-	auto handleGameState = std::make_unique<std::function<void(std::unique_ptr<NetworkMessage>)>>([this](std::unique_ptr<NetworkMessage> message) {
-		/*
-		GameStateMessage* gameStateMsg = dynamic_cast<GameStateMessage*>(message.get());
-
-		SerializationStream stream1 = SerializationStream::createExp();
-		SerializationStream stream2 = SerializationStream::createExp();
-		SerializationStream stream3 = SerializationStream::createExp();
-		Serializer::write(*gameStateMsg->state, stream1);
-		S::log.add("SERVER STATE (" + std::to_string(gameStateMsg->state->timeStamp) + ")\n\t" +
-			Serializer::toHex(stream1.readAll(), stream1.getLength()), { LOG_TAGS::UNIQUE });
-		
-		GameUpdater* gameUpdater = m_gameMode.getGameUpdater();
-		
-		auto myState = gameUpdater->getNewStateByStamp(gameStateMsg->state->timeStamp);
-		Serializer::write(*gameStateMsg->state, stream2);
-
-		if (stream1.getLength() != stream2.getLength() ||
-			std::memcmp(stream1.readAll(), stream2.readAll(), stream1.getLength()) != 0)
-		{
-			S::log.add("BUT MY STATE (" + std::to_string(myState->timeStamp) + ")\n\t" +
-				Serializer::toHex(stream2.readAll(), stream2.getLength()), { LOG_TAGS::UNIQUE });
-		}*/
-		/*
-		Serializer::write(gameUpdater->state.get(), stream3);
-		S::log.add("CURRENT STATE (" + std::to_string(gameUpdater->state->timeStamp) + ")\n\t" +
-		Serializer::toHex(stream3.readAll(), stream3.getLength()), { LOG_TAGS::UNIQUE });*/	
-	});
-
-	binding = std::make_unique<AnonymousBinding>("TYPE_GAME_STATE_MSG");
-	binding->
-	bindByMsgType(MESSAGE_TYPE::TYPE_GAME_STATE_MSG)->
-	setCallOnce(false)->
-	setHandler(std::move(handleGameState));
 	S::network->binder.bind(std::move(binding));
 
 	//-------------------------------------------------------------------------------

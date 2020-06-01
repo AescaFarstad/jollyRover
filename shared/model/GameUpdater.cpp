@@ -142,7 +142,7 @@ void GameUpdater::rewindToPrecedingState(uint32_t stamp)
 	s->resetCursors();
 	state.propagatePrototypes(prototypes);
 	S::log.add("\nrewind from " + std::to_string(from % 100000) + 
-			" to " + std::to_string(state.timeStamp % 100000) + "\n");
+			" to " + std::to_string(state.timeStamp % 100000) + "\n", {LOG_TAGS::NET);
 }
 
 void GameUpdater::saveState(GameState& state, bool skipCrc)
