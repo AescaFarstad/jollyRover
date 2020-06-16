@@ -59,7 +59,7 @@ void GameMode::update(bool isActive)
 		m_gameUpdater.update(SDL_GetTicks() + m_clientToServerDelta);
 		handleRouteInput();
 		m_gameView.render(&m_gameUpdater.state, &m_routeInput);
-		if (m_gameUpdater.crcs.getCapacity() - m_gameUpdater.crcs.getNumNewEntries() < m_gameUpdater.crcs.getCapacity() / 3)
+		if (S::config.desyncMode && m_gameUpdater.crcs.getCapacity() - m_gameUpdater.crcs.getNumNewEntries() < m_gameUpdater.crcs.getCapacity() / 3)
 		{
 			ChecksumMessage msg;
 			msg.checksums = m_gameUpdater.crcs.extract(m_gameUpdater.crcs.getCapacity() / 3);			

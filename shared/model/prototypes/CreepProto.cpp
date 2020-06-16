@@ -35,13 +35,13 @@ void from_json(const nlohmann::json& j, CreepProto& creep)
 		creep.angularSpeed = j.at("angularSpeed");
 		creep.acceleration.x = j.at("acceleration").at("0");
 		creep.acceleration.y = j.at("acceleration").at("1");
-		creep.normalFriction = j.at("normalFriction");
+		//creep.normalFriction = j.at("normalFriction");
 		creep.breaksStrength = j.at("breaksStrength");
 		creep.omniDirectionalSpeed = j.at("omniDirectionalSpeed");
 	}
 	else
 	{
-		creep.normalFriction = 0;
+		//creep.normalFriction = 0;
 	}
 	
 	creep.hullTextureName = j.at("hullTexture").get<std::vector<std::string>>();

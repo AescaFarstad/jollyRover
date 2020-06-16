@@ -19,7 +19,7 @@ public:
 	void setDataAvailable(bool value);
 
 private:
-	static const int16_t BUFFER_SIZE = 513;
+	static constexpr int16_t BUFFER_SIZE = 513;
 	char buffer[BUFFER_SIZE];
 	int16_t bufferCursor;
 	int16_t bytesInBuffer;

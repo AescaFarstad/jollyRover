@@ -48,7 +48,6 @@ public:
 	Point acceleration; //x - at 0 speed, y - at max speed
 	float breaksStrength;
 	float omniDirectionalSpeed;
-	float normalFriction;
 	std::vector<std::string> hullTextureName;
 	std::vector<std::string> gunTextureName;
 	

@@ -80,7 +80,7 @@ void Root::init()
 
 bool Root::mainLoop()
 {
-	bool isFinished;
+	bool isFinished = false;
 	SDL_Event e;
 	while (SDL_PollEvent(&e) != 0)
 	{
@@ -186,6 +186,9 @@ void Root::handleNetworkMessage(std::unique_ptr<NetworkMessage> message)
 		}
 		case MESSAGE_TYPE::TYPE_CHECKSUM_MSG:
 		{
+			if (!S::config.desyncMode)
+				break;
+				
 			auto crcMsg = std2::unique_ptr_cast<ChecksumMessage>(std::move(message));
 			auto client = m_network.clientByLogin(crcMsg->login);
 			if (client->hasDesynced)

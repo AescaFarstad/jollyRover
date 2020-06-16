@@ -9,6 +9,7 @@ namespace S
 	}
 	GameConfig config;
 	int debug = 0;
+	bool isLoaded = false;
 }
 
 

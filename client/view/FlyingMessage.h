@@ -19,8 +19,8 @@ private:
 	int32_t m_stamp;
 	NFont::Effect m_effect;
 	
-	static constexpr int32_t LIFETIME = 2000;
-	static constexpr int32_t MOVEMENT = -170;
+	static constexpr int32_t LIFETIME = 2200;
+	static constexpr int32_t MOVEMENT = -150;
 	static constexpr float ACCEL = 3.5;
 	static constexpr float FADE_POINT = 0.65;
 	

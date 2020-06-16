@@ -1,7 +1,7 @@
 {
 	"globalConfig":
 	{
-		"host":"server.aesca.xyz",
+		"host":"192.168.0.60",
 		"webPort":12880,
 		"desktopPort":12745,
 		"saveStateInterval":3,
@@ -43,6 +43,12 @@
 			"Z"
 		],
 		"disable":[
+			"INPUT_",
+			"NET_MESSAGE",
+			"TASK",
+			"NET_BRIEF",
+			"NET",
+			"GAME",
 			"Z"
 		]
 	}

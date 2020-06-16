@@ -92,7 +92,7 @@ void SerialAnimationView::init(int32_t seed, CreepDeathEvent& event, GameState* 
 	m_seed = seed;
 	SeededRandom random(seed);
 	
-	if (event.unitDeath.prototypeId == 0)
+	if (event.unitDeath.prototypeId == 0 || event.unitDeath.prototypeId == 4)
 	{		
 		GPU_Rect& origin = prototypes->creeps[event.unitDeath.prototypeId].hullTexture[event.force]->rect;
 		initFragAnimation(event.unitDeath, random, origin, m_startTime);

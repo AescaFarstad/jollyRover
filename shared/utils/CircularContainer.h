@@ -115,7 +115,6 @@ private:
 
     T* m_start;
     T* m_ptr;
-	static const size_t m_rawLength = arraySize * sizeof(T);
 };
 
 template <typename T, uint32_t arraySize>

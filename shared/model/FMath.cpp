@@ -12,9 +12,10 @@ float FMath::nlerp(float x1, float y1, float x2, float y2, float argument, float
 {
 	if (x1 == x2)
 		return y1 == y2 ? y1 : std::numeric_limits<float>::quiet_NaN();
-	x1 = std::pow(x1, power);
-	x2 = std::pow(x2, power);
-	argument = std::pow(argument, power);
+	//(double) - to lower GLIBC version
+	x1 = std::pow((double)x1, (double)power);
+	x2 = std::pow((double)x2, (double)power);
+	argument = std::pow((double)argument, (double)power);
 	return (argument  - x1) * (y1 - y2) / (x1 - x2) + y1;
 }
 

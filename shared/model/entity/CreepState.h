@@ -9,7 +9,7 @@ class CreepState
 public:
 	CreepState();
 	
-	static const int8_t MAX_WHISKER_COUNT = 32;
+	static constexpr int8_t MAX_WHISKER_COUNT = 32;
 	
 	Unit unit;
 	Weapon weapon;

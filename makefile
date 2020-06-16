@@ -7,24 +7,28 @@ LOCAL_COMPILER := $(CXX)
 
 OUT := out
 WEB_TARGET := $(OUT)/web
-LOCAL_TARGET := $(OUT)/local
+LOCAL_TARGET_NAME := local
+LOCAL_TARGET := $(OUT)/$(LOCAL_TARGET_NAME)
 SERVER_TARGET_NAME := JRserver
 SERVER_TARGET := $(OUT)/$(SERVER_TARGET_NAME)
 CONFIG := $(OUT)/config.json
 PROTOTYPES := $(OUT)/prototypes.json
 SSH_CONFIG := JollyRover
 REMOTE_DEPLOY_PATH := ~/JollyRover
+SERVER_PORT := 12745 ##to kill procs
+SERVER_DUMP_DIRECTORY := /tmp/JRdump/
+LOCAL_DUMP_DIRECTORY := ../dumps/
 
 
 AUTODEPS = -MMD -MF $(subst .bc,.d,$@)
 
-SANITIZATION= -fsanitize=address
+#SANITIZATION= -fsanitize=address
 OPTIMIZATION_SERVER= -g -O0
 OPTIMIZATION_LOCAL= -g -O0
-OPTIMIZATION_WEB= -g -O0
+OPTIMIZATION_WEB= -g -O3
 
-DEBUG_MODE :=1
-DEBUG_DEFINES :=-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC 
+DEBUG_MODE :=0
+#DEBUG_DEFINES :=-D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC 
 
 COMPILE_FLAGS := -Wall -c -std=c++17 -D_REENTRANT $(DEBUG_DEFINES) -DSDL_DISABLE_IMMINTRIN_H -DFC_USE_SDL_GPU $(CXXFLAGS)
 LINK_FLAGS := -std=c++17 $(LDFLAGS)
@@ -85,29 +89,31 @@ SDL_FontCache_WEB_OBJECT = $(OBJDIR_CLIENT_WEB)/$(SDL_FontCachePATH).bc
 
 local: $(SUBOBJ_LOCAL) $(SDL_FontCache_LOCAL_OBJECT)
 	$(LOCAL_COMPILER) $(OPTIMIZATION_LOCAL) $(SANITIZATION) $(LINK_FLAGS) -o $(LOCAL_TARGET) $(SUBOBJ_LOCAL) $(SDL_FontCache_LOCAL_OBJECT) $(LOCAL_LIBS)
-	cp shared/prototypes.json out/prototypes.json
-	rsync -r assets/ out/assets
+	cp shared/prototypes.json $(OUT)/prototypes.json
+	mkdir -p $(OUT)/save
+	rsync -r assets/ $(OUT)/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
-web: $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT)
-	cp shared/prototypes.json out/prototypes.json
-	rsync -r assets/ out/assets/
-	rsync -r web/ out/
+/web/index.html:
+web: $(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT) /web/index.html
+	cp shared/prototypes.json $(OUT)/prototypes.json
+	rsync -r assets/ $(OUT)/assets/
+	rsync -r web/ $(OUT)/
 	$(WEB_COMPILER) \
 		$(OPTIMIZATION_WEB) -s USE_SDL=2 -s USE_SDL_NET=2 -s USE_SDL_IMAGE=2 -s USE_GLFW=3 -s USE_WEBGL2=1 -s USE_SDL_TTF=2\
 		-s WASM=1 -s TOTAL_MEMORY=268435456 -s DEMANGLE_SUPPORT=1 -s DISABLE_EXCEPTION_CATCHING=1 -s ASSERTIONS=1 -s SAFE_HEAP=1 \
 		--use-preload-plugins -v -o $(WEB_TARGET).html \
 		lib/renderer_GLES_2.o lib/SDL_gpu_matrix.o lib/SDL_gpu_renderer.o lib/SDL_gpu_shapes.o lib/SDL_gpu.o lib/stb_image_write.o lib/stb_image.o \
 		$(SUBOBJ_WEB) $(SDL_FontCache_WEB_OBJECT) \
-		--embed-file out/prototypes.json --embed-file out/config.json --preload-file out/assets \
-		--memory-init-file 1 --shell-file out/index.html -lidbfs.js -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']" 
+		--embed-file $(OUT)/prototypes.json --embed-file $(OUT)/config.json --preload-file $(OUT)/assets \
+		--memory-init-file 1 --shell-file $(OUT)/index.html -lidbfs.js -s "EXTRA_EXPORTED_RUNTIME_METHODS=['ccall']" 
 	sed -i 's/antialias\:false/antialias\:true/g' $(WEB_TARGET).js
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
 server: $(SUBOBJ_SERVER)
 	$(LOCAL_COMPILER) $(OPTIMIZATION_SERVER) $(SANITIZATION) $(LINK_FLAGS) -o $(SERVER_TARGET) $(SUBOBJ_SERVER) $(SERVER_LIBS)
-	cp shared/prototypes.json out/prototypes.json
-	rsync -r assets/ out/assets
+	cp shared/prototypes.json $(OUT)/prototypes.json
+	rsync -r assets/ $(OUT)/assets
 	if which spd-say; then spd-say 'i' --volume -92; fi
 	
 all: local server web
@@ -123,7 +129,19 @@ $(SDL_FontCache_WEB_OBJECT):
 deploy:
 	rsync -Pav $(SERVER_TARGET) $(CONFIG) $(PROTOTYPES) '$(SSH_CONFIG):$(REMOTE_DEPLOY_PATH)/$(OUT)'
 	ssh $(SSH_CONFIG) pkill -x $(SERVER_TARGET_NAME) || true
-	ssh $(SSH_CONFIG) 'cd $(REMOTE_DEPLOY_PATH); $(SERVER_TARGET)' & exit
+	ssh $(SSH_CONFIG) fuser -k $(SERVER_PORT)/tcp || true
+	ssh $(SSH_CONFIG) 'ulimit -c unlimited; cd $(REMOTE_DEPLOY_PATH); $(SERVER_TARGET)' & exit
+	aws s3 sync $(OUT)/ s3://aesca.xyz --exclude "$(SERVER_TARGET_NAME)" --exclude "$(LOCAL_TARGET_NAME)" --delete --acl public-read --profile AirMin
+	
+takeDumps:
+	rsync -Pav '$(SSH_CONFIG):$(SERVER_DUMP_DIRECTORY)' $(LOCAL_DUMP_DIRECTORY)
+	
+clearDumps:
+	ssh $(SSH_CONFIG) rm -rf $(SERVER_DUMP_DIRECTORY)
+	
+takeLogsNDemos:
+	rsync -Pav '$(SSH_CONFIG):$(REMOTE_DEPLOY_PATH)/../logs/' ../remoteLog/
+	rsync -Pav '$(SSH_CONFIG):$(REMOTE_DEPLOY_PATH)/../demo/' ../remoteDemo/
 
 $(OBJDIR_CLIENT_LOCAL)/%.bc : %.cpp
 	@mkdir -p $(dir $@)

@@ -7,6 +7,7 @@
 
 auto& globalLog = S::log;
 auto& drawSettings = S::drawSettings;
+auto& isGameLoaded = S::isLoaded;
 
 
 extern "C" {
@@ -24,10 +25,11 @@ extern "C" {
 			case 5: globalLog.toggleTag(LOG_TAGS::TASK); break;
 			case 6: globalLog.toggleTag(LOG_TAGS::INPUT_); break;
 			case 7: globalLog.toggleTag(LOG_TAGS::NET_MESSAGE); break;
-			case 8: globalLog.toggleTag(LOG_TAGS::SUBTASK); break;
-			case 9: globalLog.toggleTag(LOG_TAGS::FILE_SYSTEM); break;
-			case 10: globalLog.toggleTag(LOG_TAGS::HARD_LOG); break;
-			case 11: globalLog.toggleTag(LOG_TAGS::Z); break;
+			case 8: globalLog.toggleTag(LOG_TAGS::NET_BRIEF); break;
+			case 9: globalLog.toggleTag(LOG_TAGS::SUBTASK); break;
+			case 10: globalLog.toggleTag(LOG_TAGS::FILE_SYSTEM); break;
+			case 11: globalLog.toggleTag(LOG_TAGS::HARD_LOG); break;
+			case 12: globalLog.toggleTag(LOG_TAGS::Z); break;
 			
 			default:
 				globalLog.add("Wrong log type index: " + std::to_string(index), {LOG_TAGS::ERROR_});
@@ -37,7 +39,7 @@ extern "C" {
 	
 	int8_t* EMSCRIPTEN_KEEPALIVE getLogSettings(int8_t *buf, int32_t bufSize) 
 	{
-		int8_t result[11];
+		int8_t result[13];
 		
 		result[0] = globalLog.isEnabled(LOG_TAGS::UNIQUE) ? 1 : 0;
 		result[1] = globalLog.isEnabled(LOG_TAGS::ERROR_) ? 1 : 0;
@@ -47,10 +49,11 @@ extern "C" {
 		result[5] = globalLog.isEnabled(LOG_TAGS::TASK) ? 1 : 0;
 		result[6] = globalLog.isEnabled(LOG_TAGS::INPUT_) ? 1 : 0;
 		result[7] = globalLog.isEnabled(LOG_TAGS::NET_MESSAGE) ? 1 : 0;
-		result[8] = globalLog.isEnabled(LOG_TAGS::SUBTASK) ? 1 : 0;
-		result[9] = globalLog.isEnabled(LOG_TAGS::FILE_SYSTEM) ? 1 : 0;
-		result[10] = globalLog.isEnabled(LOG_TAGS::HARD_LOG) ? 1 : 0;
-		result[11] = globalLog.isEnabled(LOG_TAGS::Z) ? 1 : 0;
+		result[8] = globalLog.isEnabled(LOG_TAGS::NET_BRIEF) ? 1 : 0;
+		result[9] = globalLog.isEnabled(LOG_TAGS::SUBTASK) ? 1 : 0;
+		result[10] = globalLog.isEnabled(LOG_TAGS::FILE_SYSTEM) ? 1 : 0;
+		result[11] = globalLog.isEnabled(LOG_TAGS::HARD_LOG) ? 1 : 0;
+		result[12] = globalLog.isEnabled(LOG_TAGS::Z) ? 1 : 0;
 		
 		globalLog.add("getLogSettings " + 
 				std::to_string(result[0]) + "," +
@@ -64,7 +67,8 @@ extern "C" {
 				std::to_string(result[8]) + "," +
 				std::to_string(result[9]) + "," +
 				std::to_string(result[10]) + "," + 
-				std::to_string(result[11]) + ",", 
+				std::to_string(result[11]) + "," + 
+				std::to_string(result[12]) + ",", 
 				{LOG_TAGS::UNIQUE});
 		
 		return &result[0]; //This is OK
@@ -144,10 +148,17 @@ extern "C" {
 				std::to_string(result[14]) + "," +
 				std::to_string(result[15]) + "," +
 				std::to_string(result[16]) + "," +
-				std::to_string(result[17]) + ",", 
+				std::to_string(result[17]) + "," + 
+				std::to_string(result[18]) + "," + 
+				std::to_string(result[19]) + ",", 
 				{LOG_TAGS::UNIQUE});
 		
 		return &result[0]; // this is OK
+	}
+	
+	bool EMSCRIPTEN_KEEPALIVE isLoaded() 
+	{
+		return isGameLoaded;
 	}
 	 
 }

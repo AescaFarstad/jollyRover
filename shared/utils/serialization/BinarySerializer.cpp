@@ -91,7 +91,6 @@ void BinarySerializer::write(const std::vector<char>& vec, const std::string& fi
 {
 	if (DEBUG_TRACE) std::cout << "write " << fieldName << "\t" << "char assary of size "<<vec.size() << "\n";
 	int32_t size = (int32_t)vec.size();
-	printf("\nw vec<char> = %d\n", size);
 	write(size);
 	auto target = m_writingStream->allocate(size);
 	std::memcpy(target, vec.data(), size);

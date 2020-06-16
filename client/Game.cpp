@@ -183,7 +183,7 @@ void Game::startGame()
 			m_password = gMsg->password;			
 			delete gMsg;
 			
-			S::log.add("I am " + std::to_string(m_login), {LOG_TAGS::GAME);
+			S::log.add("I am " + std::to_string(m_login), {LOG_TAGS::GAME});
 
 			cb->execute();
 			delete cb;

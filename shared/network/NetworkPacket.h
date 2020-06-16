@@ -39,8 +39,8 @@ public:
 	bool isFullyLoaded();
 
 private:
-	static const int16_t SUGAR = 1934;
-	static const int16_t bufferSize = sizeof(uint16_t) * 2;
+	static constexpr int16_t SUGAR = 1934;
+	static constexpr int16_t bufferSize = sizeof(uint16_t) * 2;
 	char tempBuffer[bufferSize];
 
 };

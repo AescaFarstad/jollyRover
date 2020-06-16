@@ -64,10 +64,9 @@ void Network::connect()
 	
 	IPaddress ip;
 	SDLNet_ResolveHost(&ip, S::config.host, S::config.port);
-	m_socket = SDLNet_TCP_Open(&ip);
-
-	S::log.add("connect status: " + std::string(m_socket == nullptr ? "false" : "true"), {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
 	S::log.add("ip, port: " + std::string(S::config.host) + " " + std::to_string(S::config.port), {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
+	m_socket = SDLNet_TCP_Open(&ip);
+	S::log.add("connect status: " + std::string(m_socket == nullptr ? "false" : "true"), {LOG_TAGS::NET, LOG_TAGS::NET_BRIEF});
 
 	m_isConnected = m_socket != nullptr;
 	if (m_isConnected)

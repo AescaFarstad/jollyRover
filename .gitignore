@@ -1,6 +1,8 @@
 *.d
 *.bc
 out/*
+tmp/*
 .vscode/ipch/*
 callgrind.*
 include.txt
+todo.txt

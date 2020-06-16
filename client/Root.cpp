@@ -16,7 +16,7 @@ void Root::init()
 		return;
 	}
 	
-	printRenderers();
+	//printRenderers();
 	printCurrentRenderer();
 	
 	//Temporary setup until config file is parsed
@@ -32,6 +32,8 @@ void Root::init()
 	m_game.start();
 	
 	root = this;
+	
+	S::isLoaded = true;
 }
 
 void Root::mainLoop(void*)

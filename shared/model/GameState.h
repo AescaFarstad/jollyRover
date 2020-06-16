@@ -17,7 +17,7 @@ public:
 	GameState();
 	GameState(uint32_t randomSeed);
 	
-	static const int32_t MAX_CREEPS = 1500;
+	static constexpr int32_t MAX_CREEPS = 1500;
 	
 	std::vector<CreepState> creeps;
 	std::vector<ProjectileState> projectiles;

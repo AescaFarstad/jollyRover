@@ -27,6 +27,7 @@ std::unique_ptr<NetworkPacket> PacketReader::poll()
 		if (bytesInBuffer == -1)
 		{
 			currentPacket->isDisconnectNotice = true;
+			bytesInBuffer = 0;
 			return std::move(currentPacket);
 		}
 	}

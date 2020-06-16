@@ -57,4 +57,5 @@ namespace S
 	extern int32_t idCounter;
 	extern GameConfig config;
 	extern int debug;
+	extern bool isLoaded;
 };

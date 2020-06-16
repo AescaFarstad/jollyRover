@@ -20,7 +20,7 @@ class FormationState
 {
 public:
 	
-	static const int8_t MAX_FORMATION_COUNT = 32;
+	static constexpr int8_t MAX_FORMATION_COUNT = 32;
 		
 	int32_t id;
 	int16_t prototypeId;
