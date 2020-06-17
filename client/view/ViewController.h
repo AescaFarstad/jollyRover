@@ -10,14 +10,14 @@ class ViewController
 {
 public:
 	template<typename T>
-	void render(Renderer* renderer, T begin, T end, GameState* state, Prototypes* prototypes, int32_t thisPlayer)
+	void render(T begin, T end, uint32_t stamp, std::function<void(typename std::iterator_traits<T>::reference, V& )> renderMethod)
 	{
 		size_t updateCount = 0;
 		while(begin != end)
 		{
 			auto& view = m_views[begin->getId()];
-			view.render(renderer, *begin, state, prototypes, thisPlayer);
-			view.lastUpdate = state->timeStamp;
+			renderMethod((*begin), view);
+			view.lastUpdate = stamp;
 			++updateCount;
 			++begin;
 		}
@@ -25,12 +25,22 @@ public:
 		{
 			for(auto it = m_views.begin(); it != m_views.end(); )
 			{
-				if(it->second.lastUpdate != state->timeStamp)
+				if(it->second.lastUpdate != stamp)
 					it = m_views.erase(it);
 				else
 					++it;
 			}
 		}
+		
+		m_lastUpdateStamp = stamp;
+	}
+	
+	V* getView(int32_t id)
+	{
+		auto result = m_views.find(id);
+		if (result != m_views.end()) // && result->lastUpdate == m_lastUpdateStamp
+			return &result->second;
+		return nullptr;
 	}
 	
 	void clear()
@@ -42,4 +52,5 @@ public:
 private:
 	static constexpr size_t CLEAN_UP_SIZE = 100;
 	std::unordered_map<int32_t, V> m_views;
+	int32_t m_lastUpdateStamp = 0;
 };

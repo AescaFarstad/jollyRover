@@ -293,12 +293,12 @@ void GameView::drawCars()
 void GameView::drawCreeps()
 {
 	m_creeps.render(
-			m_renderer, 
 			m_state->creeps.begin(), 
 			m_state->creeps.end(),
-			m_state, 
-			m_prototypes,
-			m_login
+			m_state->timeStamp, 
+			[this](CreepState& creep, CreepView& view){
+				view.render(m_renderer, creep, m_state, m_prototypes, m_login);
+			}
 		);
 }
 
@@ -545,35 +545,50 @@ void GameView::drawProjectileExplosion()
 {
 	if (!m_state->isEventLoggerEnabled)
 		return;
+		
+	auto init = [this](ProjectileExplosionEvent& event, uint32_t seed, SerialAnimationView& view){
+		view.init(seed, event, m_state, m_prototypes, m_login);
+	};
+		
 	m_projectileExplosions.render(
-			m_renderer, 
 			m_state->eventLogger.projectileExplosions.begin(), 
 			m_state->eventLogger.projectileExplosions.end(),
-			m_state, 
-			m_prototypes,
-			m_login
+			m_state->timeStamp,
+			[this, &init](ProjectileExplosionEvent& event, SerialAnimationView& view){
+				view.render<ProjectileExplosionEvent>(m_renderer, event, m_state->time.time, init);
+			}
 		);
 }
 
 void GameView::drawRemnants()
 {
 	if (!m_state->isEventLoggerEnabled)
-		return;
+		return;		
+		
+	auto initCreep = [this](CreepDeathEvent& event, uint32_t seed, SerialAnimationView& view){
+		view.init(seed, event, m_state, m_prototypes, m_login, m_creeps.getView(event.unitDeath.unitId));
+	};
+	
+	auto initCar = [this](CarDeathEvent& event, uint32_t seed, SerialAnimationView& view){
+		view.init(seed, event, m_state, m_prototypes, m_login);
+	};
+	
 	m_creepDeaths.render(
-			m_renderer, 
 			m_state->eventLogger.creepDeaths.begin(), 
 			m_state->eventLogger.creepDeaths.end(),
-			m_state, 
-			m_prototypes,
-			m_login
+			m_state->timeStamp,
+			[this, &initCreep](CreepDeathEvent& event, SerialAnimationView& view){
+				view.render<CreepDeathEvent>(m_renderer, event, m_state->time.time, initCreep);
+			}
+			//, m_creeps.getView(event.unitDeath.unitId)
 		);	
 	m_carDeaths.render(
-			m_renderer, 
 			m_state->eventLogger.carDeaths.begin(), 
 			m_state->eventLogger.carDeaths.end(),
-			m_state, 
-			m_prototypes,
-			m_login
+			m_state->timeStamp,
+			[this, &initCar](CarDeathEvent& event, SerialAnimationView& view){
+				view.render<CarDeathEvent>(m_renderer, event, m_state->time.time, initCar);
+			}
 		);
 }
 

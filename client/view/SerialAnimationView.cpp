@@ -1,22 +1,9 @@
 #include <SerialAnimationView.h>
 #include <FMath.h>
 
-template<typename T>
-void SerialAnimationView::render(Renderer* renderer, T& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer)
-{	
-	int32_t seed = FMath::q_sdbm(event.id * event.stamp);
-	if (m_seed != seed)
-		init(seed, event, state, prototypes, thisPlayer);
-		
-	if (state->time.time > m_endTime)
-		return;
-	for(auto& p : particles)
-	{
-		p.render(renderer, state->time.time - m_startTime);
-	}	
-}
 
-void SerialAnimationView::initFragAnimation(UnitDeathEvent& event, SeededRandom& random, GPU_Rect& origin, int32_t startTime)
+
+void SerialAnimationView::initFragAnimation(UnitDeathEvent& event, SeededRandom& random, GPU_Rect& origin, uint32_t startTime)
 {
 	Particle p;
 	p.sequence = &S::sequences.explosion;
@@ -86,7 +73,7 @@ void SerialAnimationView::initFragAnimation(UnitDeathEvent& event, SeededRandom&
 		}
 }
 
-void SerialAnimationView::init(int32_t seed, CreepDeathEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer)
+void SerialAnimationView::init(int32_t seed, CreepDeathEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer, CreepView* originalView)
 {	
 	m_startTime = event.stamp;
 	m_seed = seed;
@@ -99,19 +86,36 @@ void SerialAnimationView::init(int32_t seed, CreepDeathEvent& event, GameState* 
 	}
 	else
 	{
-		Particle p;
-		p.texture = &S::textures.tanks_1.Smoke.smokeOrange0;
-		p.delay = 0;
-		p.duration = random.get(4500, 14500);
-		m_endTime = m_startTime + p.duration;
-		p.from.location = event.unitDeath.location;
-		p.from.rotation = random.get(0.f, 2*M_PI);
-		p.from.scale = 0.1;
-		p.from.tint = ViewUtil::colorFromHex(0xffffff, 0xff);		
-		p.to = p.from;
-		p.to.tint.a = 0x10;
-		p.to.scale = 0.2;
-		particles.push_back(p);
+		Particle blood;
+		blood.texture = &S::textures.tanks_1.Smoke.smokeOrange0;
+		blood.delay = 0;
+		blood.duration = random.get(4500, 14500);
+		m_endTime = m_startTime + blood.duration;
+		blood.from.location = event.unitDeath.location;
+		blood.from.rotation = random.get(0.f, 2*M_PI);
+		blood.from.scale = 0.1;
+		blood.from.tint = ViewUtil::colorFromHex(0xffffff, 0xff);		
+		blood.to = blood.from;
+		blood.to.tint.a = 0x10;
+		blood.to.scale = 0.2;
+		particles.push_back(blood);
+		
+		auto rotation = originalView ? originalView->getRotation() : 0;
+		
+		Particle corpse;
+		corpse.texture = prototypes->creeps[event.unitDeath.prototypeId].hullTexture[event.force];
+		corpse.delay = 0;
+		corpse.duration = random.get(600, 1200);
+		m_endTime = m_startTime + corpse.duration;
+		corpse.from.location = event.unitDeath.location;
+		corpse.from.rotation = rotation;
+		corpse.from.scale = 0.8;
+		corpse.from.tint = ViewUtil::colorFromHex(0xffffff, 0xff);		
+		corpse.to = corpse.from;
+		corpse.to.tint.a = 0x0;
+		corpse.to.scale = 0.1;
+		corpse.to.rotation = rotation + random.get(-(float)M_PI, (float)M_PI) / 3;
+		particles.push_back(corpse);
 	}
 }
 
@@ -198,15 +202,9 @@ void SerialAnimationView::init(int32_t seed, ProjectileExplosionEvent& event, Ga
 			p.to.scale *= 0.7;
 		}
 		
-		m_endTime = std::max(m_endTime, p.delay + p.duration);
+		m_endTime = std::max(m_endTime, (uint32_t)(p.delay + p.duration));
 		particles.push_back(p);
 	}
 	m_endTime += m_startTime;
 	
 }
-
-
-template void SerialAnimationView::render<ProjectileExplosionEvent>(Renderer* renderer, ProjectileExplosionEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer);
-template void SerialAnimationView::render<CreepDeathEvent>(Renderer* renderer, CreepDeathEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer);
-template void SerialAnimationView::render<CarDeathEvent>(Renderer* renderer, CarDeathEvent& event, GameState* state, Prototypes* prototypes, int32_t thisPlayer);
-	

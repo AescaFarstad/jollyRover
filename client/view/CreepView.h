@@ -8,7 +8,8 @@ public:
 	uint32_t lastUpdate;
 	
 	void render(Renderer* renderer, CreepState& creep, GameState* state, Prototypes* prototypes, int32_t thisPlayer);
+	float getRotation();
 	
 private:
-	float lastAngle = 0;
+	float m_lastAngle = 0;
 };

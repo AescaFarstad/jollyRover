@@ -29,5 +29,5 @@ namespace FMath
 	float cos(float angle);
 	float sin(float angle);
 	///quick simple hash sdbm
-	int32_t q_sdbm(int32_t number);
+	uint32_t q_sdbm(int32_t number);
 }

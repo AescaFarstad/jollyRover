@@ -20,15 +20,20 @@ void CreepView::render(Renderer* renderer, CreepState& creep, GameState* state, 
 	else
 	{
 		float bodyAngle = creep.unit.voluntaryMovement.asAngle();
-		float delta = FMath::angleDelta(bodyAngle, lastAngle);
+		float delta = FMath::angleDelta(bodyAngle, m_lastAngle);
 		if (std::fabs(delta) > M_PI / (48.f + ((creep.unit.id * 7)% 24)) )
 		{
 			if (delta > 0)
-				bodyAngle = lastAngle + M_PI / (48.f + ((creep.unit.id * 7) % 24));
+				bodyAngle = m_lastAngle + M_PI / (48.f + ((creep.unit.id * 7) % 24));
 			else
-				bodyAngle = lastAngle - M_PI / (48.f + ((creep.unit.id * 7) % 24));
+				bodyAngle = m_lastAngle - M_PI / (48.f + ((creep.unit.id * 7) % 24));
 		}
-		lastAngle = bodyAngle;
+		m_lastAngle = bodyAngle;
 		renderer->blit(*creep.creepProto_->hullTexture[creep.unit.force], creep.unit.location, bodyAngle + M_PI_2, 0.5);
 	}
+}
+
+float CreepView::getRotation()
+{
+	return m_lastAngle + M_PI_2;
 }

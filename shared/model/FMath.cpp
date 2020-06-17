@@ -359,12 +359,12 @@ float FMath::cos(float angle)
 	return sin((float)M_PI / 2 - angle);
 }
 
-int32_t FMath::q_sdbm(int32_t number)
+uint32_t FMath::q_sdbm(int32_t number)
 {
-	int32_t out = 0;
-    int32_t c;
+	uint32_t out = 0;
+    uint32_t c;
 	unsigned char *str = (unsigned char *)&number;
-	for(size_t i = 0; i < sizeof(int32_t); i++)
+	for(size_t i = 0; i < sizeof(uint32_t); i++)
 	{
 		c = *str++;
 		out = c + (out << 6) + (out << 16) - out;
