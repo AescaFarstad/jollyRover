@@ -9,6 +9,8 @@ NetworkClient::NetworkClient(std::function< int32_t() > globalSocketNudgeFunctio
 	isInitialized = false;
 	hasDesynced = false;
 	connectionStamp = 0;
+	login = -1;
+	state = NETWORK_CLIENT_STATE::UNDETERMINED;
 	this->globalSocketNudgeFunction = globalSocketNudgeFunction;
 }
 

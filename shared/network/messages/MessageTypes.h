@@ -27,6 +27,7 @@ enum class MESSAGE_TYPE : int16_t
 
 enum class REQUEST_TYPE : int16_t
 {
+	INVALID = 0,
 	REQUEST_GREETING = 1,
 	REQUEST_JOIN_GAME = 2,
 	REQUEST_GAME_STATE = 3,

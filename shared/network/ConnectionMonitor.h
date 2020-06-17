@@ -11,8 +11,8 @@ public:
 	void onHearbeatMessage(int32_t time);
 	
 private:
-	int32_t m_lastRcvHBStamp;
-	int32_t m_lastSentHBStamp;
-	int32_t m_interval;
-	int32_t m_timeout;
+	int32_t m_lastRcvHBStamp = 0;
+	int32_t m_lastSentHBStamp = 0;
+	int32_t m_interval = 0;
+	int32_t m_timeout = 0;
 };

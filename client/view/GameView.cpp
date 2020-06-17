@@ -296,14 +296,14 @@ void GameView::drawCars()
 				SeededRandom rnd(FMath::q_sdbm(car.unit.id));
 				offset.x = rnd.get(-0.2f, 0.2f) * carTexture->rect.w;
 				offset.y = rnd.get(-0.2f, 0.2f) * carTexture->rect.h;
-				offset.rotate(angle, offset);
+				offset = offset.rotate(angle);
 				drawFire(car.unit.location + offset, angle, rnd, m_state->time.time);
 				
 				if (car.unit.health < m_prototypes->cars[car.unit.prototypeId].maxHealth * 0.3)
 				{
 					offset.x = rnd.get(-0.2f, 0.2f) * carTexture->rect.w;
 					offset.y = rnd.get(-0.2f, 0.2f) * carTexture->rect.h;
-					offset.rotate(angle, offset);
+					offset = offset.rotate(angle);
 					drawFire(car.unit.location + offset, angle, rnd, m_state->time.time);
 				}
 				m_renderer->setBlendMode(blendMode);
@@ -325,7 +325,7 @@ void GameView::drawFire(const Point& location, float rotation, SeededRandom& rnd
 			Point offset;
 			offset.x = rndFlame.get(-1.f, 1.f) * 6;
 			offset.y = rndFlame.get(-1.f, 1.f) * 6;
-			offset.rotate(rotation, offset);
+			offset = offset.rotate(rotation);
 			auto flameTint = ViewUtil::colorFromHex(0xffffff, FMath::lerp_ui8(0, 0, 0.5, 0xbb, intensity));
 			auto flameScale = FMath::lerp(0, 0.2, 0.5, 0.4, intensity);
 			m_renderer->blit(S::textures.td.fire1, location + offset, -M_PI_2, flameScale, flameTint);

@@ -126,35 +126,14 @@ Point Point::subtract(const Point& anotherPoint) const
 	return Point(x - anotherPoint.x, y - anotherPoint.y);
 }
 
-void Point::subtract(const Point& anotherPoint, Point& out)
-{
-	out.x = x - anotherPoint.x;
-	out.y = y - anotherPoint.y;
-}
-
 Point Point::add(const Point& anotherPoint) const
 {
 	return Point(x + anotherPoint.x, y + anotherPoint.y);
 }
 
-void Point::add(const Point& anotherPoint, Point& out)
-{
-	out.x = x + anotherPoint.x;
-	out.y = y + anotherPoint.y;
-}
-
 Point Point::rotate(const float angle) const
 {
 	return Point(x * FMath::cos(angle) - y * FMath::sin(angle),  x * FMath::sin(angle) + y * FMath::cos(angle));
-}
-
-void Point::rotate(const float angle, Point& out)
-{
-	//&out can be the point itself -> don't mutate it until both x and y are final
-	float nx = x * FMath::cos(angle) - y * FMath::sin(angle);
-	float ny = x * FMath::sin(angle) + y * FMath::cos(angle);
-	out.x = nx;
-	out.y = ny;
 }
 
 float Point::crossProduct(const Point& anotherPoint) const

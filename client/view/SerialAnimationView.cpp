@@ -46,7 +46,7 @@ void SerialAnimationView::initFragAnimation(UnitDeathEvent& event, SeededRandom&
 				p.from.rotation = event.rotation;
 				
 				Point c2c = Point(origin.w * (i + 0.5) / wShreds,  origin.h * (j + 0.5) / hShreds) - Point(origin.w/2, origin.h/2);
-				c2c.rotate(p.from.rotation, c2c);  
+				c2c = c2c.rotate(p.from.rotation);
 				p.from.location = event.location + c2c;
 				
 				p.from.scale = 1;
@@ -59,7 +59,7 @@ void SerialAnimationView::initFragAnimation(UnitDeathEvent& event, SeededRandom&
 					c2c += imp;
 				}	
 				c2c.scaleBy(random.get(1.f, 3.f));
-				c2c.rotate(random.get(-0.05f, 0.05f), c2c);
+				c2c = c2c.rotate(random.get(-0.05f, 0.05f));
 				
 				p.to = p.from;
 				p.to.location = event.location + c2c;

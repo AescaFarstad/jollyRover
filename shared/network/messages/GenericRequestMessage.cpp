@@ -3,6 +3,7 @@
 GenericRequestMessage::GenericRequestMessage()
 {
 	typeId = MESSAGE_TYPE::TYPE_REQUEST_MSG;
+	request = REQUEST_TYPE::INVALID;
 }
 
 std::string GenericRequestMessage::getName() const
