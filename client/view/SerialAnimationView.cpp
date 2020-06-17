@@ -59,7 +59,7 @@ void SerialAnimationView::initFragAnimation(UnitDeathEvent& event, SeededRandom&
 					c2c += imp;
 				}	
 				c2c.scaleBy(random.get(1.f, 3.f));
-				c2c.rotate(random.get(-0.05f, 0.05f));
+				c2c.rotate(random.get(-0.05f, 0.05f), c2c);
 				
 				p.to = p.from;
 				p.to.location = event.location + c2c;
@@ -106,14 +106,14 @@ void SerialAnimationView::init(int32_t seed, CreepDeathEvent& event, GameState* 
 		corpse.texture = prototypes->creeps[event.unitDeath.prototypeId].hullTexture[event.force];
 		corpse.delay = 0;
 		corpse.duration = random.get(600, 1200);
-		m_endTime = m_startTime + corpse.duration;
 		corpse.from.location = event.unitDeath.location;
 		corpse.from.rotation = rotation;
 		corpse.from.scale = 0.8;
-		corpse.from.tint = ViewUtil::colorFromHex(0xffffff, 0xff);		
+		corpse.from.tint = ViewUtil::colorFromHex(0xfff5f5, 0xff);		
 		corpse.to = corpse.from;
 		corpse.to.tint.a = 0x0;
 		corpse.to.scale = 0.1;
+		corpse.to.tint = ViewUtil::colorFromHex(0xffcccc, 0xaa);	
 		corpse.to.rotation = rotation + random.get(-(float)M_PI, (float)M_PI) / 3;
 		particles.push_back(corpse);
 	}
@@ -146,21 +146,21 @@ void SerialAnimationView::init(int32_t seed, ProjectileExplosionEvent& event, Ga
 	if (weapon.splash < 3)
 		numParticles = random.get() > 0.8 ? 1 : 0;
 	else if (weapon.splash < 10)		
-		numParticles = random.get(2, 4);
+		numParticles = random.get(3, 5);
 	else		
-		numParticles = random.get(3, 6);
+		numParticles = random.get(4, 8);
 	
 	for(int32_t i = 0; i < numParticles; i++)
 	{
 		Particle p;
-		int32_t pictureIndex = random.get(1, 6);
-		if (pictureIndex == 1)
+		int32_t pictureIndex = random.get(1, 15);
+		if (pictureIndex < 2)
 			p.texture = &S::textures.tanks_1.Smoke.smokeGrey1;
-		else if (pictureIndex == 2)
+		else if (pictureIndex < 5)
 			p.texture = &S::textures.tanks_1.Smoke.smokeGrey2;
-		else if (pictureIndex == 3)
+		else if (pictureIndex < 8)
 			p.texture = &S::textures.tanks_1.Smoke.smokeGrey3;
-		else if (pictureIndex == 4)
+		else if (pictureIndex < 11)
 			p.texture = &S::textures.tanks_1.Smoke.smokeGrey4;
 		else
 			p.texture = &S::textures.tanks_1.Smoke.smokeGrey5;

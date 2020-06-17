@@ -29,20 +29,20 @@ public:
 	std::string toString() const;
 	std::string toFullString() const;
 
-	float distanceTo(const Point& anotherPoint) const;
-	float distanceTo(const float x, const float y) const;
-	float sqDistanceTo(const Point& anotherPoint) const;
-	float sqDistanceTo(const float x, const float y) const;
-	Point subtract(const Point& anotherPoint) const;
-	void subtract(const Point& anotherPoint, Point& out);
-	Point add(const Point& anotherPoint) const;
-	void add(const Point& anotherPoint, Point& out);
-	Point rotate(const float angle) const;
-	void rotate(const float angle, Point& out);
-	float crossProduct(const Point& anotherPoint) const;
-	float cos(const Point& anotherPoint) const;
-	float sin(const Point& anotherPoint) const;
-	float projectOnto(const Point& anotherPoint) const;
+	[[nodiscard]] 	float distanceTo(const Point& anotherPoint) const;
+	[[nodiscard]] 	float distanceTo(const float x, const float y) const;
+	[[nodiscard]] 	float sqDistanceTo(const Point& anotherPoint) const;
+	[[nodiscard]] 	float sqDistanceTo(const float x, const float y) const;
+	[[nodiscard]] 	Point subtract(const Point& anotherPoint) const;
+					void subtract(const Point& anotherPoint, Point& out);
+	[[nodiscard]]	Point add(const Point& anotherPoint) const;
+					void add(const Point& anotherPoint, Point& out);
+	[[nodiscard]]	Point rotate(const float angle) const;
+					void rotate(const float angle, Point& out);
+	[[nodiscard]] 	float crossProduct(const Point& anotherPoint) const;
+	[[nodiscard]]	float cos(const Point& anotherPoint) const;
+	[[nodiscard]]	float sin(const Point& anotherPoint) const;
+	[[nodiscard]]	float projectOnto(const Point& anotherPoint) const;
 	
 	void operator+=(const Point& p);
 	void operator-=(const Point& p);

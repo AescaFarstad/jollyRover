@@ -75,6 +75,7 @@ private:
 	void drawPhantomRoutes();
 	
 	void renderPathStep(Point from, Point to, SequenceDef& dash, SequenceDef& dot, uint32_t rndSeed, float ratio);
+	void drawFire(const Point&  location, float rotation, SeededRandom& rnd, int32_t time);
 	
 	GPU_Image* loadImage(std::string path);
 	void resolveTextures(Prototypes* prototypes);

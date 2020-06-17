@@ -371,3 +371,11 @@ uint32_t FMath::q_sdbm(int32_t number)
 	}
 	return out;
 }
+
+float FMath::fluctuation(std::vector<float> periods, float t)
+{
+	float result = periods.size();
+	for(auto p : periods)
+		result += sin(t * M_PI * 2 / p);
+	return result / 2 / periods.size();
+}

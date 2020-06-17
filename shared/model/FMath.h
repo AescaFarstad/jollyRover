@@ -30,4 +30,6 @@ namespace FMath
 	float sin(float angle);
 	///quick simple hash sdbm
 	uint32_t q_sdbm(int32_t number);
+	///Returns a value in [0, 1]
+	float fluctuation(std::vector<float> periods, float t);
 }

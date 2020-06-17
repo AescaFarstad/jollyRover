@@ -22,5 +22,6 @@ public:
 	SequenceDef redPathDot;
 	SequenceDef grayPathDash;
 	SequenceDef grayPathDot;
+	SequenceDef fire;
 	
 };

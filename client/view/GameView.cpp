@@ -286,7 +286,67 @@ void GameView::drawCars()
 			auto gunLocation = Point::fromAngle(angle, 9);
 			gunLocation += car.unit.location;
 			m_renderer->blit(*carGunTexture, gunLocation, angle, 0.8);
+			
+			//fire
+			if (car.unit.health < m_prototypes->cars[car.unit.prototypeId].maxHealth * 0.6)
+			{
+				auto blendMode = m_renderer->getBlendMode();
+				m_renderer->setBlendMode(GPU_BlendPresetEnum::GPU_BLEND_ADD);
+				Point offset;
+				SeededRandom rnd(FMath::q_sdbm(car.unit.id));
+				offset.x = rnd.get(-0.2f, 0.2f) * carTexture->rect.w;
+				offset.y = rnd.get(-0.2f, 0.2f) * carTexture->rect.h;
+				offset.rotate(angle, offset);
+				drawFire(car.unit.location + offset, angle, rnd, m_state->time.time);
+				
+				if (car.unit.health < m_prototypes->cars[car.unit.prototypeId].maxHealth * 0.3)
+				{
+					offset.x = rnd.get(-0.2f, 0.2f) * carTexture->rect.w;
+					offset.y = rnd.get(-0.2f, 0.2f) * carTexture->rect.h;
+					offset.rotate(angle, offset);
+					drawFire(car.unit.location + offset, angle, rnd, m_state->time.time);
+				}
+				m_renderer->setBlendMode(blendMode);
+			}
 		}
+	}
+}
+
+void GameView::drawFire(const Point& location, float rotation, SeededRandom& rnd, int32_t time)
+{
+	float miniFlamesIntensity = 0;
+	for(size_t i = 0; i < 5; i++)
+	{
+		SeededRandom rndFlame(rnd.getSeed() * (i + 100));
+		float intensity = FMath::fluctuation({3000.f + rndFlame.get(0, 1000), 1700, 1300}, time) - 0.5;
+		if (intensity > 0)
+		{
+			miniFlamesIntensity += intensity;
+			Point offset;
+			offset.x = rndFlame.get(-1.f, 1.f) * 6;
+			offset.y = rndFlame.get(-1.f, 1.f) * 6;
+			offset.rotate(rotation, offset);
+			auto flameTint = ViewUtil::colorFromHex(0xffffff, FMath::lerp_ui8(0, 0, 0.5, 0xbb, intensity));
+			auto flameScale = FMath::lerp(0, 0.2, 0.5, 0.4, intensity);
+			m_renderer->blit(S::textures.td.fire1, location + offset, -M_PI_2, flameScale, flameTint);
+		}
+	}
+	
+	miniFlamesIntensity = std::min(1.f, miniFlamesIntensity);
+	
+	{
+		const int32_t fps = 15;
+		auto& fireFrames = S::sequences.fire.frames;
+		auto frameIndex = (time * fps / 1000 + rnd.get(0, fireFrames.size())) % fireFrames.size();
+		auto& frame = fireFrames[frameIndex];
+		
+		auto alpha = FMath::lerp_ui8(0, 0xff, 1, 0x55, FMath::fluctuation({5000, 1500, 580}, time));
+		alpha = FMath::lerp_ui8(0, alpha, 1, alpha / 2, miniFlamesIntensity);
+		auto scale = FMath::lerp(0, 0.4, 1, 0.6, FMath::fluctuation({7000, 1900}, time));
+		
+		auto tint = ViewUtil::colorFromHex(0xffffff, alpha);
+	
+		m_renderer->blit(frame, location, -M_PI_2, scale, tint);
 	}
 }
 
@@ -549,7 +609,9 @@ void GameView::drawProjectileExplosion()
 	auto init = [this](ProjectileExplosionEvent& event, uint32_t seed, SerialAnimationView& view){
 		view.init(seed, event, m_state, m_prototypes, m_login);
 	};
-		
+	auto blendMode = m_renderer->getBlendMode();
+	m_renderer->setBlendMode(GPU_BlendPresetEnum::GPU_BLEND_ADD);
+	
 	m_projectileExplosions.render(
 			m_state->eventLogger.projectileExplosions.begin(), 
 			m_state->eventLogger.projectileExplosions.end(),
@@ -558,6 +620,7 @@ void GameView::drawProjectileExplosion()
 				view.render<ProjectileExplosionEvent>(m_renderer, event, m_state->time.time, init);
 			}
 		);
+	m_renderer->setBlendMode(blendMode);
 }
 
 void GameView::drawRemnants()

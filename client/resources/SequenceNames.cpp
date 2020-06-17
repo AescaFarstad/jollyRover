@@ -62,4 +62,11 @@ SequenceNames::SequenceNames(TextureNames& textures)
 		textures.art.path.gray.s2,
 		textures.art.path.gray.s3
 		};
+		
+	fire.name = "fire";
+	fire.frames = {
+		textures.td.fire2,
+		textures.td.fire3,
+		textures.td.fire4
+		};
 }

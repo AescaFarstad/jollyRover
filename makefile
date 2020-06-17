@@ -130,7 +130,7 @@ deploy:
 	rsync -Pav $(SERVER_TARGET) $(CONFIG) $(PROTOTYPES) '$(SSH_CONFIG):$(REMOTE_DEPLOY_PATH)/$(OUT)'
 	ssh $(SSH_CONFIG) pkill -x $(SERVER_TARGET_NAME) || true
 	ssh $(SSH_CONFIG) fuser -k $(SERVER_PORT)/tcp || true
-	ssh $(SSH_CONFIG) 'ulimit -c unlimited; cd $(REMOTE_DEPLOY_PATH); $(SERVER_TARGET)' & exit
+	ssh $(SSH_CONFIG) 'ulimit -c unlimited; cd $(REMOTE_DEPLOY_PATH); $(SERVER_TARGET)' & disown & exit
 	aws s3 sync $(OUT)/ s3://aesca.xyz --exclude "$(SERVER_TARGET_NAME)" --exclude "$(LOCAL_TARGET_NAME)" --delete --acl public-read --profile AirMin
 	
 takeDumps:
